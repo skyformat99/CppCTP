@@ -12,8 +12,11 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/time.h>
+#include <list>
 #include "ThostFtdcMdApi.h"
 #include "ThostFtdcUserApiStruct.h"
+#include "User.h"
+
 
 
 using std::map;
@@ -41,14 +44,19 @@ public:
 	//登出
 	void Logout(char *BrokerID, char *UserID);
     ///登出请求响应
-    void OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout, CThostFtdcRspInfoField *pRspInfo,
-                         int nRequestID, bool bIsLast);
+    void OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
+	///订阅行情
+	void SubMarket(list<string> l_instrument);
+
+	///取消订阅行情
+	void UnSubMarket(list<string> l_instrument);
+
     ///订阅行情应答
-    void OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo,
-                            int nRequestID, bool bIsLast);
+    void OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
     ///取消订阅行情应答
-    void OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo,
-                              int nRequestID, bool bIsLast);
+    void OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
     ///深度行情通知
     void OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData);
 

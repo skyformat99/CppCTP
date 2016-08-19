@@ -1,15 +1,13 @@
 //
 // Created by quant on 6/7/16.
 //
-
-
 #include <iostream>
-#include <cstring>
+#include <string>
 #include "MdSpi.h"
 
 using namespace std;
 
-#define DEBUG
+//#define DEBUG
 #ifdef DEBUG
 #define USER_PRINT(x) std::cout << "[DEBUG] - " << __DATE__ << ", " << __TIME__<< "  " << __FILE__ << ", Line - " << __LINE__ << endl; std::cout << #x << " = " << x << std::endl;
 #else
@@ -57,8 +55,8 @@ int MdSpi::controlTimeOut(sem_t *t, int timeout) {
 	int ret = sem_timedwait(t, &outtime);
 	int value;
 	sem_getvalue(t, &value);
-	cout << "value = " << value << endl;
-	cout << "ret = " << ret << endl;
+	//cout << "value = " << value << endl;
+	//cout << "ret = " << ret << endl;
 	/*协程结束*/
 	return ret;
 }
@@ -196,6 +194,40 @@ void MdSpi::SubMarketData(char *ppInstrumentID[], int nCount) {
 	}
 }
 
+///订阅行情
+void MdSpi::SubMarket(list<string> l_instrument) {
+	list<string>::iterator itor;
+	char **instrumentID = new char *[l_instrument.size()];
+	int size = l_instrument.size();
+	int i = 0;
+	const char *charResult;
+	for (itor = l_instrument.begin(), i = 0; itor != l_instrument.end(); itor++, i++) {
+		//cout << *itor << endl;
+		charResult = (*itor).c_str();
+		instrumentID[i] = new char[strlen(charResult) + 1];
+		strcpy(instrumentID[i], charResult);
+	}
+	USER_PRINT(this->mdapi);
+	this->mdapi->SubscribeMarketData(instrumentID, size);
+}
+
+///取消订阅行情
+void MdSpi::UnSubMarket(list<string> l_instrument) {
+	list<string>::iterator itor;
+	char **instrumentID = new char *[l_instrument.size()];
+	int size = l_instrument.size();
+	int i = 0;
+	const char *charResult;
+	for (itor = l_instrument.begin(), i = 0; itor != l_instrument.end(); itor++, i++) {
+		cout << *itor << endl;
+		charResult = (*itor).c_str();
+		instrumentID[i] = new char[strlen(charResult) + 1];
+		strcpy(instrumentID[i], charResult);
+	}
+	USER_PRINT(this->mdapi);
+	this->mdapi->UnSubscribeMarketData(instrumentID, size);
+}
+
 //订阅行情应答
 void MdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT(bIsLast)
@@ -206,7 +238,6 @@ void MdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstr
 		cout << "应答信息:" << pRspInfo->ErrorID << " " << pRspInfo->ErrorMsg << endl;
 		USER_PRINT("sem_post(&submarket_sem) was called!")
 		sem_post(&submarket_sem);
-
 	}
 }
 
@@ -258,16 +289,16 @@ void MdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificIns
 void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData){
 	USER_PRINT("OnRtnDepthMarketData")
     cout << "===========================================" << endl;
-    cout << "深度行情" << endl;
-    cout << "交易日:" << pDepthMarketData->TradingDay << endl
-    << "合约代码:" << pDepthMarketData->InstrumentID << endl
-    << "最新价:" << pDepthMarketData->LastPrice << endl
+    //cout << "深度行情" << ", ";
+	cout << "交易日:" << pDepthMarketData->TradingDay << ", "
+	<< "合约代码:" << pDepthMarketData->InstrumentID << ", "
+	<< "最新价:" << pDepthMarketData->LastPrice << ", "
     //<< "上次结算价:" << pDepthMarketData->PreSettlementPrice << endl
     //<< "昨收盘:" << pDepthMarketData->PreClosePrice << endl
     //<< "数量:" << pDepthMarketData->Volume << endl
     //<< "昨持仓量:" << pDepthMarketData->PreOpenInterest << endl
-    << "最后修改时间" << pDepthMarketData->UpdateTime << endl
-    << "最后修改毫秒" << pDepthMarketData->UpdateMillisec << endl;
+	<< "最后修改时间" << pDepthMarketData->UpdateTime << ", "
+	<< "最后修改毫秒" << pDepthMarketData->UpdateMillisec << endl;
     //<< "申买价一：" << pDepthMarketData->BidPrice1 << endl
     //<< "申买量一:" << pDepthMarketData->BidVolume1 << endl
     //<< "申卖价一:" << pDepthMarketData->AskPrice1 << endl

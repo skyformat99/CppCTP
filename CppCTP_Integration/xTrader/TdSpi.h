@@ -1,7 +1,3 @@
-//
-// Created by quant on 6/8/16.
-//
-
 #ifndef QUANT_CTP_TRADE_TDSPI_H
 #define QUANT_CTP_TRADE_TDSPI_H
 
@@ -12,9 +8,17 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/time.h>
+#include <list>
+#include <map>
 
 #include "ThostFtdcTraderApi.h"
 #include "ThostFtdcUserApiStruct.h"
+
+using std::string;
+
+class User;
+
+
 #ifndef NULL
 #define NULL 0
 #endif
@@ -32,16 +36,19 @@ public:
 	int controlTimeOut(sem_t *t, int timeout = 2000);
 
     //构造函数
-    TdSpi(CThostFtdcTraderApi *tdapi);
+	TdSpi();
+
+	//增加api
+	void addApi(User *user, string flowpath);
 
 	//建立连接
-	void Connect(char *frontAddress);
+	void Connect(User *user);
 
     //当客户端与交易后台建立起通信连接时（还未登录前），该方法被调用。
     void OnFrontConnected();
 
 	//登录
-	void Login(char *BrokerID, char *UserID, char *Password);
+	void Login(User *user);
 
 
     ///登录请求响应
@@ -58,22 +65,24 @@ public:
 	//等待线程结束
 	void Join();
 
+
+
 	//查询结算信息确认
-	void QrySettlementInfoConfirm(char *BrokerID, char *InvestorID, int nRequestID);
+	void QrySettlementInfoConfirm(User *user);
 
     //请求查询结算信息确认响应
     void OnRspQrySettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm,
                                        CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 	//查询结算信息
-	void QrySettlementInfo(char *BrokerID, char *InvestorID, int nRequestID);
+	void QrySettlementInfo(User *user);
 
     //请求查询投资者结算结果响应
     void OnRspQrySettlementInfo(CThostFtdcSettlementInfoField *pSettlementInfo,
                                 CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 	//确认结算结果
-	void ConfirmSettlementInfo(char *BrokerID, char *InvestorID, char *TradingDay, int nRequestID);
+	void ConfirmSettlementInfo(User *user);
 
     //投资者结算结果确认响应
     void OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm,
@@ -87,6 +96,12 @@ public:
 
 	//查询合约
 	void QryInstrument(string exchangeid = "", string instrumentid = "");
+
+	//查询行情
+	void QryDepthMarketData(string instrumentid);
+
+	///请求查询行情响应
+	void OnRspQryDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 	//响应查询合约
 	void OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
@@ -140,10 +155,13 @@ public:
 	void OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
     //下单
-	void OrderInsert(char *InstrumentID, char CombOffsetFlag, char Direction, int Volume, double Price, string OrderRef);
+	void OrderInsert(User *user, char *InstrumentID, char CombOffsetFlag, char Direction, int Volume, double Price, string OrderRef);
 
 	//下单响应
 	void OnRtnOrder(CThostFtdcOrderField *pOrder);
+
+	//成交通知
+	void OnRtnTrade(CThostFtdcTradeField *pTrade);
 
 	//下单错误响应
 	void OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo);
@@ -162,10 +180,6 @@ public:
 	
 	///用户口令更新请求响应
     void OnRspUserPasswordUpdate(CThostFtdcUserPasswordUpdateField *pUserPasswordUpdate,
-                                 CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-
-    ///请求查询行情响应
-    void OnRspQryDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData,
                                  CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
     //登陆是否报错
@@ -198,6 +212,9 @@ public:
 	//得到isConfirmSettlement
 	bool getIsConfirmSettlement();
 
+	//得到OrderRef
+
+
 private:
     CThostFtdcTraderApi *tdapi;
     CThostFtdcReqUserLoginField *loginField;
@@ -219,6 +236,12 @@ private:
 	sem_t sem_ReqQrySettlementInfoConfirm;
 	sem_t sem_ReqQrySettlementInfo;
 	sem_t sem_ReqSettlementInfoConfirm;
+	//list<CThostFtdcTraderApi *> l_api;
+	//list<User *> l_user;
+	//list<User *>::iterator iter_user;
+	map <string, int> m_user_requestid;
+	map <int, CThostFtdcTraderApi *> m_requestid_api;
+	User *current_user;
 };
 
 #endif //QUANT_CTP_TRADE_TDSPI_H

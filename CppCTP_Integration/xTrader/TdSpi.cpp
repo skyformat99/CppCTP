@@ -4,26 +4,12 @@
 #include <thread>
 
 #include "TdSpi.h"
-using namespace std;
-using std::string;
+#include "Utils.h"
+#include "User.h"
+#include "Debug.h"
 
-#define DEBUG
-#ifdef DEBUG
-#define USER_PRINT(x) std::cout << "DEBUG - " << __DATE__ << ", " << __TIME__<< ", " << __FILE__ << ", Line - " << __LINE__ << endl; std::cout << #x << " = " << x << std::endl;
-#else
-#define USER_PRINT(x)
-#endif
-
-//实盘账号
-//const string USER_ID = "83601689";
-//const string PASS = "270338";
-//const string BROKER = "9999";
-string tradingDate;
-
-//模拟账号
-const string USER_ID = "058176";
-const string PASS = "669822";
-const string BROKER = "9999";
+//转码数组
+char codeDst[90] = { 0 };
 
 
 //协程控制
@@ -32,17 +18,17 @@ int TdSpi::controlTimeOut(sem_t *t, int timeout) {
 	//struct timeval now;
 	//struct timespec outtime;
 	//gettimeofday(&now, NULL);
-	////cout << now.tv_sec << " " << (now.tv_usec) << "\n";
+	////std::cout << now.tv_sec << " " << (now.tv_usec) << "\n";
 	//timeraddMS(&now, timeout);
 	//outtime.tv_sec = now.tv_sec;
 	//outtime.tv_nsec = now.tv_usec * 1000;
-	//cout << outtime.tv_sec << " " << (outtime.tv_nsec) << "\n";
+	//std::cout << outtime.tv_sec << " " << (outtime.tv_nsec) << "\n";
 	//int ret = sem_timedwait(t, &outtime);
 	int ret = 0;
 	int value = 0;
 	//sem_getvalue(t, &value);
-	//cout << "value = " << value << endl;
-	//cout << "ret = " << ret << endl;
+	//std::cout << "value = " << value << endl;
+	//std::cout << "ret = " << ret << endl;
 	/*协程结束*/
 	return ret;
 }
@@ -57,27 +43,47 @@ void TdSpi::timeraddMS(struct timeval *now_time, int ms) {
 }
 
 //构造函数
-TdSpi::TdSpi(CThostFtdcTraderApi *tdapi) {
-	USER_PRINT("TdSpi::TdSpi")
+TdSpi::TdSpi() {
+	USER_PRINT("TdSpi::TdSpi");
+	/*int flag = Utils::CreateFolder(flowpath.c_str());
+	if (flag != 0) {
+		USER_PRINT("Can not create folder");
+	}
+	tdapi = CThostFtdcTraderApi::CreateFtdcTraderApi(flowpath.c_str());*/
 	/*sem_init(&connect_sem, 0, 1);
 	sem_init(&login_sem, 0, 1);
 	sem_init(&logout_sem, 0, 1);
 	sem_init(&sem_ReqQrySettlementInfoConfirm, 0, 1);
 	sem_init(&sem_ReqQrySettlementInfo, 0, 1);
 	sem_init(&sem_ReqSettlementInfoConfirm, 0, 1);*/
-	this->isLogged = false;
-	this->isFirstTimeLogged = true;
-	this->loginRequestID = 10;
-    this->tdapi = tdapi;
-	this->isConfirmSettlement = false;
+}
+
+//增加api
+void TdSpi::addApi(User *user, string flowpath) {
+	USER_PRINT("TdSpi::addApi");
+	USER_PRINT(flowpath);
+	
+
+	int flag = Utils::CreateFolder(flowpath.c_str());
+	if (flag != 0) {
+		USER_PRINT("Can not create folder");
+	} else {
+		this->tdapi = CThostFtdcTraderApi::CreateFtdcTraderApi(flowpath.c_str());
+		cout << this->tdapi << endl;
+		USER_PRINT("API ADD TO user Already!");
+		//l_api.push_back(tdapi);
+	}
 }
 
 //建立连接
-void TdSpi::Connect(char *frontAddress) {
-	USER_PRINT("TdSpi::Connect")
-	this->tdapi->RegisterFront(frontAddress); //24H
+void TdSpi::Connect(User *user) {
+	USER_PRINT("TdSpi::Connect");
+	USER_PRINT(const_cast<char *>(user->getFrontAddress().c_str()));
+	this->tdapi = user->getUserTradeAPI();
+	cout << "this.tdapi = " << this->tdapi;
+	this->tdapi->RegisterFront(const_cast<char *>(user->getFrontAddress().c_str()));
 	//注册事件处理对象
-	this->tdapi->RegisterSpi(this);
+	this->tdapi->RegisterSpi(user->getUserTradeSPI());
 	//订阅共有流和私有流
 	this->tdapi->SubscribePublicTopic(THOST_TERT_RESUME);
 	this->tdapi->SubscribePrivateTopic(THOST_TERT_RESUME);
@@ -91,7 +97,7 @@ void TdSpi::Connect(char *frontAddress) {
 
 //当客户端与交易后台建立起通信连接时（还未登录前），该方法被调用。
 void TdSpi::OnFrontConnected() {
-	USER_PRINT("TdSpi::OnFrontConnected")
+	USER_PRINT("TdSpi::OnFrontConnected");
 	if (this->isFirstTimeLogged) {
 		//sem_post(&connect_sem);
 		//this->Login("0187", "86001525", "206029");
@@ -104,23 +110,28 @@ void TdSpi::OnFrontConnected() {
 }
 
 //登录
-void TdSpi::Login(char *arg_BrokerID, char *arg_UserID, char *arg_Password) {
-	USER_PRINT("TdSpi::Login")
+void TdSpi::Login(User *user) {
+	USER_PRINT("TdSpi::Login");
+	this->current_user = user;
 
-	this->BrokerID = arg_BrokerID;
-	this->UserID = arg_UserID;
-	this->Password = arg_Password;
+	this->BrokerID = user->getBrokerID();
+	this->UserID = user->getUserID();
+	this->Password = user->getPassword();
+
+	//this->l_BrokerID.push_back(BrokerID);
+	//this->l_UserID.push_back(UserID);
+	//this->l_Password.push_back(Password);
 
 	loginField = new CThostFtdcReqUserLoginField();
-	strcpy(loginField->BrokerID, arg_BrokerID);
-	strcpy(loginField->UserID, arg_UserID);
-	strcpy(loginField->Password, arg_Password);
-	tdapi->ReqUserLogin(loginField, this->loginRequestID);
+	strcpy(loginField->BrokerID, user->getBrokerID().c_str());
+	strcpy(loginField->UserID, user->getUserID().c_str());
+	strcpy(loginField->Password, user->getPassword().c_str());
+	this->tdapi->ReqUserLogin(loginField, user->getRequestID());
 
 	int ret = this->controlTimeOut(&login_sem);
 
 	if (ret == -1) {
-		USER_PRINT("TdSpi::Login TimeOut!")
+		USER_PRINT("TdSpi::Login TimeOut!");
 	}
 	delete loginField;
 }
@@ -130,51 +141,62 @@ void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
                            CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
 	USER_PRINT("MdSpi::OnRspUserLogin")
 	USER_PRINT(bIsLast)
-	if (bIsLast && !(this->IsErrorRspInfo(pRspInfo))) {
-		this->isLogged = true;
+	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		//sem_post(&login_sem);
-		cout << "=================================================================================" << endl;
-		cout << "||TdAPI 交易日:" << this->tdapi->GetTradingDay() << ", ";
+		std::cout << "=================================================================================" << endl;
+		std::cout << "||TdAPI 交易日:" << this->tdapi->GetTradingDay() << ", ";
 		///交易日
-		//cout << "CThostFtdcRspUserLoginField 交易日:" << pRspUserLogin->TradingDay << ", ";
+		//std::cout << "CThostFtdcRspUserLoginField 交易日:" << pRspUserLogin->TradingDay << ", ";
 		///登录成功时间
-		cout << "登录成功时间:" << pRspUserLogin->LoginTime << ", ";
+		std::cout << "登录成功时间:" << pRspUserLogin->LoginTime << ", ";
 		///经纪公司代码
-		cout << "经纪公司代码:" << pRspUserLogin->BrokerID << ", ";
+		std::cout << "经纪公司代码:" << pRspUserLogin->BrokerID << ", ";
 		///用户代码
-		cout << "用户代码:" << pRspUserLogin->UserID << endl;
+		std::cout << "用户代码:" << pRspUserLogin->UserID << endl;
 		///交易系统名称
-		cout << "||交易系统名称:" << pRspUserLogin->SystemName << ", ";
+		std::cout << "||交易系统名称:" << pRspUserLogin->SystemName << ", ";
 		///前置编号
-		cout << "前置编号:" << pRspUserLogin->FrontID << ", ";
+		std::cout << "前置编号:" << pRspUserLogin->FrontID << ", ";
 		///会话编号
-		cout << "会话编号:" << pRspUserLogin->SessionID << ", ";
+		std::cout << "会话编号:" << pRspUserLogin->SessionID << ", ";
 		///最大报单引用
-		cout << "最大报单引用:" << pRspUserLogin->MaxOrderRef << ", ";
+		std::cout << "最大报单引用:" << pRspUserLogin->MaxOrderRef << ", ";
 		///上期所时间
-		cout << "上期所时间:" << pRspUserLogin->SHFETime << endl;
+		std::cout << "上期所时间:" << pRspUserLogin->SHFETime << endl;
 		///大商所时间
-		cout << "||大商所时间:" << pRspUserLogin->DCETime << ", ";
+		std::cout << "||大商所时间:" << pRspUserLogin->DCETime << ", ";
 		///郑商所时间
-		cout << "郑商所时间:" << pRspUserLogin->CZCETime << ", ";
+		std::cout << "郑商所时间:" << pRspUserLogin->CZCETime << ", ";
 		///中金所时间
-		cout << "中金所时间" << pRspUserLogin->FFEXTime << ", ";
+		std::cout << "中金所时间" << pRspUserLogin->FFEXTime << ", ";
 		///能源中心时间
-		cout << "能源中心时间" << pRspUserLogin->INETime << endl;
-		cout << "=================================================================================" << endl;
+		std::cout << "能源中心时间" << pRspUserLogin->INETime << endl;
+		std::cout << "=================================================================================" << endl;
+		
+		this->current_user->setBrokerID(pRspUserLogin->BrokerID);
+		this->current_user->setUserID(pRspUserLogin->UserID);
+		this->current_user->setRequestID(nRequestID);
+		this->current_user->setIsConfirmSettlement(false);
+		this->current_user->setUserTradeAPI(this->tdapi);
+		this->current_user->setUserTradeSPI(this);
+
+		this->setIsConfirmSettlement(false);
+
+		std::cout << "this->current_user->getUserID()" << this->current_user->getUserID() << endl;
 	}
 }
 
 //查询交易结算确认
-void TdSpi::QrySettlementInfoConfirm(char *BrokerID, char *InvestorID, int nRequestID) {
+void TdSpi::QrySettlementInfoConfirm(User *user) {
 	USER_PRINT("TdSpi::QrySettlementInfoConfirm")
 
 	CThostFtdcQrySettlementInfoConfirmField *qrySettlementField = new CThostFtdcQrySettlementInfoConfirmField();
 
-	strcpy(qrySettlementField->BrokerID, BrokerID);
-	strcpy(qrySettlementField->InvestorID, InvestorID);
+	strcpy(qrySettlementField->BrokerID, user->getBrokerID().c_str());
+	strcpy(qrySettlementField->InvestorID, user->getUserID().c_str());
+
 	sleep(1);
-	this->tdapi->ReqQrySettlementInfoConfirm(qrySettlementField, nRequestID);
+	this->tdapi->ReqQrySettlementInfoConfirm(qrySettlementField, user->getRequestID());
 
 	int ret = this->controlTimeOut(&sem_ReqQrySettlementInfoConfirm);
 	if (ret == -1) {
@@ -185,154 +207,112 @@ void TdSpi::QrySettlementInfoConfirm(char *BrokerID, char *InvestorID, int nRequ
 
 
 //请求查询结算信息确认响应
-void TdSpi::OnRspQrySettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm,
-                                          CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+void TdSpi::OnRspQrySettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspQrySettlementInfoConfirm");
 	USER_PRINT(bIsLast)
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
-		//sem_post(&sem_ReqQrySettlementInfoConfirm);
-		if ((!pSettlementInfoConfirm)) { //如果未确认过，pSettlementInfoConfirm为空
-			USER_PRINT("pSettlementInfoConfirm is null");
-			if (this->getIsConfirmSettlement()) {
-				USER_PRINT("Already Confirm!");
-				cout << "|==确认结算信息==|" << endl;
-				cout << "|确认日期" << this->getCharTradingDate() << "|" << endl;
-				cout << "|交易时间" << this->tdapi->GetTradingDay() << "|" << endl;
-				cout << "|================|" << endl;
+		if (this->current_user->getRequestID() == nRequestID) {
+			//sem_post(&sem_ReqQrySettlementInfoConfirm);
+			if ((!pSettlementInfoConfirm)) { //如果未确认过，pSettlementInfoConfirm为空
+				USER_PRINT("pSettlementInfoConfirm is null");
+				USER_PRINT(this->isConfirmSettlement);
+				if (this->isConfirmSettlement) {
+					USER_PRINT("Already Confirm!");
+					std::cout << "|==确认结算信息==|" << endl;
+					std::cout << "|经纪公司" << this->current_user->getBrokerID() << "|" << endl;
+					std::cout << "|结算客户" << this->current_user->getUserID() << "|" << endl;
+					std::cout << "|确认日期" << this->getCharTradingDate() << "|" << endl;
+					std::cout << "|交易时间" << this->tdapi->GetTradingDay() << "|" << endl;
+					std::cout << "|================|" << endl;
+				} else {
+					sleep(1);
+					this->QrySettlementInfo(this->current_user);
+				}
+			} else {
+				USER_PRINT("今天已经确认结算!");
+				std::cout << "|==确认结算信息==|" << endl;
+				std::cout << "|经纪公司代码" << pSettlementInfoConfirm->BrokerID << "|" << endl;
+				std::cout << "|投资者代码" << pSettlementInfoConfirm->InvestorID << "|" << endl;
+				std::cout << "|确认日期" << pSettlementInfoConfirm->ConfirmDate << "|" << endl;
+				std::cout << "|确认时间" << pSettlementInfoConfirm->ConfirmTime << "|" << endl;
+				std::cout << "|交易时间" << this->tdapi->GetTradingDay() << "|" << endl;
+				std::cout << "|================|" << endl;
+				//std::chrono::milliseconds sleepDuration(15 * 1000);
+				//sleep(1);
 			}
-			else {
-				this->QrySettlementInfo(const_cast<char *>(this->getBrokerID().c_str()), const_cast<char *>(this->getUserID().c_str()), this->getRequestID());
-			}
-		} else {
-			USER_PRINT("Already Confirm!")
-			cout << "|==确认结算信息==|" << endl;
-			cout << "|经纪公司代码" << pSettlementInfoConfirm->BrokerID  << "|" << endl;
-			cout << "|投资者代码" << pSettlementInfoConfirm->InvestorID << "|" << endl;
-			cout << "|确认日期" << pSettlementInfoConfirm->ConfirmDate << "|" << endl;
-			cout << "|确认时间" << pSettlementInfoConfirm->ConfirmTime << "|" << endl;
-			cout << "|交易时间" << this->tdapi->GetTradingDay() << "|" << endl;
-			cout << "|================|" << endl;
-
-			if (bIsLast) {
-				
-				//查询交易所
-				//this->QryExchange();
-				
-				//查询合约
-				//this->QryInstrument();
-			}
-			
-
-			//std::chrono::milliseconds sleepDuration(15 * 1000);
-			//sleep(1);
-			
-
-		}
-		{ //执行其他操作
-#if 0
-			//今天已经确认
-			USER_PRINT("Today Has Confirmed!")
-			//CThostFtdcQryTradingAccountField *account = new CThostFtdcQryTradingAccountField();
-			//strcpy(account->BrokerID, BROKER.c_str());
-			//strcpy(account->InvestorID, USER_ID.c_str());
-			//this->tdapi->ReqQryTradingAccount(account, 999);
-
-
-			CThostFtdcQryTradingAccountField *account = new CThostFtdcQryTradingAccountField();
-			strcpy(account->BrokerID, BROKER.c_str());
-			strcpy(account->InvestorID, USER_ID.c_str());
-			tdapi->ReqQryTradingAccount(account, 999);
-
-			//查询请求查询成交
-			std::chrono::milliseconds sleepDuration(5 * 1000);
-			//std::this_thread::sleep_for(sleepDuration);
-			CThostFtdcQryTradeField *a = new CThostFtdcQryTradeField();
-			strcpy(a->BrokerID, BROKER.c_str());
-			strcpy(a->InvestorID, USER_ID.c_str());
-			strcpy(a->InstrumentID, "cu1409");
-			strcpy(a->TradeTimeStart, "20140101");
-			strcpy(a->TradeTimeEnd, "20140720");
-			tdapi->ReqQryTrade(a, 10);
-
-			//请求查询投资者持仓明细
-			std::chrono::milliseconds sleepDuration2(1 * 1000);
-			std::this_thread::sleep_for(sleepDuration2);
-			CThostFtdcQryInvestorPositionField *b = new CThostFtdcQryInvestorPositionField();
-			strcpy(b->BrokerID, BROKER.c_str());
-			strcpy(b->InvestorID, USER_ID.c_str());
-			strcpy(b->InstrumentID, "");
-			int result = tdapi->ReqQryInvestorPosition(b, 10);
-			cout << result << endl;
-
-			////休息两秒再发
-			//std::chrono::milliseconds sleepDuration(1*1000);
-			//std::this_thread::sleep_for(sleepDuration);
-			//cout << "X.X" << endl;
-			//int result=tdapi->ReqQryInvestorPosition(a, 3);
-			//cout << "result:" << result << endl;
-#endif
-		}
+	}
 	}
 }
 
 //查询结算信息
-void TdSpi::QrySettlementInfo(char *BrokerID, char *InvestorID, int nRequestID) {
+void TdSpi::QrySettlementInfo(User *user) {
 	USER_PRINT("TdSpi::QrySettlementInfo")
-	cout << "broker ID" << BrokerID << endl;
-	cout << "InvestorID" << InvestorID << endl;
+	std::cout << "broker ID = " << user->getBrokerID() << endl;
+	std::cout << "InvestorID = " << user->getUserID() << endl;
+
 	CThostFtdcQrySettlementInfoField *pQrySettlementInfo = new CThostFtdcQrySettlementInfoField();
-	strcpy(pQrySettlementInfo->BrokerID, BrokerID);
-	strcpy(pQrySettlementInfo->InvestorID, InvestorID);
-	//strcpy(pQrySettlementInfo->TradingDay, "");
+	strcpy(pQrySettlementInfo->BrokerID, user->getBrokerID().c_str());
+	strcpy(pQrySettlementInfo->InvestorID, user->getUserID().c_str());
+
+	strcpy(pQrySettlementInfo->TradingDay, "");
+
 	sleep(1);
-	this->tdapi->ReqQrySettlementInfo(pQrySettlementInfo, nRequestID);
+	this->tdapi->ReqQrySettlementInfo(pQrySettlementInfo, user->getRequestID());
+	USER_PRINT("after ReqQrySettlementInfo1");
+
 	int ret = this->controlTimeOut(&sem_ReqQrySettlementInfo);
 	if (ret == -1) {
 		USER_PRINT("TdSpi::QrySettlementInfo TimeOut!")
 	}
 	delete pQrySettlementInfo;
+	USER_PRINT("after ReqQrySettlementInfo2");
 }
 
 //请求查询投资者结算结果响应
 void TdSpi::OnRspQrySettlementInfo(CThostFtdcSettlementInfoField *pSettlementInfo,
                                    CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspQrySettlementInfo");
-	cout << "bIsLast = " << bIsLast;
+	std::cout << "bIsLast = " << bIsLast;
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
-		//sem_post(&sem_ReqQrySettlementInfo);
-		if (pSettlementInfo) {
-			///交易日
-			cout << "交易日:" << pSettlementInfo->TradingDay << endl;
-			///结算编号
-			cout << "结算编号:" << pSettlementInfo->SettlementID << endl;
-			///经纪公司代码
-			cout << "经纪公司代码:" << pSettlementInfo->BrokerID << endl;
-			///投资者代码
-			cout << "投资者代码:" << pSettlementInfo->InvestorID << endl;
-			///序号
-			cout << "序号:" << pSettlementInfo->SequenceNo << endl;
-			///消息正文
-			cout << "消息正文:" << pSettlementInfo->Content << endl;
+		if (this->current_user->getRequestID() == nRequestID) {
+			//sem_post(&sem_ReqQrySettlementInfo);
+			if (pSettlementInfo) {
+				///交易日
+				std::cout << "交易日:" << pSettlementInfo->TradingDay << endl;
+				///结算编号
+				std::cout << "结算编号:" << pSettlementInfo->SettlementID << endl;
+				///经纪公司代码
+				std::cout << "经纪公司代码:" << pSettlementInfo->BrokerID << endl;
+				///投资者代码
+				std::cout << "投资者代码:" << pSettlementInfo->InvestorID << endl;
+				///序号
+				std::cout << "序号:" << pSettlementInfo->SequenceNo << endl;
+				///消息正文
+				std::cout << "消息正文:" << pSettlementInfo->Content << endl;
+			}
+
+			if (bIsLast) {
+				//确认投资者结算结果
+				this->ConfirmSettlementInfo(this->current_user);
+			}
 		}
+		
 	}
-	if (bIsLast) {
-		//确认投资者结算结果
-		this->ConfirmSettlementInfo(const_cast<char *>(this->getBrokerID().c_str()), const_cast<char *>(this->getUserID().c_str()), this->getCharTradingDate(), this->getRequestID());
-	}
+	
 }
 
 //确认结算结果
-void TdSpi::ConfirmSettlementInfo(char *BrokerID, char *InvestorID, char *TradingDay, int nRequestID) {
+void TdSpi::ConfirmSettlementInfo(User *user) {
 	USER_PRINT("TdSpi::ConfirmSettlementInfo");
 	CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm = new CThostFtdcSettlementInfoConfirmField();
 
-	strcpy(pSettlementInfoConfirm->BrokerID, BrokerID);
-	strcpy(pSettlementInfoConfirm->InvestorID, InvestorID);
-	cout << this->getCharTradingDate() << endl;
-	strcpy(pSettlementInfoConfirm->ConfirmDate, this->getCharTradingDate());
+	strcpy(pSettlementInfoConfirm->BrokerID, user->getBrokerID().c_str());
+	strcpy(pSettlementInfoConfirm->InvestorID, user->getUserID().c_str());
+	USER_PRINT(this->tdapi->GetTradingDay());
+	strcpy(pSettlementInfoConfirm->ConfirmDate, this->tdapi->GetTradingDay());
 
 	sleep(1);
-	this->tdapi->ReqSettlementInfoConfirm(pSettlementInfoConfirm, nRequestID);
+	this->tdapi->ReqSettlementInfoConfirm(pSettlementInfoConfirm, user->getRequestID());
 
 	int ret = this->controlTimeOut(&sem_ReqSettlementInfoConfirm);
 	if (ret == -1) {
@@ -342,38 +322,40 @@ void TdSpi::ConfirmSettlementInfo(char *BrokerID, char *InvestorID, char *Tradin
 }
 
 //投资者结算结果确认响应
-void TdSpi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm,
-                                       CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+void TdSpi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspSettlementInfoConfirm");
 	USER_PRINT(bIsLast);
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		//sem_post(&sem_ReqSettlementInfoConfirm);
-		if (pSettlementInfoConfirm) {
-			///经纪公司代码
-			cout << "经纪公司代码" << pSettlementInfoConfirm->BrokerID << endl;
-			///投资者代码
-			cout << "投资者代码" << pSettlementInfoConfirm->InvestorID << endl;
-			///确认日期
-			cout << "确认日期" << pSettlementInfoConfirm->ConfirmDate << endl;
-			///确认时间
-			cout << "确认时间" << pSettlementInfoConfirm->ConfirmTime << endl;
-			string today_date = this->tdapi->GetTradingDay();
-			string confirm_date = pSettlementInfoConfirm->ConfirmDate;
-			USER_PRINT(today_date);
-			USER_PRINT(confirm_date);
-			if (today_date == confirm_date) {
-				USER_PRINT("today_date == confirm_date");
-				this->setIsConfirmSettlement(true);
+		if (this->current_user->getRequestID() == nRequestID) {
+			if (pSettlementInfoConfirm) {
+				///经纪公司代码
+				std::cout << "经纪公司代码" << pSettlementInfoConfirm->BrokerID << endl;
+				///投资者代码
+				std::cout << "投资者代码" << pSettlementInfoConfirm->InvestorID << endl;
+				///确认日期
+				std::cout << "确认日期" << pSettlementInfoConfirm->ConfirmDate << endl;
+				///确认时间
+				std::cout << "确认时间" << pSettlementInfoConfirm->ConfirmTime << endl;
+				string today = this->tdapi->GetTradingDay();
+				string confirm_date = pSettlementInfoConfirm->ConfirmDate;
+				if (today == confirm_date) {
+					USER_PRINT("today_date == confirm_date");
+					this->setIsConfirmSettlement(true);
+				}
+				else {
+					USER_PRINT("today_date != confirm_date");
+					this->setIsConfirmSettlement(false);
+					this->current_user->setIsConfirmSettlement(false);
+				}
 			}
-			else {
-				USER_PRINT("today_date != confirm_date");
-				this->setIsConfirmSettlement(false);
+
+			if (bIsLast) {
+				this->QrySettlementInfoConfirm(this->current_user);
 			}
 		}
 	}
-	if (bIsLast) {
-		this->QrySettlementInfoConfirm(const_cast<char *>(this->getBrokerID().c_str()), const_cast<char *>(this->getUserID().c_str()), this->getRequestID());
-	}
+	
 }
 
 //查询交易所
@@ -390,11 +372,11 @@ void TdSpi::OnRspQryExchange(CThostFtdcExchangeField *pExchange, CThostFtdcRspIn
 	USER_PRINT("TdSpi::OnRspQryExchange")
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		///交易所代码
-		cout << "交易所代码" << pExchange->ExchangeID << endl;
+		std::cout << "交易所代码" << pExchange->ExchangeID << endl;
 		///交易所名称
-		cout << "交易所名称" << pExchange->ExchangeName << endl;
+		std::cout << "交易所名称" << pExchange->ExchangeName << endl;
 		///交易所属性
-		cout << "交易所属性" << pExchange->ExchangeProperty << endl;
+		std::cout << "交易所属性" << pExchange->ExchangeProperty << endl;
 	}
 }
 
@@ -410,73 +392,182 @@ void TdSpi::QryInstrument(string exchangeid, string instrumentid) {
 	delete pQryInstrument;
 }
 
+//查询行情
+void TdSpi::QryDepthMarketData(string instrumentid) {
+	CThostFtdcQryDepthMarketDataField *pQryDepthMarketData = new CThostFtdcQryDepthMarketDataField();
+
+	strcpy(pQryDepthMarketData->InstrumentID, instrumentid.c_str());
+
+	this->tdapi->ReqQryDepthMarketData(pQryDepthMarketData, this->current_user->getRequestID());
+	delete pQryDepthMarketData;
+}
+
+///请求查询行情响应
+void TdSpi::OnRspQryDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+	USER_PRINT("TdSpi::OnRspQryDepthMarketData");
+	if (!IsErrorRspInfo(pRspInfo)) {
+		if (pDepthMarketData) {
+			std::cout << "=================================================================================" << endl;
+			///交易日
+			cout << "交易日:" << pDepthMarketData->TradingDay << ", ";
+			///合约代码
+			cout << "合约代码:" << pDepthMarketData->InstrumentID << ", ";
+			///交易所代码
+			cout << "交易所代码:" << pDepthMarketData->ExchangeID << ", ";
+			///合约在交易所的代码
+			cout << "合约在交易所的代码:" << pDepthMarketData->ExchangeInstID << ", ";
+			///最新价
+			cout << "最新价:" << pDepthMarketData->LastPrice << endl;
+			///上次结算价
+			cout << "上次结算价:" << pDepthMarketData->PreSettlementPrice << ", ";
+			///昨收盘
+			cout << "昨收盘:" << pDepthMarketData->PreClosePrice << ", ";
+			///昨持仓量
+			cout << "昨持仓量:" << pDepthMarketData->PreOpenInterest << ", ";
+			///今开盘
+			cout << "今开盘:" << pDepthMarketData->OpenPrice << ", ";
+			///最高价
+			cout << "最高价:" << pDepthMarketData->HighestPrice << endl;
+			///最低价
+			cout << "最低价:" << pDepthMarketData->LowestPrice << ", ";
+			///数量
+			cout << "数量:" << pDepthMarketData->Volume << ", ";
+			///成交金额
+			cout << "成交金额:" << pDepthMarketData->Turnover << ", ";
+			///持仓量
+			cout << "持仓量:" << pDepthMarketData->OpenInterest << ", ";
+			///今收盘
+			cout << "今收盘:" << pDepthMarketData->ClosePrice << endl;
+			///本次结算价
+			cout << "本次结算价:" << pDepthMarketData->SettlementPrice << ", ";
+			///涨停板价
+			cout << "涨停板价:" << pDepthMarketData->UpperLimitPrice << ", ";
+			///跌停板价
+			cout << "跌停板价:" << pDepthMarketData->LowerLimitPrice << ", ";
+			///昨虚实度
+			cout << "昨虚实度:" << pDepthMarketData->PreDelta << ", ";
+			///今虚实度
+			cout << "今虚实度:" << pDepthMarketData->CurrDelta << endl;
+			///最后修改时间
+			cout << "最后修改时间:" << pDepthMarketData->UpdateTime << ", ";
+			///最后修改毫秒
+			cout << "最后修改毫秒:" << pDepthMarketData->UpdateMillisec << ", ";
+			///申买价一
+			cout << "申买价一:" << pDepthMarketData->BidPrice1 << ", ";
+			///申买量一
+			cout << "申买量一:" << pDepthMarketData->BidVolume1 << ", ";
+			///申卖价一
+			cout << "申卖价一:" << pDepthMarketData->AskPrice1 << endl;
+			///申卖量一
+			cout << "申卖量一:" << pDepthMarketData->AskVolume1 << ", ";
+			///申买价二
+			cout << "申买价二:" << pDepthMarketData->BidPrice2 << ", ";
+			///申买量二
+			cout << "申买量二:" << pDepthMarketData->BidVolume2 << ", ";
+			///申卖价二
+			cout << "申卖价二:" << pDepthMarketData->AskPrice2 << ", ";
+			///申卖量二
+			cout << "申卖量二:" << pDepthMarketData->AskVolume2 << endl;
+			///申买价三
+			cout << "申买价三:" << pDepthMarketData->BidPrice3 << ", ";
+			///申买量三
+			cout << "申买量三:" << pDepthMarketData->BidVolume3 << ", ";
+			///申卖价三
+			cout << "申卖价三:" << pDepthMarketData->AskPrice3 << ", ";
+			///申卖量三
+			cout << "申卖量三:" << pDepthMarketData->AskVolume3 << ", ";
+			///申买价四
+			cout << "申买价四:" << pDepthMarketData->BidPrice4 << endl;
+			///申买量四
+			cout << "申买量四:" << pDepthMarketData->BidVolume4 << ", ";
+			///申卖价四
+			cout << "申卖价四:" << pDepthMarketData->AskPrice4 << ", ";
+			///申卖量四
+			cout << "申卖量四:" << pDepthMarketData->AskVolume4 << ", ";
+			///申买价五
+			cout << "申买价五:" << pDepthMarketData->BidPrice5 << ", ";
+			///申买量五
+			cout << "申买量五:" << pDepthMarketData->BidVolume5 << endl;
+			///申卖价五
+			cout << "申卖价五:" << pDepthMarketData->AskPrice5 << ", ";
+			///申卖量五
+			cout << "申卖量五:" << pDepthMarketData->AskVolume5 << ", ";
+			///当日均价
+			cout << "当日均价:" << pDepthMarketData->AveragePrice << ", ";
+			///业务日期
+			cout << "业务日期:" << pDepthMarketData->ActionDay << endl;
+			std::cout << "=================================================================================" << endl;
+		}
+	}
+}
+
 //响应查询合约
 void TdSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	//USER_PRINT("TdSpi::OnRspQryInstrument")
-	cout << "isLast" << bIsLast << endl;
+	std::cout << "isLast" << bIsLast << endl;
 	if ((!this->IsErrorRspInfo(pRspInfo))) {
 		///合约代码
-		cout << "合约代码:" << pInstrument->InstrumentID << ", ";
+		std::cout << "合约代码:" << pInstrument->InstrumentID << ", ";
 		///交易所代码
-		cout << "交易所代码:" << pInstrument->ExchangeID << ", ";
+		std::cout << "交易所代码:" << pInstrument->ExchangeID << ", ";
 		///合约名称
-		cout << "合约名称:" << pInstrument->InstrumentName << ", ";
+		std::cout << "合约名称:" << pInstrument->InstrumentName << ", ";
 		///合约在交易所的代码
-		cout << "合约在交易所的代码:" << pInstrument->ExchangeInstID << ", ";
+		std::cout << "合约在交易所的代码:" << pInstrument->ExchangeInstID << ", ";
 		///产品代码
-		cout << "产品代码:" << pInstrument->ProductID << ", ";
+		std::cout << "产品代码:" << pInstrument->ProductID << ", ";
 		///产品类型
-		cout << "产品类型:" << pInstrument->ProductClass << endl;
+		std::cout << "产品类型:" << pInstrument->ProductClass << endl;
 		/*///交割年份
-		cout << "交割年份" << pInstrument->DeliveryYear << endl;
+		std::cout << "交割年份" << pInstrument->DeliveryYear << endl;
 		///交割月
-		cout << "交割月" << pInstrument->DeliveryMonth << endl;
+		std::cout << "交割月" << pInstrument->DeliveryMonth << endl;
 		///市价单最大下单量
-		cout << "市价单最大下单量" << pInstrument->MaxMarketOrderVolume << endl;
+		std::cout << "市价单最大下单量" << pInstrument->MaxMarketOrderVolume << endl;
 		///市价单最小下单量
-		cout << "市价单最小下单量" << pInstrument->MinMarketOrderVolume << endl;
+		std::cout << "市价单最小下单量" << pInstrument->MinMarketOrderVolume << endl;
 		///限价单最大下单量
-		cout << "限价单最大下单量" << pInstrument->MaxLimitOrderVolume << endl;
+		std::cout << "限价单最大下单量" << pInstrument->MaxLimitOrderVolume << endl;
 		///限价单最小下单量
-		cout << "限价单最小下单量" << pInstrument->MinLimitOrderVolume << endl;
+		std::cout << "限价单最小下单量" << pInstrument->MinLimitOrderVolume << endl;
 		///合约数量乘数
-		cout << "合约数量乘数" << pInstrument->VolumeMultiple << endl;
+		std::cout << "合约数量乘数" << pInstrument->VolumeMultiple << endl;
 		///最小变动价位
-		cout << "最小变动价位" << pInstrument->PriceTick << endl;
+		std::cout << "最小变动价位" << pInstrument->PriceTick << endl;
 		///创建日
-		cout << "创建日" << pInstrument->CreateDate << endl;
+		std::cout << "创建日" << pInstrument->CreateDate << endl;
 		///上市日
-		cout << "上市日" << pInstrument->OpenDate << endl;
+		std::cout << "上市日" << pInstrument->OpenDate << endl;
 		///到期日
-		cout << "到期日" << pInstrument->ExpireDate << endl;
+		std::cout << "到期日" << pInstrument->ExpireDate << endl;
 		///开始交割日
-		cout << "开始交割日" << pInstrument->StartDelivDate << endl;
+		std::cout << "开始交割日" << pInstrument->StartDelivDate << endl;
 		///结束交割日
-		cout << "结束交割日" << pInstrument->EndDelivDate << endl;
+		std::cout << "结束交割日" << pInstrument->EndDelivDate << endl;
 		///合约生命周期状态
-		cout << "合约生命周期状态" << pInstrument->InstLifePhase << endl;
+		std::cout << "合约生命周期状态" << pInstrument->InstLifePhase << endl;
 		///当前是否交易
-		cout << "当前是否交易" << pInstrument->IsTrading << endl;
+		std::cout << "当前是否交易" << pInstrument->IsTrading << endl;
 		///持仓类型
-		cout << "持仓类型" << pInstrument->PositionType << endl;
+		std::cout << "持仓类型" << pInstrument->PositionType << endl;
 		///持仓日期类型
-		cout << "持仓日期类型" << pInstrument->PositionDateType << endl;
+		std::cout << "持仓日期类型" << pInstrument->PositionDateType << endl;
 		///多头保证金率
-		cout << "多头保证金率" << pInstrument->LongMarginRatio << endl;
+		std::cout << "多头保证金率" << pInstrument->LongMarginRatio << endl;
 		///空头保证金率
-		cout << "空头保证金率" << pInstrument->ShortMarginRatio << endl;
+		std::cout << "空头保证金率" << pInstrument->ShortMarginRatio << endl;
 		///是否使用大额单边保证金算法
-		cout << "是否使用大额单边保证金算法" << pInstrument->MaxMarginSideAlgorithm << endl;
+		std::cout << "是否使用大额单边保证金算法" << pInstrument->MaxMarginSideAlgorithm << endl;
 		///基础商品代码
-		cout << "基础商品代码" << pInstrument->UnderlyingInstrID << endl;
+		std::cout << "基础商品代码" << pInstrument->UnderlyingInstrID << endl;
 		///执行价
-		cout << "执行价" << pInstrument->StrikePrice << endl;
+		std::cout << "执行价" << pInstrument->StrikePrice << endl;
 		///期权类型
-		cout << "期权类型" << pInstrument->OptionsType << endl;
+		std::cout << "期权类型" << pInstrument->OptionsType << endl;
 		///合约基础商品乘数
-		cout << "合约基础商品乘数" << pInstrument->UnderlyingMultiple << endl;
+		std::cout << "合约基础商品乘数" << pInstrument->UnderlyingMultiple << endl;
 		///组合类型
-		cout << "组合类型" << pInstrument->CombinationType << endl;*/
+		std::cout << "组合类型" << pInstrument->CombinationType << endl;*/
 	}
 }
 
@@ -485,21 +576,21 @@ void TdSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentSt
 	USER_PRINT("TdSpi::OnRtnInstrumentStatus");
 	if (pInstrumentStatus) {
 		///交易所代码
-		cout << "交易所代码" << pInstrumentStatus->ExchangeID << endl;
+		std::cout << "交易所代码" << pInstrumentStatus->ExchangeID << endl;
 		///合约在交易所的代码
-		cout << "合约在交易所的代码" << pInstrumentStatus->ExchangeInstID << endl;
+		std::cout << "合约在交易所的代码" << pInstrumentStatus->ExchangeInstID << endl;
 		///结算组代码
-		cout << "结算组代码" << pInstrumentStatus->SettlementGroupID << endl;
+		std::cout << "结算组代码" << pInstrumentStatus->SettlementGroupID << endl;
 		///合约代码
-		cout << "合约代码" << pInstrumentStatus->InstrumentID << endl;
+		std::cout << "合约代码" << pInstrumentStatus->InstrumentID << endl;
 		///合约交易状态
-		cout << "合约交易状态" << pInstrumentStatus->InstrumentStatus << endl;
+		std::cout << "合约交易状态" << pInstrumentStatus->InstrumentStatus << endl;
 		///交易阶段编号
-		cout << "交易阶段编号" << pInstrumentStatus->TradingSegmentSN << endl;
+		std::cout << "交易阶段编号" << pInstrumentStatus->TradingSegmentSN << endl;
 		///进入本状态时间
-		cout << "进入本状态时间" << pInstrumentStatus->EnterTime << endl;
+		std::cout << "进入本状态时间" << pInstrumentStatus->EnterTime << endl;
 		///进入本状态原因
-		cout << "进入本状态原因" << pInstrumentStatus->EnterReason << endl;
+		std::cout << "进入本状态原因" << pInstrumentStatus->EnterReason << endl;
 	}
 }
 
@@ -510,7 +601,7 @@ void TdSpi::QryOrder() {
 	//strcpy(pQryOrder->BrokerID, const_cast<char *>(this->getBrokerID().c_str()));
 	//strcpy(pQryOrder->InvestorID, const_cast<char *>(this->getUserID().c_str()));
 	int error_no = this->tdapi->ReqQryOrder(pQryOrder, this->getRequestID());
-	cout << "error_no = " << error_no << endl;
+	std::cout << "error_no = " << error_no << endl;
 	delete pQryOrder;
 }
 
@@ -518,128 +609,131 @@ void TdSpi::QryOrder() {
 void TdSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspQryOrder")
 	if (!pOrder) {
-		cout << "None Order Return!" << endl;
+		std::cout << "None Order Return!" << endl;
 	}
 	if (!this->IsErrorRspInfo(pRspInfo)) {
 		if (pOrder) {
-			cout << "=================================================================================" << endl;
+			std::cout << "=================================================================================" << endl;
 			///经纪公司代码
-			cout << "||经纪公司代码:" << pOrder->BrokerID << ", ";
+			std::cout << "||经纪公司代码:" << pOrder->BrokerID << ", ";
 			///投资者代码
-			cout << "投资者代码:" << pOrder->InvestorID << ", ";
+			std::cout << "投资者代码:" << pOrder->InvestorID << ", ";
 			///合约代码
-			cout << "合约代码:" << pOrder->InstrumentID << ", ";
+			std::cout << "合约代码:" << pOrder->InstrumentID << ", ";
 			///报单引用
-			cout << "报单引用:" << pOrder->OrderRef << ", ";
+			std::cout << "报单引用:" << pOrder->OrderRef << ", ";
 			///用户代码
-			cout << "用户代码:" << pOrder->UserID << endl;
+			std::cout << "用户代码:" << pOrder->UserID << endl;
 			///报单价格条件
-			cout << "||报单价格条件:" << pOrder->OrderPriceType << ", ";
+			std::cout << "||报单价格条件:" << pOrder->OrderPriceType << ", ";
 			///买卖方向
-			cout << "买卖方向:" << pOrder->Direction << ", ";
+			std::cout << "买卖方向:" << pOrder->Direction << ", ";
 			///组合开平标志
-			cout << "组合开平标志:" << pOrder->CombOffsetFlag << ", ";
+			std::cout << "组合开平标志:" << pOrder->CombOffsetFlag << ", ";
 			///组合投机套保标志
-			cout << "组合投机套保标志:" << pOrder->CombHedgeFlag << ", ";
+			std::cout << "组合投机套保标志:" << pOrder->CombHedgeFlag << ", ";
 			///价格
-			cout << "价格:" << pOrder->LimitPrice << endl;
+			std::cout << "价格:" << pOrder->LimitPrice << endl;
 			///数量
-			cout << "||数量:" << pOrder->VolumeTotalOriginal << ", ";
+			std::cout << "||数量:" << pOrder->VolumeTotalOriginal << ", ";
 			///有效期类型
-			cout << "有效期类型:" << pOrder->TimeCondition << ", ";
+			std::cout << "有效期类型:" << pOrder->TimeCondition << ", ";
 			///GTD日期
-			//cout << "GTD日期:" << pOrder->GTDDate << ", ";
+			//std::cout << "GTD日期:" << pOrder->GTDDate << ", ";
 			///成交量类型
-			cout << "成交量类型:" << pOrder->VolumeCondition << ", ";
+			std::cout << "成交量类型:" << pOrder->VolumeCondition << ", ";
 			///最小成交量
-			cout << "最小成交量:" << pOrder->MinVolume << endl;
+			std::cout << "最小成交量:" << pOrder->MinVolume << endl;
 			///触发条件
-			cout << "||触发条件:" << pOrder->ContingentCondition << ", ";
+			std::cout << "||触发条件:" << pOrder->ContingentCondition << ", ";
 			///止损价
-			cout << "止损价:" << pOrder->StopPrice << ", ";
+			std::cout << "止损价:" << pOrder->StopPrice << ", ";
 			///强平原因
-			cout << "强平原因:" << pOrder->ForceCloseReason << ", ";
+			std::cout << "强平原因:" << pOrder->ForceCloseReason << ", ";
 			///自动挂起标志
-			cout << "自动挂起标志:" << pOrder->IsAutoSuspend << ", ";
+			std::cout << "自动挂起标志:" << pOrder->IsAutoSuspend << ", ";
 			///业务单元
-			cout << "业务单元:" << pOrder->BusinessUnit << endl;
+			std::cout << "业务单元:" << pOrder->BusinessUnit << endl;
 			///请求编号
-			cout << "||请求编号:" << pOrder->RequestID << ", ";
+			std::cout << "||请求编号:" << pOrder->RequestID << ", ";
 			///本地报单编号
-			cout << "本地报单编号:" << pOrder->OrderLocalID << ", ";
+			std::cout << "本地报单编号:" << pOrder->OrderLocalID << ", ";
 			///交易所代码
-			cout << "交易所代码:" << pOrder->ExchangeID << ", ";
+			std::cout << "交易所代码:" << pOrder->ExchangeID << ", ";
 			///会员代码
-			cout << "会员代码:" << pOrder->ParticipantID << ", ";
+			std::cout << "会员代码:" << pOrder->ParticipantID << ", ";
 			///客户代码
-			cout << "客户代码:" << pOrder->ClientID << endl;
+			std::cout << "客户代码:" << pOrder->ClientID << endl;
 			///合约在交易所的代码
-			cout << "||合约在交易所的代码:" << pOrder->ExchangeInstID << ", ";
+			std::cout << "||合约在交易所的代码:" << pOrder->ExchangeInstID << ", ";
 			///交易所交易员代码
-			cout << "交易所交易员代码:" << pOrder->TraderID << ", ";
+			std::cout << "交易所交易员代码:" << pOrder->TraderID << ", ";
 			///安装编号
-			cout << "安装编号:" << pOrder->InstallID << ", ";
+			std::cout << "安装编号:" << pOrder->InstallID << ", ";
 			///报单提交状态
-			cout << "报单提交状态:" << pOrder->OrderSubmitStatus << ", ";
+			std::cout << "报单提交状态:" << pOrder->OrderSubmitStatus << ", ";
 			///报单提示序号
-			cout << "报单提示序号:" << pOrder->NotifySequence << endl;
+			std::cout << "报单提示序号:" << pOrder->NotifySequence << endl;
 			///交易日
-			cout << "||交易日:" << pOrder->TradingDay << ", ";
+			std::cout << "||交易日:" << pOrder->TradingDay << ", ";
 			///结算编号
-			cout << "结算编号:" << pOrder->SettlementID << ", ";
+			std::cout << "结算编号:" << pOrder->SettlementID << ", ";
 			///报单编号
-			cout << "报单编号:" << pOrder->OrderSysID << ", ";
+			std::cout << "报单编号:" << pOrder->OrderSysID << ", ";
 			///报单来源
-			cout << "报单来源:" << pOrder->OrderSource << ", ";
+			std::cout << "报单来源:" << pOrder->OrderSource << ", ";
 			///报单状态
-			cout << "报单状态:" << pOrder->OrderStatus << endl;
+			std::cout << "报单状态:" << pOrder->OrderStatus << endl;
 			///报单类型
-			cout << "||报单类型:" << pOrder->OrderType << ", ";
+			std::cout << "||报单类型:" << pOrder->OrderType << ", ";
 			///今成交数量
-			cout << "今成交数量:" << pOrder->VolumeTraded << ", ";
+			std::cout << "今成交数量:" << pOrder->VolumeTraded << ", ";
 			///剩余数量
-			cout << "剩余数量:" << pOrder->VolumeTotal << ", ";
+			std::cout << "剩余数量:" << pOrder->VolumeTotal << ", ";
 			///报单日期
-			cout << "报单日期:" << pOrder->InsertDate << ", ";
+			std::cout << "报单日期:" << pOrder->InsertDate << ", ";
 			///委托时间
-			cout << "委托时间:" << pOrder->InsertTime << endl;
+			std::cout << "委托时间:" << pOrder->InsertTime << endl;
 			///激活时间
-			cout << "||激活时间:" << pOrder->ActiveTime << ", ";
+			std::cout << "||激活时间:" << pOrder->ActiveTime << ", ";
 			///挂起时间
-			cout << "挂起时间:" << pOrder->SuspendTime << ", ";
+			std::cout << "挂起时间:" << pOrder->SuspendTime << ", ";
 			///最后修改时间
-			cout << "最后修改时间:" << pOrder->UpdateTime << ", ";
+			std::cout << "最后修改时间:" << pOrder->UpdateTime << ", ";
 			///撤销时间
-			cout << "撤销时间:" << pOrder->CancelTime << ", ";
+			std::cout << "撤销时间:" << pOrder->CancelTime << ", ";
 			///最后修改交易所交易员代码
-			cout << "最后修改交易所交易员代码:" << pOrder->ActiveTraderID << endl;
+			std::cout << "最后修改交易所交易员代码:" << pOrder->ActiveTraderID << endl;
 			///结算会员编号
-			cout << "||结算会员编号:" << pOrder->ClearingPartID << ", ";
+			std::cout << "||结算会员编号:" << pOrder->ClearingPartID << ", ";
 			///序号
-			cout << "序号:" << pOrder->SequenceNo << ", ";
+			std::cout << "序号:" << pOrder->SequenceNo << ", ";
 			///前置编号
-			cout << "前置编号:" << pOrder->FrontID << ", ";
+			std::cout << "前置编号:" << pOrder->FrontID << ", ";
 			///会话编号
-			cout << "会话编号:" << pOrder->SessionID << ", ";
+			std::cout << "会话编号:" << pOrder->SessionID << ", ";
 			///用户端产品信息
-			cout << "用户端产品信息:" << pOrder->UserProductInfo << endl;
+			std::cout << "用户端产品信息:" << pOrder->UserProductInfo << endl;
 			///状态信息
-			cout << "||状态信息:" << pOrder->StatusMsg << ", ";
+
+			codeDst[90] = { 0 };
+			Utils::Gb2312ToUtf8(codeDst, 90, pOrder->StatusMsg, strlen(pOrder->StatusMsg)); // Gb2312ToUtf8
+			std::cout << "||状态信息:" << codeDst << ", ";
 			///用户强评标志
-			cout << "用户强评标志:" << pOrder->UserForceClose << ", ";
+			std::cout << "用户强评标志:" << pOrder->UserForceClose << ", ";
 			///操作用户代码
-			cout << "操作用户代码:" << pOrder->ActiveUserID << ", ";
+			std::cout << "操作用户代码:" << pOrder->ActiveUserID << ", ";
 			///经纪公司报单编号
-			cout << "经纪公司报单编号:" << pOrder->BrokerOrderSeq << ", ";
+			std::cout << "经纪公司报单编号:" << pOrder->BrokerOrderSeq << ", ";
 			///相关报单
-			cout << "相关报单:" << pOrder->RelativeOrderSysID << endl;
+			std::cout << "相关报单:" << pOrder->RelativeOrderSysID << endl;
 			///郑商所成交数量
-			cout << "||郑商所成交数量:" << pOrder->ZCETotalTradedVolume << ", ";
+			std::cout << "||郑商所成交数量:" << pOrder->ZCETotalTradedVolume << ", ";
 			///互换单标志
-			cout << "互换单标志:" << pOrder->IsSwapOrder << endl;
-			cout << "=================================================================================" << endl;
+			std::cout << "互换单标志:" << pOrder->IsSwapOrder << endl;
+			std::cout << "=================================================================================" << endl;
 		} else {
-			cout << "none order return!" << endl;
+			std::cout << "none order return!" << endl;
 		}
 		
 	}
@@ -659,28 +753,28 @@ void TdSpi::OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateField *pI
 	USER_PRINT("TdSpi::OnRspQryInstrumentMarginRate")
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (pInstrumentMarginRate) {
-			cout << "=================================================================================" << endl;
+			std::cout << "=================================================================================" << endl;
 			///合约代码
-			cout << "||合约代码:" << pInstrumentMarginRate->InstrumentID << ", ";
+			std::cout << "||合约代码:" << pInstrumentMarginRate->InstrumentID << ", ";
 			///投资者范围
-			cout << "投资者范围:" << pInstrumentMarginRate->InvestorRange << ", ";
+			std::cout << "投资者范围:" << pInstrumentMarginRate->InvestorRange << ", ";
 			///经纪公司代码
-			cout << "经纪公司代码:" << pInstrumentMarginRate->BrokerID << ", ";
+			std::cout << "经纪公司代码:" << pInstrumentMarginRate->BrokerID << ", ";
 			///投资者代码
-			cout << "投资者代码:" << pInstrumentMarginRate->InvestorID << ", ";
+			std::cout << "投资者代码:" << pInstrumentMarginRate->InvestorID << ", ";
 			///投机套保标志
-			cout << "投机套保标志:" << pInstrumentMarginRate->HedgeFlag << endl;
+			std::cout << "投机套保标志:" << pInstrumentMarginRate->HedgeFlag << endl;
 			///多头保证金率
-			cout << "||多头保证金率:" << pInstrumentMarginRate->LongMarginRatioByMoney << ", ";
+			std::cout << "||多头保证金率:" << pInstrumentMarginRate->LongMarginRatioByMoney << ", ";
 			///多头保证金费
-			cout << "多头保证金费:" << pInstrumentMarginRate->LongMarginRatioByVolume << ", ";
+			std::cout << "多头保证金费:" << pInstrumentMarginRate->LongMarginRatioByVolume << ", ";
 			///空头保证金率
-			cout << "空头保证金率:" << pInstrumentMarginRate->ShortMarginRatioByMoney << ", ";
+			std::cout << "空头保证金率:" << pInstrumentMarginRate->ShortMarginRatioByMoney << ", ";
 			///空头保证金费
-			cout << "空头保证金费:" << pInstrumentMarginRate->ShortMarginRatioByVolume << ", ";
+			std::cout << "空头保证金费:" << pInstrumentMarginRate->ShortMarginRatioByVolume << ", ";
 			///是否相对交易所收取
-			cout << "是否相对交易所收取:" << pInstrumentMarginRate->IsRelative << endl;
-			cout << "=================================================================================" << endl;
+			std::cout << "是否相对交易所收取:" << pInstrumentMarginRate->IsRelative << endl;
+			std::cout << "=================================================================================" << endl;
 		}
 	}
 }
@@ -699,25 +793,25 @@ void TdSpi::OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissionRateF
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (pInstrumentCommissionRate) {
 			///合约代码
-			cout << "合约代码:" << pInstrumentCommissionRate->InstrumentID << endl;
+			std::cout << "合约代码:" << pInstrumentCommissionRate->InstrumentID << endl;
 			///投资者范围
-			cout << "投资者范围:" << pInstrumentCommissionRate->InvestorRange << endl;
+			std::cout << "投资者范围:" << pInstrumentCommissionRate->InvestorRange << endl;
 			///经纪公司代码
-			cout << "经纪公司代码:" << pInstrumentCommissionRate->BrokerID << endl;
+			std::cout << "经纪公司代码:" << pInstrumentCommissionRate->BrokerID << endl;
 			///投资者代码
-			cout << "投资者代码:" << pInstrumentCommissionRate->InvestorID << endl;
+			std::cout << "投资者代码:" << pInstrumentCommissionRate->InvestorID << endl;
 			///开仓手续费率
-			cout << "开仓手续费率:" << pInstrumentCommissionRate->OpenRatioByMoney << endl;
+			std::cout << "开仓手续费率:" << pInstrumentCommissionRate->OpenRatioByMoney << endl;
 			///开仓手续费
-			cout << "开仓手续费:" << pInstrumentCommissionRate->OpenRatioByVolume << endl;
+			std::cout << "开仓手续费:" << pInstrumentCommissionRate->OpenRatioByVolume << endl;
 			///平仓手续费率
-			cout << "平仓手续费率:" << pInstrumentCommissionRate->CloseRatioByMoney << endl;
+			std::cout << "平仓手续费率:" << pInstrumentCommissionRate->CloseRatioByMoney << endl;
 			///平仓手续费
-			cout << "平仓手续费:" << pInstrumentCommissionRate->CloseRatioByVolume << endl;
+			std::cout << "平仓手续费:" << pInstrumentCommissionRate->CloseRatioByVolume << endl;
 			///平今手续费率
-			cout << "平今手续费率:" << pInstrumentCommissionRate->CloseTodayRatioByMoney << endl;
+			std::cout << "平今手续费率:" << pInstrumentCommissionRate->CloseTodayRatioByMoney << endl;
 			///平今手续费
-			cout << "平今手续费:" << pInstrumentCommissionRate->CloseTodayRatioByVolume << endl;
+			std::cout << "平今手续费:" << pInstrumentCommissionRate->CloseTodayRatioByVolume << endl;
 		}
 	}
 }
@@ -735,34 +829,34 @@ void TdSpi::OnRspQryInvestor(CThostFtdcInvestorField *pInvestor, CThostFtdcRspIn
 	USER_PRINT("TdSpi::OnRspQryInvestor")
 	if (!this->IsErrorRspInfo(pRspInfo)) {
 		if (pInvestor) {
-			cout << "=================================================================================" << endl;
+			std::cout << "=================================================================================" << endl;
 			///投资者代码
-			cout << "||投资者代码:" << pInvestor->InvestorID << ", ";
+			std::cout << "||投资者代码:" << pInvestor->InvestorID << ", ";
 			///经纪公司代码
-			cout << "经纪公司代码:" << pInvestor->BrokerID << ", ";
+			std::cout << "经纪公司代码:" << pInvestor->BrokerID << ", ";
 			///投资者分组代码
-			cout << "投资者分组代码:" << pInvestor->InvestorGroupID << ", ";
+			std::cout << "投资者分组代码:" << pInvestor->InvestorGroupID << ", ";
 			///投资者名称
-			cout << "投资者名称:" << pInvestor->InvestorName << ", ";
+			std::cout << "投资者名称:" << pInvestor->InvestorName << ", ";
 			///证件类型
-			cout << "证件类型:" << pInvestor->IdentifiedCardType << endl;
+			std::cout << "证件类型:" << pInvestor->IdentifiedCardType << endl;
 			///证件号码
-			cout << "||证件号码:" << pInvestor->IdentifiedCardNo << ", ";
+			std::cout << "||证件号码:" << pInvestor->IdentifiedCardNo << ", ";
 			///是否活跃
-			cout << "是否活跃:" << pInvestor->IsActive << ", ";
+			std::cout << "是否活跃:" << pInvestor->IsActive << ", ";
 			///联系电话
-			cout << "联系电话:" << pInvestor->Telephone << ", ";
+			std::cout << "联系电话:" << pInvestor->Telephone << ", ";
 			///通讯地址
-			cout << "通讯地址:" << pInvestor->Address << ", ";
+			std::cout << "通讯地址:" << pInvestor->Address << ", ";
 			///开户日期
-			cout << "开户日期:" << pInvestor->OpenDate << endl;
+			std::cout << "开户日期:" << pInvestor->OpenDate << endl;
 			///手机
-			cout << "||手机:" << pInvestor->Mobile << ", ";
+			std::cout << "||手机:" << pInvestor->Mobile << ", ";
 			///手续费率模板代码
-			cout << "手续费率模板代码:" << pInvestor->CommModelID << ", ";
+			std::cout << "手续费率模板代码:" << pInvestor->CommModelID << ", ";
 			///保证金率模板代码
-			cout << "保证金率模板代码:" << pInvestor->MarginModelID << endl;
-			cout << "=================================================================================" << endl;
+			std::cout << "保证金率模板代码:" << pInvestor->MarginModelID << endl;
+			std::cout << "=================================================================================" << endl;
 		}
 	}
 }
@@ -781,94 +875,95 @@ void TdSpi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorP
 	USER_PRINT("TdSpi::OnRspQryInvestorPosition");
 	if (!this->IsErrorRspInfo(pRspInfo)) {
 		if (pInvestorPosition) {
-			cout << "=================================================================================" << endl;
+			std::cout << "=================================================================================" << endl;
 			///合约代码
-			cout << "||合约代码:" << pInvestorPosition->InstrumentID << ", ";
+			std::cout << "||合约代码:" << pInvestorPosition->InstrumentID << ", ";
 			///经纪公司代码
-			cout << "经纪公司代码:" << pInvestorPosition->BrokerID << ", ";
+			std::cout << "经纪公司代码:" << pInvestorPosition->BrokerID << ", ";
 			///投资者代码
-			cout << "投资者代码:" << pInvestorPosition->InvestorID << ", ";
+			std::cout << "投资者代码:" << pInvestorPosition->InvestorID << ", ";
 			///持仓多空方向
-			cout << "持仓多空方向:" << pInvestorPosition->PosiDirection << ", ";
+			std::cout << "持仓多空方向:" << pInvestorPosition->PosiDirection << ", ";
 			///投机套保标志
-			cout << "投机套保标志:" << pInvestorPosition->HedgeFlag << endl;
+			std::cout << "投机套保标志:" << pInvestorPosition->HedgeFlag << endl;
 			///持仓日期
-			cout << "||持仓日期:" << pInvestorPosition->PositionDate << ", ";
+			std::cout << "||持仓日期:" << pInvestorPosition->PositionDate << ", ";
 			///上日持仓
-			cout << "上日持仓:" << pInvestorPosition->YdPosition << ", ";
+			std::cout << "上日持仓:" << pInvestorPosition->YdPosition << ", ";
 			///今日持仓
-			cout << "今日持仓:" << pInvestorPosition->Position << ", ";
+			std::cout << "今日持仓:" << pInvestorPosition->Position << ", ";
 			///多头冻结
-			cout << "多头冻结:" << pInvestorPosition->LongFrozen << ", ";
+			std::cout << "多头冻结:" << pInvestorPosition->LongFrozen << ", ";
 			///空头冻结
-			cout << "空头冻结:" << pInvestorPosition->ShortFrozen << endl;
+			std::cout << "空头冻结:" << pInvestorPosition->ShortFrozen << endl;
 			///开仓冻结金额
-			cout << "||开仓冻结金额:" << pInvestorPosition->LongFrozenAmount << ", ";
+			std::cout << "||开仓冻结金额:" << pInvestorPosition->LongFrozenAmount << ", ";
 			///开仓冻结金额
-			cout << "开仓冻结金额:" << pInvestorPosition->ShortFrozenAmount << ", ";
+			std::cout << "开仓冻结金额:" << pInvestorPosition->ShortFrozenAmount << ", ";
 			///开仓量
-			cout << "开仓量:" << pInvestorPosition->OpenVolume << ", ";
+			std::cout << "开仓量:" << pInvestorPosition->OpenVolume << ", ";
 			///平仓量
-			cout << "平仓量:" << pInvestorPosition->CloseVolume << ", ";
+			std::cout << "平仓量:" << pInvestorPosition->CloseVolume << ", ";
 			///开仓金额
-			cout << "开仓金额:" << pInvestorPosition->OpenAmount << endl;
+			std::cout << "开仓金额:" << pInvestorPosition->OpenAmount << endl;
 			///平仓金额
-			cout << "||平仓金额:" << pInvestorPosition->CloseAmount << ", ";
+			std::cout << "||平仓金额:" << pInvestorPosition->CloseAmount << ", ";
 			///持仓成本
-			cout << "持仓成本:" << pInvestorPosition->PositionCost << ", ";
+			std::cout << "持仓成本:" << pInvestorPosition->PositionCost << ", ";
 			///上次占用的保证金
-			cout << "上次占用的保证金:" << pInvestorPosition->PreMargin << ", ";
+			std::cout << "上次占用的保证金:" << pInvestorPosition->PreMargin << ", ";
 			///占用的保证金
-			cout << "占用的保证金:" << pInvestorPosition->UseMargin << ", ";
+			std::cout << "占用的保证金:" << pInvestorPosition->UseMargin << ", ";
 			///冻结的保证金
-			cout << "冻结的保证金:" << pInvestorPosition->FrozenMargin << endl;
+			std::cout << "冻结的保证金:" << pInvestorPosition->FrozenMargin << endl;
 			///冻结的资金
-			cout << "||冻结的资金:" << pInvestorPosition->FrozenCash << ", ";
+			std::cout << "||冻结的资金:" << pInvestorPosition->FrozenCash << ", ";
 			///冻结的手续费
-			cout << "冻结的手续费:" << pInvestorPosition->FrozenCommission << ", ";
+			std::cout << "冻结的手续费:" << pInvestorPosition->FrozenCommission << ", ";
 			///资金差额
-			cout << "资金差额:" << pInvestorPosition->CashIn << ", ";
+			std::cout << "资金差额:" << pInvestorPosition->CashIn << ", ";
 			///手续费
-			cout << "手续费:" << pInvestorPosition->Commission << ", ";
+			std::cout << "手续费:" << pInvestorPosition->Commission << ", ";
 			///平仓盈亏
-			cout << "平仓盈亏:" << pInvestorPosition->CloseProfit << endl;
+			std::cout << "平仓盈亏:" << pInvestorPosition->CloseProfit << endl;
 			///持仓盈亏
-			cout << "||持仓盈亏:" << pInvestorPosition->PositionProfit << ", ";
+			std::cout << "||持仓盈亏:" << pInvestorPosition->PositionProfit << ", ";
 			///上次结算价
-			cout << "上次结算价:" << pInvestorPosition->PreSettlementPrice << ", ";
+			std::cout << "上次结算价:" << pInvestorPosition->PreSettlementPrice << ", ";
 			///本次结算价
-			cout << "本次结算价:" << pInvestorPosition->SettlementPrice << ", ";
+			std::cout << "本次结算价:" << pInvestorPosition->SettlementPrice << ", ";
 			///交易日
-			cout << "交易日:" << pInvestorPosition->TradingDay << ", ";
+			std::cout << "交易日:" << pInvestorPosition->TradingDay << ", ";
 			///结算编号
-			cout << "结算编号:" << pInvestorPosition->SettlementID << endl;
+			std::cout << "结算编号:" << pInvestorPosition->SettlementID << endl;
 			///开仓成本
-			cout << "||开仓成本:" << pInvestorPosition->OpenCost << ", ";
+			std::cout << "||开仓成本:" << pInvestorPosition->OpenCost << ", ";
 			///交易所保证金
-			cout << "交易所保证金:" << pInvestorPosition->ExchangeMargin << ", ";
+			std::cout << "交易所保证金:" << pInvestorPosition->ExchangeMargin << ", ";
 			///组合成交形成的持仓
-			cout << "组合成交形成的持仓:" << pInvestorPosition->CombPosition << ", ";
+			std::cout << "组合成交形成的持仓:" << pInvestorPosition->CombPosition << ", ";
 			///组合多头冻结
-			cout << "组合多头冻结:" << pInvestorPosition->CombLongFrozen << ", ";
+			std::cout << "组合多头冻结:" << pInvestorPosition->CombLongFrozen << ", ";
 			///组合空头冻结
-			cout << "组合空头冻结:" << pInvestorPosition->CombShortFrozen << endl;
+			std::cout << "组合空头冻结:" << pInvestorPosition->CombShortFrozen << endl;
 			///逐日盯市平仓盈亏
-			cout << "||逐日盯市平仓盈亏:" << pInvestorPosition->CloseProfitByDate << ", ";
+			std::cout << "||逐日盯市平仓盈亏:" << pInvestorPosition->CloseProfitByDate << ", ";
 			///逐笔对冲平仓盈亏
-			cout << "逐笔对冲平仓盈亏:" << pInvestorPosition->CloseProfitByTrade << ", ";
+			std::cout << "逐笔对冲平仓盈亏:" << pInvestorPosition->CloseProfitByTrade << ", ";
 			///今日持仓
-			cout << "今日持仓:" << pInvestorPosition->TodayPosition << ", ";
+			std::cout << "今日持仓:" << pInvestorPosition->TodayPosition << ", ";
 			///保证金率
-			cout << "保证金率:" << pInvestorPosition->MarginRateByMoney << ", ";
+			std::cout << "保证金率:" << pInvestorPosition->MarginRateByMoney << ", ";
 			///保证金率(按手数)
-			cout << "保证金率(按手数):" << pInvestorPosition->MarginRateByVolume << endl;
+			std::cout << "保证金率(按手数):" << pInvestorPosition->MarginRateByVolume << endl;
 			///执行冻结
-			cout << "||执行冻结:" << pInvestorPosition->StrikeFrozen << ", ";
+			std::cout << "||执行冻结:" << pInvestorPosition->StrikeFrozen << ", ";
 			///执行冻结金额
-			cout << "执行冻结金额:" << pInvestorPosition->StrikeFrozenAmount << ", ";
+			std::cout << "执行冻结金额:" << pInvestorPosition->StrikeFrozenAmount << ", ";
 			///放弃执行冻结
-			cout << "放弃执行冻结:" << pInvestorPosition->AbandonFrozen << endl;
-			cout << "=================================================================================" << endl;
+			std::cout << "放弃执行冻结:" << pInvestorPosition->AbandonFrozen << endl;
+			std::cout << "=================================================================================" << endl;
+			this->current_user->DB_OnRspQryInvestorPosition(this->current_user->GetPositionConn(), pInvestorPosition);
 		}
 	}
 }
@@ -885,100 +980,100 @@ void TdSpi::OnRspQryTradingAccount(CThostFtdcTradingAccountField *pTradingAccoun
 	USER_PRINT("TdSpi::OnRspQryTradingAccount")
 	if (!this->IsErrorRspInfo(pRspInfo)) {
 		if (pTradingAccount) {
-			cout << "=================================================================================" << endl;
+			std::cout << "=================================================================================" << endl;
 			///经纪公司代码
-			cout << "||经纪公司代码:" << pTradingAccount->BrokerID << ", ";
+			std::cout << "||经纪公司代码:" << pTradingAccount->BrokerID << ", ";
 			///投资者帐号
-			cout << "投资者帐号:" << pTradingAccount->AccountID << ", ";
+			std::cout << "投资者帐号:" << pTradingAccount->AccountID << ", ";
 			///上次质押金额
-			cout << "上次质押金额:" << pTradingAccount->PreMortgage << ", ";
+			std::cout << "上次质押金额:" << pTradingAccount->PreMortgage << ", ";
 			///上次信用额度
-			cout << "上次信用额度:" << pTradingAccount->PreCredit << ", ";
+			std::cout << "上次信用额度:" << pTradingAccount->PreCredit << ", ";
 			///上次存款额
-			cout << "上次存款额:" << pTradingAccount->PreDeposit << endl;
+			std::cout << "上次存款额:" << pTradingAccount->PreDeposit << endl;
 			///上次结算准备金
-			cout << "||上次结算准备金:" << pTradingAccount->PreBalance << ", ";
+			std::cout << "||上次结算准备金:" << pTradingAccount->PreBalance << ", ";
 			///上次占用的保证金
-			cout << "上次占用的保证金:" << pTradingAccount->PreMargin << ", ";
+			std::cout << "上次占用的保证金:" << pTradingAccount->PreMargin << ", ";
 			///利息基数
-			cout << "利息基数:" << pTradingAccount->InterestBase << ", ";
+			std::cout << "利息基数:" << pTradingAccount->InterestBase << ", ";
 			///利息收入
-			cout << "利息收入:" << pTradingAccount->Interest << ", ";
+			std::cout << "利息收入:" << pTradingAccount->Interest << ", ";
 			///入金金额
-			cout << "入金金额:" << pTradingAccount->Deposit << endl;
+			std::cout << "入金金额:" << pTradingAccount->Deposit << endl;
 			///出金金额
-			cout << "||出金金额:" << pTradingAccount->Withdraw << ", ";
+			std::cout << "||出金金额:" << pTradingAccount->Withdraw << ", ";
 			///冻结的保证金
-			cout << "冻结的保证金:" << pTradingAccount->FrozenMargin << ", ";
+			std::cout << "冻结的保证金:" << pTradingAccount->FrozenMargin << ", ";
 			///冻结的资金
-			cout << "冻结的资金:" << pTradingAccount->FrozenCash << ", ";
+			std::cout << "冻结的资金:" << pTradingAccount->FrozenCash << ", ";
 			///冻结的手续费
-			cout << "冻结的手续费:" << pTradingAccount->FrozenCommission << ", ";
+			std::cout << "冻结的手续费:" << pTradingAccount->FrozenCommission << ", ";
 			///当前保证金总额
-			cout << "当前保证金总额:" << pTradingAccount->CurrMargin << endl;
+			std::cout << "当前保证金总额:" << pTradingAccount->CurrMargin << endl;
 			///资金差额
-			cout << "||资金差额:" << pTradingAccount->CashIn << ", ";
+			std::cout << "||资金差额:" << pTradingAccount->CashIn << ", ";
 			///手续费
-			cout << "手续费:" << pTradingAccount->Commission << ", ";
+			std::cout << "手续费:" << pTradingAccount->Commission << ", ";
 			///平仓盈亏
-			cout << "平仓盈亏:" << pTradingAccount->CloseProfit << ", ";
+			std::cout << "平仓盈亏:" << pTradingAccount->CloseProfit << ", ";
 			///持仓盈亏
-			cout << "持仓盈亏:" << pTradingAccount->PositionProfit << ", ";
+			std::cout << "持仓盈亏:" << pTradingAccount->PositionProfit << ", ";
 			///期货结算准备金
-			cout << "期货结算准备金:" << pTradingAccount->Balance << endl;
+			std::cout << "期货结算准备金:" << pTradingAccount->Balance << endl;
 			///可用资金
-			cout << "||可用资金:" << pTradingAccount->Available << ", ";
+			std::cout << "||可用资金:" << pTradingAccount->Available << ", ";
 			///可取资金
-			cout << "可取资金:" << pTradingAccount->WithdrawQuota << ", ";
+			std::cout << "可取资金:" << pTradingAccount->WithdrawQuota << ", ";
 			///基本准备金
-			cout << "基本准备金:" << pTradingAccount->Reserve << ", ";
+			std::cout << "基本准备金:" << pTradingAccount->Reserve << ", ";
 			///交易日
-			cout << "交易日:" << pTradingAccount->TradingDay << ", ";
+			std::cout << "交易日:" << pTradingAccount->TradingDay << ", ";
 			///结算编号
-			cout << "结算编号:" << pTradingAccount->SettlementID << endl;
+			std::cout << "结算编号:" << pTradingAccount->SettlementID << endl;
 			///信用额度
-			cout << "||信用额度:" << pTradingAccount->Credit << ", ";
+			std::cout << "||信用额度:" << pTradingAccount->Credit << ", ";
 			///质押金额
-			cout << "质押金额:" << pTradingAccount->Mortgage << ", ";
+			std::cout << "质押金额:" << pTradingAccount->Mortgage << ", ";
 			///交易所保证金
-			cout << "交易所保证金:" << pTradingAccount->ExchangeMargin << ", ";
+			std::cout << "交易所保证金:" << pTradingAccount->ExchangeMargin << ", ";
 			///投资者交割保证金
-			cout << "投资者交割保证金:" << pTradingAccount->DeliveryMargin << ", ";
+			std::cout << "投资者交割保证金:" << pTradingAccount->DeliveryMargin << ", ";
 			///交易所交割保证金
-			cout << "交易所交割保证金:" << pTradingAccount->ExchangeDeliveryMargin << endl;
+			std::cout << "交易所交割保证金:" << pTradingAccount->ExchangeDeliveryMargin << endl;
 			///保底期货结算准备金
-			cout << "||保底期货结算准备金:" << pTradingAccount->ReserveBalance << ", ";
+			std::cout << "||保底期货结算准备金:" << pTradingAccount->ReserveBalance << ", ";
 			///币种代码
-			cout << "币种代码:" << pTradingAccount->CurrencyID << ", ";
+			std::cout << "币种代码:" << pTradingAccount->CurrencyID << ", ";
 			///上次货币质入金额
-			cout << "上次货币质入金额:" << pTradingAccount->PreFundMortgageIn << ", ";
+			std::cout << "上次货币质入金额:" << pTradingAccount->PreFundMortgageIn << ", ";
 			///上次货币质出金额
-			cout << "上次货币质出金额:" << pTradingAccount->PreFundMortgageOut << ", ";
+			std::cout << "上次货币质出金额:" << pTradingAccount->PreFundMortgageOut << ", ";
 			///货币质入金额
-			cout << "货币质入金额:" << pTradingAccount->FundMortgageIn << endl;
+			std::cout << "货币质入金额:" << pTradingAccount->FundMortgageIn << endl;
 			///货币质出金额
-			cout << "||货币质出金额:" << pTradingAccount->FundMortgageOut << ", ";
+			std::cout << "||货币质出金额:" << pTradingAccount->FundMortgageOut << ", ";
 			///货币质押余额
-			cout << "货币质押余额:" << pTradingAccount->FundMortgageAvailable << ", ";
+			std::cout << "货币质押余额:" << pTradingAccount->FundMortgageAvailable << ", ";
 			///可质押货币金额
-			cout << "可质押货币金额:" << pTradingAccount->MortgageableFund << ", ";
+			std::cout << "可质押货币金额:" << pTradingAccount->MortgageableFund << ", ";
 			///特殊产品占用保证金
-			cout << "特殊产品占用保证金:" << pTradingAccount->SpecProductMargin << ", ";
+			std::cout << "特殊产品占用保证金:" << pTradingAccount->SpecProductMargin << ", ";
 			///特殊产品冻结保证金
-			cout << "特殊产品冻结保证金:" << pTradingAccount->SpecProductFrozenMargin << endl;
+			std::cout << "特殊产品冻结保证金:" << pTradingAccount->SpecProductFrozenMargin << endl;
 			///特殊产品手续费
-			cout << "||特殊产品手续费:" << pTradingAccount->SpecProductCommission << ", ";
+			std::cout << "||特殊产品手续费:" << pTradingAccount->SpecProductCommission << ", ";
 			///特殊产品冻结手续费
-			cout << "特殊产品冻结手续费:" << pTradingAccount->SpecProductFrozenCommission << ", ";
+			std::cout << "特殊产品冻结手续费:" << pTradingAccount->SpecProductFrozenCommission << ", ";
 			///特殊产品持仓盈亏
-			cout << "特殊产品持仓盈亏:" << pTradingAccount->SpecProductPositionProfit << ", ";
+			std::cout << "特殊产品持仓盈亏:" << pTradingAccount->SpecProductPositionProfit << ", ";
 			///特殊产品平仓盈亏
-			cout << "特殊产品平仓盈亏:" << pTradingAccount->SpecProductCloseProfit << ", ";
+			std::cout << "特殊产品平仓盈亏:" << pTradingAccount->SpecProductCloseProfit << ", ";
 			///根据持仓盈亏算法计算的特殊产品持仓盈亏
-			cout << "根据持仓盈亏算法计算的特殊产品持仓盈亏:" << pTradingAccount->SpecProductPositionProfitByAlg << endl;
+			std::cout << "根据持仓盈亏算法计算的特殊产品持仓盈亏:" << pTradingAccount->SpecProductPositionProfitByAlg << endl;
 			///特殊产品交易所保证金
-			cout << "||特殊产品交易所保证金:" << pTradingAccount->SpecProductExchangeMargin << endl;
-			cout << "=================================================================================" << endl;
+			std::cout << "||特殊产品交易所保证金:" << pTradingAccount->SpecProductExchangeMargin << endl;
+			std::cout << "=================================================================================" << endl;
 		}
 	}
 }
@@ -996,98 +1091,98 @@ void TdSpi::OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *
 	USER_PRINT("TdSpi::OnRspQryTrade");
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (pTrade) {
-			cout << "=================================================================================" << endl;
+			std::cout << "=================================================================================" << endl;
 			///经纪公司代码
-			cout << "||经纪公司代码:" << pTrade->BrokerID << ",";
+			std::cout << "||经纪公司代码:" << pTrade->BrokerID << ",";
 			///投资者代码
-			cout << "投资者代码:" << pTrade->InvestorID << ",";
+			std::cout << "投资者代码:" << pTrade->InvestorID << ",";
 			///合约代码
-			cout << "合约代码:" << pTrade->InstrumentID << ",";
+			std::cout << "合约代码:" << pTrade->InstrumentID << ",";
 			///报单引用
-			cout << "报单引用:" << pTrade->OrderRef << ",";
+			std::cout << "报单引用:" << pTrade->OrderRef << ",";
 			///用户代码
-			cout << "用户代码:" << pTrade->UserID << endl;
+			std::cout << "用户代码:" << pTrade->UserID << endl;
 			///交易所代码
-			cout << "||交易所代码:" << pTrade->ExchangeID << ",";
+			std::cout << "||交易所代码:" << pTrade->ExchangeID << ",";
 			///成交编号
-			cout << "成交编号:" << pTrade->TradeID << ",";
+			std::cout << "成交编号:" << pTrade->TradeID << ",";
 			///买卖方向
-			cout << "买卖方向:" << pTrade->Direction << ",";
+			std::cout << "买卖方向:" << pTrade->Direction << ",";
 			///报单编号
-			cout << "报单编号:" << pTrade->OrderSysID << ",";
+			std::cout << "报单编号:" << pTrade->OrderSysID << ",";
 			///会员代码
-			cout << "会员代码:" << pTrade->ParticipantID << endl;
+			std::cout << "会员代码:" << pTrade->ParticipantID << endl;
 			///客户代码
-			cout << "||客户代码:" << pTrade->ClientID << ",";
+			std::cout << "||客户代码:" << pTrade->ClientID << ",";
 			///交易角色
-			cout << "交易角色:" << pTrade->TradingRole << ",";
+			std::cout << "交易角色:" << pTrade->TradingRole << ",";
 			///合约在交易所的代码
-			cout << "合约在交易所的代码:" << pTrade->ExchangeInstID << ",";
+			std::cout << "合约在交易所的代码:" << pTrade->ExchangeInstID << ",";
 			///开平标志
-			cout << "开平标志:" << pTrade->OffsetFlag << ",";
+			std::cout << "开平标志:" << pTrade->OffsetFlag << ",";
 			///投机套保标志
-			cout << "投机套保标志:" << pTrade->HedgeFlag << endl;
+			std::cout << "投机套保标志:" << pTrade->HedgeFlag << endl;
 			///价格
-			cout << "||价格:" << pTrade->Price << ",";
+			std::cout << "||价格:" << pTrade->Price << ",";
 			///数量
-			cout << "数量:" << pTrade->Volume << ",";
+			std::cout << "数量:" << pTrade->Volume << ",";
 			///成交时期
-			cout << "成交时期:" << pTrade->TradeDate << ",";
+			std::cout << "成交时期:" << pTrade->TradeDate << ",";
 			///成交时间
-			cout << "成交时间:" << pTrade->TradeTime << ",";
+			std::cout << "成交时间:" << pTrade->TradeTime << ",";
 			///成交类型
-			cout << "成交类型:" << pTrade->TradeType << endl;
+			std::cout << "成交类型:" << pTrade->TradeType << endl;
 			///成交价来源
-			cout << "||成交价来源:" << pTrade->PriceSource << ",";
+			std::cout << "||成交价来源:" << pTrade->PriceSource << ",";
 			///交易所交易员代码
-			cout << "交易所交易员代码:" << pTrade->TraderID << ",";
+			std::cout << "交易所交易员代码:" << pTrade->TraderID << ",";
 			///本地报单编号
-			cout << "本地报单编号:" << pTrade->OrderLocalID << ",";
+			std::cout << "本地报单编号:" << pTrade->OrderLocalID << ",";
 			///结算会员编号
-			cout << "结算会员编号:" << pTrade->ClearingPartID << ",";
+			std::cout << "结算会员编号:" << pTrade->ClearingPartID << ",";
 			///业务单元
-			cout << "业务单元:" << pTrade->BusinessUnit << endl;
+			std::cout << "业务单元:" << pTrade->BusinessUnit << endl;
 			///序号
-			cout << "||序号:" << pTrade->SequenceNo << ",";
+			std::cout << "||序号:" << pTrade->SequenceNo << ",";
 			///交易日
-			cout << "交易日:" << pTrade->TradingDay << ",";
+			std::cout << "交易日:" << pTrade->TradingDay << ",";
 			///结算编号
-			cout << "结算编号:" << pTrade->SettlementID << ",";
+			std::cout << "结算编号:" << pTrade->SettlementID << ",";
 			///经纪公司报单编号
-			cout << "经纪公司报单编号:" << pTrade->BrokerOrderSeq << ",";
+			std::cout << "经纪公司报单编号:" << pTrade->BrokerOrderSeq << ",";
 			///成交来源
-			cout << "成交来源:" << pTrade->TradeSource << endl;
-			cout << "=================================================================================" << endl;
+			std::cout << "成交来源:" << pTrade->TradeSource << endl;
+			std::cout << "=================================================================================" << endl;
 		}
 	}
 }
 
 //下单
-void TdSpi::OrderInsert(char *InstrumentID, char CombOffsetFlag, char Direction, int Volume, double Price, string OrderRef) {
+void TdSpi::OrderInsert(User *user, char *InstrumentID, char CombOffsetFlag, char Direction, int Volume, double Price, string OrderRef) {
 	CThostFtdcInputOrderField *pInputOrder = new CThostFtdcInputOrderField();
 	memset(pInputOrder, 0, sizeof(CThostFtdcInputOrderField));
-	cout << "***************************" << endl;
-	cout << "broker id = " << this->getBrokerID().c_str() << endl;
-	cout << "user id = " << this->getUserID().c_str() << endl;
-	cout << "instrument id = " << InstrumentID << endl;
-	cout << "Order Ref = " << OrderRef << endl;
-	cout << "Direction = " << THOST_FTDC_D_Buy << endl;
-	cout << "CombOffsetFlag = " << CombOffsetFlag << endl;
-	cout << "Price = " << Price << endl;
-	cout << "Volume = " << Volume << endl;
-	cout << "Request id = " << this->getRequestID() << endl;
+	std::cout << "***************************" << endl;
+	std::cout << "broker id = " << user->getBrokerID().c_str() << endl;
+	std::cout << "user id = " << user->getUserID().c_str() << endl;
+	std::cout << "instrument id = " << InstrumentID << endl;
+	std::cout << "Order Ref = " << OrderRef << endl;
+	std::cout << "Direction = " << THOST_FTDC_D_Buy << endl;
+	std::cout << "CombOffsetFlag = " << CombOffsetFlag << endl;
+	std::cout << "Price = " << Price << endl;
+	std::cout << "Volume = " << Volume << endl;
+	std::cout << "Request id = " << this->getRequestID() << endl;
 
 
 	///经纪公司代码
-	strcpy(pInputOrder->BrokerID, this->getBrokerID().c_str());
+	strcpy(pInputOrder->BrokerID, user->getBrokerID().c_str());
 
 	///投资者代码
-	strcpy(pInputOrder->InvestorID, this->getUserID().c_str());
+	strcpy(pInputOrder->InvestorID, user->getUserID().c_str());
 
 	///合约代码
 	//string heyue = "cu1609";
 	//strcpy(pInputOrder->InstrumentID, "cu1609");
-	//cout << "instrument ID c_str()" << InstrumentID.c_str() << endl;
+	//std::cout << "instrument ID c_str()" << InstrumentID.c_str() << endl;
 
 	std::strcpy(pInputOrder->InstrumentID, InstrumentID);
 
@@ -1181,9 +1276,11 @@ void TdSpi::OrderInsert(char *InstrumentID, char CombOffsetFlag, char Direction,
 	//TThostFtdcIPAddressType	IPAddress;
 	///Mac地址
 	//TThostFtdcMacAddressType	MacAddress;
-
-	this->tdapi->ReqOrderInsert(pInputOrder, this->getRequestID());
-
+	//sleep(1);
+	USER_PRINT("before ReqOrderInsert");
+	this->tdapi->ReqOrderInsert(pInputOrder, 1);
+	USER_PRINT("after ReqOrderInsert");
+	this->current_user->DB_OrderInsert(this->current_user->GetOrderConn(), pInputOrder);
 	delete pInputOrder;
 }
 
@@ -1192,54 +1289,55 @@ void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcR
 	USER_PRINT("TdSpi::OnRspOrderInsert");
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (pInputOrder) {
-			cout << "=================================================================================" << endl;
+			std::cout << "=================================================================================" << endl;
 			///经纪公司代码
-			cout << "经纪公司代码:" << pInputOrder->BrokerID << ", ";
+			std::cout << "经纪公司代码:" << pInputOrder->BrokerID << ", ";
 			///投资者代码
-			cout << "投资者代码:" << pInputOrder->InvestorID << ", ";
+			std::cout << "投资者代码:" << pInputOrder->InvestorID << ", ";
 			///合约代码
-			cout << "合约代码:" << pInputOrder->InstrumentID << ", ";
+			std::cout << "合约代码:" << pInputOrder->InstrumentID << ", ";
 			///报单引用
-			cout << "报单引用:" << pInputOrder->OrderRef << ", ";
+			std::cout << "报单引用:" << pInputOrder->OrderRef << ", ";
 			///用户代码
-			cout << "用户代码:" << pInputOrder->UserID << endl;
+			std::cout << "用户代码:" << pInputOrder->UserID << endl;
 			///报单价格条件
-			cout << "报单价格条件:" << pInputOrder->OrderPriceType << ", ";
+			std::cout << "报单价格条件:" << pInputOrder->OrderPriceType << ", ";
 			///买卖方向
-			cout << "买卖方向:" << pInputOrder->Direction << ", ";
+			std::cout << "买卖方向:" << pInputOrder->Direction << ", ";
 			///组合开平标志
-			cout << "组合开平标志:" << pInputOrder->CombOffsetFlag << ", ";
+			std::cout << "组合开平标志:" << pInputOrder->CombOffsetFlag << ", ";
 			///组合投机套保标志
-			cout << "组合投机套保标志:" << pInputOrder->CombHedgeFlag << ", ";
+			std::cout << "组合投机套保标志:" << pInputOrder->CombHedgeFlag << ", ";
 			///价格
-			cout << "价格:" << pInputOrder->LimitPrice << endl;
+			std::cout << "价格:" << pInputOrder->LimitPrice << endl;
 			///数量
-			cout << "数量:" << pInputOrder->VolumeTotalOriginal << ", ";
+			std::cout << "数量:" << pInputOrder->VolumeTotalOriginal << ", ";
 			///有效期类型
-			cout << "有效期类型:" << pInputOrder->TimeCondition << ", ";
+			std::cout << "有效期类型:" << pInputOrder->TimeCondition << ", ";
 			///GTD日期
-			cout << "GTD日期:" << pInputOrder->GTDDate << ", ";
+			std::cout << "GTD日期:" << pInputOrder->GTDDate << ", ";
 			///成交量类型
-			cout << "成交量类型:" << pInputOrder->VolumeCondition << ", ";
+			std::cout << "成交量类型:" << pInputOrder->VolumeCondition << ", ";
 			///最小成交量
-			cout << "最小成交量:" << pInputOrder->MinVolume << endl;
+			std::cout << "最小成交量:" << pInputOrder->MinVolume << endl;
 			///触发条件
-			cout << "触发条件:" << pInputOrder->ContingentCondition << ", ";
+			std::cout << "触发条件:" << pInputOrder->ContingentCondition << ", ";
 			///止损价
-			cout << "止损价:" << pInputOrder->StopPrice << ", ";
+			std::cout << "止损价:" << pInputOrder->StopPrice << ", ";
 			///强平原因
-			cout << "强平原因:" << pInputOrder->ForceCloseReason << ", ";
+			std::cout << "强平原因:" << pInputOrder->ForceCloseReason << ", ";
 			///自动挂起标志
-			cout << "自动挂起标志:" << pInputOrder->IsAutoSuspend << ", ";
+			std::cout << "自动挂起标志:" << pInputOrder->IsAutoSuspend << ", ";
 			///业务单元
-			cout << "业务单元:" << pInputOrder->BusinessUnit << endl;
+			std::cout << "业务单元:" << pInputOrder->BusinessUnit << endl;
 			///请求编号
-			cout << "请求编号:" << pInputOrder->RequestID << ", ";
+			std::cout << "请求编号:" << pInputOrder->RequestID << ", ";
 			///用户强评标志
-			cout << "用户强评标志:" << pInputOrder->UserForceClose << ", ";
+			std::cout << "用户强评标志:" << pInputOrder->UserForceClose << ", ";
 			///互换单标志
-			cout << "互换单标志:" << pInputOrder->IsSwapOrder << endl;
-			cout << "=================================================================================" << endl;
+			std::cout << "互换单标志:" << pInputOrder->IsSwapOrder << endl;
+			std::cout << "=================================================================================" << endl;
+			this->current_user->DB_OnRspOrderInsert(this->current_user->GetOrderConn(), pInputOrder);
 		}
 	}
 }
@@ -1248,128 +1346,208 @@ void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcR
 void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	USER_PRINT("TdSpi::OnRtnOrder");
 	if (pOrder) {
+		std::cout << "=================================================================================" << endl;
+		///经纪公司代码
+		std::cout << "||经纪公司代码:" << pOrder->BrokerID << ", ";
+		///投资者代码
+		std::cout << "投资者代码:" << pOrder->InvestorID << ", ";
+		///合约代码
+		std::cout << "合约代码:" << pOrder->InstrumentID << ", ";
+		///报单引用
+		std::cout << "报单引用:" << pOrder->OrderRef << ", ";
+		///用户代码
+		std::cout << "用户代码:" << pOrder->UserID << endl;
+		///报单价格条件
+		std::cout << "||报单价格条件:" << pOrder->OrderPriceType << ", ";
+		///买卖方向
+		std::cout << "买卖方向:" << pOrder->Direction << ", ";
+		///组合开平标志
+		std::cout << "组合开平标志:" << pOrder->CombOffsetFlag << ", ";
+		///组合投机套保标志
+		std::cout << "组合投机套保标志:" << pOrder->CombHedgeFlag << ", ";
+		///价格
+		std::cout << "价格:" << pOrder->LimitPrice << endl;
+		///数量
+		std::cout << "||数量:" << pOrder->VolumeTotalOriginal << ", ";
+		///有效期类型
+		std::cout << "有效期类型:" << pOrder->TimeCondition << ", ";
+		///GTD日期
+		std::cout << "GTD日期:" << pOrder->GTDDate << ", ";
+		///成交量类型
+		std::cout << "成交量类型:" << pOrder->VolumeCondition << ", ";
+		///最小成交量
+		std::cout << "最小成交量:" << pOrder->MinVolume << endl;
+		///触发条件
+		std::cout << "||触发条件:" << pOrder->ContingentCondition << ", ";
+		///止损价
+		std::cout << "止损价:" << pOrder->StopPrice << ", ";
+		///强平原因
+		std::cout << "强平原因:" << pOrder->ForceCloseReason << ", ";
+		///自动挂起标志
+		std::cout << "自动挂起标志:" << pOrder->IsAutoSuspend << ", ";
+		///业务单元
+		std::cout << "业务单元:" << pOrder->BusinessUnit << endl;
+		///请求编号
+		std::cout << "||请求编号:" << pOrder->RequestID << ", ";
+		///本地报单编号
+		std::cout << "本地报单编号:" << pOrder->OrderLocalID << ", ";
+		///交易所代码
+		std::cout << "交易所代码:" << pOrder->ExchangeID << ", ";
+		///会员代码
+		std::cout << "会员代码:" << pOrder->ParticipantID << ", ";
+		///客户代码
+		std::cout << "客户代码:" << pOrder->ClientID << endl;
+		///合约在交易所的代码
+		std::cout << "||合约在交易所的代码:" << pOrder->ExchangeInstID << ", ";
+		///交易所交易员代码
+		std::cout << "交易所交易员代码:" << pOrder->TraderID << ", ";
+		///安装编号
+		std::cout << "安装编号:" << pOrder->InstallID << ", ";
+		///报单提交状态
+		std::cout << "报单提交状态:" << pOrder->OrderSubmitStatus << ", ";
+		///报单提示序号
+		std::cout << "报单提示序号:" << pOrder->NotifySequence << endl;
+		///交易日
+		std::cout << "||交易日:" << pOrder->TradingDay << ", ";
+		///结算编号
+		std::cout << "结算编号:" << pOrder->SettlementID << ", ";
+		///报单编号
+		std::cout << "报单编号:" << pOrder->OrderSysID << ", ";
+		///报单来源
+		std::cout << "报单来源:" << pOrder->OrderSource << ", ";
+		///报单状态
+		std::cout << "报单状态:" << pOrder->OrderStatus << endl;
+		///报单类型
+		std::cout << "||报单类型:" << pOrder->OrderType << ", ";
+		///今成交数量
+		std::cout << "今成交数量:" << pOrder->VolumeTraded << ", ";
+		///剩余数量
+		std::cout << "剩余数量:" << pOrder->VolumeTotal << ", ";
+		///报单日期
+		std::cout << "报单日期:" << pOrder->InsertDate << ", ";
+		///委托时间
+		std::cout << "委托时间:" << pOrder->InsertTime << endl;
+		///激活时间
+		std::cout << "||激活时间:" << pOrder->ActiveTime << ", ";
+		///挂起时间
+		std::cout << "挂起时间:" << pOrder->SuspendTime << ", ";
+		///最后修改时间
+		std::cout << "最后修改时间:" << pOrder->UpdateTime << ", ";
+		///撤销时间
+		std::cout << "撤销时间:" << pOrder->CancelTime << ", ";
+		///最后修改交易所交易员代码
+		std::cout << "最后修改交易所交易员代码:" << pOrder->ActiveTraderID << endl;
+		///结算会员编号
+		std::cout << "||结算会员编号:" << pOrder->ClearingPartID << ", ";
+		///序号
+		std::cout << "序号:" << pOrder->SequenceNo << ", ";
+		///前置编号
+		std::cout << "前置编号:" << pOrder->FrontID << ", ";
+		///会话编号
+		std::cout << "会话编号:" << pOrder->SessionID << ", ";
+		///用户端产品信息
+		std::cout << "用户端产品信息:" << pOrder->UserProductInfo << endl;
+		///状态信息
+		codeDst[90] = { 0 };
+		Utils::Gb2312ToUtf8(codeDst, 90, pOrder->StatusMsg, strlen(pOrder->StatusMsg)); // Gb2312ToUtf8
+		std::cout << "||状态信息:" << codeDst << ", ";
+		///用户强评标志
+		std::cout << "用户强评标志:" << pOrder->UserForceClose << ", ";
+		///操作用户代码
+		std::cout << "操作用户代码:" << pOrder->ActiveUserID << ", ";
+		///经纪公司报单编号
+		std::cout << "经纪公司报单编号:" << pOrder->BrokerOrderSeq << ", ";
+		///相关报单
+		std::cout << "相关报单:" << pOrder->RelativeOrderSysID << endl;
+		///郑商所成交数量
+		std::cout << "||郑商所成交数量:" << pOrder->ZCETotalTradedVolume << ", ";
+		///互换单标志
+		std::cout << "互换单标志:" << pOrder->IsSwapOrder << endl;
+		std::cout << "=================================================================================" << endl;
+
+		this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pOrder);
+		//delete[] codeDst;
+	}
+}
+
+//成交通知
+void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
+	USER_PRINT("TdSpi::OnRtnTrade");
+	if (pTrade) {
 		cout << "=================================================================================" << endl;
 		///经纪公司代码
-		cout << "||经纪公司代码:" << pOrder->BrokerID << ", ";
+		cout << "||经纪公司代码" << pTrade->BrokerID << ", ";
 		///投资者代码
-		cout << "投资者代码:" << pOrder->InvestorID << ", ";
+		cout << "投资者代码" << pTrade->InvestorID << ", ";
 		///合约代码
-		cout << "合约代码:" << pOrder->InstrumentID << ", ";
+		cout << "合约代码" << pTrade->InstrumentID << ", ";
 		///报单引用
-		cout << "报单引用:" << pOrder->OrderRef << ", ";
+		cout << "报单引用" << pTrade->OrderRef << ", ";
 		///用户代码
-		cout << "用户代码:" << pOrder->UserID << endl;
-		///报单价格条件
-		cout << "||报单价格条件:" << pOrder->OrderPriceType << ", ";
-		///买卖方向
-		cout << "买卖方向:" << pOrder->Direction << ", ";
-		///组合开平标志
-		cout << "组合开平标志:" << pOrder->CombOffsetFlag << ", ";
-		///组合投机套保标志
-		cout << "组合投机套保标志:" << pOrder->CombHedgeFlag << ", ";
-		///价格
-		cout << "价格:" << pOrder->LimitPrice << endl;
-		///数量
-		cout << "||数量:" << pOrder->VolumeTotalOriginal << ", ";
-		///有效期类型
-		cout << "有效期类型:" << pOrder->TimeCondition << ", ";
-		///GTD日期
-		cout << "GTD日期:" << pOrder->GTDDate << ", ";
-		///成交量类型
-		cout << "成交量类型:" << pOrder->VolumeCondition << ", ";
-		///最小成交量
-		cout << "最小成交量:" << pOrder->MinVolume << endl;
-		///触发条件
-		cout << "||触发条件:" << pOrder->ContingentCondition << ", ";
-		///止损价
-		cout << "止损价:" << pOrder->StopPrice << ", ";
-		///强平原因
-		cout << "强平原因:" << pOrder->ForceCloseReason << ", ";
-		///自动挂起标志
-		cout << "自动挂起标志:" << pOrder->IsAutoSuspend << ", ";
-		///业务单元
-		cout << "业务单元:" << pOrder->BusinessUnit << endl;
-		///请求编号
-		cout << "||请求编号:" << pOrder->RequestID << ", ";
-		///本地报单编号
-		cout << "本地报单编号:" << pOrder->OrderLocalID << ", ";
+		cout << "用户代码" << pTrade->UserID << endl;
 		///交易所代码
-		cout << "交易所代码:" << pOrder->ExchangeID << ", ";
-		///会员代码
-		cout << "会员代码:" << pOrder->ParticipantID << ", ";
-		///客户代码
-		cout << "客户代码:" << pOrder->ClientID << endl;
-		///合约在交易所的代码
-		cout << "||合约在交易所的代码:" << pOrder->ExchangeInstID << ", ";
-		///交易所交易员代码
-		cout << "交易所交易员代码:" << pOrder->TraderID << ", ";
-		///安装编号
-		cout << "安装编号:" << pOrder->InstallID << ", ";
-		///报单提交状态
-		cout << "报单提交状态:" << pOrder->OrderSubmitStatus << ", ";
-		///报单提示序号
-		cout << "报单提示序号:" << pOrder->NotifySequence << endl;
-		///交易日
-		cout << "||交易日:" << pOrder->TradingDay << ", ";
-		///结算编号
-		cout << "结算编号:" << pOrder->SettlementID << ", ";
+		cout << "||交易所代码" << pTrade->ExchangeID << ", ";
+		///成交编号
+		cout << "成交编号" << pTrade->TradeID << ", ";
+		///买卖方向
+		cout << "买卖方向" << pTrade->Direction << ", ";
 		///报单编号
-		cout << "报单编号:" << pOrder->OrderSysID << ", ";
-		///报单来源
-		cout << "报单来源:" << pOrder->OrderSource << ", ";
-		///报单状态
-		cout << "报单状态:" << pOrder->OrderStatus << endl;
-		///报单类型
-		cout << "||报单类型:" << pOrder->OrderType << ", ";
-		///今成交数量
-		cout << "今成交数量:" << pOrder->VolumeTraded << ", ";
-		///剩余数量
-		cout << "剩余数量:" << pOrder->VolumeTotal << ", ";
-		///报单日期
-		cout << "报单日期:" << pOrder->InsertDate << ", ";
-		///委托时间
-		cout << "委托时间:" << pOrder->InsertTime << endl;
-		///激活时间
-		cout << "||激活时间:" << pOrder->ActiveTime << ", ";
-		///挂起时间
-		cout << "挂起时间:" << pOrder->SuspendTime << ", ";
-		///最后修改时间
-		cout << "最后修改时间:" << pOrder->UpdateTime << ", ";
-		///撤销时间
-		cout << "撤销时间:" << pOrder->CancelTime << ", ";
-		///最后修改交易所交易员代码
-		cout << "最后修改交易所交易员代码:" << pOrder->ActiveTraderID << endl;
+		cout << "报单编号" << pTrade->OrderSysID << ", ";
+		///会员代码
+		cout << "会员代码" << pTrade->ParticipantID << endl;
+		///客户代码
+		cout << "||客户代码" << pTrade->ClientID << ", ";
+		///交易角色
+		cout << "交易角色" << pTrade->TradingRole << ", ";
+		///合约在交易所的代码
+		cout << "合约在交易所的代码" << pTrade->ExchangeInstID << ", ";
+		///开平标志
+		cout << "开平标志" << pTrade->OffsetFlag << ", ";
+		///投机套保标志
+		cout << "投机套保标志" << pTrade->HedgeFlag << endl;
+		///价格
+		cout << "||价格" << pTrade->Price << ", ";
+		///数量
+		cout << "数量" << pTrade->Volume << ", ";
+		///成交时期
+		cout << "成交时期" << pTrade->TradeDate << ", ";
+		///成交时间
+		cout << "成交时间" << pTrade->TradeTime << ", ";
+		///成交类型
+		cout << "成交类型" << pTrade->TradeType << endl;
+		///成交价来源
+		cout << "||成交价来源" << pTrade->PriceSource << ", ";
+		///交易所交易员代码
+		cout << "交易所交易员代码" << pTrade->TraderID << ", ";
+		///本地报单编号
+		cout << "本地报单编号" << pTrade->OrderLocalID << ", ";
 		///结算会员编号
-		cout << "||结算会员编号:" << pOrder->ClearingPartID << ", ";
+		cout << "结算会员编号" << pTrade->ClearingPartID << endl;
+		///业务单元
+		cout << "||业务单元" << pTrade->BusinessUnit << ", ";
 		///序号
-		cout << "序号:" << pOrder->SequenceNo << ", ";
-		///前置编号
-		cout << "前置编号:" << pOrder->FrontID << ", ";
-		///会话编号
-		cout << "会话编号:" << pOrder->SessionID << ", ";
-		///用户端产品信息
-		cout << "用户端产品信息:" << pOrder->UserProductInfo << endl;
-		///状态信息
-		cout << "||状态信息:" << pOrder->StatusMsg << ", ";
-		///用户强评标志
-		cout << "用户强评标志:" << pOrder->UserForceClose << ", ";
-		///操作用户代码
-		cout << "操作用户代码:" << pOrder->ActiveUserID << ", ";
+		cout << "序号" << pTrade->SequenceNo << ", ";
+		///交易日
+		cout << "交易日" << pTrade->TradingDay << ", ";
+		///结算编号
+		cout << "结算编号" << pTrade->SettlementID << endl;
 		///经纪公司报单编号
-		cout << "经纪公司报单编号:" << pOrder->BrokerOrderSeq << ", ";
-		///相关报单
-		cout << "相关报单:" << pOrder->RelativeOrderSysID << endl;
-		///郑商所成交数量
-		cout << "||郑商所成交数量:" << pOrder->ZCETotalTradedVolume << ", ";
-		///互换单标志
-		cout << "互换单标志:" << pOrder->IsSwapOrder << endl;
+		cout << "||经纪公司报单编号" << pTrade->BrokerOrderSeq << ", ";
+		///成交来源
+		cout << "成交来源" << pTrade->TradeSource << endl;
 		cout << "=================================================================================" << endl;
+		this->current_user->DB_OnRtnTrade(this->current_user->GetTradeConn(), pTrade);
 	}
 }
 
 //下单错误响应
 void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo) {
 	USER_PRINT("TdSpi::OnErrRtnOrderInsert");
+	if (!(this->IsErrorRspInfo(pRspInfo))) {
+		if (pInputOrder) {
+			this->current_user->DB_OnErrRtnOrderInsert(this->current_user->GetOrderConn(), pInputOrder);
+		}
+	}
 }
 
 //撤单
@@ -1383,6 +1561,7 @@ void TdSpi::OrderAction(string ExchangeID, string OrderRef, string OrderSysID) {
 	strcpy(pOrderAction->OrderSysID, OrderSysID.c_str());
 	pOrderAction->ActionFlag = THOST_FTDC_AF_Delete; //删除
 	this->tdapi->ReqOrderAction(pOrderAction, this->getRequestID());
+	this->current_user->DB_OrderAction(this->current_user->GetOrderConn(), pOrderAction);
 	delete pOrderAction;
 }
 
@@ -1390,7 +1569,9 @@ void TdSpi::OrderAction(string ExchangeID, string OrderRef, string OrderSysID) {
 void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspOrderAction");
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
-
+		if (pInputOrderAction) {
+			this->current_user->DB_OnRspOrderAction(this->current_user->GetOrderConn(), pInputOrderAction);
+		}
 	}
 }
 
@@ -1398,12 +1579,11 @@ void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction,
 void TdSpi::OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction, CThostFtdcRspInfoField *pRspInfo) {
 	USER_PRINT("TdSpi::OnErrRtnOrderAction");
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
-
+		if (pOrderAction) {
+			this->current_user->DB_OnErrRtnOrderAction(this->current_user->GetOrderConn(), pOrderAction);
+		}
 	}
 }
-
-
-
 
 
 //登出
@@ -1439,30 +1619,14 @@ void TdSpi::Join() {
 ///用户口令更新请求响应
 void TdSpi::OnRspUserPasswordUpdate(CThostFtdcUserPasswordUpdateField *pUserPasswordUpdate,
                                     CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
-    cout << "回调用户口令更新请求响应OnRspUserPasswordUpdate" << endl;
+    std::cout << "回调用户口令更新请求响应OnRspUserPasswordUpdate" << endl;
     if (pRspInfo->ErrorID == 0){
-        cout << "更改成功 " << endl
+        std::cout << "更改成功 " << endl
         << "旧密码为:" << pUserPasswordUpdate->OldPassword << endl
         << "新密码为:" << pUserPasswordUpdate->NewPassword << endl;
     }
     else{
-        cout << pRspInfo->ErrorID << ends << pRspInfo->ErrorMsg << endl;
-    }
-}
-
-///请求查询行情响应
-void TdSpi::OnRspQryDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData,
-                                    CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
-    cout << "OnRspQryDepthMarketData" << endl;
-    cout << nRequestID << endl;
-    if (pDepthMarketData != NULL){
-        cout << "-----------------行情数据--------------------" << endl;
-        cout << "交易日:" << pDepthMarketData->TradingDay << endl
-        << "合约代码:" << pDepthMarketData->InstrumentID << endl
-        << "最新价:" << pDepthMarketData->LastPrice << endl
-        << "最高价:" << pDepthMarketData->HighestPrice << endl
-        << "最低价:" << pDepthMarketData->LowestPrice << endl;
-        cout << "-----------------行情数据--------------------" << endl;
+        std::cout << pRspInfo->ErrorID << ends << pRspInfo->ErrorMsg << endl;
     }
 }
 
@@ -1470,8 +1634,11 @@ bool TdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 {
 	// 如果ErrorID != 0, 说明收到了错误的响应
 	bool bResult = ((pRspInfo) && (pRspInfo->ErrorID != 0));
-	if (bResult)
-		cerr << "--->>> ErrorID=" << pRspInfo->ErrorID << ", ErrorMsg=" << pRspInfo->ErrorMsg << endl;
+	if (bResult) {
+		codeDst[90] = { 0 };
+		Utils::Gb2312ToUtf8(codeDst, 90, pRspInfo->ErrorMsg, strlen(pRspInfo->ErrorMsg)); // Gb2312ToUtf8
+		cerr << "--->>> ErrorID=" << pRspInfo->ErrorID << ", ErrorMsg=" << codeDst << endl;
+	}
 	return bResult;
 }
 

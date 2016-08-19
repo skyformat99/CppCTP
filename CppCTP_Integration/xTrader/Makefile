@@ -42,10 +42,10 @@ EQUALS = =
 CMAKE_EDIT_COMMAND = /usr/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /mnt/hgfs/gmctp/CppCTP_Integration/xTrader
+CMAKE_SOURCE_DIR = /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /mnt/hgfs/gmctp/CppCTP_Integration/xTrader
+CMAKE_BINARY_DIR = /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -72,9 +72,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/hgfs/gmctp/CppCTP_Integration/xTrader/CMakeFiles /mnt/hgfs/gmctp/CppCTP_Integration/xTrader/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/hgfs/gmctp/CppCTP_Integration/xTrader/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -114,6 +114,102 @@ quant_ctp_XTrader/fast:
 	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/build
 .PHONY : quant_ctp_XTrader/fast
 
+Algorithm.o: Algorithm.cpp.o
+.PHONY : Algorithm.o
+
+# target to build an object file
+Algorithm.cpp.o:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.o
+.PHONY : Algorithm.cpp.o
+
+Algorithm.i: Algorithm.cpp.i
+.PHONY : Algorithm.i
+
+# target to preprocess a source file
+Algorithm.cpp.i:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.i
+.PHONY : Algorithm.cpp.i
+
+Algorithm.s: Algorithm.cpp.s
+.PHONY : Algorithm.s
+
+# target to generate assembly for a file
+Algorithm.cpp.s:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.s
+.PHONY : Algorithm.cpp.s
+
+CTP_Manager.o: CTP_Manager.cpp.o
+.PHONY : CTP_Manager.o
+
+# target to build an object file
+CTP_Manager.cpp.o:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o
+.PHONY : CTP_Manager.cpp.o
+
+CTP_Manager.i: CTP_Manager.cpp.i
+.PHONY : CTP_Manager.i
+
+# target to preprocess a source file
+CTP_Manager.cpp.i:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.i
+.PHONY : CTP_Manager.cpp.i
+
+CTP_Manager.s: CTP_Manager.cpp.s
+.PHONY : CTP_Manager.s
+
+# target to generate assembly for a file
+CTP_Manager.cpp.s:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.s
+.PHONY : CTP_Manager.cpp.s
+
+DBManager.o: DBManager.cpp.o
+.PHONY : DBManager.o
+
+# target to build an object file
+DBManager.cpp.o:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o
+.PHONY : DBManager.cpp.o
+
+DBManager.i: DBManager.cpp.i
+.PHONY : DBManager.i
+
+# target to preprocess a source file
+DBManager.cpp.i:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.i
+.PHONY : DBManager.cpp.i
+
+DBManager.s: DBManager.cpp.s
+.PHONY : DBManager.s
+
+# target to generate assembly for a file
+DBManager.cpp.s:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.s
+.PHONY : DBManager.cpp.s
+
+FutureAccount.o: FutureAccount.cpp.o
+.PHONY : FutureAccount.o
+
+# target to build an object file
+FutureAccount.cpp.o:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o
+.PHONY : FutureAccount.cpp.o
+
+FutureAccount.i: FutureAccount.cpp.i
+.PHONY : FutureAccount.i
+
+# target to preprocess a source file
+FutureAccount.cpp.i:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.i
+.PHONY : FutureAccount.cpp.i
+
+FutureAccount.s: FutureAccount.cpp.s
+.PHONY : FutureAccount.s
+
+# target to generate assembly for a file
+FutureAccount.cpp.s:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.s
+.PHONY : FutureAccount.cpp.s
+
 MdSpi.o: MdSpi.cpp.o
 .PHONY : MdSpi.o
 
@@ -138,6 +234,54 @@ MdSpi.cpp.s:
 	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.s
 .PHONY : MdSpi.cpp.s
 
+Order.o: Order.cpp.o
+.PHONY : Order.o
+
+# target to build an object file
+Order.cpp.o:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o
+.PHONY : Order.cpp.o
+
+Order.i: Order.cpp.i
+.PHONY : Order.i
+
+# target to preprocess a source file
+Order.cpp.i:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.i
+.PHONY : Order.cpp.i
+
+Order.s: Order.cpp.s
+.PHONY : Order.s
+
+# target to generate assembly for a file
+Order.cpp.s:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.s
+.PHONY : Order.cpp.s
+
+Strategy.o: Strategy.cpp.o
+.PHONY : Strategy.o
+
+# target to build an object file
+Strategy.cpp.o:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o
+.PHONY : Strategy.cpp.o
+
+Strategy.i: Strategy.cpp.i
+.PHONY : Strategy.i
+
+# target to preprocess a source file
+Strategy.cpp.i:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.i
+.PHONY : Strategy.cpp.i
+
+Strategy.s: Strategy.cpp.s
+.PHONY : Strategy.s
+
+# target to generate assembly for a file
+Strategy.cpp.s:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.s
+.PHONY : Strategy.cpp.s
+
 TdSpi.o: TdSpi.cpp.o
 .PHONY : TdSpi.o
 
@@ -161,6 +305,78 @@ TdSpi.s: TdSpi.cpp.s
 TdSpi.cpp.s:
 	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.s
 .PHONY : TdSpi.cpp.s
+
+Trader.o: Trader.cpp.o
+.PHONY : Trader.o
+
+# target to build an object file
+Trader.cpp.o:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o
+.PHONY : Trader.cpp.o
+
+Trader.i: Trader.cpp.i
+.PHONY : Trader.i
+
+# target to preprocess a source file
+Trader.cpp.i:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.i
+.PHONY : Trader.cpp.i
+
+Trader.s: Trader.cpp.s
+.PHONY : Trader.s
+
+# target to generate assembly for a file
+Trader.cpp.s:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.s
+.PHONY : Trader.cpp.s
+
+User.o: User.cpp.o
+.PHONY : User.o
+
+# target to build an object file
+User.cpp.o:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o
+.PHONY : User.cpp.o
+
+User.i: User.cpp.i
+.PHONY : User.i
+
+# target to preprocess a source file
+User.cpp.i:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/User.cpp.i
+.PHONY : User.cpp.i
+
+User.s: User.cpp.s
+.PHONY : User.s
+
+# target to generate assembly for a file
+User.cpp.s:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/User.cpp.s
+.PHONY : User.cpp.s
+
+Utils.o: Utils.cpp.o
+.PHONY : Utils.o
+
+# target to build an object file
+Utils.cpp.o:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o
+.PHONY : Utils.cpp.o
+
+Utils.i: Utils.cpp.i
+.PHONY : Utils.i
+
+# target to preprocess a source file
+Utils.cpp.i:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.i
+.PHONY : Utils.cpp.i
+
+Utils.s: Utils.cpp.s
+.PHONY : Utils.s
+
+# target to generate assembly for a file
+Utils.cpp.s:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.s
+.PHONY : Utils.cpp.s
 
 main.o: main.cpp.o
 .PHONY : main.o
@@ -195,12 +411,39 @@ help:
 	@echo "... edit_cache"
 	@echo "... quant_ctp_XTrader"
 	@echo "... rebuild_cache"
+	@echo "... Algorithm.o"
+	@echo "... Algorithm.i"
+	@echo "... Algorithm.s"
+	@echo "... CTP_Manager.o"
+	@echo "... CTP_Manager.i"
+	@echo "... CTP_Manager.s"
+	@echo "... DBManager.o"
+	@echo "... DBManager.i"
+	@echo "... DBManager.s"
+	@echo "... FutureAccount.o"
+	@echo "... FutureAccount.i"
+	@echo "... FutureAccount.s"
 	@echo "... MdSpi.o"
 	@echo "... MdSpi.i"
 	@echo "... MdSpi.s"
+	@echo "... Order.o"
+	@echo "... Order.i"
+	@echo "... Order.s"
+	@echo "... Strategy.o"
+	@echo "... Strategy.i"
+	@echo "... Strategy.s"
 	@echo "... TdSpi.o"
 	@echo "... TdSpi.i"
 	@echo "... TdSpi.s"
+	@echo "... Trader.o"
+	@echo "... Trader.i"
+	@echo "... Trader.s"
+	@echo "... User.o"
+	@echo "... User.i"
+	@echo "... User.s"
+	@echo "... Utils.o"
+	@echo "... Utils.i"
+	@echo "... Utils.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

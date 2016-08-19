@@ -38,10 +38,10 @@ EQUALS = =
 CMAKE_EDIT_COMMAND = /usr/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /mnt/hgfs/gmctp/CppCTP_Integration/xTrader
+CMAKE_SOURCE_DIR = /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /mnt/hgfs/gmctp/CppCTP_Integration/xTrader
+CMAKE_BINARY_DIR = /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader
 
 # Include any dependencies generated for this target.
 include CMakeFiles/quant_ctp_XTrader.dir/depend.make
@@ -52,19 +52,111 @@ include CMakeFiles/quant_ctp_XTrader.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/quant_ctp_XTrader.dir/flags.make
 
+CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.o: CMakeFiles/quant_ctp_XTrader.dir/flags.make
+CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.o: Algorithm.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles $(CMAKE_PROGRESS_1)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.o"
+	g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.o -c /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Algorithm.cpp
+
+CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.i"
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Algorithm.cpp > CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.i
+
+CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.s"
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Algorithm.cpp -o CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.s
+
+CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.o.requires:
+.PHONY : CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.o.requires
+
+CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.o.provides: CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.o.requires
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.o.provides.build
+.PHONY : CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.o.provides
+
+CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.o.provides.build: CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.o
+
+CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o: CMakeFiles/quant_ctp_XTrader.dir/flags.make
+CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o: CTP_Manager.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles $(CMAKE_PROGRESS_2)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o"
+	g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o -c /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CTP_Manager.cpp
+
+CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.i"
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CTP_Manager.cpp > CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.i
+
+CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.s"
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CTP_Manager.cpp -o CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.s
+
+CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o.requires:
+.PHONY : CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o.requires
+
+CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o.provides: CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o.requires
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o.provides.build
+.PHONY : CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o.provides
+
+CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o.provides.build: CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o
+
+CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o: CMakeFiles/quant_ctp_XTrader.dir/flags.make
+CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o: DBManager.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles $(CMAKE_PROGRESS_3)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o"
+	g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o -c /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/DBManager.cpp
+
+CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.i"
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/DBManager.cpp > CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.i
+
+CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.s"
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/DBManager.cpp -o CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.s
+
+CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o.requires:
+.PHONY : CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o.requires
+
+CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o.provides: CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o.requires
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o.provides.build
+.PHONY : CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o.provides
+
+CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o.provides.build: CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o
+
+CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o: CMakeFiles/quant_ctp_XTrader.dir/flags.make
+CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o: FutureAccount.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles $(CMAKE_PROGRESS_4)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o"
+	g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o -c /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/FutureAccount.cpp
+
+CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.i"
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/FutureAccount.cpp > CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.i
+
+CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.s"
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/FutureAccount.cpp -o CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.s
+
+CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o.requires:
+.PHONY : CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o.requires
+
+CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o.provides: CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o.requires
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o.provides.build
+.PHONY : CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o.provides
+
+CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o.provides.build: CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o
+
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: CMakeFiles/quant_ctp_XTrader.dir/flags.make
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: main.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/gmctp/CppCTP_Integration/xTrader/CMakeFiles $(CMAKE_PROGRESS_1)
+	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles $(CMAKE_PROGRESS_5)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o -c /mnt/hgfs/gmctp/CppCTP_Integration/xTrader/main.cpp
+	g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o -c /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/main.cpp
 
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/quant_ctp_XTrader.dir/main.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /mnt/hgfs/gmctp/CppCTP_Integration/xTrader/main.cpp > CMakeFiles/quant_ctp_XTrader.dir/main.cpp.i
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/main.cpp > CMakeFiles/quant_ctp_XTrader.dir/main.cpp.i
 
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/quant_ctp_XTrader.dir/main.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /mnt/hgfs/gmctp/CppCTP_Integration/xTrader/main.cpp -o CMakeFiles/quant_ctp_XTrader.dir/main.cpp.s
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/main.cpp -o CMakeFiles/quant_ctp_XTrader.dir/main.cpp.s
 
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o.requires:
 .PHONY : CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o.requires
@@ -77,17 +169,17 @@ CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o.provides.build: CMakeFiles/quant_ctp
 
 CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o: CMakeFiles/quant_ctp_XTrader.dir/flags.make
 CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o: MdSpi.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/gmctp/CppCTP_Integration/xTrader/CMakeFiles $(CMAKE_PROGRESS_2)
+	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles $(CMAKE_PROGRESS_6)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o -c /mnt/hgfs/gmctp/CppCTP_Integration/xTrader/MdSpi.cpp
+	g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o -c /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MdSpi.cpp
 
 CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /mnt/hgfs/gmctp/CppCTP_Integration/xTrader/MdSpi.cpp > CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.i
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MdSpi.cpp > CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.i
 
 CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /mnt/hgfs/gmctp/CppCTP_Integration/xTrader/MdSpi.cpp -o CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.s
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MdSpi.cpp -o CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.s
 
 CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o.requires:
 .PHONY : CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o.requires
@@ -98,19 +190,65 @@ CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o.provides: CMakeFiles/quant_ctp_XTra
 
 CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o.provides.build: CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o
 
+CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o: CMakeFiles/quant_ctp_XTrader.dir/flags.make
+CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o: Order.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles $(CMAKE_PROGRESS_7)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o"
+	g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o -c /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Order.cpp
+
+CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.i"
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Order.cpp > CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.i
+
+CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.s"
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Order.cpp -o CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.s
+
+CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o.requires:
+.PHONY : CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o.requires
+
+CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o.provides: CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o.requires
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o.provides.build
+.PHONY : CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o.provides
+
+CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o.provides.build: CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o
+
+CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: CMakeFiles/quant_ctp_XTrader.dir/flags.make
+CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: Strategy.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles $(CMAKE_PROGRESS_8)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o"
+	g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o -c /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.cpp
+
+CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.i"
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.cpp > CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.i
+
+CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.s"
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.cpp -o CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.s
+
+CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o.requires:
+.PHONY : CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o.requires
+
+CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o.provides: CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o.requires
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o.provides.build
+.PHONY : CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o.provides
+
+CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o.provides.build: CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o
+
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: CMakeFiles/quant_ctp_XTrader.dir/flags.make
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: TdSpi.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/gmctp/CppCTP_Integration/xTrader/CMakeFiles $(CMAKE_PROGRESS_3)
+	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles $(CMAKE_PROGRESS_9)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o -c /mnt/hgfs/gmctp/CppCTP_Integration/xTrader/TdSpi.cpp
+	g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o -c /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/TdSpi.cpp
 
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /mnt/hgfs/gmctp/CppCTP_Integration/xTrader/TdSpi.cpp > CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.i
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/TdSpi.cpp > CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.i
 
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /mnt/hgfs/gmctp/CppCTP_Integration/xTrader/TdSpi.cpp -o CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.s
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/TdSpi.cpp -o CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.s
 
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o.requires:
 .PHONY : CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o.requires
@@ -121,18 +259,105 @@ CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o.provides: CMakeFiles/quant_ctp_XTra
 
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o.provides.build: CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o
 
+CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o: CMakeFiles/quant_ctp_XTrader.dir/flags.make
+CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o: Trader.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles $(CMAKE_PROGRESS_10)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o"
+	g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o -c /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Trader.cpp
+
+CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.i"
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Trader.cpp > CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.i
+
+CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.s"
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Trader.cpp -o CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.s
+
+CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o.requires:
+.PHONY : CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o.requires
+
+CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o.provides: CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o.requires
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o.provides.build
+.PHONY : CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o.provides
+
+CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o.provides.build: CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o
+
+CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o: CMakeFiles/quant_ctp_XTrader.dir/flags.make
+CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o: User.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles $(CMAKE_PROGRESS_11)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o"
+	g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o -c /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/User.cpp
+
+CMakeFiles/quant_ctp_XTrader.dir/User.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/quant_ctp_XTrader.dir/User.cpp.i"
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/User.cpp > CMakeFiles/quant_ctp_XTrader.dir/User.cpp.i
+
+CMakeFiles/quant_ctp_XTrader.dir/User.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/quant_ctp_XTrader.dir/User.cpp.s"
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/User.cpp -o CMakeFiles/quant_ctp_XTrader.dir/User.cpp.s
+
+CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o.requires:
+.PHONY : CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o.requires
+
+CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o.provides: CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o.requires
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o.provides.build
+.PHONY : CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o.provides
+
+CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o.provides.build: CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o
+
+CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o: CMakeFiles/quant_ctp_XTrader.dir/flags.make
+CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o: Utils.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles $(CMAKE_PROGRESS_12)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o"
+	g++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o -c /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Utils.cpp
+
+CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.i"
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -E /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Utils.cpp > CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.i
+
+CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.s"
+	g++  $(CXX_DEFINES) $(CXX_FLAGS) -S /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Utils.cpp -o CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.s
+
+CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o.requires:
+.PHONY : CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o.requires
+
+CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o.provides: CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o.requires
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o.provides.build
+.PHONY : CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o.provides
+
+CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o.provides.build: CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o
+
 # Object files for target quant_ctp_XTrader
 quant_ctp_XTrader_OBJECTS = \
+"CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.o" \
+"CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o" \
+"CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o" \
+"CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o" \
 "CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o" \
 "CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o" \
-"CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o"
+"CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o" \
+"CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o" \
+"CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o" \
+"CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o" \
+"CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o" \
+"CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o"
 
 # External object files for target quant_ctp_XTrader
 quant_ctp_XTrader_EXTERNAL_OBJECTS =
 
+quant_ctp_XTrader: CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.o
+quant_ctp_XTrader: CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o
+quant_ctp_XTrader: CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o
+quant_ctp_XTrader: CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o
 quant_ctp_XTrader: CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o
 quant_ctp_XTrader: CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o
+quant_ctp_XTrader: CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o
+quant_ctp_XTrader: CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o
 quant_ctp_XTrader: CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o
+quant_ctp_XTrader: CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o
+quant_ctp_XTrader: CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o
+quant_ctp_XTrader: CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o
 quant_ctp_XTrader: CMakeFiles/quant_ctp_XTrader.dir/build.make
 quant_ctp_XTrader: CMakeFiles/quant_ctp_XTrader.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking CXX executable quant_ctp_XTrader"
@@ -142,9 +367,18 @@ quant_ctp_XTrader: CMakeFiles/quant_ctp_XTrader.dir/link.txt
 CMakeFiles/quant_ctp_XTrader.dir/build: quant_ctp_XTrader
 .PHONY : CMakeFiles/quant_ctp_XTrader.dir/build
 
+CMakeFiles/quant_ctp_XTrader.dir/requires: CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.o.requires
+CMakeFiles/quant_ctp_XTrader.dir/requires: CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o.requires
+CMakeFiles/quant_ctp_XTrader.dir/requires: CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o.requires
+CMakeFiles/quant_ctp_XTrader.dir/requires: CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o.requires
 CMakeFiles/quant_ctp_XTrader.dir/requires: CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o.requires
 CMakeFiles/quant_ctp_XTrader.dir/requires: CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o.requires
+CMakeFiles/quant_ctp_XTrader.dir/requires: CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o.requires
+CMakeFiles/quant_ctp_XTrader.dir/requires: CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o.requires
 CMakeFiles/quant_ctp_XTrader.dir/requires: CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o.requires
+CMakeFiles/quant_ctp_XTrader.dir/requires: CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o.requires
+CMakeFiles/quant_ctp_XTrader.dir/requires: CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o.requires
+CMakeFiles/quant_ctp_XTrader.dir/requires: CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o.requires
 .PHONY : CMakeFiles/quant_ctp_XTrader.dir/requires
 
 CMakeFiles/quant_ctp_XTrader.dir/clean:
@@ -152,6 +386,6 @@ CMakeFiles/quant_ctp_XTrader.dir/clean:
 .PHONY : CMakeFiles/quant_ctp_XTrader.dir/clean
 
 CMakeFiles/quant_ctp_XTrader.dir/depend:
-	cd /mnt/hgfs/gmctp/CppCTP_Integration/xTrader && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /mnt/hgfs/gmctp/CppCTP_Integration/xTrader /mnt/hgfs/gmctp/CppCTP_Integration/xTrader /mnt/hgfs/gmctp/CppCTP_Integration/xTrader /mnt/hgfs/gmctp/CppCTP_Integration/xTrader /mnt/hgfs/gmctp/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/DependInfo.cmake --color=$(COLOR)
+	cd /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/quant_ctp_XTrader.dir/depend
 

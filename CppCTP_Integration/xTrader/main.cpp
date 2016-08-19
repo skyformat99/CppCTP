@@ -1,13 +1,21 @@
 #include <iostream>
-#include <string.h>
+#include <string>
+#include <list>
+#include <mongo/client/dbclient.h>
+#include <stdio.h>
 #include "ThostFtdcTraderApi.h"
 #include "TdSpi.h"
 #include "ThostFtdcMdApi.h"
 #include "MdSpi.h"
-using namespace std;
+#include "CTP_Manager.h"
+#include "Utils.h"
+#include "Debug.h"
+#include "DBManager.h"
+#include "Trader.h"
+#include "FutureAccount.h"
 
-using std::map;
-using std::string;
+using std::cout;
+using std::cin;
 
 void printMenuEN() {
 	cout << "|==========================|" << endl;
@@ -28,16 +36,9 @@ void printMenuEN() {
 void printMenu() {
 	cout << "|==============================|" << endl;
 	cout << "|请输入您的操作编号:           |" << endl;
-	cout << "|【u】:账户信息查询            |" << endl;
-	cout << "|【t】:账户资金查询            |" << endl;
-	cout << "|【s】:查询合约信息            |" << endl;
-	cout << "|【d】:查询交易信息            |" << endl;
-	cout << "|【h】:查询持仓信息            |" << endl;
-	cout << "|【i】:报单录入                |" << endl;
-	cout << "|【o】:报单查询                |" << endl;
-	cout << "|【a】:撤单操作                |" << endl;
-	cout << "|【e】:查询交易所代码          |" << endl;
-	cout << "|【b】:退出程序                |" << endl;
+	cout << "|【1】:交易员登陆              |" << endl;
+	cout << "|【2】:管理员登陆              |" << endl;
+	cout << "|【q】:退出                    |" << endl;
 	cout << "|==============================|" << endl;
 }
 
@@ -53,7 +54,101 @@ void printContinueEN() {
 	cout << "|======================|" << endl;
 }
 
+void printLoginSuccessMenu() {
+	cout << "|=============|" << endl;
+	printf("|\033[47;30m【登陆成功!】\033[0m|\n");
+	cout << "|=============|" << endl;
+}
+
+void printLoginFailedMenu() {
+	cout << "|========================|" << endl;
+	printf("|\033[47;31m【！！！登录失败！！！】\033[0m|\n");
+	cout << "|========================|" << endl;
+}
+
+void printErrorInputMenu() {
+	cout << "|========================|" << endl;
+	printf("|\033[47;31m【！！！重新输入！！！】\033[0m|\n");
+	cout << "|========================|" << endl;
+}
+
+void printWelcome() {
+	cout << "|===========================|" << endl;
+	//cout << "|欢迎登录期货多账户交易系统!|" << endl;
+	printf("|\033[47;30m欢迎登录期货多账户交易系统!\033[0m|\n");
+	cout << "|===========================|" << endl;
+}
+
+void printLoginTraderOperatorMenu() {
+	cout << "|==============================|" << endl;
+	cout << "|请输入您的操作编号:           |" << endl;
+	cout << "|【1】:账户查询                |" << endl;
+	cout << "|【2】:持仓查询                |" << endl;
+	cout << "|【3】:报单查询                |" << endl;
+	cout << "|【4】:成交查询                |" << endl;
+	cout << "|【5】:报单                    |" << endl;
+	cout << "|【6】:撤单                    |" << endl;
+	cout << "|【7】:订阅行情                |" << endl;
+	cout << "|【8】:退订行情                |" << endl;
+	cout << "|【q】:退出                    |" << endl;
+	cout << "|==============================|" << endl;
+}
+
+void printFutureAccountListMenu() {
+	cout << "|==============================|" << endl;
+	//cout << "|\033[40;32m当前您所管理的期货账户列表:   \033[0m|\n" << endl;
+	printf("|\033[47;30m当前您所管理的期货账户列表:   \033[0m|\n");
+	cout << "|==============================|" << endl;
+}
+
+void printTraderAccoutListMenu() {
+	cout << "|==============================|" << endl;
+	printf("|\033[47;30m当前您所管理的交易员列表:     \033[0m|\n");
+	cout << "|==============================|" << endl;
+}
+
+void printAdminOperateMenu() {
+	cout << "|==============================|" << endl;
+	cout << "|请输入您的操作编号:           |" << endl;
+	cout << "|【1】:交易员管理              |" << endl;
+	cout << "|【2】:期货账户管理            |" << endl;
+	cout << "|【q】:退出                    |" << endl;
+	cout << "|==============================|" << endl;
+}
+
+void printTraderOperateMenu() {
+	cout << "|==============================|" << endl;
+	cout << "|请输入您的操作编号:           |" << endl;
+	cout << "|【1】:查看所有交易员          |" << endl;
+	cout << "|【2】:增加交易员              |" << endl;
+	cout << "|【3】:删除交易员              |" << endl;
+	cout << "|【4】:修改交易员              |" << endl;
+	cout << "|【q】:退出                    |" << endl;
+	cout << "|==============================|" << endl;
+}
+
+void printFutureAccountOperateMenu() {
+	cout << "|==============================|" << endl;
+	cout << "|请输入您的操作编号:           |" << endl;
+	cout << "|【1】:查看所有期货账户        |" << endl;
+	cout << "|【2】:增加期货账户            |" << endl;
+	cout << "|【3】:删除期货账户            |" << endl;
+	cout << "|【4】:修改期货账户            |" << endl;
+	cout << "|【q】:退出                    |" << endl;
+	cout << "|==============================|" << endl;
+}
+
 int main() {
+	mongo::client::initialize();
+
+	/************************************************************************/
+	/*   标准CTP：
+			Trade Front：180.168.146.187:10000，
+			Market Front：180.168.146.187:10010；【电信】
+		第二套：
+			交易前置：180.168.146.187:10030，
+			行情前置：180.168.146.187:10031；【7x24】                                                                   */
+	/************************************************************************/
 
 	string trade_frontAddr = "tcp://180.168.146.187:10000"; //仿真
 	string broker_id = "9999";
@@ -64,13 +159,14 @@ int main() {
 	//string broker_id = "0187";
 	//string user_id = "86001525";
 	//string password = "206029";
+	
+	string market_frontAddr = "tcp://180.168.146.187:10011"; //实盘
 
-	string market_frontAddr = "tcp://180.168.146.187:10010"; //实盘
 
+	//CThostFtdcTraderApi *tdapi = CThostFtdcTraderApi::CreateFtdcTraderApi("./conn/user1/");
+	//TdSpi *tdspi = new TdSpi("/conn/user1/");
 
-	CThostFtdcTraderApi *tdapi = CThostFtdcTraderApi::CreateFtdcTraderApi("./conn/user1/");
-	TdSpi *tdspi = new TdSpi(tdapi);
-
+	#if 0
 	CThostFtdcMdApi *mdapi = CThostFtdcMdApi::CreateFtdcMdApi("./conn/market");
 	MdSpi *mdspi = new MdSpi(mdapi);
 	mdspi->Connect(const_cast<char *>(market_frontAddr.c_str())); //Standard
@@ -92,464 +188,643 @@ int main() {
 	}
 
 	//cout << instrumentID << endl;
-	mdspi->SubMarketData(instrumentID, size);
+	//mdspi->SubMarketData(instrumentID, size);
 
 	sleep(2);
+#endif
 
-	//mdspi->UnSubscribeMarketData(instrumentID, size);
+	/************************************************************************/
+	/* new multi accout test                                                */
+	/************************************************************************/
 
-	//注册前置机
-	//tdapi->RegisterFront("tcp://180.169.75.19:41205");	//实盘270338
-	/**
-	 * 标准CTP：
-	 第一组：Trade Front：180.168.146.187:10000，Market Front：180.168.146.187:10010；【电信】
-	 第二组：Trade Front：180.168.146.187:10001，Market Front：180.168.146.187:10011；【电信】
-	 第三组：Trade Front：218.202.237.33 :10002，Market Front：218.202.237.33 :10012；【移动】
-	 第二套：
-	 交易前置：180.168.146.187:10030，行情前置：180.168.146.187:10031；【7x24】
-	 实盘：
-	 交易前置地址：101.95.8.190:41205
-	 行情前置地址：101.95.8.190:41213
-	 实盘账号：86001525/206029
-	 */
-
-	tdspi->Connect(const_cast<char *>(trade_frontAddr.c_str())); //仿真
-	//tdspi->Connect("tcp://180.168.146.187:10030"); //24H
-	sleep(1);
-	tdspi->Login(const_cast<char *>(broker_id.c_str()), const_cast<char *>(user_id.c_str()), const_cast<char *>(password.c_str()));
-
-	//sleep(2);
-	//tdspi->Login("9999", "063802", "123456");
-	//tdspi->Login("9999", "063802", "123456");
-
-	/**
-	实盘
-	*/
-	//连接
-	//tdspi->Connect("tcp://220.248.44.146:41205");
+	CTP_Manager *ctp_m = new CTP_Manager();
+	//User *user1 = ctp_m->CreateAccount("tcp://180.168.146.187:10000", "9999", "058176", "669822");
+	
 	//sleep(1);
-	//登录
-	//tdspi->Login("0187", "86001525", "206029");
-	//tdspi->Login("0187", "801859", "162860");
-	sleep(1);
-	//查询交易结算确认
-	tdspi->QrySettlementInfoConfirm(const_cast<char *>(tdspi->getBrokerID().c_str()), const_cast<char *>(tdspi->getUserID().c_str()), tdspi->getRequestID());
-	//查询交易所
-	sleep(6);
-	//tdspi->QryExchange();
-	//查询合约
+	
+	//User *user2 = ctp_m->CreateAccount("tcp://180.168.146.187:10000", "9999", "063802", "123456");
+
+	//sleep(3);
+
+	/************************************************************************/
+	/* 测试行情                                                              */
+	/************************************************************************/
+	/*MdSpi *mdspi1 = ctp_m->CreateMd(market_frontAddr, broker_id, user_id, password);
+
+	list<string> l_instrument = ctp_m->addInstrument("cu1609", ctp_m->getL_Instrument());
+	l_instrument = ctp_m->addInstrument("ag1612", l_instrument);
+	l_instrument = ctp_m->addInstrument("cu1609", l_instrument);
+	l_instrument = ctp_m->addInstrument("cu1609", l_instrument);
+	l_instrument = ctp_m->addInstrument("cu1609", l_instrument);
+
+	ctp_m->submarketData(mdspi1, l_instrument);*/
+
+
+	/************************************************************************/
+	/*                                                                      */
+	/************************************************************************/
+
+	//string instrument = "cu1701";
+	//string instrument2 = "cu1609";
+	//user1->getUserTradeSPI()->QryDepthMarketData(instrument);
 	//sleep(1);
-	//tdspi->QryInstrument();
-
-	//查询报单
+	//user1->getUserTradeSPI()->QryDepthMarketData(instrument2);
 	//sleep(1);
-	//tdspi->QryOrder();
-
+	////sleep()
+	//user2->getUserTradeSPI()->QryDepthMarketData(instrument);
 	//sleep(1);
-	//cout << "oh?" << endl;
+	//user2->getUserTradeSPI()->QryDepthMarketData(instrument2);
 
-	//查询账户资金
-	//sleep(1);
-	//tdspi->QryTradingAccount();
+	//if (mdapi) {
+	//	mdapi->RegisterSpi(NULL);
+	//	mdapi->Release();
+	//}
+	//if (mdspi) {
+	//	delete mdspi;
+	//}
 
-	//查询保证金率
-	//sleep(1);
-	//tdspi->QryInstrumentMarginRate();
+	/************************************************************************/
+	/* 测试DBmanager                                                         */
+	/************************************************************************/
+	
+	//DBManager *dbm = new DBManager();
+	//DBManager dbm;
 
-	//查询手续费率
-	//sleep(1);
-	//tdspi->QryInstrumentCommissionRate();
+	//Trader *op = new Trader();
+	//op->setIsActive("1");
+	//op->setTraderID("1111");
+	//op->setPassword("xxxx");
+	//op->setTraderName("lucas");
+	
 
-	//查询账户
-	//sleep(1);
-	//tdspi->QryInvestor();
+	//dbm->CreateTrader(op);
+	//dbm->DeleteTrader(op);
+	//dbm->UpdateTrader(op);
+	//dbm->SearchTraderByTraderID("1111");
+	//dbm->SearchTraderByTraderName("lucas");
+	//dbm->SearchTraderByTraderIdAndPassword("1111", "xxxx");
+	//cout << dbm->FindTraderByTraderIdAndPassword("1", "xxxx") << endl;
 
-	//查询账户持仓情况
-	//sleep(1);
-	//tdspi->QryInvestorPosition();
+	//FutureAccount *fa = new FutureAccount();
+	//fa->setBrokerID("9999");
+	//fa->setIsActive("1");
+	//fa->setTrader(op);
+	//fa->setUserID("058176");
+	//fa->setPassword("123456");
+	//fa->setFrontAddress("tcp://180.168.146.187:10011");
 
-	//查询成交单
-	//sleep(1);
-	//tdspi->QryTrade();
+	//dbm->CreateFutureAccount(op, fa);
+	//dbm->DeleteFutureAccount(op, fa);
+	//dbm->UpdateFutureAccount(op, fa);
+	//dbm->SearchFutrueByTraderID(op->getTraderID());
+	//dbm->SearchFutrueByUserID(fa->getUserID());
 
-	//sleep(1);
-	//tdspi->OrderInsert();
+	//list<FutureAccount *> *l_futureaccount = new list<FutureAccount *>();
+	//ctp_m->getDBManager()->SearchFutrueListByTraderID("1", l_futureaccount);
+	//list<FutureAccount *>::iterator itor;
+	//for (itor = l_futureaccount->begin(); itor != l_futureaccount->end(); itor++) {
+	//	cout << "l_futureaccount member : " << (*itor)->getUserID() << endl;
+	//}
 
-	char input_c;
-	char innner_input_c;
-	/*order insert*/
-	string order_InstrumentID;
-	char order_CombOffsetFlag;
-	char order_Direction;
-	int order_Volume;
-	double order_Price;
-	string order_OrderRef;
-
-	/*order action delete*/
-	string action_ExchangeId;
-	int action_int_ExchangeId;
-	string action_OrderRef;
-	string action_OrderSysId;
-
-	/*qry vars*/
-	string qry_ExchangeId;
-	string qry_InstrumentId;
-	int qry_Flag;
+	string chooice;
+	string userid; //期货账户id
+	printWelcome();
 
 	printMenu();
-	//测试下单，撤单
-	while (1) {
-		input_c = getchar();
-		if (input_c == 'i') {
-			cout << "Order Insert Operation" << endl;
-			/************************************************************************/
-			/* Code Below  Order Insert                                             */
-			/************************************************************************/
-			cout << "Please input instrumentID, such as cu1609, zn1701..." << endl;
-			cin >> order_InstrumentID;
-			cout << "Please input Comboffsetflag" << endl;
-			cout << "0:Open 1:Close 2:ForceClose 3:CloseToday 4:CloseYesterday" << endl;
-			cin >> order_CombOffsetFlag;
-			cout << "Please input Direction" << endl;
-			cout << "0:Buy 1:Sell" << endl;
-			cin >> order_Direction;
-			cout << "Please input Volume, such as 10, 50, 100..." << endl;
-			cin >> order_Volume;
-			cout << "Please input Price" << endl;
-			cin >> order_Price;
-			cout << "Please input OrderRef, such as 1, 2, 3 or user specific" << endl;
-			cin >> order_OrderRef;
+	cin >> chooice;
+	
+	Trader *op = new Trader();
+	FutureAccount *fa = new FutureAccount();
+	//list<FutureAccount *> *l_futureaccount = new list<FutureAccount *>();
+	
+	/*订阅行情*/
 
-			cout << "order_InstrumentID = " << order_InstrumentID << endl;
-			cout << "order_CombOffsetFlag = " << order_CombOffsetFlag << endl;
-			cout << "order_Direction = " << order_Direction << endl;
-			cout << "order_Volume = " << order_Volume << endl;
-			cout << "order_Price = " << order_Price << endl;
-			cout << "order_OrderRef = " << order_OrderRef << endl;
+	MdSpi *mdspi1 = ctp_m->CreateMd(market_frontAddr, broker_id, user_id, password);
+	list<string> l_Sub_instrument;
+	list<string> l_UnSub_instrument;
 
-			tdspi->OrderInsert(const_cast<char *>(order_InstrumentID.c_str()), order_CombOffsetFlag, order_Direction, order_Volume, order_Price, order_OrderRef);
-			/************************************************************************/
-			/* Code Finished                                                        */
-			/************************************************************************/
-			printContinue();
-			getchar();
-			innner_input_c = getchar();
-			if (innner_input_c == 'c') {
-				input_c = ' ';
-				innner_input_c = ' ';
-				printMenu();
-				continue;
-			}
-			else {
-				input_c = ' ';
-				innner_input_c = ' ';
-				printMenu();
-				continue;
-			}
-		}
-		else if (input_c == 'a') {
-			cout << "Order Action Operation" << endl;
-			/************************************************************************/
-			/* Code Below  Order Action                                             */
-			/************************************************************************/
-			cout << "Pleas Input ExchanageID" << endl;
-			cout << "1:SHFE 2:DCE 3:CZCE 4:CFFEX" << endl;
-			cin >> action_int_ExchangeId;
-			cout << "Pleas Input OrderRef" << endl;
-			cin >> action_OrderRef;
-			cout << "Pleas Input OrderSysId" << endl;
-			cin.ignore(0x7fffffff, '\n');
-			getline(cin, action_OrderSysId);
+	//= ctp_m->addInstrument("cu1609", ctp_m->getL_Instrument());
+	
 
-			switch (action_int_ExchangeId)
-			{
-			case 1:action_ExchangeId = "SHFE"; break;
-			case 2:action_ExchangeId = "DCE"; break;
-			case 3:action_ExchangeId = "CZCE"; break;
-			case 4:action_ExchangeId = "CFFEX"; break;
-			default:
-				action_ExchangeId = "";
-				break;
-			}
+	while (chooice != "q") {
+		/************************************************************************/
+		/* 交易员登陆           CreateMd                                          */
+		/************************************************************************/
+		if (chooice == "1") {
+			string traderid;
+			string traderpassword;
+			bool flag;
+			cout << "请输入交易员账号:" << endl;
+			cin >> traderid;
+			cout << "请输入交易员密码:" << endl;
+			cin >> traderpassword;
 
-			cout << "action_ExchangeId = " << action_ExchangeId << endl;
-			cout << "action_OrderRef = " << action_OrderRef << endl;
-			cout << "action_OrderSysId = " << action_OrderSysId << endl;
+			flag = ctp_m->TraderLogin(traderid, traderpassword);
+			if (flag) { //交易员登陆成功
+				printLoginSuccessMenu();
+				printFutureAccountListMenu();
+				op->setTraderID(traderid);
+				op->setPassword(traderpassword);
 
-			tdspi->OrderAction(action_ExchangeId, action_OrderRef, action_OrderSysId);
-
-			/************************************************************************/
-			/* Code Finished                                                        */
-			/************************************************************************/
-			printContinue();
-			getchar();
-			innner_input_c = getchar();
-			if (innner_input_c == 'c') {
-				input_c = ' ';
-				innner_input_c = ' ';
-				printMenu();
-				continue;
-			}
-			else {
-				input_c = ' ';
-				innner_input_c = ' ';
-				printMenu();
-				continue;
-			}
-		}
-		else if (input_c == 'b') {
-			cout << "拜拜~" << endl;
-			break;
-		}
-		else if (input_c == 's') {
-			cout << "Qry Instrument Operation" << endl;
-			/************************************************************************/
-			/* code below here                                                                     */
-			/************************************************************************/
-			cout << "Query All or Query One?" << endl;
-			cout << "0:Query All 1:Query One" << endl;
-			cin >> qry_Flag;
-			if (qry_Flag) {
-				cout << "Please Input ExchangeId:" << endl;
-				cout << "1:SHFE 2:DCE 3:CZCE 4:CFFEX" << endl;
-				cin >> qry_Flag;
-				switch (action_int_ExchangeId)
-				{
-				case 1:qry_ExchangeId = "SHFE"; break;
-				case 2:qry_ExchangeId = "DCE"; break;
-				case 3:qry_ExchangeId = "CZCE"; break;
-				case 4:qry_ExchangeId = "CFFEX"; break;
-				default:
-					qry_ExchangeId = "";
-					break;
+				bool create_flag = false;
+				create_flag = ctp_m->checkInLTrader(traderid);
+				list<FutureAccount *> *l_futureaccount = new list<FutureAccount *>();
+				ctp_m->getDBManager()->SearchFutrueListByTraderID(traderid, l_futureaccount);
+				list<FutureAccount *>::iterator itor;
+				for (itor = l_futureaccount->begin(); itor != l_futureaccount->end(); itor++) {
+					cout << "【期货账户 : " << (*itor)->getUserID() << ", "
+						<< "经纪公司ID : " << (*itor)->getBrokerID() << ", "
+						<< "密码 : " << (*itor)->getPassword() << ", "
+						<< "交易前置地址 : " << (*itor)->getFrontAddress() << "】" << endl;
+					if (!create_flag) {
+						Trader *new_trader = new Trader();
+						new_trader->setTraderID(traderid);
+						new_trader->setPassword(password);
+						ctp_m->CreateAccount((*itor)->getFrontAddress(), (*itor)->getBrokerID(), (*itor)->getUserID(), (*itor)->getPassword(), new_trader);
+					}
 				}
-				cout << "Please Input InstrumentId:" << endl;
-				cin >> qry_InstrumentId;
+				//将已登录的账户存入登陆列表里
+				ctp_m->addTraderToLTrader(traderid);
+
+				/************************************************************************/
+				/* 进入交易员操作界面                                                      */
+				/************************************************************************/
+				printLoginTraderOperatorMenu();
+				cin >> chooice;
+
+				while (chooice != "q") {
+					if (chooice == "1") {
+						cout << "账户查询" << endl;
+						list<string> l_trader = ctp_m->getL_Trader();
+						list<string>::iterator itor;
+						for (itor = l_trader.begin(); itor != l_trader.end(); itor++) {
+							// 打印交易员id
+							cout << "【交易员账户 : " << (*itor) << "】" << endl;
+							//根据交易员id获取账户
+							list<FutureAccount *> *l_futureaccount = new list<FutureAccount *>();
+							ctp_m->getDBManager()->SearchFutrueListByTraderID((*itor), l_futureaccount);
+							list<FutureAccount *>::iterator inner_itor;
+							for (inner_itor = l_futureaccount->begin(); inner_itor != l_futureaccount->end(); inner_itor++) {
+								cout << "【期货账户:" << (*inner_itor)->getUserID() << "】" << endl;
+								
+							}
+							delete l_futureaccount;
+						}
+					}
+					else if (chooice == "2") {
+						cout << "持仓查询" << endl;
+						//根据不同的期货账户User查找对应的持仓信息
+						if (ctp_m->getL_User()->size() == 0) {
+							cout << "NULL" << endl;
+						}
+						else {
+							cout << "NOT NULL" << endl;
+							list<User *>::iterator itor;
+							for (itor = ctp_m->getL_User()->begin(); itor != ctp_m->getL_User()->end(); itor++) {
+								cout << "【期货账户:" << (*itor)->getUserID() << "】" << endl;
+								(*itor)->getUserTradeSPI()->QryInvestorPosition();
+								sleep(1);
+								(*itor)->getUserTradeSPI()->QryInvestor();
+							}
+						}
+						
+					}
+					else if (chooice == "3") {
+						cout << "报单查询" << endl;
+						cout << "请输入期货账户ID" << endl;
+						cin >> userid;
+						//根据不同的期货账户User查找对应的持仓信息
+						if (ctp_m->getL_User()->size() == 0) {
+							cout << "NULL" << endl;
+						}
+						else {
+							cout << "NOT NULL" << endl;
+							list<User *>::iterator itor;
+							for (itor = ctp_m->getL_User()->begin(); itor != ctp_m->getL_User()->end(); itor++) {
+								cout << "【期货账户:" << (*itor)->getUserID() << "】" << endl;
+								if ((*itor)->getUserID() == userid) {
+									(*itor)->getUserTradeSPI()->QryOrder();
+								}
+							}
+						}
+					}
+					else if (chooice == "4") {
+						cout << "成交查询" << endl;
+						cout << "请输入期货账户ID" << endl;
+						cin >> userid;
+						//根据不同的期货账户User查找对应的持仓信息
+						if (ctp_m->getL_User()->size() == 0) {
+							cout << "NULL" << endl;
+						}
+						else {
+							cout << "NOT NULL" << endl;
+							list<User *>::iterator itor;
+							for (itor = ctp_m->getL_User()->begin(); itor != ctp_m->getL_User()->end(); itor++) {
+								cout << "【期货账户:" << (*itor)->getUserID() << "】" << endl;
+								if ((*itor)->getUserID() == userid) { //成交查询
+									(*itor)->getUserTradeSPI();
+								}
+							}
+						}
+					}
+					else if (chooice == "5") {
+						cout << "报单" << endl;
+						cout << "请输入期货账户ID" << endl;
+						cin >> userid;
+						//根据不同的期货账户User查找对应的持仓信息
+						if (ctp_m->getL_User()->size() == 0) {
+							cout << "NULL" << endl;
+						}
+						else {
+							cout << "NOT NULL" << endl;
+							list<User *>::iterator itor;
+							for (itor = ctp_m->getL_User()->begin(); itor != ctp_m->getL_User()->end(); itor++) {
+								cout << "【期货账户:" << (*itor)->getUserID() << "】" << endl;
+								if ((*itor)->getUserID() == userid) { // 开始下单
+									/*order insert*/
+									string order_InstrumentID;
+									char order_CombOffsetFlag;
+									char order_Direction;
+									int order_Volume;
+									double order_Price;
+									string order_OrderRef;
+
+									cout << "Order Insert Operation" << endl;
+									/************************************************************************/
+									/* Code Below  Order Insert                                             */
+									/************************************************************************/
+									cout << "Please input instrumentID, such as cu1609, zn1701..." << endl;
+									cin >> order_InstrumentID;
+									cout << "Please input Comboffsetflag" << endl;
+									cout << "0:Open 1:Close 2:ForceClose 3:CloseToday 4:CloseYesterday" << endl;
+									cin >> order_CombOffsetFlag;
+									cout << "Please input Direction" << endl;
+									cout << "0:Buy 1:Sell" << endl;
+									cin >> order_Direction;
+									cout << "Please input Volume, such as 10, 50, 100..." << endl;
+									cin >> order_Volume;
+									cout << "Please input Price" << endl;
+									cin >> order_Price;
+									cout << "Please input OrderRef, such as 1, 2, 3 or user specific" << endl;
+									cin >> order_OrderRef;
+
+									cout << "order_InstrumentID = " << order_InstrumentID << endl;
+									cout << "order_CombOffsetFlag = " << order_CombOffsetFlag << endl;
+									cout << "order_Direction = " << order_Direction << endl;
+									cout << "order_Volume = " << order_Volume << endl;
+									cout << "order_Price = " << order_Price << endl;
+									cout << "order_OrderRef = " << order_OrderRef << endl;
+									
+									(*itor)->getUserTradeSPI()->OrderInsert((*itor), const_cast<char *>(order_InstrumentID.c_str()), order_CombOffsetFlag, order_Direction, order_Volume, order_Price, order_OrderRef);
+								}
+							}
+						}
+
+					}
+					else if (chooice == "6") {
+						cout << "撤单" << endl;
+						cout << "请输入期货账户ID" << endl;
+						cin >> userid;
+						//根据不同的期货账户User查找对应的持仓信息
+						if (ctp_m->getL_User()->size() == 0) {
+							cout << "NULL" << endl;
+						}
+						else {
+							cout << "NOT NULL" << endl;
+							list<User *>::iterator itor;
+							for (itor = ctp_m->getL_User()->begin(); itor != ctp_m->getL_User()->end(); itor++) {
+								cout << "【期货账户:" << (*itor)->getUserID() << "】" << endl;
+								if ((*itor)->getUserID() == userid) { // 开始撤单
+									/*order action delete*/
+									string action_ExchangeId;
+									int action_int_ExchangeId;
+									string action_OrderRef;
+									string action_OrderSysId;
+
+									cout << "撤单操作" << endl;
+									/************************************************************************/
+									/* Code Below  Order Action                                             */
+									/************************************************************************/
+									cout << "请选择期货交易所" << endl;
+									cout << "1:上海期货交易所 2:大连商品交易所 3:郑州商品交易所 4:中国金融期货交易所" << endl;
+									cin >> action_int_ExchangeId;
+									cout << "请输入报单引用" << endl;
+									cin >> action_OrderRef;
+									cout << "请输入报单编号" << endl;
+									cin.ignore(0x7fffffff, '\n');
+									getline(cin, action_OrderSysId);
+
+									switch (action_int_ExchangeId)
+									{
+									case 1:action_ExchangeId = "SHFE"; break;
+									case 2:action_ExchangeId = "DCE"; break;
+									case 3:action_ExchangeId = "CZCE"; break;
+									case 4:action_ExchangeId = "CFFEX"; break;
+									default:
+										action_ExchangeId = "";
+										break;
+									}
+
+									cout << "action_ExchangeId = " << action_ExchangeId << endl;
+									cout << "action_OrderRef = " << action_OrderRef << endl;
+									cout << "action_OrderSysId = " << action_OrderSysId << endl;
+
+									(*itor)->getUserTradeSPI()->OrderAction(action_ExchangeId, action_OrderRef, action_OrderSysId);
+								}
+							}
+						}
+					}
+					else if (chooice == "7") {
+						cout << "订阅行情" << endl;
+						string instrumentid;
+						cout << "请输入你要订阅的合约id，例如cu1609" << endl;
+						cin >> instrumentid;
+						l_Sub_instrument = ctp_m->addSubInstrument(instrumentid, l_Sub_instrument);
+						int count = ctp_m->calInstrument(instrumentid, l_Sub_instrument);
+						USER_PRINT(count);
+						if (count == 0 || count == 1) {
+							ctp_m->SubmarketData(mdspi1, l_Sub_instrument);
+						}
+						else {
+							cout << "已经订阅该行情!" << endl;
+						}
+						
+					}
+					else if (chooice == "8") {
+						cout << "退订行情" << endl;
+						string instrumentid;
+						cout << "请输入你要退订的合约id，例如cu1609" << endl;
+						cin >> instrumentid;
+						l_Sub_instrument = ctp_m->delSubInstrument(instrumentid, l_Sub_instrument);
+						if ((ctp_m->calInstrument(instrumentid, l_Sub_instrument) <= 0)) { // 如果合约列表里没有了该项,那么就取消订阅
+							l_UnSub_instrument = ctp_m->addUnSubInstrument(instrumentid, l_UnSub_instrument);
+							if (l_UnSub_instrument.size() > 0) {
+								cout << "l_UnSub_instrument NOT NULL" << endl;
+							}
+							else {
+								cout << "l_UnSub_instrument NULL" << endl;
+							}
+							ctp_m->UnSubmarketData(mdspi1, l_UnSub_instrument);
+						}
+					}
+					else {
+						printErrorInputMenu();
+					}
+					/************************************************************************/
+					/* 进入交易员操作界面                                                      */
+					/************************************************************************/
+					printLoginTraderOperatorMenu();
+					cin >> chooice;
+				}
+
+			}
+			else { //登陆失败打印登陆失败菜单
+				printLoginFailedMenu();
+			}
+			
+		}
+		/************************************************************************/
+		/* 管理员登陆                                                             */
+		/************************************************************************/
+		else if (chooice == "2") {
+			string adminid;
+			string adminpassword;
+			bool flag;
+			cout << "请输入管理员账号:" << endl;
+			cin >> adminid;
+			cout << "请输入管理员密码:" << endl;
+			cin >> adminpassword;
+			
+			flag = ctp_m->AdminLogin(adminid, adminpassword);
+			if (flag) {
+				printLoginSuccessMenu();
+				printAdminOperateMenu();
+				cin >> chooice;
+				while (chooice != "q")
+				{
+					if (chooice == "1") { //交易员管理
+						cout << "交易员管理" << endl;
+						printTraderOperateMenu();
+						cin >> chooice;
+						while (chooice != "q") {
+							if (chooice == "1") { //查询交易员
+								//ctp_m->getDBManager()->getAllTrader();
+								printTraderAccoutListMenu();
+								ctp_m->getDBManager()->getAllTrader();
+							}
+							else if (chooice == "2") { //增加交易员
+
+								cout << "当前系统已存在交易员" << endl;
+								//ctp_m->getDBManager()->getAllTrader();
+								printTraderAccoutListMenu();
+								ctp_m->getDBManager()->getAllTrader();
+
+								string tradername;
+								string password;
+								string traderid;
+								string isactive;
+								cout << "请输入交易员ID:" << endl;
+								cin >> traderid;
+								cout << "请输入交易员名字:" << endl;
+								cin >> tradername;
+								cout << "请输入交易员密码:" << endl;
+								cin >> password;
+								op->setTraderID(traderid);
+								op->setTraderName(tradername);
+								op->setPassword(password);
+								
+								//ctp_m->getDBManager()->CreateTrader(op);
+								ctp_m->getDBManager()->CreateTrader(op);
+
+								//delete op;
+							}
+							else if (chooice == "3") { //删除交易员
+								cout << "当前系统已存在交易员" << endl;
+								//打印当前存在的交易员
+								printTraderAccoutListMenu();
+								ctp_m->getDBManager()->getAllTrader();
+
+								string traderid;
+								cout << "请输入要删除的交易员的ID" << endl;
+								cin >> traderid;
+								op->setTraderID(traderid);
+								ctp_m->getDBManager()->DeleteTrader(op);
+								
+							}
+							else if (chooice == "4") { //修改交易员
+								cout << "当前系统已存在交易员" << endl;
+								//打印当前存在的交易员
+								printTraderAccoutListMenu();
+								ctp_m->getDBManager()->getAllTrader();
+
+								string tradername;
+								string password;
+								string traderid;
+								string new_traderid;
+								string isactive;
+								cout << "请输入交易员ID:" << endl;
+								cin >> traderid;
+								cout << "请输入交易员名字:" << endl;
+								cin >> tradername;
+								cout << "请输入交易员密码:" << endl;
+								cin >> password;
+								cout << "请输入交易员新ID:" << endl;
+								cin >> new_traderid;
+								cout << "请输入交易员激活状态" << endl;
+								cin >> isactive;
+								op->setTraderID(new_traderid);
+								op->setTraderName(tradername);
+								op->setPassword(password);
+								op->setIsActive(isactive);
+								ctp_m->getDBManager()->UpdateTrader(traderid, op);
+
+							}
+							else { //输入错误
+								printErrorInputMenu();
+							}
+							//继续在交易员管理进行循环
+							printTraderOperateMenu();
+							cin >> chooice;
+						}
+					}
+					else if (chooice == "2") { //期货账户管理
+						cout << "期货账户管理" << endl;
+						printFutureAccountOperateMenu();
+						cin >> chooice;
+						while (chooice != "q") {
+							if (chooice == "1") { //查询期货账户
+								printFutureAccountListMenu();
+								ctp_m->getDBManager()->getAllFutureAccount();
+							}
+							else if (chooice == "2") { //增加期货账户
+								cout << "当前系统已存在交易员" << endl;
+								//打印当前存在的交易员
+								printTraderAccoutListMenu();
+								ctp_m->getDBManager()->getAllTrader();
+
+								cout << "当前系统已存在期货账户" << endl;
+								//打印当前存在的期货账户
+								printFutureAccountListMenu();
+								ctp_m->getDBManager()->getAllFutureAccount();
+
+								string userID;
+								string password;
+								string brokerID;
+								string traderID;
+								string frontAddress;
+								string isActive;
+								cout << "请输入所属交易员ID:" << endl;
+								cin >> traderID;
+								cout << "请输入期货账户ID:" << endl;
+								cin >> userID;
+								cout << "请输入密码:" << endl;
+								cin >> password;
+								cout << "请输入BrokerID:" << endl;
+								cin >> brokerID;
+								cout << "请输入交易行情前置地址:" << endl;
+								cin >> frontAddress;
+								//cout << "请输入是否激活" << endl;
+								//cin >> isActive;
+								
+								fa->setUserID(userID);
+								fa->setPassword(password);
+								fa->setBrokerID(brokerID);
+								fa->setTraderID(traderID);
+								fa->setFrontAddress(frontAddress);
+								//fa->setIsActive(isActive);
+								op->setTraderID(traderID);
+
+								ctp_m->getDBManager()->CreateFutureAccount(op, fa);
+
+							}
+							else if (chooice == "3") { //删除期货账户
+								cout << "当前系统已存在期货账户" << endl;
+								//打印当前存在的期货账户
+								printFutureAccountListMenu();
+								ctp_m->getDBManager()->getAllFutureAccount();
+
+								string userID;
+								cout << "请输入账户ID:" << endl;
+								cin >> userID;
+
+								fa->setUserID(userID);
+								ctp_m->getDBManager()->DeleteFutureAccount(fa);
+							}
+							else if (chooice == "4") { //修改期货账户
+								cout << "当前系统已存在交易员" << endl;
+								//打印当前存在的交易员
+								printTraderAccoutListMenu();
+								ctp_m->getDBManager()->getAllTrader();
+
+								cout << "当前系统已存在期货账户" << endl;
+								//打印当前存在的期货账户
+								printFutureAccountListMenu();
+								ctp_m->getDBManager()->getAllFutureAccount();
+
+								string userID;
+								string new_userID;
+								string password;
+								string brokerID;
+								string traderID;
+								string frontAddress;
+								string isActive;
+								cout << "请输入所属交易员ID:" << endl;
+								cin >> traderID;
+								cout << "请输入期货账户ID:" << endl;
+								cin >> userID;
+								cout << "请输入密码:" << endl;
+								cin >> password;
+								cout << "请输入BrokerID:" << endl;
+								cin >> brokerID;
+								cout << "请输入账户新ID:" << endl;
+								cin >> new_userID;
+								cout << "请输入交易行情前置地址:" << endl;
+								cin >> frontAddress;
+								cout << "请输入是否激活" << endl;
+								cin >> isActive;
+
+								fa->setUserID(new_userID);
+								fa->setPassword(password);
+								fa->setBrokerID(brokerID);
+								fa->setTraderID(traderID);
+								fa->setFrontAddress(frontAddress);
+								fa->setIsActive(isActive);
+								op->setTraderID(traderID);
+
+
+								ctp_m->getDBManager()->UpdateFutureAccount(userID, op, fa);
+							}
+							else { //输入错误
+								printErrorInputMenu();
+							}
+							//继续在期货账户管理进行循环
+							printFutureAccountOperateMenu();
+							cin >> chooice;
+						}
+					}
+					else {
+						printErrorInputMenu();
+					}
+					/************************************************************************/
+					/* 进入管理员操作菜单                                                      */
+					/************************************************************************/
+					printAdminOperateMenu();
+					cin >> chooice;
+				}
+
+
 
 			}
 			else {
-				qry_InstrumentId = "";
-				qry_ExchangeId = "";
-			}
-
-			cout << "qry_ExchangeId = " << qry_ExchangeId << endl;
-			cout << "qry_InstrumentId = " << qry_InstrumentId << endl;
-
-			tdspi->QryInstrument(qry_ExchangeId, qry_InstrumentId);
-
-			/************************************************************************/
-			/* code finished                                                                     */
-			/************************************************************************/
-			printContinue();
-			getchar();
-			innner_input_c = getchar();
-			if (innner_input_c == 'c') {
-				input_c = ' ';
-				innner_input_c = ' ';
-				printMenu();
-				continue;
-			}
-			else {
-				input_c = ' ';
-				innner_input_c = ' ';
-				printMenu();
-				continue;
+				printLoginFailedMenu();
 			}
 		}
-		else if (input_c == 'e') {
-			cout << "Qry Exchange Operation" << endl;
-			/************************************************************************/
-			/* code below here                                                                     */
-			/************************************************************************/
-
-			tdspi->QryExchange();
-
-			/************************************************************************/
-			/* code finished                                                                     */
-			/************************************************************************/
-			printContinue();
-			getchar();
-			innner_input_c = getchar();
-			if (innner_input_c == 'c') {
-				input_c = ' ';
-				innner_input_c = ' ';
-				printMenu();
-				continue;
-			}
-			else {
-				input_c = ' ';
-				innner_input_c = ' ';
-				printMenu();
-				continue;
-			}
+		else {
+			printErrorInputMenu();
 		}
-		else if (input_c == 'o') {
-			cout << "Qry Order Operation" << endl;
-			/************************************************************************/
-			/* code below here                                                                     */
-			/************************************************************************/
 
-			tdspi->QryOrder();
-
-			/************************************************************************/
-			/* code finished                                                                     */
-			/************************************************************************/
-			printContinue();
-			getchar();
-			innner_input_c = getchar();
-			if (innner_input_c == 'c') {
-				input_c = ' ';
-				innner_input_c = ' ';
-				printMenu();
-				continue;
-			}
-			else {
-				input_c = ' ';
-				innner_input_c = ' ';
-				printMenu();
-				continue;
-			}
-		}
-		else if (input_c == 't') {
-			cout << "Qry Trading Account Operation" << endl;
-			/************************************************************************/
-			/* code below here                                                                     */
-			/************************************************************************/
-
-			tdspi->QryTradingAccount();
-
-			/************************************************************************/
-			/* code finished                                                                     */
-			/************************************************************************/
-			printContinue();
-			getchar();
-			innner_input_c = getchar();
-			if (innner_input_c == 'c') {
-				input_c = ' ';
-				innner_input_c = ' ';
-				printMenu();
-				continue;
-			}
-			else {
-				input_c = ' ';
-				innner_input_c = ' ';
-				printMenu();
-				continue;
-			}
-		}
-		else if (input_c == 'u') {
-			cout << "Qry Investor Operation" << endl;
-			/************************************************************************/
-			/* code below here                                                                     */
-			/************************************************************************/
-
-			tdspi->QryInvestor();
-
-			/************************************************************************/
-			/* code finished                                                                     */
-			/************************************************************************/
-			printContinue();
-			getchar();
-			innner_input_c = getchar();
-			if (innner_input_c == 'c') {
-				input_c = ' ';
-				innner_input_c = ' ';
-				printMenu();
-				continue;
-			}
-			else {
-				input_c = ' ';
-				innner_input_c = ' ';
-				printMenu();
-				continue;
-			}
-		}
-		else if (input_c == 'd') {
-			cout << "Qry Trade Operation" << endl;
-			/************************************************************************/
-			/* code below here                                                                     */
-			/************************************************************************/
-
-			tdspi->QryTrade();
-
-			/************************************************************************/
-			/* code finished                                                                     */
-			/************************************************************************/
-			printContinue();
-			getchar();
-			innner_input_c = getchar();
-			if (innner_input_c == 'c') {
-				input_c = ' ';
-				innner_input_c = ' ';
-				printMenu();
-				continue;
-			}
-			else {
-				input_c = ' ';
-				innner_input_c = ' ';
-				printMenu();
-				continue;
-			}
-		}
-		else if (input_c == 'h') {
-			cout << "Qry Investor Position Operation" << endl;
-			/************************************************************************/
-			/* code below here                                                                     */
-			/************************************************************************/
-
-			tdspi->QryInvestorPosition();
-
-			/************************************************************************/
-			/* code finished                                                                     */
-			/************************************************************************/
-			printContinue();
-			getchar();
-			innner_input_c = getchar();
-			if (innner_input_c == 'c') {
-				input_c = ' ';
-				innner_input_c = ' ';
-				printMenu();
-				continue;
-			}
-			else {
-				input_c = ' ';
-				innner_input_c = ' ';
-				printMenu();
-				continue;
-			}
-		}
-		else if (input_c == 'w') {
-			cout << "" << endl;
-			/************************************************************************/
-			/* code below here                                                                     */
-			/************************************************************************/
-
-
-			/************************************************************************/
-			/* code finished                                                                     */
-			/************************************************************************/
-			printContinue();
-			getchar();
-			innner_input_c = getchar();
-			if (innner_input_c == 'c') {
-				input_c = ' ';
-				innner_input_c = ' ';
-				printMenu();
-				continue;
-			}
-			else {
-				input_c = ' ';
-				innner_input_c = ' ';
-				printMenu();
-				continue;
-			}
-		}
+		printMenu();
+		cin >> chooice;
 	}
-	//sleep(1);
-	//tdspi->Join();
-	//sleep(1);
-	tdspi->Release();
-	delete tdspi;
-	tdspi = NULL;
 	return 0;
 }
