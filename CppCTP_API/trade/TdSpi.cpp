@@ -1182,8 +1182,10 @@ void TdSpi::OrderInsert(char *InstrumentID, char CombOffsetFlag, char Direction,
 	///Mac地址
 	//TThostFtdcMacAddressType	MacAddress;
 
-	this->tdapi->ReqOrderInsert(pInputOrder, this->getRequestID());
-
+	int call_flag = this->tdapi->ReqOrderInsert(pInputOrder, this->getRequestID());
+	
+	cout << "call flag" << call_flag << endl;
+	
 	delete pInputOrder;
 }
 

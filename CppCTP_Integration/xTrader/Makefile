@@ -210,6 +210,30 @@ FutureAccount.cpp.s:
 	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.s
 .PHONY : FutureAccount.cpp.s
 
+MarketConfig.o: MarketConfig.cpp.o
+.PHONY : MarketConfig.o
+
+# target to build an object file
+MarketConfig.cpp.o:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/MarketConfig.cpp.o
+.PHONY : MarketConfig.cpp.o
+
+MarketConfig.i: MarketConfig.cpp.i
+.PHONY : MarketConfig.i
+
+# target to preprocess a source file
+MarketConfig.cpp.i:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/MarketConfig.cpp.i
+.PHONY : MarketConfig.cpp.i
+
+MarketConfig.s: MarketConfig.cpp.s
+.PHONY : MarketConfig.s
+
+# target to generate assembly for a file
+MarketConfig.cpp.s:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/MarketConfig.cpp.s
+.PHONY : MarketConfig.cpp.s
+
 MdSpi.o: MdSpi.cpp.o
 .PHONY : MdSpi.o
 
@@ -423,6 +447,9 @@ help:
 	@echo "... FutureAccount.o"
 	@echo "... FutureAccount.i"
 	@echo "... FutureAccount.s"
+	@echo "... MarketConfig.o"
+	@echo "... MarketConfig.i"
+	@echo "... MarketConfig.s"
 	@echo "... MdSpi.o"
 	@echo "... MdSpi.i"
 	@echo "... MdSpi.s"

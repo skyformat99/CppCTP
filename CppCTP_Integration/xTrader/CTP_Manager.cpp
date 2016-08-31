@@ -7,6 +7,9 @@
 CTP_Manager::CTP_Manager() {
 	this->dbm = new DBManager();
 	this->l_user = new list<User *>();
+	this->l_trader = new list<string>();
+	this->l_obj_trader = new list<Trader *>();
+	this->l_strategys = new list<Strategy *>();
 }
 
 bool CTP_Manager::CheckIn(Login *login) {
@@ -23,44 +26,48 @@ bool CTP_Manager::AdminLogin(string adminid, string password) {
 	return this->dbm->FindAdminByAdminIdAndPassword(adminid, password);
 }
 
-User * CTP_Manager::CreateAccount(string td_frontAddress, string td_broker, string td_user, string td_pass, Trader *trader) {
+User * CTP_Manager::CreateAccount(User *user) {
 	USER_PRINT("CTP_Manager::CreateAccount");
 	//tcp://180.168.146.187:10030 //24H
 	//tcp://180.168.146.187:10000 //实盘仿真
 
-	TdSpi *tdspi = new TdSpi();
+	if (user != NULL) {
+		TdSpi *tdspi = new TdSpi();
 
-	User *user = new User(td_frontAddress, td_broker, td_user, td_pass, td_user, trader);
+		//User *user = new User(td_frontAddress, td_broker, td_user, td_pass, td_user, TraderID);
 
-	/*设置api*/
-	string flowpath = "conn/td/" + user->getUserID() + "/";
-	int flag = Utils::CreateFolder(flowpath.c_str());
-	if (flag != 0) {
-		cout << "无法创建用户流文件!" << endl;
-		return NULL;
-	} else {
-		CThostFtdcTraderApi *tdapi = CThostFtdcTraderApi::CreateFtdcTraderApi(flowpath.c_str());
-		cout << tdapi << endl;
-		if (!tdapi) {
+		/*设置api*/
+		string flowpath = "conn/td/" + user->getUserID() + "/";
+		int flag = Utils::CreateFolder(flowpath.c_str());
+		if (flag != 0) {
+			cout << "无法创建用户流文件!" << endl;
 			return NULL;
-		} else {
-			user->setUserTradeAPI(tdapi);
-			user->setUserTradeSPI(tdspi);
 		}
-	}
-	
-	sleep(1);
-	user->getUserTradeSPI()->Connect(user);
-	sleep(1);
-	user->getUserTradeSPI()->Login(user);
-	sleep(1);
-	user->getUserTradeSPI()->QrySettlementInfoConfirm(user);
+		else {
+			CThostFtdcTraderApi *tdapi = CThostFtdcTraderApi::CreateFtdcTraderApi(flowpath.c_str());
+			cout << tdapi << endl;
+			if (!tdapi) {
+				return NULL;
+			}
+			else {
+				user->setUserTradeAPI(tdapi);
+				user->setUserTradeSPI(tdspi);
+			}
+		}
 
-	this->l_user->push_back(user);
-	//tdspi->QrySettlementInfo(user);
-	//sleep(6);
-	//string instrument = "cu1609";
-	//user->getUserTradeSPI()->OrderInsert(user, const_cast<char *>(instrument.c_str()), '0', '0', 20, 39000, "1");
+		sleep(1);
+		user->getUserTradeSPI()->Connect(user);
+		sleep(1);
+		user->getUserTradeSPI()->Login(user);
+		sleep(1);
+		user->getUserTradeSPI()->QrySettlementInfoConfirm(user);
+
+		
+		//tdspi->QrySettlementInfo(user);
+		//sleep(6);
+		//string instrument = "cu1609";
+		//user->getUserTradeSPI()->OrderInsert(user, const_cast<char *>(instrument.c_str()), '0', '0', 20, 39000, "1");
+	}
 
 	return user;
 }
@@ -91,7 +98,7 @@ MdSpi * CTP_Manager::CreateMd(string md_frontAddress, string md_broker, string m
 	return mdspi;
 }
 
-///释放
+/// 释放
 void CTP_Manager::ReleaseAccount(User *user) {
 	if (user) {
 		// 释放UserApi
@@ -110,7 +117,7 @@ void CTP_Manager::ReleaseAccount(User *user) {
 	}
 }
 
-///订阅行情
+/// 订阅行情
 void CTP_Manager::SubmarketData(MdSpi *mdspi, list<string > l_instrument) {
 	if (mdspi && (l_instrument.size() > 0)) {
 		mdspi->SubMarket(l_instrument);
@@ -195,14 +202,14 @@ DBManager * CTP_Manager::getDBManager() {
 
 /// 设置l_trader
 void CTP_Manager::addTraderToLTrader(string trader) {
-	this->l_trader.push_back(trader);
+	this->l_trader->push_back(trader);
 }
 
 /// 获取trader是否在l_trader里
 bool CTP_Manager::checkInLTrader(string trader) {
 	bool flag = false;
 	list<string>::iterator Itor;
-	for (Itor = this->l_trader.begin(); Itor != this->l_trader.end(); Itor++) {
+	for (Itor = this->l_trader->begin(); Itor != this->l_trader->end(); Itor++) {
 		if (*Itor == trader) {
 			flag = true;
 		}
@@ -211,16 +218,21 @@ bool CTP_Manager::checkInLTrader(string trader) {
 }
 
 /// 得到l_trader
-list<string> CTP_Manager::getL_Trader() {
+list<string> *CTP_Manager::getL_Trader() {
 	return this->l_trader;
+}
+
+/// 得到l_obj_trader
+list<Trader *> * CTP_Manager::getL_Obj_Trader() {
+	return this->l_obj_trader;
 }
 
 /// 移除元素
 void CTP_Manager::removeFromLTrader(string trader) {
 	list<string>::iterator Itor;
-	for (Itor = this->l_trader.begin(); Itor != this->l_trader.end();) {
+	for (Itor = this->l_trader->begin(); Itor != this->l_trader->end();) {
 		if (*Itor == trader) {
-			Itor = this->l_trader.erase(Itor);
+			Itor = this->l_trader->erase(Itor);
 		}
 		else {
 			Itor++;
@@ -252,4 +264,61 @@ map<string, list<User *> *> CTP_Manager::getTraderMap() {
 /// 返回用户列表
 list<User *> *CTP_Manager::getL_User() {
 	return this->l_user;
+}
+
+/// 得到strategy_list
+list<Strategy *> * CTP_Manager::getListStrategy() {
+	return this->l_strategys;
+}
+
+/// 设置strategy_list
+void CTP_Manager::setListStrategy(list<Strategy *> *l_strategys) {
+	this->l_strategys = l_strategys;
+}
+
+/// 设置mdspi
+void CTP_Manager::setMdSpi(MdSpi *mdspi) {
+	this->mdspi = mdspi;
+}
+
+/// 获得mdspi
+MdSpi * CTP_Manager::getMdSpi() {
+	return this->mdspi;
+}
+
+/// 初始化
+void CTP_Manager::init() {
+	/// 数据库查询所有的Trader
+	this->dbm->getAllTrader(this->l_trader);
+
+	/// 查询所有的策略
+	this->dbm->getAllStragegy(this->l_strategys);
+
+	/// 查询所有的期货账户
+	this->dbm->getAllFutureAccount(this->l_user);
+
+	/// 绑定操作,策略绑定到对应期货账户下
+	list<User *>::iterator user_itor;
+	list<Strategy *>::iterator stg_itor;
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
+		USER_PRINT((*user_itor)->getUserID());
+		for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
+			USER_PRINT((*stg_itor)->getUserID());
+			if ((*stg_itor)->getUserID() == (*user_itor)->getUserID()) {
+				USER_PRINT("Strategy Bind To User");
+				(*user_itor)->addStrategyToList((*stg_itor));
+			}
+		}
+		/// 遍历设值后进行TD初始化
+		this->CreateAccount((*user_itor));
+	}
+
+	/// 行情初始化
+	MarketConfig *mc = this->dbm->getOneMarketConfig();
+	if (mc != NULL) {
+		this->mdspi = this->CreateMd(mc->getMarketFrontAddr(), mc->getBrokerID(), mc->getUserID(), mc->getPassword());
+		if (this->mdspi != NULL) {
+			this->mdspi->setListStrategy(this->l_strategys);
+		}
+	}
 }

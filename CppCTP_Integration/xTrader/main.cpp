@@ -13,9 +13,13 @@
 #include "DBManager.h"
 #include "Trader.h"
 #include "FutureAccount.h"
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
 
 using std::cout;
 using std::cin;
+using namespace rapidjson;
 
 void printMenuEN() {
 	cout << "|==========================|" << endl;
@@ -139,6 +143,24 @@ void printFutureAccountOperateMenu() {
 }
 
 int main() {
+
+	/************************************************************************/
+	/* 测试rapid json                                                        */
+	/************************************************************************/
+	// 1. 把 JSON 解析至 DOM。
+	const char* json = "{\"project\":\"rapidjson\",\"stars\":10}";
+	Document d;
+	d.Parse(json);
+	// 2. 利用 DOM 作出修改。
+	Value& s = d["stars"];
+	s.SetInt(s.GetInt() + 1);
+	// 3. 把 DOM 转换（stringify）成 JSON。
+	StringBuffer buffer;
+	Writer<StringBuffer> writer(buffer);
+	d.Accept(writer);
+	// Output {"project":"rapidjson","stars":11}
+	std::cout << buffer.GetString() << std::endl;
+
 	mongo::client::initialize();
 
 	/************************************************************************/
@@ -248,13 +270,47 @@ int main() {
 	/************************************************************************/
 	
 	//DBManager *dbm = new DBManager();
-	//DBManager dbm;
+
+	//MarketConfig *mc = new MarketConfig("1", "tcp://180.168.146.187:10011", "9999", "058176", "123456");
+	//dbm->CreateMarketConfig(mc);
+	//dbm->DeleteMarketConfig(mc);
+	//dbm->UpdateMarketConfig(mc);
+	//MarketConfig *mc = dbm->getOneMarketConfig();
+	//cout << "Got The PassWord = " << mc->getPassword() << endl;
+	ctp_m->init();
+
+
+
 
 	//Trader *op = new Trader();
 	//op->setIsActive("1");
 	//op->setTraderID("1111");
 	//op->setPassword("xxxx");
 	//op->setTraderName("lucas");
+	/// 增加策略
+	//Strategy *stg = new Strategy();
+	//stg->setStrategyId("2");
+	//stg->setUserID("058176");
+	//stg->setTraderID("1");
+	//
+	//dbm->CreateStrategy(stg);
+
+	///// 更新策略
+	//stg->setStrategyId("2");
+	//stg->setUserID("058176");
+	//stg->setTraderID("1");
+	//stg->setIsActive("1");
+
+	//dbm->UpdateStrategy(stg);
+
+	///// 删除策略
+	//dbm->DeleteStrategy(stg);
+
+	///// 获取所有的策略
+	//list<Strategy *> *l_strategys = new list<Strategy *>();
+	//dbm->getAllStragegy(l_strategys);
+	//cout << "l_strategys size = " << l_strategys->size() << endl;
+
 	
 
 	//dbm->CreateTrader(op);
@@ -288,10 +344,7 @@ int main() {
 
 	string chooice;
 	string userid; //期货账户id
-	printWelcome();
 
-	printMenu();
-	cin >> chooice;
 	
 	Trader *op = new Trader();
 	FutureAccount *fa = new FutureAccount();
@@ -299,13 +352,21 @@ int main() {
 	
 	/*订阅行情*/
 
-	MdSpi *mdspi1 = ctp_m->CreateMd(market_frontAddr, broker_id, user_id, password);
+	//MdSpi *mdspi1 = ctp_m->CreateMd(market_frontAddr, broker_id, user_id, password);
+
 	list<string> l_Sub_instrument;
 	list<string> l_UnSub_instrument;
+	/// 所有的策略列表
+	//list<Strategy *> *l_strategys = new list<Strategy *>();
+	//ctp_m->getDBManager()->getAllStragegy(l_strategys);
 
-	//= ctp_m->addInstrument("cu1609", ctp_m->getL_Instrument());
-	
+	//mdspi1->setListStrategy(l_strategys);
 
+	//ctp_m->addInstrument("cu1609", ctp_m->getL_Instrument());
+	printWelcome();
+	printMenu();
+	cin >> chooice;
+#if 1
 	while (chooice != "q") {
 		/************************************************************************/
 		/* 交易员登陆           CreateMd                                          */
@@ -337,14 +398,10 @@ int main() {
 						<< "密码 : " << (*itor)->getPassword() << ", "
 						<< "交易前置地址 : " << (*itor)->getFrontAddress() << "】" << endl;
 					if (!create_flag) {
-						Trader *new_trader = new Trader();
-						new_trader->setTraderID(traderid);
-						new_trader->setPassword(password);
-						ctp_m->CreateAccount((*itor)->getFrontAddress(), (*itor)->getBrokerID(), (*itor)->getUserID(), (*itor)->getPassword(), new_trader);
+						//将已登录的账户存入登陆列表里
+						ctp_m->addTraderToLTrader(traderid);
 					}
 				}
-				//将已登录的账户存入登陆列表里
-				ctp_m->addTraderToLTrader(traderid);
 
 				/************************************************************************/
 				/* 进入交易员操作界面                                                      */
@@ -355,9 +412,9 @@ int main() {
 				while (chooice != "q") {
 					if (chooice == "1") {
 						cout << "账户查询" << endl;
-						list<string> l_trader = ctp_m->getL_Trader();
+						list<string> *l_trader = ctp_m->getL_Trader();
 						list<string>::iterator itor;
-						for (itor = l_trader.begin(); itor != l_trader.end(); itor++) {
+						for (itor = l_trader->begin(); itor != l_trader->end(); itor++) {
 							// 打印交易员id
 							cout << "【交易员账户 : " << (*itor) << "】" << endl;
 							//根据交易员id获取账户
@@ -366,7 +423,6 @@ int main() {
 							list<FutureAccount *>::iterator inner_itor;
 							for (inner_itor = l_futureaccount->begin(); inner_itor != l_futureaccount->end(); inner_itor++) {
 								cout << "【期货账户:" << (*inner_itor)->getUserID() << "】" << endl;
-								
 							}
 							delete l_futureaccount;
 						}
@@ -543,7 +599,7 @@ int main() {
 						int count = ctp_m->calInstrument(instrumentid, l_Sub_instrument);
 						USER_PRINT(count);
 						if (count == 0 || count == 1) {
-							ctp_m->SubmarketData(mdspi1, l_Sub_instrument);
+							ctp_m->SubmarketData(ctp_m->getMdSpi(), l_Sub_instrument);
 						}
 						else {
 							cout << "已经订阅该行情!" << endl;
@@ -564,7 +620,7 @@ int main() {
 							else {
 								cout << "l_UnSub_instrument NULL" << endl;
 							}
-							ctp_m->UnSubmarketData(mdspi1, l_UnSub_instrument);
+							ctp_m->UnSubmarketData(ctp_m->getMdSpi(), l_UnSub_instrument);
 						}
 					}
 					else {
@@ -610,14 +666,14 @@ int main() {
 							if (chooice == "1") { //查询交易员
 								//ctp_m->getDBManager()->getAllTrader();
 								printTraderAccoutListMenu();
-								ctp_m->getDBManager()->getAllTrader();
+								//ctp_m->getDBManager()->getAllTrader();
 							}
 							else if (chooice == "2") { //增加交易员
 
 								cout << "当前系统已存在交易员" << endl;
 								//ctp_m->getDBManager()->getAllTrader();
 								printTraderAccoutListMenu();
-								ctp_m->getDBManager()->getAllTrader();
+								//ctp_m->getDBManager()->getAllTrader();
 
 								string tradername;
 								string password;
@@ -642,7 +698,7 @@ int main() {
 								cout << "当前系统已存在交易员" << endl;
 								//打印当前存在的交易员
 								printTraderAccoutListMenu();
-								ctp_m->getDBManager()->getAllTrader();
+								//ctp_m->getDBManager()->getAllTrader();
 
 								string traderid;
 								cout << "请输入要删除的交易员的ID" << endl;
@@ -655,7 +711,7 @@ int main() {
 								cout << "当前系统已存在交易员" << endl;
 								//打印当前存在的交易员
 								printTraderAccoutListMenu();
-								ctp_m->getDBManager()->getAllTrader();
+								//ctp_m->getDBManager()->getAllTrader();
 
 								string tradername;
 								string password;
@@ -694,18 +750,18 @@ int main() {
 						while (chooice != "q") {
 							if (chooice == "1") { //查询期货账户
 								printFutureAccountListMenu();
-								ctp_m->getDBManager()->getAllFutureAccount();
+								//ctp_m->getDBManager()->getAllFutureAccount();
 							}
 							else if (chooice == "2") { //增加期货账户
 								cout << "当前系统已存在交易员" << endl;
 								//打印当前存在的交易员
 								printTraderAccoutListMenu();
-								ctp_m->getDBManager()->getAllTrader();
+								//ctp_m->getDBManager()->getAllTrader();
 
 								cout << "当前系统已存在期货账户" << endl;
 								//打印当前存在的期货账户
 								printFutureAccountListMenu();
-								ctp_m->getDBManager()->getAllFutureAccount();
+								//ctp_m->getDBManager()->getAllFutureAccount();
 
 								string userID;
 								string password;
@@ -741,7 +797,7 @@ int main() {
 								cout << "当前系统已存在期货账户" << endl;
 								//打印当前存在的期货账户
 								printFutureAccountListMenu();
-								ctp_m->getDBManager()->getAllFutureAccount();
+								//ctp_m->getDBManager()->getAllFutureAccount();
 
 								string userID;
 								cout << "请输入账户ID:" << endl;
@@ -754,12 +810,12 @@ int main() {
 								cout << "当前系统已存在交易员" << endl;
 								//打印当前存在的交易员
 								printTraderAccoutListMenu();
-								ctp_m->getDBManager()->getAllTrader();
+								//ctp_m->getDBManager()->getAllTrader();
 
 								cout << "当前系统已存在期货账户" << endl;
 								//打印当前存在的期货账户
 								printFutureAccountListMenu();
-								ctp_m->getDBManager()->getAllFutureAccount();
+								//ctp_m->getDBManager()->getAllFutureAccount();
 
 								string userID;
 								string new_userID;
@@ -826,5 +882,7 @@ int main() {
 		printMenu();
 		cin >> chooice;
 	}
+
+#endif
 	return 0;
 }

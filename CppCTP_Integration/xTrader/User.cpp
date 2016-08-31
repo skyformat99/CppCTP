@@ -16,10 +16,11 @@
 #define DB_ONERRRTNORDERINSERT_COLLECTION "CTP.onerrrtnorderinsert"
 #define DB_ONRSPQRYINVESTORPOSITION       "CTP.onrspqryinvestorposition"
 
+
 //转码数组
 char codeDst_2[90] = { 0 };
 
-User::User(string frontAddress, string BrokerID, string UserID, string Password, string nRequestID, Trader *trader) {
+User::User(string frontAddress, string BrokerID, string UserID, string Password, string nRequestID, string TraderID) {
 	this->BrokerID = BrokerID;
 	this->UserID = UserID;
 	this->Password = Password;
@@ -29,7 +30,8 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 	this->TradeConn = DBManager::getDBConnection();
 	this->PositionConn = DBManager::getDBConnection();
 	this->OrderConn = DBManager::getDBConnection();
-	this->trader = trader;
+	this->TraderID = TraderID;
+	this->l_strategys = new list<Strategy *>();
 }
 
 User::User(string BrokerID, string UserID, int nRequestID) {
@@ -37,6 +39,7 @@ User::User(string BrokerID, string UserID, int nRequestID) {
 	this->UserID = UserID;
 	this->nRequestID = atoi(UserID.c_str());
 	this->isConfirmSettlement = false;
+	this->l_strategys = new list<Strategy *>();
 }
 
 User::~User() {
@@ -127,6 +130,30 @@ void User::setTrader(Trader *trader) {
 	this->trader = trader;
 }
 
+string User::getTraderID() {
+	return this->TraderID;
+}
+
+
+void User::setTraderID(string TraderID) {
+	this->TraderID = TraderID;
+}
+
+/// 得到strategy_list
+list<Strategy *> * User::getListStrategy() {
+	return this->l_strategys;
+}
+
+/// 设置strategy_list
+void User::setListStrategy(list<Strategy *> * l_strategys) {
+	this->l_strategys = l_strategys;
+}
+
+/// 添加strategy到list
+void User::addStrategyToList(Strategy *stg) {
+	this->l_strategys->push_back(stg);
+}
+
 /************************************************************************/
 /* 获取数据库连接                                                         */
 /************************************************************************/
@@ -149,7 +176,7 @@ void User::DB_OrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderF
 	BSONObjBuilder b;
 
 	/// 交易员id
-	b.append("OperatorID", this->GetTrader()->getTraderID());
+	b.append("OperatorID", this->getTraderID());
 
 	///经纪公司代码
 	b.append("BrokerID", pInputOrder->BrokerID);
@@ -234,7 +261,7 @@ void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *
 	USER_PRINT(conn);
 	BSONObjBuilder b;
 	/// 交易员id
-	b.append("OperatorID", this->GetTrader()->getTraderID());
+	b.append("OperatorID", this->getTraderID());
 	///经纪公司代码
 	b.append("BrokerID", pOrder->BrokerID);
 	///投资者代码
@@ -396,7 +423,7 @@ void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *
 	USER_PRINT(conn);
 	BSONObjBuilder b;
 	/// 交易员id
-	b.append("OperatorID", this->GetTrader()->getTraderID());
+	b.append("OperatorID", this->getTraderID());
 	///经纪公司代码
 	b.append("BrokerID", pTrade->BrokerID);
 	///投资者代码
@@ -481,7 +508,7 @@ void User::DB_OrderAction(mongo::DBClientConnection *conn, CThostFtdcInputOrderA
 	USER_PRINT(conn);
 	BSONObjBuilder b;
 	/// 交易员id
-	b.append("OperatorID", this->GetTrader()->getTraderID());
+	b.append("OperatorID", this->getTraderID());
 	///经纪公司代码
 	b.append("BrokerID", pOrderAction->BrokerID);
 	///投资者代码
@@ -526,7 +553,7 @@ void User::DB_OrderCombine(mongo::DBClientConnection *conn, CThostFtdcOrderField
 	USER_PRINT(conn);
 	BSONObjBuilder b;
 	/// 交易员id
-	b.append("OperatorID", this->GetTrader()->getTraderID());
+	b.append("OperatorID", this->getTraderID());
 	///经纪公司代码
 	b.append("BrokerID", pOrder->BrokerID);
 	///投资者代码
@@ -667,7 +694,7 @@ void User::DB_OnRspOrderAction(mongo::DBClientConnection *conn, CThostFtdcInputO
 	USER_PRINT(conn);
 	BSONObjBuilder b;
 	/// 交易员id
-	b.append("OperatorID", this->GetTrader()->getTraderID());
+	b.append("OperatorID", this->getTraderID());
 	///经纪公司代码
 	b.append("BrokerID", pInputOrderAction->BrokerID);
 	///投资者代码
@@ -712,7 +739,7 @@ void User::DB_OnErrRtnOrderAction(mongo::DBClientConnection *conn, CThostFtdcOrd
 	USER_PRINT(conn);
 	BSONObjBuilder b;
 	/// 交易员id
-	b.append("OperatorID", this->GetTrader()->getTraderID());
+	b.append("OperatorID", this->getTraderID());
 	///经纪公司代码
 	b.append("BrokerID", pOrderAction->BrokerID);
 	///投资者代码
@@ -781,7 +808,7 @@ void User::DB_OnRspOrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputO
 	USER_PRINT(conn);
 	BSONObjBuilder b;
 	/// 交易员id
-	b.append("OperatorID", this->GetTrader()->getTraderID());
+	b.append("OperatorID", this->getTraderID());
 	///经纪公司代码
 	b.append("BrokerID", pInputOrder->BrokerID);
 	///投资者代码
@@ -854,7 +881,7 @@ void User::DB_OnErrRtnOrderInsert(mongo::DBClientConnection *conn, CThostFtdcInp
 	USER_PRINT(conn);
 	BSONObjBuilder b;
 	/// 交易员id
-	b.append("OperatorID", this->GetTrader()->getTraderID());
+	b.append("OperatorID", this->getTraderID());
 	///经纪公司代码
 	b.append("BrokerID", pInputOrder->BrokerID);
 	///投资者代码
@@ -925,7 +952,7 @@ void User::DB_OnRspQryInvestorPosition(mongo::DBClientConnection *conn, CThostFt
 	USER_PRINT(conn);
 	BSONObjBuilder b;
 	/// 交易员id
-	b.append("OperatorID", this->GetTrader()->getTraderID());
+	b.append("OperatorID", this->getTraderID());
 	///合约代码
 	b.append("InstrumentID", pInvestorPosition->InstrumentID);
 	///经纪公司代码

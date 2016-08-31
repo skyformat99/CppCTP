@@ -8,6 +8,12 @@
 
 #include "Trader.h"
 #include "FutureAccount.h"
+#include "Strategy.h"
+#include "MarketConfig.h"
+
+class Strategy;
+class MarketConfig;
+
 
 using namespace mongo;
 using namespace std;
@@ -15,17 +21,18 @@ using std::string;
 using mongo::DBClientConnection;
 
 class DBManager {
+
 public:
 	DBManager();
 	~DBManager();
 	static mongo::DBClientConnection * getDBConnection();
 
 	/************************************************************************/
-	/* ´´½¨½»Ò×Ô±
-	   É¾³ı½»Ò×Ô±
-	   ¸üĞÂ½»Ò×Ô±
-	   ²éÕÒ½»Ò×Ô±(username)
-	   ²éÕÒ½»Ò×Ô±(nickname)                                                  */
+	/* åˆ›å»ºäº¤æ˜“å‘˜
+	   åˆ é™¤äº¤æ˜“å‘˜
+	   æ›´æ–°äº¤æ˜“å‘˜
+	   æŸ¥æ‰¾äº¤æ˜“å‘˜(username)
+	   æŸ¥æ‰¾äº¤æ˜“å‘˜(nickname)                                                  */
 	/************************************************************************/
 	void CreateTrader(Trader *op);
 	void DeleteTrader(Trader *op);
@@ -34,21 +41,21 @@ public:
 	void SearchTraderByTraderName(string tradername);
 	void SearchTraderByTraderIdAndPassword(string traderid, string password);
 	bool FindTraderByTraderIdAndPassword(string traderid, string password);
-	void getAllTrader();
+	void getAllTrader(list<string> *l_trader);
 
 
 	/************************************************************************/
-	/* ²éÕÒ¹ÜÀíÔ±                                                             */
+	/* æŸ¥æ‰¾ç®¡ç†å‘˜                                                             */
 	/************************************************************************/
 	bool FindAdminByAdminIdAndPassword(string adminid, string password);
 
 
 	/************************************************************************/
-	/* ´´½¨ÕË»§
-	   É¾³ıÕË»§
-	   ¸üĞÂÕË»§
-	   ²éÕÒÕË»§(userid)
-	   ²éÕÒÕË»§(tradername)                                                  */
+	/* åˆ›å»ºè´¦æˆ·
+	   åˆ é™¤è´¦æˆ·
+	   æ›´æ–°è´¦æˆ·
+	   æŸ¥æ‰¾è´¦æˆ·(userid)
+	   æŸ¥æ‰¾è´¦æˆ·(tradername)                                                  */
 	/************************************************************************/
 	void CreateFutureAccount(Trader *op, FutureAccount *fa);
 	void DeleteFutureAccount(FutureAccount *fa);
@@ -56,7 +63,32 @@ public:
 	void SearchFutrueByUserID(string userid);
 	void SearchFutrueByTraderID(string traderid);
 	void SearchFutrueListByTraderID(string traderid, list<FutureAccount *> *l_futureaccount);
-	void getAllFutureAccount();
+	void getAllFutureAccount(list<User *> *l_user);
+
+	/************************************************************************/
+	/* åˆ›å»ºç­–ç•¥
+	   åˆ é™¤ç­–ç•¥
+	   æ›´æ–°ç­–ç•¥
+	   æŸ¥æ‰¾ç­–ç•¥				                                                */
+	/************************************************************************/
+	void CreateStrategy(Strategy *stg);
+	void DeleteStrategy(Strategy *stg);
+	void UpdateStrategy(Strategy *stg);
+	void getAllStragegy(list<Strategy *> *l_strategys);
+
+	/************************************************************************/
+	/* åˆ›å»ºMDé…ç½®
+	   åˆ é™¤MDé…ç½®
+	   æ›´æ–°MDé…ç½®
+	   è·å–æ‰€æœ‰MDé…ç½®
+	   è·å–ä¸€æ¡MDè®°å½•															*/
+	/************************************************************************/
+	void CreateMarketConfig(MarketConfig *mc);
+	void DeleteMarketConfig(MarketConfig *mc);
+	void UpdateMarketConfig(MarketConfig *mc);
+	void getAllMarketConfig(list<MarketConfig *> *l_marketconfig);
+	MarketConfig *getOneMarketConfig();
+	
 
 	void setConn(mongo::DBClientConnection *conn);
 	mongo::DBClientConnection *getConn();

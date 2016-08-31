@@ -4,6 +4,7 @@ FILE(REMOVE_RECURSE
   "CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o"
   "CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o"
   "CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o"
+  "CMakeFiles/quant_ctp_XTrader.dir/MarketConfig.cpp.o"
   "CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o"
   "CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o"
   "CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o"

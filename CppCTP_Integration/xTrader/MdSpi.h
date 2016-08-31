@@ -16,7 +16,7 @@
 #include "ThostFtdcMdApi.h"
 #include "ThostFtdcUserApiStruct.h"
 #include "User.h"
-
+#include "Strategy.h"
 
 
 using std::map;
@@ -81,6 +81,15 @@ public:
 	//得到Password
 	string getPassword();
 
+	//添加strategy
+	void addStrategyToList(Strategy *stg);
+
+	/// 得到strategy_list
+	list<Strategy *> *getListStrategy();
+
+	/// 设置strategy_list
+	void setListStrategy(list<Strategy *> *l_strategys);
+
 private:
     CThostFtdcMdApi *mdapi;
     CThostFtdcReqUserLoginField *loginField;
@@ -98,5 +107,6 @@ private:
 	sem_t logout_sem;
 	sem_t submarket_sem;
 	sem_t unsubmarket_sem;
+	list<Strategy *> *l_strategys;
 };
 #endif //QUANT_CTP_MDSPI_H

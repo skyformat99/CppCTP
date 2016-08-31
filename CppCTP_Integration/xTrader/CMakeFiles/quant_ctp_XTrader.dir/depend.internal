@@ -5,14 +5,17 @@ CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.o
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Algorithm.cpp
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Algorithm.h
 CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Algorithm.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CTP_Manager.cpp
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CTP_Manager.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/DBManager.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Debug.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/FutureAccount.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Login.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MarketConfig.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MdSpi.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Order.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/TdSpi.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcMdApi.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcTraderApi.h
@@ -22,11 +25,14 @@ CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/User.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Utils.h
 CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Algorithm.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/DBManager.cpp
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/DBManager.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Debug.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/FutureAccount.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MarketConfig.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Order.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/TdSpi.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcTraderApi.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcUserApiDataType.h
@@ -34,22 +40,34 @@ CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Trader.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/User.h
 CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Algorithm.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/DBManager.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Debug.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/FutureAccount.cpp
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/FutureAccount.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MarketConfig.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Order.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/TdSpi.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcTraderApi.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcUserApiDataType.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcUserApiStruct.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Trader.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/User.h
+CMakeFiles/quant_ctp_XTrader.dir/MarketConfig.cpp.o
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Debug.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MarketConfig.cpp
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MarketConfig.h
 CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Algorithm.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/DBManager.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Debug.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/FutureAccount.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MarketConfig.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MdSpi.cpp
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MdSpi.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Order.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/TdSpi.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcMdApi.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcTraderApi.h
@@ -61,13 +79,28 @@ CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Order.cpp
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Order.h
 CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o
- /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.cpp
- /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.h
-CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Algorithm.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/DBManager.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Debug.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/FutureAccount.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MarketConfig.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Order.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.cpp
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/TdSpi.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcTraderApi.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcUserApiDataType.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcUserApiStruct.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Trader.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/User.h
+CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Algorithm.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/DBManager.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Debug.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/FutureAccount.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MarketConfig.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Order.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/TdSpi.cpp
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/TdSpi.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcTraderApi.h
@@ -77,10 +110,13 @@ CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/User.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Utils.h
 CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Algorithm.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/DBManager.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Debug.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/FutureAccount.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MarketConfig.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Order.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/TdSpi.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcTraderApi.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcUserApiDataType.h
@@ -89,10 +125,13 @@ CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Trader.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/User.h
 CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Algorithm.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/DBManager.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Debug.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/FutureAccount.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MarketConfig.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Order.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/TdSpi.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcTraderApi.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcUserApiDataType.h
@@ -105,13 +144,16 @@ CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Utils.cpp
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Utils.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Algorithm.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CTP_Manager.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/DBManager.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Debug.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/FutureAccount.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Login.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MarketConfig.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MdSpi.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Order.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/TdSpi.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcMdApi.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcTraderApi.h
@@ -121,3 +163,27 @@ CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/User.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Utils.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/main.cpp
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/allocators.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/document.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/encodedstream.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/encodings.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/error/error.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/internal/biginteger.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/internal/diyfp.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/internal/dtoa.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/internal/ieee754.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/internal/itoa.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/internal/meta.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/internal/pow10.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/internal/stack.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/internal/strfunc.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/internal/strtod.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/internal/swap.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/memorystream.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/msinttypes/inttypes.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/msinttypes/stdint.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/rapidjson.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/reader.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/stream.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/stringbuffer.h
+ /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/rapidjson/writer.h

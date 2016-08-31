@@ -214,6 +214,13 @@ public:
 
 	//得到OrderRef
 
+	//frontid
+	void setFrontID(int FrontID);
+	int getFrontID();
+
+	//sessionid
+	void setSessionID(int SessionID);
+	int getSessionID();
 
 private:
     CThostFtdcTraderApi *tdapi;
@@ -242,6 +249,8 @@ private:
 	map <string, int> m_user_requestid;
 	map <int, CThostFtdcTraderApi *> m_requestid_api;
 	User *current_user;
+	int FrontID;
+	int SessionID;
 };
 
 #endif //QUANT_CTP_TRADE_TDSPI_H

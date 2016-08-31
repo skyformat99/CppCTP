@@ -7,13 +7,6 @@
 
 using namespace std;
 
-//#define DEBUG
-#ifdef DEBUG
-#define USER_PRINT(x) std::cout << "[DEBUG] - " << __DATE__ << ", " << __TIME__<< "  " << __FILE__ << ", Line - " << __LINE__ << endl; std::cout << #x << " = " << x << std::endl;
-#else
-#define USER_PRINT(x)
-#endif
-
 const string BROKER_ID = "9999";
 const string USER_ID = "058176";
 const string PASS = "669822";
@@ -133,7 +126,32 @@ void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtd
 	USER_PRINT("MdSpi::OnRspUserLogin")
 	USER_PRINT(bIsLast)
 	if (bIsLast && !(this->IsErrorRspInfo(pRspInfo))) {
-		cout << "交易日：" << this->mdapi->GetTradingDay() << endl;
+		///交易日
+		cout << "交易日" << pRspUserLogin->TradingDay << ", ";
+		///登录成功时间
+		cout << "登录成功时间" << pRspUserLogin->LoginTime << ", ";
+		///经纪公司代码
+		cout << "经纪公司代码" << pRspUserLogin->BrokerID << ", ";
+		///用户代码
+		cout << "用户代码" << pRspUserLogin->UserID << ", ";
+		///交易系统名称
+		cout << "交易系统名称" << pRspUserLogin->SystemName << endl;
+		///前置编号
+		cout << "前置编号" << pRspUserLogin->FrontID << ", ";
+		///会话编号
+		cout << "会话编号" << pRspUserLogin->SessionID << ", ";
+		///最大报单引用
+		cout << "最大报单引用" << pRspUserLogin->MaxOrderRef << ", ";
+		///上期所时间
+		cout << "上期所时间" << pRspUserLogin->SHFETime << ", ";
+		///大商所时间
+		cout << "大商所时间" << pRspUserLogin->DCETime << endl;
+		///郑商所时间
+		cout << "郑商所时间" << pRspUserLogin->CZCETime << ", ";
+		///中金所时间
+		cout << "中金所时间" << pRspUserLogin->FFEXTime << ", ";
+		///能源中心时间
+		cout << "能源中心时间" << pRspUserLogin->INETime << endl;
 		this->isLogged = true;
 		sem_post(&login_sem);
 		if (this->isFirstTimeLogged == false) {
@@ -272,6 +290,21 @@ string MdSpi::getPassword() {
 	return this->Password;
 }
 
+//添加strategy
+void MdSpi::addStrategyToList(Strategy *stg) {
+	this->l_strategys->push_back(stg);
+}
+
+/// 得到strategy_list
+list<Strategy *> * MdSpi::getListStrategy() {
+	return this->l_strategys;
+}
+
+/// 设置strategy_list
+void MdSpi::setListStrategy(list<Strategy *> *l_strategys) {
+	this->l_strategys = l_strategys;
+}
+
 //取消订阅行情应答
 void MdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT(bIsLast)
@@ -286,7 +319,7 @@ void MdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificIns
 }
 
 //深度行情接收
-void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData){
+void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 	USER_PRINT("OnRtnDepthMarketData")
     cout << "===========================================" << endl;
     //cout << "深度行情" << ", ";
@@ -308,6 +341,11 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
     //<< "本次结算价格:" << pDepthMarketData->SettlementPrice << endl
     //<< "成交金额:" << pDepthMarketData->Turnover << endl
     //<< "持仓量:" << pDepthMarketData->OpenInterest << endl;
+
+	list<Strategy *>::iterator itor;
+	for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+		(*itor)->get_tick(pDepthMarketData);
+	}
 }
 
 //通信断开

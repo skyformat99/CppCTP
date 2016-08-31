@@ -8,9 +8,11 @@ using std::unique_ptr;
 using namespace std;
 
 
-#define DB_OPERATOR_COLLECTION "CTP.trader"
-#define DB_FUTUREACCOUNT_COLLECTION "CTP.futureaccount"
-#define DB_ADMIN_COLLECTION "CTP.admin"
+#define DB_OPERATOR_COLLECTION            "CTP.trader"
+#define DB_FUTUREACCOUNT_COLLECTION       "CTP.futureaccount"
+#define DB_ADMIN_COLLECTION               "CTP.admin"
+#define DB_STRATEGY_COLLECTION            "CTP.strategy"
+#define DB_MARKETCONFIG_COLLECTION        "CTP.marketconfig"
 #define ISACTIVE "1"
 #define ISNOTACTIVE "0"
 
@@ -21,6 +23,7 @@ DBManager::DBManager() {
 	USER_PRINT(conn);
 	//USER_PRINT(this->conn);
 }
+
 DBManager::~DBManager() {
 	delete this;
 }
@@ -55,6 +58,7 @@ void DBManager::CreateTrader(Trader *op) {
 		BSONObj p = b.obj();
 
 		conn->insert(DB_OPERATOR_COLLECTION, p);
+		
 		USER_PRINT("DBManager::CreateOperator ok");
 	}
 }
@@ -91,8 +95,6 @@ void DBManager::UpdateTrader(string traderid, Trader *op) {
 	{
 		cout << "Trader ID Not Exists!" << endl;
 	}
-
-	
 }
 
 void DBManager::SearchTraderByTraderID(string traderid) {
@@ -149,22 +151,33 @@ bool DBManager::FindTraderByTraderIdAndPassword(string traderid, string password
 	return flag;
 }
 
-void DBManager::getAllTrader() {
+void DBManager::getAllTrader(list<string> *l_trader) {
+
+	/// 初始化的时候，必须保证list为空
+	if (l_trader->size() > 0) {
+		list<string>::iterator Itor;
+		for (Itor = l_trader->begin(); Itor != l_trader->end();) {
+			Itor = l_trader->erase(Itor);
+		}
+	}
+
 	int countnum = this->conn->count(DB_OPERATOR_COLLECTION);
 	USER_PRINT(countnum);
 	if (countnum == 0) {
-
+		cout << "DBManager::getAllTrader is NONE!" << endl;
 	}
 	else {
 		unique_ptr<DBClientCursor> cursor =
 			this->conn->query(DB_OPERATOR_COLLECTION);
 		while (cursor->more()) {
-			Trader *trader = new Trader();
+
 			BSONObj p = cursor->next();
 			cout << "*" << "traderid:" << p.getStringField("traderid") << "  "
 				<< "tradername:" << p.getStringField("tradername") << "  "
 				<< "password:" << p.getStringField("password") << "  "
 				<< "isactive:" << p.getStringField("isactive") << "*" << endl;
+
+			l_trader->push_back(p.getStringField("traderid"));
 		}
 		USER_PRINT("DBManager::getAllTrader1 ok");
 	}
@@ -291,10 +304,19 @@ void DBManager::SearchFutrueListByTraderID(string traderid, list<FutureAccount *
 	USER_PRINT("DBManager::SearchFutrueByTraderName ok");
 }
 
-void DBManager::getAllFutureAccount() {
+void DBManager::getAllFutureAccount(list<User *> *l_user) {
+
+	/// 初始化的时候，必须保证list为空
+	if (l_user->size() > 0) {
+		list<User *>::iterator user_itor;
+		for (user_itor = l_user->begin(); user_itor != l_user->end();) {
+			user_itor = l_user->erase(user_itor);
+		}
+	}
 
 	int countnum = this->conn->count(DB_FUTUREACCOUNT_COLLECTION);
 	if (countnum == 0) {
+		cout << "DBManager::getAllFutureAccount None!" << endl;
 	}
 	else {
 		unique_ptr<DBClientCursor> cursor =
@@ -307,11 +329,219 @@ void DBManager::getAllFutureAccount() {
 				<< "userid:" << p.getStringField("userid") << "  "
 				<< "frontAddress:" << p.getStringField("frontaddress") << "  "
 				<< "isactive:" << p.getStringField("isactive") << "*" << endl;
-
+			User *user = new User(p.getStringField("frontaddress"), p.getStringField("brokerid"), p.getStringField("userid"), p.getStringField("password"), p.getStringField("userid"), p.getStringField("traderid"));
+			l_user->push_back(user);
 		}
+		
 		USER_PRINT("DBManager::getAllFutureAccount ok");
 	}
 }
+
+void DBManager::CreateStrategy(Strategy *stg) {
+	int count_number = 0;
+
+	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
+		BSON("strategyid" << stg->getStrategyId()));
+
+	if (count_number > 0) {
+		cout << "Strategy Already Exists!" << endl;
+	}
+	else {
+		BSONObjBuilder b;
+		b.append("strategyid", stg->getStrategyId());
+		b.append("userid", stg->getUserID());
+		b.append("traderid", stg->getTraderID());
+		b.append("isactive", stg->getIsActive());
+		BSONObj p = b.obj();
+
+		conn->insert(DB_STRATEGY_COLLECTION, p);
+		USER_PRINT("DBManager::CreateStrategy ok");
+	}
+}
+void DBManager::DeleteStrategy(Strategy *stg) {
+	int count_number = 0;
+
+	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
+		BSON("strategyid" << stg->getStrategyId()));
+
+	if (count_number > 0) {
+		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategyid" << (stg->getStrategyId().c_str())), BSON("$set" << BSON("isactive" << ISNOTACTIVE)));
+		USER_PRINT("DBManager::DeleteStrategy ok");
+	}
+	else {
+		cout << "Strategy ID Not Exists!" << endl;
+	}
+}
+void DBManager::UpdateStrategy(Strategy *stg) {
+	int count_number = 0;
+
+	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
+		BSON("strategyid" << stg->getStrategyId()));
+
+	if (count_number > 0) {
+		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategyid" << (stg->getStrategyId().c_str())), BSON("$set" << BSON("strategyid" << stg->getStrategyId() << "userid" << stg->getUserID() << "traderid" << stg->getTraderID() << "isactive" << stg->getIsActive())));
+		USER_PRINT("DBManager::UpdateStrategy ok");
+	}
+	else
+	{
+		cout << "Strategy ID Not Exists!" << endl;
+	}
+}
+void DBManager::getAllStragegy(list<Strategy *> *l_strategys) {
+	/// 初始化的时候，必须保证list为空
+	if (l_strategys->size() > 0) {
+		list<Strategy *>::iterator Itor;
+		for (Itor = l_strategys->begin(); Itor != l_strategys->end();) {
+			Itor = l_strategys->erase(Itor);
+		}
+	}
+
+	unique_ptr<DBClientCursor> cursor =
+		this->conn->query(DB_STRATEGY_COLLECTION);
+	while (cursor->more()) {
+		BSONObj p = cursor->next();
+		Strategy *stg = new Strategy();
+		cout << "strategyid = " << p.getStringField("strategyid") << endl;
+		cout << "traderid = " << p.getStringField("traderid") << endl;
+		cout << "userid = " << p.getStringField("userid") << endl;
+
+		stg->setStrategyId(p.getStringField("strategyid"));
+		stg->setTraderID(p.getStringField("traderid"));
+		stg->setUserID(p.getStringField("userid"));
+		
+		l_strategys->push_back(stg);
+	}
+
+	USER_PRINT("DBManager::getAllStragegy ok");
+}
+
+/************************************************************************/
+/* 创建MD配置
+删除MD配置
+更新MD配置
+获取所有MD配置
+获取一条MD记录															*/
+/************************************************************************/
+void DBManager::CreateMarketConfig(MarketConfig *mc) {
+	int count_number = 0;
+
+	count_number = this->conn->count(DB_MARKETCONFIG_COLLECTION,
+		BSON("market_id" << mc->getMarketID()));
+
+	if (count_number > 0) {
+		cout << "MarketConfig Already Exists!" << endl;
+	}
+	else {
+		BSONObjBuilder b;
+		b.append("market_id", mc->getMarketID());
+		b.append("market_frontAddr", mc->getMarketFrontAddr());
+		b.append("broker_id", mc->getBrokerID());
+		b.append("user_id", mc->getUserID());
+		b.append("password", mc->getPassword());
+		b.append("isactive", ISACTIVE);
+		BSONObj p = b.obj();
+
+		conn->insert(DB_MARKETCONFIG_COLLECTION, p);
+		USER_PRINT("DBManager::CreateMarketConfig ok");
+	}
+}
+
+void DBManager::DeleteMarketConfig(MarketConfig *mc) {
+	int count_number = 0;
+
+	count_number = this->conn->count(DB_MARKETCONFIG_COLLECTION,
+		BSON("market_id" << mc->getMarketID()));
+
+	if (count_number > 0) {
+		this->conn->update(DB_MARKETCONFIG_COLLECTION, BSON("market_id" << (mc->getMarketID().c_str())), BSON("$set" << BSON("isactive" << ISNOTACTIVE)));
+		USER_PRINT("DBManager::DeleteMarketConfig ok");
+	}
+	else {
+		cout << "MarketConfig ID Not Exists!" << endl;
+	}
+}
+
+void DBManager::UpdateMarketConfig(MarketConfig *mc) {
+	int count_number = 0;
+
+	count_number = this->conn->count(DB_MARKETCONFIG_COLLECTION,
+		BSON("market_id" << mc->getMarketID()));
+
+	if (count_number > 0) {
+		this->conn->update(DB_MARKETCONFIG_COLLECTION, BSON("market_id" << (mc->getMarketID().c_str())), BSON("$set" << BSON("market_id" << mc->getMarketID() << "market_frontAddr" << mc->getMarketFrontAddr() << "broker_id" << mc->getBrokerID() << "user_id" << mc->getUserID() << "password" << mc->getPassword() << "isactive" << mc->getIsActive())));
+		USER_PRINT("DBManager::UpdateMarketConfig ok");
+	}
+	else
+	{
+		cout << "MarketConfig ID Not Exists!" << endl;
+	}
+}
+
+void DBManager::getAllMarketConfig(list<MarketConfig *> *l_marketconfig) {
+	/// 初始化的时候，必须保证list为空
+	if (l_marketconfig->size() > 0) {
+		list<MarketConfig *>::iterator market_itor;
+		for (market_itor = l_marketconfig->begin(); market_itor != l_marketconfig->end();) {
+			market_itor = l_marketconfig->erase(market_itor);
+		}
+	}
+
+	int countnum = this->conn->count(DB_MARKETCONFIG_COLLECTION);
+	if (countnum == 0) {
+		cout << "DBManager::getAllMarketConfig None!" << endl;
+	}
+	else {
+		unique_ptr<DBClientCursor> cursor =
+			this->conn->query(DB_MARKETCONFIG_COLLECTION);
+		while (cursor->more()) {
+			BSONObj p = cursor->next();
+			cout << "*" << "market_id:" << p.getStringField("market_id") << "  "
+				<< "market_frontAddr:" << p.getStringField("market_frontAddr") << "  "
+				<< "broker_id:" << p.getStringField("broker_id") << "  "
+				<< "userid:" << p.getStringField("user_id") << "  "
+				<< "password:" << p.getStringField("password") << "  "
+				<< "isactive:" << p.getStringField("isactive") << "*" << endl;
+			MarketConfig *mc = new MarketConfig();
+			mc->setMarketID(p.getStringField("market_id"));
+			mc->setMarketFrontAddr(p.getStringField("market_frontAddr"));
+			mc->setBrokerID(p.getStringField("broker_id"));
+			mc->setUserID(p.getStringField("user_id"));
+			mc->setPassword(p.getStringField("password"));
+			mc->setIsActive(p.getStringField("isactive"));
+
+			l_marketconfig->push_back(mc);
+		}
+		USER_PRINT("DBManager::getAllMarketConfig ok");
+	}
+}
+
+MarketConfig * DBManager::getOneMarketConfig() {
+	int countnum = this->conn->count(DB_MARKETCONFIG_COLLECTION);
+	if (countnum == 0) {
+		cout << "DBManager::getOneMarketConfig None!" << endl;
+	}
+	else {
+		cout << "isactive" << ISACTIVE << endl;
+		BSONObj p = this->conn->findOne(DB_MARKETCONFIG_COLLECTION, BSON("isactive" << ISACTIVE));
+		cout << "market_id = " << p.getStringField("market_id") << endl;
+		if ((strcmp(p.getStringField("market_id"), ""))) {
+			cout << "*" << "market_id:" << p.getStringField("market_id") << "  "
+				<< "market_frontAddr:" << p.getStringField("market_frontAddr") << "  "
+				<< "broker_id:" << p.getStringField("broker_id") << "  "
+				<< "userid:" << p.getStringField("user_id") << "  "
+				<< "password:" << p.getStringField("password") << "  "
+				<< "isactive:" << p.getStringField("isactive") << "*" << endl;
+			USER_PRINT("DBManager::getOneMarketConfig ok");
+			return new MarketConfig(p.getStringField("market_id"), p.getStringField("market_frontAddr"), p.getStringField("broker_id"),
+				p.getStringField("user_id"), p.getStringField("password"), p.getStringField("isactive"));
+		}
+		else {
+			USER_PRINT("DBManager::getOneMarketConfig None");
+		}
+	}
+	return NULL;
+}
+
 
 void DBManager::setConn(mongo::DBClientConnection *conn) {
 	this->conn = conn;

@@ -10,6 +10,7 @@
 #include "DBManager.h"
 #include "Order.h"
 #include "Trader.h"
+#include "Strategy.h"
 
 using namespace mongo;
 using namespace std;
@@ -20,7 +21,7 @@ using mongo::BSONObjBuilder;
 class User
 {
 public:
-	User(string frontAddress, string BrokerID, string UserID, string Password, string nRequestID, Trader *trader = NULL);
+	User(string frontAddress, string BrokerID, string UserID, string Password, string nRequestID, string TraderID = "");
 	User(string BrokerID, string UserID, int nRequestID);
 	~User();
 	string getBrokerID();
@@ -48,6 +49,15 @@ public:
 	void setFrontAddress(string frontAddress);
 	Trader *GetTrader();
 	void setTrader(Trader *trader);
+	string getTraderID();
+	void setTraderID(string TraderID);
+
+	/// 得到strategy_list
+	list<Strategy *> *getListStrategy();
+	/// 设置strategy_list
+	void setListStrategy(list<Strategy *> *l_strategys);
+	/// 添加strategy到list
+	void addStrategyToList(Strategy *stg);
 
 	/************************************************************************/
 	/* 获取数据库连接                                                         */
@@ -81,9 +91,11 @@ private:
 	bool isFirstTimeLogged;
 	bool isConfirmSettlement;
 	int loginRequestID;
+	string TraderID;
 	CThostFtdcTraderApi *UserTradeAPI;
 	TdSpi *UserTradeSPI;
 	Trader *trader;
+	list<Strategy *> *l_strategys;
 	mongo::DBClientConnection * PositionConn;
 	mongo::DBClientConnection * TradeConn;
 	mongo::DBClientConnection * OrderConn;

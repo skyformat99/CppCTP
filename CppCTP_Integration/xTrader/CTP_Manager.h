@@ -29,7 +29,7 @@ public:
 	int submarketData(char *instrument[]);
 
 	/// 创建交易对象并且登陆
-	User * CreateAccount(string td_frontAddress, string td_broker, string td_user, string td_pass, Trader *trader);
+	User * CreateAccount(User *user);
 
 	/// 创建行情
 	MdSpi * CreateMd(string td_frontAddress, string td_broker, string td_user, string td_pass);
@@ -68,7 +68,10 @@ public:
 	bool checkInLTrader(string trader);
 
 	/// 得到l_trader
-	list<string> getL_Trader();
+	list<string> *getL_Trader();
+
+	/// 得到l_obj_trader
+	list<Trader *> * getL_Obj_Trader();
 
 	/// 移除元素
 	void removeFromLTrader(string trader);
@@ -82,12 +85,30 @@ public:
 	/// 返回用户列表
 	list<User *> *getL_User();
 
+	/// 得到strategy_list
+	list<Strategy *> *getListStrategy();
+
+	/// 设置strategy_list
+	void setListStrategy(list<Strategy *> *l_strategys);
+
+	/// 设置mdspi
+	void setMdSpi(MdSpi *mdspi);
+
+	/// 获得mdspi
+	MdSpi *getMdSpi();
+
+	/// 初始化
+	void init();
+
 private:
 	Login *login;
 	list<string> l_instrument;
-	list<string> l_trader;
+	list<string> *l_trader;
 	list<User *> *l_user;
+	list<Trader *> *l_obj_trader;
 	map<string, list<User *> *> m_trader;
 	DBManager *dbm;
+	list<Strategy *> *l_strategys;
+	MdSpi *mdspi;
 };
 #endif

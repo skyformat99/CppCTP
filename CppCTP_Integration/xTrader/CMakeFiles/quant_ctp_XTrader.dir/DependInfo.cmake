@@ -8,6 +8,7 @@ SET(CMAKE_DEPENDS_CHECK_CXX
   "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CTP_Manager.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o"
   "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/DBManager.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o"
   "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/FutureAccount.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o"
+  "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MarketConfig.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/MarketConfig.cpp.o"
   "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MdSpi.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o"
   "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Order.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o"
   "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o"
