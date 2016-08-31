@@ -1,0 +1,1 @@
+/usr/bin/cc      CMakeFiles/multi-process-socket-client.dir/msg.c.o CMakeFiles/multi-process-socket-client.dir/socket_client.c.o  -o multi-process-socket-client -rdynamic 
