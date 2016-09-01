@@ -22,19 +22,3 @@ sys/types.h
 sys/types.h
 -
 
-/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket/client/socket_client.c
-sys/socket.h
--
-unistd.h
--
-string.h
--
-stdio.h
--
-memory.h
--
-signal.h
--
-time.h
--
-
