@@ -149,6 +149,9 @@ int main() {
 	/************************************************************************/
 	// 1. 把 JSON 解析至 DOM。
 	const char* json = "{\"project\":\"rapidjson\",\"stars\":10}";
+
+	const char* json_txt = "{\"Flag\":0,\"VerCode\":112345678,\"UserID\":\"160001\",\"BrokerID\":\"0187\",\"InvestorID\":\"86001234\",\"Strategy\":{\"StrategyID\":[1,\"ON\",\"C\",1],\"ContractA\":\"cu1609\",\"ContractB\":\"cu1608\",\"LotsTotal\":10,\"LotsSingle\":2,\"SpreadSellOpen\":[50,\"ON\"],\"SpreadBuyClose\":[30,\"ON\"],\"SpreadBuyOpen\":[30,\"ON\"],\"SpreadSellClose\":[50,\"ON\"],\"ContractA_ShiftWait\":0,\"ContractB_ShiftWait\":2,\"SpreadShift\":1,\"SpreadSellHold\":[[0,0],[0,0],0],\"SpreadBuyHold\":[[0,0],[0,0],0],\"Msg\":\"nill\"}}";
+
 	Document d;
 	d.Parse(json);
 	// 2. 利用 DOM 作出修改。
@@ -160,6 +163,26 @@ int main() {
 	d.Accept(writer);
 	// Output {"project":"rapidjson","stars":11}
 	std::cout << buffer.GetString() << std::endl;
+
+
+	Document document;
+	if (document.Parse(json_txt).HasParseError()) {
+		std::cout << "Parse Error" << std::endl;
+	}
+	assert(document.HasMember("Flag"));
+	std::cout << "Flag" << document["Flag"].GetInt() << endl;
+	std::cout << "VerCode" << document["VerCode"].GetInt() << endl;
+	std::cout << "BrokerID" << document["BrokerID"].GetString() << endl;
+
+	//const Value& ssh = document["SpreadSellHold"];
+	//std::cout << "" << ssh.IsArray() << std::endl;
+	//std::cout << "" << ssh[0][0].GetInt() << std::endl;
+	//std::cout << "" << ssh[0][1].GetInt() << std::endl;
+
+	//while (1)
+	//{
+	//	;
+	//}
 
 	mongo::client::initialize();
 

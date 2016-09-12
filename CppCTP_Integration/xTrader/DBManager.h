@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <list>
+#include <vector>
 #include <mongo/client/dbclient.h>
 
 #include "Trader.h"

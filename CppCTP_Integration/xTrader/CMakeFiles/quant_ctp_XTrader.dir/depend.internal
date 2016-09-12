@@ -79,20 +79,7 @@ CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Order.cpp
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Order.h
 CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o
- /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Algorithm.h
- /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/DBManager.h
- /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Debug.h
- /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/FutureAccount.h
- /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MarketConfig.h
- /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Order.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.cpp
- /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.h
- /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/TdSpi.h
- /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcTraderApi.h
- /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcUserApiDataType.h
- /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcUserApiStruct.h
- /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Trader.h
- /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/User.h
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Algorithm.h
  /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/DBManager.h

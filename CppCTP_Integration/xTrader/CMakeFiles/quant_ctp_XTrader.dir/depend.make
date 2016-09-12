@@ -78,20 +78,7 @@ CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o: User.h
 CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o: Order.cpp
 CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o: Order.h
 
-CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: Algorithm.h
-CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: DBManager.h
-CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: Debug.h
-CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: FutureAccount.h
-CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: MarketConfig.h
-CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: Order.h
 CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: Strategy.cpp
-CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: Strategy.h
-CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: TdSpi.h
-CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: ThostFtdcTraderApi.h
-CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: ThostFtdcUserApiDataType.h
-CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: ThostFtdcUserApiStruct.h
-CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: Trader.h
-CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: User.h
 
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: Algorithm.h
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: DBManager.h

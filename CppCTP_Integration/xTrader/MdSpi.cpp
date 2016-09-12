@@ -180,7 +180,7 @@ void MdSpi::Logout(char *BrokerID, char *UserID) {
 	this->mdapi->ReqUserLogout(logoutField, this->loginRequestID);
 	int ret = this->controlTimeOut(&logout_sem);
 	if (ret == -1) {
-		USER_PRINT("MdSpi::Logout TimeOut!")
+		USER_PRINT("MdSpi::Logout TimeOut!");
 	}
 }
 
@@ -189,7 +189,7 @@ void MdSpi::OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout, CThostFtdcRs
                             int nRequestID, bool bIsLast) {
 	USER_PRINT("MdSpi::OnRspUserLogout")
 	if (bIsLast && !(this->IsErrorRspInfo(pRspInfo))) {
-		USER_PRINT("OnRspUserLogout")
+		USER_PRINT("OnRspUserLogout");
 		this->isLogged = false;
 		sem_post(&logout_sem);
 	}
@@ -197,18 +197,18 @@ void MdSpi::OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout, CThostFtdcRs
 
 //订阅行情
 void MdSpi::SubMarketData(char *ppInstrumentID[], int nCount) {
-	USER_PRINT("MdSpi::SubMarketData")
+	USER_PRINT("MdSpi::SubMarketData");
 	if (this->isLogged) {
-		USER_PRINT("SubMarketData")
+		USER_PRINT("SubMarketData");
 		this->ppInstrumentID = ppInstrumentID;
 		this->nCount = nCount;
 		this->mdapi->SubscribeMarketData(ppInstrumentID, nCount);
 		int ret = this->controlTimeOut(&submarket_sem);
 		if (ret == -1) {
-			USER_PRINT("MdSpi::SubMarketData TimeOut!")
+			USER_PRINT("MdSpi::SubMarketData TimeOut!");
 		}
 	} else {
-		USER_PRINT("Please Login First!")
+		USER_PRINT("Please Login First!");
 	}
 }
 
@@ -250,7 +250,7 @@ void MdSpi::UnSubMarket(list<string> l_instrument) {
 void MdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT(bIsLast)
 	if (bIsLast && !(this->IsErrorRspInfo(pRspInfo))) {
-		USER_PRINT("OnRspSubMarketData")
+		USER_PRINT("OnRspSubMarketData");
 		cout << "订阅行情应答" << endl;
 		cout << "合约代码:" << pSpecificInstrument->InstrumentID << endl;
 		cout << "应答信息:" << pRspInfo->ErrorID << " " << pRspInfo->ErrorMsg << endl;
@@ -263,15 +263,15 @@ void MdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstr
 void MdSpi::UnSubscribeMarketData(char *ppInstrumentID[], int nCount) {
 	USER_PRINT("MdSpi::UnSubscribeMarketData")
 	if (this->isLogged) {
-		USER_PRINT("UnSubscribeMarketData")
+		USER_PRINT("UnSubscribeMarketData");
 			this->mdapi->UnSubscribeMarketData(ppInstrumentID, nCount);
 		int ret = this->controlTimeOut(&unsubmarket_sem);
 		if (ret == -1) {
-			USER_PRINT("MdSpi::UnSubscribeMarketData TimeOut!")
+			USER_PRINT("MdSpi::UnSubscribeMarketData TimeOut!");
 		}
 	}
 	else {
-		USER_PRINT("Please Login First!")
+		USER_PRINT("Please Login First!");
 	}
 }
 
