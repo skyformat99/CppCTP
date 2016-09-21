@@ -213,14 +213,15 @@ void MdSpi::SubMarketData(char *ppInstrumentID[], int nCount) {
 }
 
 ///订阅行情
-void MdSpi::SubMarket(list<string> l_instrument) {
+void MdSpi::SubMarket(list<string> *l_instrument) {
 	list<string>::iterator itor;
-	char **instrumentID = new char *[l_instrument.size()];
-	int size = l_instrument.size();
+	char **instrumentID = new char *[l_instrument->size()];
+	int size = l_instrument->size();
 	int i = 0;
 	const char *charResult;
-	for (itor = l_instrument.begin(), i = 0; itor != l_instrument.end(); itor++, i++) {
+	for (itor = l_instrument->begin(), i = 0; itor != l_instrument->end(); itor++, i++) {
 		//cout << *itor << endl;
+		USER_PRINT(*itor);
 		charResult = (*itor).c_str();
 		instrumentID[i] = new char[strlen(charResult) + 1];
 		strcpy(instrumentID[i], charResult);
@@ -230,13 +231,13 @@ void MdSpi::SubMarket(list<string> l_instrument) {
 }
 
 ///取消订阅行情
-void MdSpi::UnSubMarket(list<string> l_instrument) {
+void MdSpi::UnSubMarket(list<string> *l_instrument) {
 	list<string>::iterator itor;
-	char **instrumentID = new char *[l_instrument.size()];
-	int size = l_instrument.size();
+	char **instrumentID = new char *[l_instrument->size()];
+	int size = l_instrument->size();
 	int i = 0;
 	const char *charResult;
-	for (itor = l_instrument.begin(), i = 0; itor != l_instrument.end(); itor++, i++) {
+	for (itor = l_instrument->begin(), i = 0; itor != l_instrument->end(); itor++, i++) {
 		cout << *itor << endl;
 		charResult = (*itor).c_str();
 		instrumentID[i] = new char[strlen(charResult) + 1];
@@ -248,7 +249,7 @@ void MdSpi::UnSubMarket(list<string> l_instrument) {
 
 //订阅行情应答
 void MdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-	USER_PRINT(bIsLast)
+	USER_PRINT(bIsLast);
 	if (bIsLast && !(this->IsErrorRspInfo(pRspInfo))) {
 		USER_PRINT("OnRspSubMarketData");
 		cout << "订阅行情应答" << endl;
@@ -320,27 +321,27 @@ void MdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificIns
 
 //深度行情接收
 void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
-	USER_PRINT("OnRtnDepthMarketData")
-    cout << "===========================================" << endl;
-    //cout << "深度行情" << ", ";
-	cout << "交易日:" << pDepthMarketData->TradingDay << ", "
-	<< "合约代码:" << pDepthMarketData->InstrumentID << ", "
-	<< "最新价:" << pDepthMarketData->LastPrice << ", "
-    //<< "上次结算价:" << pDepthMarketData->PreSettlementPrice << endl
-    //<< "昨收盘:" << pDepthMarketData->PreClosePrice << endl
-    //<< "数量:" << pDepthMarketData->Volume << endl
-    //<< "昨持仓量:" << pDepthMarketData->PreOpenInterest << endl
-	<< "最后修改时间" << pDepthMarketData->UpdateTime << ", "
-	<< "最后修改毫秒" << pDepthMarketData->UpdateMillisec << endl;
-    //<< "申买价一：" << pDepthMarketData->BidPrice1 << endl
-    //<< "申买量一:" << pDepthMarketData->BidVolume1 << endl
-    //<< "申卖价一:" << pDepthMarketData->AskPrice1 << endl
-    //<< "申卖量一:" << pDepthMarketData->AskVolume1 << endl
-    //<< "今收盘价:" << pDepthMarketData->ClosePrice << endl
-    //<< "当日均价:" << pDepthMarketData->AveragePrice << endl
-    //<< "本次结算价格:" << pDepthMarketData->SettlementPrice << endl
-    //<< "成交金额:" << pDepthMarketData->Turnover << endl
-    //<< "持仓量:" << pDepthMarketData->OpenInterest << endl;
+	//USER_PRINT("OnRtnDepthMarketData")
+ //   cout << "===========================================" << endl;
+ //   //cout << "深度行情" << ", ";
+	//cout << "交易日:" << pDepthMarketData->TradingDay << ", "
+	//<< "合约代码:" << pDepthMarketData->InstrumentID << ", "
+	//<< "最新价:" << pDepthMarketData->LastPrice << ", "
+ //   //<< "上次结算价:" << pDepthMarketData->PreSettlementPrice << endl
+ //   //<< "昨收盘:" << pDepthMarketData->PreClosePrice << endl
+ //   //<< "数量:" << pDepthMarketData->Volume << endl
+ //   //<< "昨持仓量:" << pDepthMarketData->PreOpenInterest << endl
+	//<< "最后修改时间" << pDepthMarketData->UpdateTime << ", "
+	//<< "最后修改毫秒" << pDepthMarketData->UpdateMillisec << endl;
+ //   //<< "申买价一：" << pDepthMarketData->BidPrice1 << endl
+ //   //<< "申买量一:" << pDepthMarketData->BidVolume1 << endl
+ //   //<< "申卖价一:" << pDepthMarketData->AskPrice1 << endl
+ //   //<< "申卖量一:" << pDepthMarketData->AskVolume1 << endl
+ //   //<< "今收盘价:" << pDepthMarketData->ClosePrice << endl
+ //   //<< "当日均价:" << pDepthMarketData->AveragePrice << endl
+ //   //<< "本次结算价格:" << pDepthMarketData->SettlementPrice << endl
+ //   //<< "成交金额:" << pDepthMarketData->Turnover << endl
+ //   //<< "持仓量:" << pDepthMarketData->OpenInterest << endl;
 
 	list<Strategy *>::iterator itor;
 	for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
@@ -350,7 +351,7 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
 
 //通信断开
 void MdSpi::OnFrontDisconnected(int nReason) {
-	USER_PRINT("MdSpi::OnFrontDisconnected")
-	USER_PRINT(nReason)
+	USER_PRINT("MdSpi::OnFrontDisconnected");
+	USER_PRINT(nReason);
 	this->isFirstTimeLogged = false;
 }

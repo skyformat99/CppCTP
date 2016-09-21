@@ -47,10 +47,10 @@ public:
     void OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 	///订阅行情
-	void SubMarket(list<string> l_instrument);
+	void SubMarket(list<string> *l_instrument);
 
 	///取消订阅行情
-	void UnSubMarket(list<string> l_instrument);
+	void UnSubMarket(list<string> *l_instrument);
 
     ///订阅行情应答
     void OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);

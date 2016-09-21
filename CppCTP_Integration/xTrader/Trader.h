@@ -6,6 +6,8 @@
 using std::string;
 using std::list;
 
+class User;
+
 #ifndef QUANT_TRADER_H
 #define QUANT_TRADER_H
 

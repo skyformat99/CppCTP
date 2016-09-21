@@ -38,25 +38,25 @@ public:
 	void ReleaseAccount(User *user);
 
 	///订阅行情
-	void SubmarketData(MdSpi *mdspi, list<string > l_instrument);
+	void SubmarketData(MdSpi *mdspi, list<string > *l_instrument);
 
 	///取消订阅行情
-	void UnSubmarketData(MdSpi *mdspi, list<string > l_instrument);
+	void UnSubmarketData(MdSpi *mdspi, string instrumentID, list<string > *l_instrument);
 
 	/// 添加合约
-	list<string> addSubInstrument(string instrumentID, list<string> l_instrument);
+	list<string> * addSubInstrument(string instrumentID, list<string> *l_instrument);
 
 	/// 删除订阅合约
-	list<string> delSubInstrument(string instrumentID, list<string> l_instrument);
+	list<string> * delSubInstrument(string instrumentID, list<string> *l_instrument);
 
 	/// 统计合约数量
-	int calInstrument(string instrumentID, list<string> l_instrument);
+	int calInstrument(string instrumentID, list<string> *l_instrument);
 
 	/// 退订合约增加
 	list<string> addUnSubInstrument(string instrumentID, list<string> l_instrument);
 
 	/// 得到l_instrument
-	list<string> getL_Instrument();
+	list<string> *getL_Instrument();
 
 	/// 得到数据库操作对象
 	DBManager *getDBManager();
@@ -102,7 +102,8 @@ public:
 
 private:
 	Login *login;
-	list<string> l_instrument;
+	list<string> *l_instrument;
+	list<string > *l_unsubinstrument;
 	list<string> *l_trader;
 	list<User *> *l_user;
 	list<Trader *> *l_obj_trader;

@@ -8,16 +8,6 @@
 
 /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Algorithm.h
 
-/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/DBManager.cpp
-mongo/bson/bson.h
--
-iostream
--
-DBManager.h
-/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/DBManager.h
-Debug.h
-/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Debug.h
-
 /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/DBManager.h
 iostream
 -
@@ -56,6 +46,10 @@ Debug.h
 string
 -
 
+/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.cpp
+Strategy.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.h
+
 /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.h
 list
 -
@@ -91,6 +85,8 @@ ThostFtdcTraderApi.h
 /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcTraderApi.h
 ThostFtdcUserApiStruct.h
 /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcUserApiStruct.h
+Strategy.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.h
 
 /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/ThostFtdcTraderApi.h
 ThostFtdcUserApiStruct.h

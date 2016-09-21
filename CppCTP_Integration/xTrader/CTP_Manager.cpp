@@ -10,6 +10,8 @@ CTP_Manager::CTP_Manager() {
 	this->l_trader = new list<string>();
 	this->l_obj_trader = new list<Trader *>();
 	this->l_strategys = new list<Strategy *>();
+	this->l_instrument = new list<string>();
+	this->l_unsubinstrument = new list<string>();
 }
 
 bool CTP_Manager::CheckIn(Login *login) {
@@ -118,38 +120,47 @@ void CTP_Manager::ReleaseAccount(User *user) {
 }
 
 /// 订阅行情
-void CTP_Manager::SubmarketData(MdSpi *mdspi, list<string > l_instrument) {
-	if (mdspi && (l_instrument.size() > 0)) {
+void CTP_Manager::SubmarketData(MdSpi *mdspi, list<string> *l_instrument) {
+	if (mdspi && (l_instrument->size() > 0)) {
 		mdspi->SubMarket(l_instrument);
 	}
 }
 
 /// 退订合约
-void CTP_Manager::UnSubmarketData(MdSpi *mdspi, list<string > l_instrument) {
-	if (mdspi && (l_instrument.size() > 0)) {
-		mdspi->UnSubMarket(l_instrument);
+void CTP_Manager::UnSubmarketData(MdSpi *mdspi, string instrumentID, list<string > *l_unsubinstrument) {
+	if (mdspi && (this->l_instrument->size() > 0)) {
+		/// 从合约列表里删除一个
+		this->delSubInstrument(instrumentID, this->l_instrument);
+		/// 统计合约的个数
+		int count = this->calInstrument(instrumentID, this->l_instrument);
+		/// 如果合约个数为0,必须退订
+		if (count == 0) {
+			this->l_unsubinstrument->push_back(instrumentID);
+			mdspi->UnSubMarket(this->l_unsubinstrument);
+		}
+		
 	}
 }
 
 /// 添加订阅合约
-list<string> CTP_Manager::addSubInstrument(string instrumentID, list<string > l_instrument) {
-	l_instrument.push_back(instrumentID);
-	USER_PRINT(l_instrument.size());
+list<string> * CTP_Manager::addSubInstrument(string instrumentID, list<string > *l_instrument) {
+	l_instrument->push_back(instrumentID);
+	USER_PRINT(l_instrument->size());
 	return l_instrument;
 }
 
 /// 删除订阅合约
-list<string> CTP_Manager::delSubInstrument(string instrumentID, list<string > l_instrument) {
-	USER_PRINT(l_instrument.size());
-	if (l_instrument.size() > 0) {
+list<string> * CTP_Manager::delSubInstrument(string instrumentID, list<string > *l_instrument) {
+	USER_PRINT(l_instrument->size());
+	if (l_instrument->size() > 0) {
 		list<string>::iterator itor;
-		for (itor = l_instrument.begin(); itor != l_instrument.end(); ) {
+		for (itor = l_instrument->begin(); itor != l_instrument->end();) {
 			cout << *itor << endl;
 			if (*itor == instrumentID) {
-				itor = l_instrument.erase(itor);
+				itor = l_instrument->erase(itor);
 				USER_PRINT("Remove OK");
 				//break;
-				USER_PRINT(l_instrument.size());
+				USER_PRINT(l_instrument->size());
 				USER_PRINT("CTP_Manager::delInstrument finish");
 				return l_instrument;
 			}
@@ -158,17 +169,17 @@ list<string> CTP_Manager::delSubInstrument(string instrumentID, list<string > l_
 			}
 		}
 	}
-	USER_PRINT(l_instrument.size());
+	USER_PRINT(l_instrument->size());
 	USER_PRINT("CTP_Manager::delInstrument finish");
 	return l_instrument;
 }
 
 /// 统计合约数量
-int CTP_Manager::calInstrument(string instrumentID, list<string> l_instrument) {
+int CTP_Manager::calInstrument(string instrumentID, list<string> *l_instrument) {
 	int count = 0;
-	if (l_instrument.size() > 0) {
+	if (l_instrument->size() > 0) {
 		list<string>::iterator itor;
-		for (itor = l_instrument.begin(); itor != l_instrument.end(); itor++) {
+		for (itor = l_instrument->begin(); itor != l_instrument->end(); itor++) {
 			cout << *itor << endl;
 			if ((*itor) == instrumentID) {
 				count++;
@@ -191,7 +202,7 @@ list<string> CTP_Manager::addUnSubInstrument(string instrumentID, list<string> l
 }
 
 /// 得到l_instrument
-list<string> CTP_Manager::getL_Instrument() {
+list<string> * CTP_Manager::getL_Instrument() {
 	return this->l_instrument;
 }
 
@@ -313,12 +324,29 @@ void CTP_Manager::init() {
 		this->CreateAccount((*user_itor));
 	}
 
+	/// 遍历User,对TdSpi进行Strategy_List赋值
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
+		USER_PRINT((*user_itor)->getUserID());
+		(*user_itor)->getUserTradeSPI()->setListStrategy(this->l_strategys);
+	}
+
 	/// 行情初始化
 	MarketConfig *mc = this->dbm->getOneMarketConfig();
 	if (mc != NULL) {
 		this->mdspi = this->CreateMd(mc->getMarketFrontAddr(), mc->getBrokerID(), mc->getUserID(), mc->getPassword());
 		if (this->mdspi != NULL) {
+			/// 向mdspi赋值strategys
 			this->mdspi->setListStrategy(this->l_strategys);
+			/// 订阅合约
+			for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
+				USER_PRINT((*stg_itor)->getStgInstrumentIdA());
+				USER_PRINT((*stg_itor)->getStgInstrumentIdB());
+				/// 添加策略的合约到l_instrument
+				this->addSubInstrument((*stg_itor)->getStgInstrumentIdA(), this->l_instrument);
+				this->addSubInstrument((*stg_itor)->getStgInstrumentIdB(), this->l_instrument);
+			}
+			/// 订阅合约
+			this->SubmarketData(this->mdspi, this->l_instrument);
 		}
 	}
 }

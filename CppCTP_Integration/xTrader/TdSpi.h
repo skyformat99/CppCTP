@@ -13,10 +13,13 @@
 
 #include "ThostFtdcTraderApi.h"
 #include "ThostFtdcUserApiStruct.h"
+#include "Strategy.h"
 
 using std::string;
+using std::list;
 
 class User;
+class Strategy;
 
 
 #ifndef NULL
@@ -222,6 +225,12 @@ public:
 	void setSessionID(int SessionID);
 	int getSessionID();
 
+	/// 得到strategy_list
+	list<Strategy *> *getListStrategy();
+
+	/// 设置strategy_list
+	void setListStrategy(list<Strategy *> *l_strategys);
+
 private:
     CThostFtdcTraderApi *tdapi;
     CThostFtdcReqUserLoginField *loginField;
@@ -251,6 +260,7 @@ private:
 	User *current_user;
 	int FrontID;
 	int SessionID;
+	list<Strategy *> *l_strategys;
 };
 
 #endif //QUANT_CTP_TRADE_TDSPI_H

@@ -1,31 +1,107 @@
-﻿#include "Strategy.h"
+﻿#include <algorithm>
+#include "Strategy.h"
 
 Strategy::Strategy() {
-
+	this->l_instruments = new list<string>();
+	this->stg_list_order_pending = new list<CThostFtdcOrderField *>();
 }
 
 void Strategy::get_tick(CThostFtdcDepthMarketDataField *pDepthMarketData) {
-	USER_PRINT("Strategy::get_tick");
-	cout << "===========================================" << endl;
-	cout << "ondepthmarket data:" << ", ";
-	cout << "trading day:" << pDepthMarketData->TradingDay << ", "
-		<< "instrument id:" << pDepthMarketData->InstrumentID << ", "
-		<< "last price:" << pDepthMarketData->LastPrice << ", "
-		//<< "上次结算价:" << pDepthMarketData->PreSettlementPrice << endl
-		//<< "昨收盘:" << pDepthMarketData->PreClosePrice << endl
-		//<< "数量:" << pDepthMarketData->Volume << endl
-		//<< "昨持仓量:" << pDepthMarketData->PreOpenInterest << endl
-		<< "updateTime:" << pDepthMarketData->UpdateTime << ", "
-		<< "UpdateMillisec:" << pDepthMarketData->UpdateMillisec << endl;
-	//<< "申买价一：" << pDepthMarketData->BidPrice1 << endl
-	//<< "申买量一:" << pDepthMarketData->BidVolume1 << endl
-	//<< "申卖价一:" << pDepthMarketData->AskPrice1 << endl
-	//<< "申卖量一:" << pDepthMarketData->AskVolume1 << endl
-	//<< "今收盘价:" << pDepthMarketData->ClosePrice << endl
-	//<< "当日均价:" << pDepthMarketData->AveragePrice << endl
-	//<< "本次结算价格:" << pDepthMarketData->SettlementPrice << endl
-	//<< "成交金额:" << pDepthMarketData->Turnover << endl
-	//<< "持仓量:" << pDepthMarketData->OpenInterest << endl;
+	//USER_PRINT(this->getStgInstrumentIdA());
+	//USER_PRINT(this->getStgInstrumentIdB());
+	// Get Own Instrument
+	if (!strcmp(pDepthMarketData->InstrumentID, this->getStgInstrumentIdA().c_str())) {
+		this->stg_instrument_A_tick = pDepthMarketData;
+	}
+	else if (!strcmp(pDepthMarketData->InstrumentID, this->getStgInstrumentIdB().c_str()))
+	{
+		this->stg_instrument_B_tick = pDepthMarketData;
+	}
+	
+	/// 如果正在交易,继续更新tick进行交易
+	if (this->stg_trade_tasking) {
+		
+	}
+	else { /// 如果未在交易，那么选择下单算法
+		this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
+	}
+
+}
+
+//选择下单算法
+int Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
+	int select_num;
+	//如果正在交易,直接返回0
+	if (this->stg_trade_tasking) {
+		return 0;
+	}
+	//如果有挂单,返回0
+	if (this->stg_list_order_pending->size() > 0) {
+		return 0;
+	}
+
+	if ((this->stg_position_a_sell == this->stg_position_b_buy) && (this->stg_position_a_buy == this->stg_position_b_sell)) {
+
+	}
+	else {
+		return 0;
+	}
+
+	if (stg_order_algorithm == ALGORITHM_ONE) { //下单算法1
+		select_num = 1;
+		this->Order_Algorithm_One();
+	}
+	else if (stg_order_algorithm == ALGORITHM_TWO) { // 下单算法2
+		select_num = 2;
+		this->Order_Algorithm_Two();
+	}
+	else if (stg_order_algorithm == ALGORITHM_THREE) { // 下单算法3
+		select_num = 3;
+		this->Order_Algorithm_Three();
+	}
+	else {
+		std::cout << "Select_Order_Algorithm has no algorithm for you!" << endl;
+	}
+	return select_num;
+}
+
+//下单算法1
+void Strategy::Order_Algorithm_One() {
+	// 计算盘口价差，量
+	if (this->stg_instrument_A_tick && this->stg_instrument_B_tick)
+	{
+		this->stg_spread_long = this->stg_instrument_A_tick->BidPrice1 - 
+								this->stg_instrument_B_tick->AskPrice1;
+		this->stg_spread_long_volume = std::min(this->stg_instrument_A_tick->BidVolume1,
+			this->stg_instrument_B_tick->AskVolume1);
+
+		this->stg_spread_short = this->stg_instrument_A_tick->AskPrice1 -
+			this->stg_instrument_B_tick->BidPrice1;
+		this->stg_spread_short_volume = std::min(this->stg_instrument_A_tick->AskVolume1,
+			this->stg_instrument_B_tick->BidVolume1);
+	} 
+	else
+	{
+		return;
+	}
+
+	/// 价差卖平
+	if ((this->stg_spread_long >= this->stg_sell_close) && (this->stg_position_a_buy > 0) &&
+		(this->stg_position_a_buy == this->stg_position_b_sell) &&
+		((this->stg_position_a_buy + this->stg_position_b_buy) < this->stg_lots)) {
+
+	}
+
+
+
+}
+//下单算法2
+void Strategy::Order_Algorithm_Two() {
+
+}
+//下单算法3
+void Strategy::Order_Algorithm_Three() {
+
 }
 
 void Strategy::setTrader(Trader *trader) {
@@ -80,13 +156,6 @@ void Strategy::setUserID(string userid) {
 }
 string Strategy::getUserID() {
 	return this->userid;
-}
-
-void Strategy::setIsActive(string isActive) {
-	this->isActive = isActive;
-}
-string Strategy::getIsActive() {
-	return this->isActive;
 }
 
 
@@ -247,11 +316,11 @@ void Strategy::setStgOrderActionTiresLimit(int stgOrderActionTiresLimit) {
 	stg_order_action_tires_limit = stgOrderActionTiresLimit;
 }
 
-int Strategy::getStgOrderAlgorithm() {
+string Strategy::getStgOrderAlgorithm() {
 	return stg_order_algorithm;
 }
 
-void Strategy::setStgOrderAlgorithm(int stgOrderAlgorithm) {
+void Strategy::setStgOrderAlgorithm(string stgOrderAlgorithm) {
 	stg_order_algorithm = stgOrderAlgorithm;
 }
 
@@ -485,5 +554,48 @@ string Strategy::getStgUserId() {
 
 void Strategy::setStgUserId(string stgUserId) {
 	stg_user_id = stgUserId;
+}
+
+/************************************************************************/
+/* 交易相关的回报函数                                                      */
+/************************************************************************/
+//下单
+void Strategy::OrderInsert(User *user, char *InstrumentID, char CombOffsetFlag, char Direction, int Volume, double Price, string OrderRef) {
+	USER_PRINT("Strategy::OrderInsert");
+}
+
+//下单响应
+void Strategy::OnRtnOrder(CThostFtdcOrderField *pOrder) {
+	USER_PRINT("Strategy::OnRtnOrder");
+}
+
+//成交通知
+void Strategy::OnRtnTrade(CThostFtdcTradeField *pTrade) {
+	USER_PRINT("Strategy::OnRtnTrade");
+}
+
+//下单错误响应
+void Strategy::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder) {
+	USER_PRINT("Strategy::OnErrRtnOrderInsert");
+}
+
+///报单录入请求响应
+void Strategy::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder) {
+	USER_PRINT("Strategy::OnRspOrderInsert");
+}
+
+//撤单
+void Strategy::OrderAction(string ExchangeID, string OrderRef, string OrderSysID) {
+	USER_PRINT("Strategy::OrderAction");
+}
+
+//撤单错误响应
+void Strategy::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction) {
+	USER_PRINT("Strategy::OnRspOrderAction");
+}
+
+//撤单错误
+void Strategy::OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction) {
+	USER_PRINT("Strategy::OnErrRtnOrderAction");
 }
 

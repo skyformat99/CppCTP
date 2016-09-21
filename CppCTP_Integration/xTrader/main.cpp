@@ -300,10 +300,10 @@ int main() {
 	//dbm->UpdateMarketConfig(mc);
 	//MarketConfig *mc = dbm->getOneMarketConfig();
 	//cout << "Got The PassWord = " << mc->getPassword() << endl;
+
+
+	// 程序入口，初始化资源
 	ctp_m->init();
-
-
-
 
 	//Trader *op = new Trader();
 	//op->setIsActive("1");
@@ -312,11 +312,45 @@ int main() {
 	//op->setTraderName("lucas");
 	/// 增加策略
 	//Strategy *stg = new Strategy();
-	//stg->setStrategyId("2");
-	//stg->setUserID("058176");
-	//stg->setTraderID("1");
+
+	//stg->setStgAWaitPriceTick(1);
+	//stg->setStgBWaitPriceTick(0);
+	//stg->setStgBuyClose(0);
+	//stg->setStgBuyOpen(-9000);
+	//stg->setStgInstrumentIdA("cu1711");
+	//stg->setStgInstrumentIdB("cu1712");
+	//stg->setStgIsActive(true);
+	//stg->setStgLots(10);
+	//stg->setStgLotsBatch(10);
+	//stg->setStgOnlyClose(false);
+	//stg->setStgOrderActionTiresLimit(400);
+	//stg->setStgOrderAlgorithm("01");
+	//stg->setStgPositionABuy(0);
+	//stg->setStgPositionABuyToday(0);
+	//stg->setStgPositionABuyYesterday(0);
+	//stg->setStgPositionASell(0);
+	//stg->setStgPositionASellToday(0);
+	//stg->setStgPositionASellYesterday(0);
+	//stg->setStgPositionBBuy(0);
+	//stg->setStgPositionBBuyToday(0);
+	//stg->setStgPositionBBuyYesterday(0);
+	//stg->setStgPositionBSell(0);
+	//stg->setStgPositionBSellToday(0);
+	//stg->setStgPositionBSellYesterday(0);
+	//stg->setStgSellClose(9000);
+	//stg->setStgSellOpen(-9000);
+	//stg->setStgSpreadShift(0);
+	//stg->setStgStopLoss(0);
+	//stg->setStgStrategyId("02");
+	//stg->setStgTraderId("1601");
+	//stg->setStgUserId("063802");
 	//
 	//dbm->CreateStrategy(stg);
+
+	//dbm->DeleteStrategy(stg);
+
+	//dbm->UpdateStrategy(stg);
+
 
 	///// 更新策略
 	//stg->setStrategyId("2");
@@ -388,8 +422,13 @@ int main() {
 	//ctp_m->addInstrument("cu1609", ctp_m->getL_Instrument());
 	printWelcome();
 	printMenu();
+	while (1)
+	{
+		;
+	}
 	cin >> chooice;
-#if 1
+	
+#if 0
 	while (chooice != "q") {
 		/************************************************************************/
 		/* 交易员登陆           CreateMd                                          */

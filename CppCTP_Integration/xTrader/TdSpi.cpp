@@ -1350,6 +1350,12 @@ void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcR
 void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	USER_PRINT("TdSpi::OnRtnOrder");
 	if (pOrder) {
+
+		std::cout << "pOrder->SessionID = " << pOrder->SessionID << endl;
+		std::cout << "this->SessionID = " << this->SessionID << endl;
+		std::cout << "pOrder->FrontID = " << pOrder->FrontID << endl;
+		std::cout << "this->FrontID = " << this->FrontID << endl;
+
 		if ((pOrder->SessionID == this->SessionID) && (pOrder->FrontID == this->FrontID)) {
 			std::cout << "=================================================================================" << endl;
 			///经纪公司代码
@@ -1472,8 +1478,17 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 
 			this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pOrder);
 			//delete[] codeDst;
+
+			list<Strategy *>::iterator itor;
+			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+				(*itor)->OnRtnOrder(pOrder);
+			}
+
 		}
 	}
+ else {
+	 USER_PRINT("OnRtnOrder no pOrder");
+ }
 }
 
 //成交通知
@@ -1543,6 +1558,11 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 		cout << "成交来源" << pTrade->TradeSource << endl;
 		cout << "=================================================================================" << endl;
 		this->current_user->DB_OnRtnTrade(this->current_user->GetTradeConn(), pTrade);
+
+		list<Strategy *>::iterator itor;
+		for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+			(*itor)->OnRtnTrade(pTrade);
+		}
 	}
 }
 
@@ -1552,6 +1572,10 @@ void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFt
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (pInputOrder) {
 			this->current_user->DB_OnErrRtnOrderInsert(this->current_user->GetOrderConn(), pInputOrder);
+			list<Strategy *>::iterator itor;
+			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+				(*itor)->OnErrRtnOrderInsert(pInputOrder);
+			}
 		}
 	}
 }
@@ -1577,6 +1601,10 @@ void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction,
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (pInputOrderAction) {
 			this->current_user->DB_OnRspOrderAction(this->current_user->GetOrderConn(), pInputOrderAction);
+			list<Strategy *>::iterator itor;
+			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+				(*itor)->OnRspOrderAction(pInputOrderAction);
+			}
 		}
 	}
 }
@@ -1587,6 +1615,10 @@ void TdSpi::OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction, CThost
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (pOrderAction) {
 			this->current_user->DB_OnErrRtnOrderAction(this->current_user->GetOrderConn(), pOrderAction);
+			list<Strategy *>::iterator itor;
+			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+				(*itor)->OnErrRtnOrderAction(pOrderAction);
+			}
 		}
 	}
 }
@@ -1713,6 +1745,16 @@ void TdSpi::setSessionID(int SessionID) {
 
 int TdSpi::getSessionID() {
 	return this->SessionID;
+}
+
+/// 得到strategy_list
+list<Strategy *> * TdSpi::getListStrategy() {
+	return this->l_strategys;
+}
+
+/// 设置strategy_list
+void TdSpi::setListStrategy(list<Strategy *> *l_strategys) {
+	this->l_strategys = l_strategys;
 }
 
 //释放api
