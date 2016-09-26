@@ -38,10 +38,10 @@ EQUALS = =
 CMAKE_EDIT_COMMAND = /usr/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server
+CMAKE_SOURCE_DIR = /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server
+CMAKE_BINARY_DIR = /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server
 
 # Include any dependencies generated for this target.
 include CMakeFiles/multi-thread-socket-server.dir/depend.make
@@ -54,17 +54,17 @@ include CMakeFiles/multi-thread-socket-server.dir/flags.make
 
 CMakeFiles/multi-thread-socket-server.dir/msg.c.o: CMakeFiles/multi-thread-socket-server.dir/flags.make
 CMakeFiles/multi-thread-socket-server.dir/msg.c.o: msg.c
-	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server/CMakeFiles $(CMAKE_PROGRESS_1)
+	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server/CMakeFiles $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object CMakeFiles/multi-thread-socket-server.dir/msg.c.o"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/multi-thread-socket-server.dir/msg.c.o   -c /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server/msg.c
+	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/multi-thread-socket-server.dir/msg.c.o   -c /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server/msg.c
 
 CMakeFiles/multi-thread-socket-server.dir/msg.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/multi-thread-socket-server.dir/msg.c.i"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -E /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server/msg.c > CMakeFiles/multi-thread-socket-server.dir/msg.c.i
+	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -E /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server/msg.c > CMakeFiles/multi-thread-socket-server.dir/msg.c.i
 
 CMakeFiles/multi-thread-socket-server.dir/msg.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/multi-thread-socket-server.dir/msg.c.s"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -S /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server/msg.c -o CMakeFiles/multi-thread-socket-server.dir/msg.c.s
+	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -S /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server/msg.c -o CMakeFiles/multi-thread-socket-server.dir/msg.c.s
 
 CMakeFiles/multi-thread-socket-server.dir/msg.c.o.requires:
 .PHONY : CMakeFiles/multi-thread-socket-server.dir/msg.c.o.requires
@@ -77,17 +77,17 @@ CMakeFiles/multi-thread-socket-server.dir/msg.c.o.provides.build: CMakeFiles/mul
 
 CMakeFiles/multi-thread-socket-server.dir/socket_server.c.o: CMakeFiles/multi-thread-socket-server.dir/flags.make
 CMakeFiles/multi-thread-socket-server.dir/socket_server.c.o: socket_server.c
-	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server/CMakeFiles $(CMAKE_PROGRESS_2)
+	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server/CMakeFiles $(CMAKE_PROGRESS_2)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object CMakeFiles/multi-thread-socket-server.dir/socket_server.c.o"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/multi-thread-socket-server.dir/socket_server.c.o   -c /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server/socket_server.c
+	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/multi-thread-socket-server.dir/socket_server.c.o   -c /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server/socket_server.c
 
 CMakeFiles/multi-thread-socket-server.dir/socket_server.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/multi-thread-socket-server.dir/socket_server.c.i"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -E /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server/socket_server.c > CMakeFiles/multi-thread-socket-server.dir/socket_server.c.i
+	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -E /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server/socket_server.c > CMakeFiles/multi-thread-socket-server.dir/socket_server.c.i
 
 CMakeFiles/multi-thread-socket-server.dir/socket_server.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/multi-thread-socket-server.dir/socket_server.c.s"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -S /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server/socket_server.c -o CMakeFiles/multi-thread-socket-server.dir/socket_server.c.s
+	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -S /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server/socket_server.c -o CMakeFiles/multi-thread-socket-server.dir/socket_server.c.s
 
 CMakeFiles/multi-thread-socket-server.dir/socket_server.c.o.requires:
 .PHONY : CMakeFiles/multi-thread-socket-server.dir/socket_server.c.o.requires
@@ -126,6 +126,6 @@ CMakeFiles/multi-thread-socket-server.dir/clean:
 .PHONY : CMakeFiles/multi-thread-socket-server.dir/clean
 
 CMakeFiles/multi-thread-socket-server.dir/depend:
-	cd /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server/CMakeFiles/multi-thread-socket-server.dir/DependInfo.cmake --color=$(COLOR)
+	cd /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server/CMakeFiles/multi-thread-socket-server.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/multi-thread-socket-server.dir/depend
 

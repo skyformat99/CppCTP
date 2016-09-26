@@ -50,10 +50,10 @@ EQUALS = =
 CMAKE_EDIT_COMMAND = /usr/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server
+CMAKE_SOURCE_DIR = /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server
+CMAKE_BINARY_DIR = /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server
 
 #=============================================================================
 # Target rules for target CMakeFiles/multi-thread-socket-server.dir
@@ -62,7 +62,7 @@ CMAKE_BINARY_DIR = /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-s
 CMakeFiles/multi-thread-socket-server.dir/all:
 	$(MAKE) -f CMakeFiles/multi-thread-socket-server.dir/build.make CMakeFiles/multi-thread-socket-server.dir/depend
 	$(MAKE) -f CMakeFiles/multi-thread-socket-server.dir/build.make CMakeFiles/multi-thread-socket-server.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server/CMakeFiles  1 2
+	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server/CMakeFiles  1 2
 	@echo "Built target multi-thread-socket-server"
 .PHONY : CMakeFiles/multi-thread-socket-server.dir/all
 
@@ -72,9 +72,9 @@ all: CMakeFiles/multi-thread-socket-server.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/multi-thread-socket-server.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server/CMakeFiles 2
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/multi-thread-socket-server.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server/CMakeFiles 0
 .PHONY : CMakeFiles/multi-thread-socket-server.dir/rule
 
 # Convenience name for target.

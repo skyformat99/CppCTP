@@ -32,6 +32,7 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 	this->OrderConn = DBManager::getDBConnection();
 	this->TraderID = TraderID;
 	this->l_strategys = new list<Strategy *>();
+	this->stg_map_instrument_action_counter = new map<string, int>();
 }
 
 User::User(string BrokerID, string UserID, int nRequestID) {
@@ -40,6 +41,7 @@ User::User(string BrokerID, string UserID, int nRequestID) {
 	this->nRequestID = atoi(UserID.c_str());
 	this->isConfirmSettlement = false;
 	this->l_strategys = new list<Strategy *>();
+	this->stg_map_instrument_action_counter = new map<string, int>();
 }
 
 User::~User() {
@@ -152,6 +154,36 @@ void User::setListStrategy(list<Strategy *> * l_strategys) {
 /// 添加strategy到list
 void User::addStrategyToList(Strategy *stg) {
 	this->l_strategys->push_back(stg);
+}
+
+/// 初始化合约撤单次数,例如"cu1601":0 "cu1701":0
+void User::init_instrument_id_action_counter(string instrument_id) {
+	//初始化为0
+	//this->stg_map_instrument_action_counter->insert(map < string, int >::value_type(instrument_id, 0)); 第一种map插入方法
+	this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0)); //第二种map插入方法
+}
+
+/// 添加对应合约撤单次数计数器,例如"cu1602":1 "cu1701":1
+void User::add_instrument_id_action_counter(string instrument_id) {
+	//对某个合约进行加1操作
+	map<string, int>::iterator m_itor;
+	m_itor = this->stg_map_instrument_action_counter->find(instrument_id);
+	if (m_itor == (this->stg_map_instrument_action_counter->end())) {
+		cout << "we do not find" << instrument_id << endl;
+		//this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0));
+	}
+	else {
+		cout << "we find " << instrument_id << endl;
+		m_itor->second += 1;
+	}
+}
+
+void User::setStgOrderRefBase(long long stg_order_ref_base) {
+	this->stg_order_ref_base = stg_order_ref_base;
+}
+
+long long User::getStgOrderRefBase() {
+	return this->stg_order_ref_base;
 }
 
 /************************************************************************/

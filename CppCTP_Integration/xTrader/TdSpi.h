@@ -158,7 +158,7 @@ public:
 	void OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
     //下单
-	void OrderInsert(User *user, char *InstrumentID, char CombOffsetFlag, char Direction, int Volume, double Price, string OrderRef);
+	void OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder);
 
 	//下单响应
 	void OnRtnOrder(CThostFtdcOrderField *pOrder);

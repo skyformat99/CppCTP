@@ -16,10 +16,10 @@ def msg_check(message):
         print("i1 = %c \n" % i)
         checknum = ((checknum + ord(i)) % 255)
         print("i1 checknum = %d \n" % checknum)
-    for i in message.buff:
-        print("i2 = %c \n" %i)
-        checknum = ((checknum + ord(i)) % 255)
-        print("i2 checknum = %d \n" % checknum)
+    # for i in message.buff:
+    #     print("i2 = %c \n" %i)
+    #     checknum = ((checknum + ord(i)) % 255)
+    #     print("i2 checknum = %d \n" % checknum)
     return checknum
 
 def write_msg(sockfd, buff):
@@ -41,7 +41,7 @@ def write_msg(sockfd, buff):
 
 def read_msg(sockfd):
     try:
-        data = sockfd.recv(1038)
+        data = sockfd.recv(10 * 1024 + 14)
     except socket.error as e:
         print(e)
     head, checknum, buff = struct.unpack(">13s1B"+ str(len(data) - 14) +"s", data)
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     if s:
         # 连接服务器: IP,port
         try:
-            s.connect(("192.168.1.12", 8888))
+            s.connect(("10.0.0.31", 8888))
         except socket.error as e:
             print("socket error", e)
             sys.exit(1)

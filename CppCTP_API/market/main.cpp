@@ -8,7 +8,7 @@ using std::map;
 using std::string;
 
 int main() {
-    CThostFtdcMdApi *mdapi = CThostFtdcMdApi::CreateFtdcMdApi("/home/quant/Desktop/demo/");
+    CThostFtdcMdApi *mdapi = CThostFtdcMdApi::CreateFtdcMdApi("demo");
     MdSpi *mdspi = new MdSpi(mdapi);
     //和前置机连接
 	/************************************************************************/
@@ -31,7 +31,7 @@ int main() {
 	//mdspi->Connect("tcp://180.168.146.187:10031"); //24H
 	mdspi->Login("9999", "058176", "669822");
 	//订阅合约所以数量为3
-	string array[] = { "cu1608", "cu1609", "zn1608", "zn1609" };
+	string array[] = { "cu1610", "cu1611", "zn1611", "zn1612" };
 	cout << "total string size is:" << sizeof(array) / sizeof(string) << endl;
 	int size = sizeof(array) / sizeof(string);
 	char **instrumentID = new char *[size];

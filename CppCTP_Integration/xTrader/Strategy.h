@@ -80,6 +80,14 @@ public:
 	void setStgInstrumentBTick(
 		CThostFtdcDepthMarketDataField* stgInstrumentBTick);
 
+	CThostFtdcDepthMarketDataField* getStgInstrumentATickLast();
+	void setStgInstrumentATickLast(
+		CThostFtdcDepthMarketDataField* stgInstrumentATick);
+
+	CThostFtdcDepthMarketDataField* getStgInstrumentBTickLast();
+	void setStgInstrumentBTickLast(
+		CThostFtdcDepthMarketDataField* stgInstrumentBTick);
+
 	string getStgInstrumentIdA();
 	void setStgInstrumentIdA(string stgInstrumentIdA);
 
@@ -194,6 +202,9 @@ public:
 	string getStgUserId();
 	void setStgUserId(string stgUserId);
 
+	void setStgOrderRefBase(long long stg_order_ref_base);
+	long long getStgOrderRefBase();
+
 	/************************************************************************/
 	/* 交易相关的回报函数                                                      */
 	/************************************************************************/
@@ -231,6 +242,26 @@ public:
 	//下单算法3
 	void Order_Algorithm_Three();
 
+	/// 生成报单引用
+	string Generate_Order_Ref();
+
+	/// 执行任务函数
+	void Exec_OrderInsert();			// 报单
+	void Exec_OnRspOrderInsert();		// 报单录入请求
+	void Exec_OnRspOrderAction();		// 报单操作请求响应
+	void Exec_OnRtnOrder(CThostFtdcOrderField *pOrder);				// 保单回报
+	void Exec_OnErrRtnOrderInsert();	// 报单录入错误回报
+	void Exec_OnErrRtnOrderAction();	// 报单操作错误回报
+	void Exec_OnTickComing();			// 行情回调,执行交易任务
+
+	/// 更新挂单list
+	void update_pending_order_list(CThostFtdcOrderField *pOrder);
+
+	/// 更新持仓量
+	void update_position(CThostFtdcOrderField *pOrder);
+
+	/// 得到三个数最小值
+	int getMinNum(int num1, int num2, int num3);
 
 private:
 	Trader *trader;
@@ -279,6 +310,8 @@ private:
 
 	CThostFtdcDepthMarketDataField *stg_instrument_A_tick;	// A合约tick（第一腿）
 	CThostFtdcDepthMarketDataField *stg_instrument_B_tick;	// B合约tick（第二腿）
+	CThostFtdcDepthMarketDataField *stg_instrument_A_tick_last;	// A合约tick（第一腿）交易前最后一次
+	CThostFtdcDepthMarketDataField *stg_instrument_B_tick_last;	// B合约tick（第二腿）交易前最后一次
 	double stg_spread_long;									// 市场多头价差：A合约买一价 - B合约买一价
 	int stg_spread_long_volume;								// 市场多头价差盘口挂单量min(A合约买一量 - B合约买一量)
 	double stg_spread_short;								// 市场空头价差：A合约卖一价 - B合约卖一价
@@ -295,6 +328,8 @@ private:
 	CThostFtdcInputOrderField *stg_a_order_insert_args;		// a合约报单参数
 	CThostFtdcInputOrderField *stg_b_order_insert_args;		// b合约报单参数
 	list<CThostFtdcOrderField *> *stg_list_order_pending;	// 挂单列表，报单、成交、撤单回报
+
+	long long stg_order_ref_base; // 报单引用计数
 
 };
 

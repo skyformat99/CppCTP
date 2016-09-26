@@ -1162,21 +1162,7 @@ void TdSpi::OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *
 }
 
 //下单
-void TdSpi::OrderInsert(User *user, char *InstrumentID, char CombOffsetFlag, char Direction, int Volume, double Price, string OrderRef) {
-	CThostFtdcInputOrderField *pInputOrder = new CThostFtdcInputOrderField();
-	memset(pInputOrder, 0, sizeof(CThostFtdcInputOrderField));
-	std::cout << "***************************" << endl;
-	std::cout << "broker id = " << user->getBrokerID().c_str() << endl;
-	std::cout << "user id = " << user->getUserID().c_str() << endl;
-	std::cout << "instrument id = " << InstrumentID << endl;
-	std::cout << "Order Ref = " << OrderRef << endl;
-	std::cout << "Direction = " << THOST_FTDC_D_Buy << endl;
-	std::cout << "CombOffsetFlag = " << CombOffsetFlag << endl;
-	std::cout << "Price = " << Price << endl;
-	std::cout << "Volume = " << Volume << endl;
-	std::cout << "Request id = " << this->getRequestID() << endl;
-
-
+void TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
 	///经纪公司代码
 	strcpy(pInputOrder->BrokerID, user->getBrokerID().c_str());
 
@@ -1188,12 +1174,12 @@ void TdSpi::OrderInsert(User *user, char *InstrumentID, char CombOffsetFlag, cha
 	//strcpy(pInputOrder->InstrumentID, "cu1609");
 	//std::cout << "instrument ID c_str()" << InstrumentID.c_str() << endl;
 
-	std::strcpy(pInputOrder->InstrumentID, InstrumentID);
+	//std::strcpy(pInputOrder->InstrumentID, InstrumentID);
 
 	//memcpy(pInputOrder->InstrumentID, InstrumentID.c_str(), InstrumentID.size() + 1);
 
 	///报单引用
-	strcpy(pInputOrder->OrderRef, OrderRef.c_str());
+	//strcpy(pInputOrder->OrderRef, OrderRef.c_str());
 
 	///用户代码
 	//strcpy(pInputOrder->UserID, this->getUserID().c_str());
@@ -1204,12 +1190,12 @@ void TdSpi::OrderInsert(User *user, char *InstrumentID, char CombOffsetFlag, cha
 
 	///买卖方向
 	//TThostFtdcDirectionType	Direction; //char 0买1卖
-	pInputOrder->Direction = Direction;
+	//pInputOrder->Direction = Direction;
 
 	///组合开平标志
 	//TThostFtdcCombOffsetFlagType	CombOffsetFlag; //char s[5]
 	//strcpy(pInputOrder->CombOffsetFlag, CombOffsetFlag); //组合开平标志 开0平1强平2平今3平昨4
-	pInputOrder->CombOffsetFlag[0] = CombOffsetFlag;
+	//pInputOrder->CombOffsetFlag[0] = CombOffsetFlag;
 
 	///组合投机套保标志
 	//TThostFtdcCombHedgeFlagType	CombHedgeFlag; //char s[5]
@@ -1218,11 +1204,11 @@ void TdSpi::OrderInsert(User *user, char *InstrumentID, char CombOffsetFlag, cha
 
 	///价格
 	//TThostFtdcPriceType	LimitPrice; //double
-	pInputOrder->LimitPrice = Price;
+	//pInputOrder->LimitPrice = Price;
 
 	///数量
 	//TThostFtdcVolumeType	VolumeTotalOriginal; //int
-	pInputOrder->VolumeTotalOriginal = Volume;
+	//pInputOrder->VolumeTotalOriginal = Volume;
 
 	///有效期类型
 	//TThostFtdcTimeConditionType	TimeCondition; //char 当日有效：'3'

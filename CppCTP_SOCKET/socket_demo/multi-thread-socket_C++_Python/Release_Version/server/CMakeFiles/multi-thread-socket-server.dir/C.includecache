@@ -6,9 +6,9 @@
 
 #IncludeRegexTransform: 
 
-/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server/msg.c
+/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server/msg.c
 msg.h
-/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server/msg.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server/msg.h
 unistd.h
 -
 string.h
@@ -18,7 +18,31 @@ memory.h
 sys/types.h
 -
 
-/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server/msg.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server/msg.h
 sys/types.h
 -
+
+/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server/socket_server.c
+netdb.h
+-
+sys/socket.h
+-
+unistd.h
+-
+string.h
+-
+stdio.h
+-
+memory.h
+-
+signal.h
+-
+time.h
+-
+pthread.h
+-
+errno.h
+-
+msg.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server/msg.h
 

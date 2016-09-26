@@ -16,11 +16,11 @@ static unsigned char msg_check(Msg *message) {
 		s = ((s + message->head[i]) % 255);
 		printf("i1 checknum = %d \n", s);
 	}
-	for (i = 0; i < sizeof(message->buff); i++) {
+	/*for (i = 0; i < sizeof(message->buff); i++) {
 		printf("i2 = %c \n", message->buff[i]);
 		s = ((s + message->buff[i]) % 255);
 		printf("i2 checknum = %d \n", s);
-	}
+	}*/
 	printf("msg_check num is %d \n", s);
 	return s;
 }

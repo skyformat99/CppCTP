@@ -59,6 +59,17 @@ public:
 	/// 添加strategy到list
 	void addStrategyToList(Strategy *stg);
 
+
+	/// 初始化合约撤单次数,例如"cu1601":0 "cu1701":0
+	void init_instrument_id_action_counter(string instrument_id);
+
+	/// 添加对应合约撤单次数计数器,例如"cu1602":1 "cu1701":1
+	void add_instrument_id_action_counter(string instrument_id);
+
+	/// 报单引用基准
+	void setStgOrderRefBase(long long stg_order_ref_base);
+	long long getStgOrderRefBase();
+
 	/************************************************************************/
 	/* 获取数据库连接                                                         */
 	/************************************************************************/
@@ -81,6 +92,8 @@ public:
 	void DB_OnErrRtnOrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderField *pInputOrder); // 交易所认为报单错误
 	void DB_OnRspQryInvestorPosition(mongo::DBClientConnection *conn, CThostFtdcInvestorPositionField *pInvestorPosition); // 持仓信息
 
+
+
 private:
 	string BrokerID;
 	string UserID;
@@ -96,9 +109,11 @@ private:
 	TdSpi *UserTradeSPI;
 	Trader *trader;
 	list<Strategy *> *l_strategys;
+	map<string, int> *stg_map_instrument_action_counter;
 	mongo::DBClientConnection * PositionConn;
 	mongo::DBClientConnection * TradeConn;
 	mongo::DBClientConnection * OrderConn;
+	long long stg_order_ref_base;
 };
 
 #endif

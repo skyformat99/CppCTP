@@ -256,17 +256,18 @@ void MdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificIns
 
 //深度行情接收
 void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData){
-	USER_PRINT("OnRtnDepthMarketData")
+    USER_PRINT("OnRtnDepthMarketData");
+    USER_PRINT(pDepthMarketData);
     cout << "===========================================" << endl;
     cout << "深度行情" << endl;
-    cout << "交易日:" << pDepthMarketData->TradingDay << endl
-    << "合约代码:" << pDepthMarketData->InstrumentID << endl
-    << "最新价:" << pDepthMarketData->LastPrice << endl
+    cout << "交易日:" << pDepthMarketData->TradingDay << ", " 
+    << "合约代码:" << pDepthMarketData->InstrumentID << ", "
+    << "最新价:" << pDepthMarketData->LastPrice << ", "
     //<< "上次结算价:" << pDepthMarketData->PreSettlementPrice << endl
     //<< "昨收盘:" << pDepthMarketData->PreClosePrice << endl
     //<< "数量:" << pDepthMarketData->Volume << endl
     //<< "昨持仓量:" << pDepthMarketData->PreOpenInterest << endl
-    << "最后修改时间" << pDepthMarketData->UpdateTime << endl
+    << "最后修改时间" << pDepthMarketData->UpdateTime << ", "
     << "最后修改毫秒" << pDepthMarketData->UpdateMillisec << endl;
     //<< "申买价一：" << pDepthMarketData->BidPrice1 << endl
     //<< "申买量一:" << pDepthMarketData->BidVolume1 << endl

@@ -17,10 +17,10 @@ def msg_check(message):
         # print("i1 = %c \n" % i)
         checknum = ((checknum + ord(i)) % 255)
         # print("i1 checknum = %d \n" % checknum)
-    for i in message.buff:
-        # print("i2 = %c \n" %i)
-        checknum = ((checknum + ord(i)) % 255)
-        # print("i2 checknum = %d \n" % checknum)
+    #for i in message.buff:
+        ## print("i2 = %c \n" %i)
+        #checknum = ((checknum + ord(i)) % 255)
+        ## print("i2 checknum = %d \n" % checknum)
     return checknum
 
 #发送数据
@@ -52,7 +52,7 @@ def write_msg(sockfd, buff):
 def read_msg(sockfd):
     try:
         #接收数据1038个字节(与服务器端统一:13位head+1位checknum+1024数据段)
-        data = sockfd.recv(1038)
+        data = sockfd.recv(10 * 1024 + 14)
     except socket.error as e:
         print(e)
     #解包数据
@@ -78,7 +78,7 @@ if __name__ == '__main__':
         # 连接服务器: IP,port
         try:
             #进行与服务端的连接(ip地址根据实际情况进行更改)
-            s.connect(("192.168.1.12", 8888))
+            s.connect(("10.0.0.31", 8888))
         except socket.error as e:
             print("socket error", e)
             sys.exit(1)

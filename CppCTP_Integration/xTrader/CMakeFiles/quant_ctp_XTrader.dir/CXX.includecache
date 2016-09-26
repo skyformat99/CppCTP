@@ -47,6 +47,8 @@ string
 -
 
 /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.cpp
+sstream
+-
 Strategy.h
 /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.h
 

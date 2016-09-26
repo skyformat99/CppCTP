@@ -4,8 +4,8 @@ SET(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 SET(CMAKE_DEPENDS_CHECK_C
-  "/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server/msg.c" "/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server/CMakeFiles/multi-thread-socket-server.dir/msg.c.o"
-  "/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server/socket_server.c" "/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/server/CMakeFiles/multi-thread-socket-server.dir/socket_server.c.o"
+  "/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server/msg.c" "/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server/CMakeFiles/multi-thread-socket-server.dir/msg.c.o"
+  "/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server/socket_server.c" "/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Release_Version/server/CMakeFiles/multi-thread-socket-server.dir/socket_server.c.o"
   )
 SET(CMAKE_C_COMPILER_ID "GNU")
 

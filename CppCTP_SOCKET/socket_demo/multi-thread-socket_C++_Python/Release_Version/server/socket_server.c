@@ -35,7 +35,7 @@ void out_addr(struct sockaddr_in *clientaddr) {
 /*输出服务器端时间*/
 void do_service(int fd) {
 	/*和客户端进行读写操作(双向通信)*/
-	char buff[1024];
+	char buff[10 *1024];
 	while (1)
 	{
 		memset(buff, 0, sizeof(buff));
