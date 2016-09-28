@@ -173,7 +173,7 @@ public:
 	void OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 	//撤单
-	void OrderAction(string ExchangeID, string OrderRef, string OrderSysID);
+	void OrderAction(char *ExchangeID, char *OrderRef, char *OrderSysID);
 
 	//撤单错误响应
 	void OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
@@ -261,6 +261,7 @@ private:
 	int FrontID;
 	int SessionID;
 	list<Strategy *> *l_strategys;
+	list<CThostFtdcInstrumentField *> *l_instruments_info;
 };
 
 #endif //QUANT_CTP_TRADE_TDSPI_H

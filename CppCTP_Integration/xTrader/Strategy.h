@@ -252,7 +252,7 @@ public:
 	void Exec_OnRtnOrder(CThostFtdcOrderField *pOrder);				// 保单回报
 	void Exec_OnErrRtnOrderInsert();	// 报单录入错误回报
 	void Exec_OnErrRtnOrderAction();	// 报单操作错误回报
-	void Exec_OnTickComing();			// 行情回调,执行交易任务
+	void Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketData);			// 行情回调,执行交易任务
 
 	/// 更新挂单list
 	void update_pending_order_list(CThostFtdcOrderField *pOrder);

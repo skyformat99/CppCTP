@@ -56,6 +56,7 @@ TdSpi::TdSpi() {
 	sem_init(&sem_ReqQrySettlementInfoConfirm, 0, 1);
 	sem_init(&sem_ReqQrySettlementInfo, 0, 1);
 	sem_init(&sem_ReqSettlementInfoConfirm, 0, 1);*/
+	this->l_instruments_info = new list<CThostFtdcInstrumentField *>();
 }
 
 //增加api
@@ -508,6 +509,15 @@ void TdSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CThostFtd
 	//USER_PRINT("TdSpi::OnRspQryInstrument")
 	std::cout << "isLast" << bIsLast << endl;
 	if ((!this->IsErrorRspInfo(pRspInfo))) {
+
+		/// 初始化的时候，必须保证l_instruments_info为空
+		if (this->l_instruments_info->size() > 0) {
+			list<CThostFtdcInstrumentField *>::iterator instrument_itor;
+			for (instrument_itor = l_instruments_info->begin(); instrument_itor != l_instruments_info->end();) {
+				instrument_itor = l_instruments_info->erase(instrument_itor);
+			}
+		}
+
 		///合约代码
 		std::cout << "合约代码:" << pInstrument->InstrumentID << ", ";
 		///交易所代码
@@ -570,6 +580,25 @@ void TdSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CThostFtd
 		std::cout << "合约基础商品乘数" << pInstrument->UnderlyingMultiple << endl;
 		///组合类型
 		std::cout << "组合类型" << pInstrument->CombinationType << endl;*/
+
+		CThostFtdcInstrumentField *pInstrument_tmp = new CThostFtdcInstrumentField();
+		memset(pInstrument_tmp, 0x00, sizeof(pInstrument_tmp));
+		memcpy(pInstrument_tmp, pInstrument, sizeof(pInstrument));
+
+		///合约代码
+		std::cout << "合约代码_tmp:" << pInstrument_tmp->InstrumentID << ", ";
+		///交易所代码
+		std::cout << "交易所代码_tmp:" << pInstrument_tmp->ExchangeID << ", ";
+		///合约名称
+		std::cout << "合约名称_tmp:" << pInstrument_tmp->InstrumentName << ", ";
+		///合约在交易所的代码
+		std::cout << "合约在交易所的代码_tmp:" << pInstrument_tmp->ExchangeInstID << ", ";
+		///产品代码
+		std::cout << "产品代码_tmp:" << pInstrument_tmp->ProductID << ", ";
+		///产品类型
+		std::cout << "产品类型_tmp:" << pInstrument_tmp->ProductClass << endl;
+
+		this->l_instruments_info->push_back(pInstrument_tmp);
 	}
 }
 
@@ -1567,14 +1596,14 @@ void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFt
 }
 
 //撤单
-void TdSpi::OrderAction(string ExchangeID, string OrderRef, string OrderSysID) {
+void TdSpi::OrderAction(char *ExchangeID, char *OrderRef, char *OrderSysID) {
 	CThostFtdcInputOrderActionField *pOrderAction = new CThostFtdcInputOrderActionField();
 	strcpy(pOrderAction->BrokerID, this->getBrokerID().c_str());
 	strcpy(pOrderAction->InvestorID, this->getUserID().c_str());
 	//strcpy(f->InstrumentID, "a1501");
-	strcpy(pOrderAction->ExchangeID, ExchangeID.c_str());
-	strcpy(pOrderAction->OrderRef, OrderRef.c_str());		//设置报单引用
-	strcpy(pOrderAction->OrderSysID, OrderSysID.c_str());
+	strcpy(pOrderAction->ExchangeID, ExchangeID);
+	strcpy(pOrderAction->OrderRef, OrderRef);		//设置报单引用
+	strcpy(pOrderAction->OrderSysID, OrderSysID);
 	pOrderAction->ActionFlag = THOST_FTDC_AF_Delete; //删除
 	this->tdapi->ReqOrderAction(pOrderAction, this->getRequestID());
 	this->current_user->DB_OrderAction(this->current_user->GetOrderConn(), pOrderAction);
