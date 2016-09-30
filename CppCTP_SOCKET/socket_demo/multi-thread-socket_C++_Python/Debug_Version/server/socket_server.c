@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <memory.h>
 #include <signal.h>
 #include <time.h>
@@ -11,6 +12,7 @@
 #include "msg.h"
 
 #define MAXCONNECTIONS 100
+#define MAX_BUFFER_SIZE	30*1024
 int sockfd;
 
 void sig_handler(int signo) {
@@ -35,7 +37,7 @@ void out_addr(struct sockaddr_in *clientaddr) {
 /*输出服务器端时间*/
 void do_service(int fd) {
 	/*和客户端进行读写操作(双向通信)*/
-	char buff[10 * 1024];
+	char buff[MAX_BUFFER_SIZE];
 	while (1)
 	{
 		memset(buff, 0, sizeof(buff));
@@ -53,8 +55,8 @@ void do_service(int fd) {
 			printf("Server Received = %s\n", buff);
 			//printf("socket_server send size = %d \n", strlen(buff));
 			//printf("socket_server fd = %d \n", fd);
-			//printf("socket_server send size = %d \n", sizeof(buff));
-			//printf("socket_server send size = %d \n", strlen(buff));
+			printf("socket_server send size = %d \n", sizeof(buff));
+			printf("socket_server send size = %d \n", strlen(buff));
 			if (write_msg(fd, buff, sizeof(buff)) < 0) {
 				printf("errorno = %d", errno);
 				if (errno == EPIPE) {
@@ -78,13 +80,13 @@ void out_fd(int fd) {
 	memset(ip, 0, sizeof(ip));
 	int port = ntohs(addr.sin_port);
 	inet_ntop(AF_INET, &addr.sin_addr.s_addr, ip, sizeof(ip));
-	printf("%16s(%5d) closed!\n", ip, port);
+	printf("%16s(%5d) connected!!!\n", ip, port);
 }
 
 void *th_fn(void *arg) {
 	int fd = (int)arg;
-	do_service(fd);
 	out_fd(fd);
+	do_service(fd);
 	close(fd);
 
 	return (void *)0;
@@ -106,6 +108,29 @@ int main(int argc, char *argv[]) {
 
 	/*步骤1:创建socket(套接字)*/
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
+	/*socket选项设置*/
+	// a：设置套接字的属性使它能够在计算机重启的时候可以再次使用套接字的端口和IP
+	int err, sock_reuse = 1;
+	err = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &sock_reuse, sizeof(sock_reuse));
+	if (err != 0) {
+		printf("SO_REUSEADDR Setting Failed!\n");
+		exit(1);
+	}
+	// b：设置接收缓冲区大小
+	int nRecvBuf = 40 * 1024; //设置为40K
+	err = setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, (const char*)&nRecvBuf, sizeof(int));
+	if (err != 0) {
+		printf("SO_RCVBUF Setting Failed!\n");
+		exit(1);
+	}
+	// c：设置发送缓冲区大小
+	int nSendBuf = 40 * 1024; //设置为40K
+	err = setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, (const char*)&nSendBuf, sizeof(int));
+	if (err != 0) {
+		printf("SO_SNDBUF Setting Failed!\n");
+		exit(1);
+	}
 
 	/*步骤2:将socket和地址(包括ip,port)进行绑定*/
 	struct sockaddr_in serveraddr;

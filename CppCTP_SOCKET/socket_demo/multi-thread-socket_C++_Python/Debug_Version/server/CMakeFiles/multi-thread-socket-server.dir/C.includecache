@@ -6,18 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Debug_Version/server/msg.c
-msg.h
-/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Debug_Version/server/msg.h
-unistd.h
--
-string.h
--
-memory.h
--
-sys/types.h
--
-
 /mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Debug_Version/server/msg.h
 sys/types.h
 -
@@ -32,6 +20,8 @@ unistd.h
 string.h
 -
 stdio.h
+-
+stdlib.h
 -
 memory.h
 -
