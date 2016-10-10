@@ -38,10 +38,10 @@ EQUALS = =
 CMAKE_EDIT_COMMAND = /usr/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /mnt/hgfs/gmctp/CppCTP_API/trade
+CMAKE_SOURCE_DIR = /mnt/hgfs/CTP/CppCTP/CppCTP_API/trade
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /mnt/hgfs/gmctp/CppCTP_API/trade
+CMAKE_BINARY_DIR = /mnt/hgfs/CTP/CppCTP/CppCTP_API/trade
 
 # Include any dependencies generated for this target.
 include CMakeFiles/quant_ctp_trade.dir/depend.make
@@ -54,17 +54,17 @@ include CMakeFiles/quant_ctp_trade.dir/flags.make
 
 CMakeFiles/quant_ctp_trade.dir/main.cpp.o: CMakeFiles/quant_ctp_trade.dir/flags.make
 CMakeFiles/quant_ctp_trade.dir/main.cpp.o: main.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/gmctp/CppCTP_API/trade/CMakeFiles $(CMAKE_PROGRESS_1)
+	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/CMakeFiles $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/quant_ctp_trade.dir/main.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/quant_ctp_trade.dir/main.cpp.o -c /mnt/hgfs/gmctp/CppCTP_API/trade/main.cpp
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/quant_ctp_trade.dir/main.cpp.o -c /mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/main.cpp
 
 CMakeFiles/quant_ctp_trade.dir/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/quant_ctp_trade.dir/main.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /mnt/hgfs/gmctp/CppCTP_API/trade/main.cpp > CMakeFiles/quant_ctp_trade.dir/main.cpp.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/main.cpp > CMakeFiles/quant_ctp_trade.dir/main.cpp.i
 
 CMakeFiles/quant_ctp_trade.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/quant_ctp_trade.dir/main.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /mnt/hgfs/gmctp/CppCTP_API/trade/main.cpp -o CMakeFiles/quant_ctp_trade.dir/main.cpp.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/main.cpp -o CMakeFiles/quant_ctp_trade.dir/main.cpp.s
 
 CMakeFiles/quant_ctp_trade.dir/main.cpp.o.requires:
 .PHONY : CMakeFiles/quant_ctp_trade.dir/main.cpp.o.requires
@@ -77,17 +77,17 @@ CMakeFiles/quant_ctp_trade.dir/main.cpp.o.provides.build: CMakeFiles/quant_ctp_t
 
 CMakeFiles/quant_ctp_trade.dir/TdSpi.cpp.o: CMakeFiles/quant_ctp_trade.dir/flags.make
 CMakeFiles/quant_ctp_trade.dir/TdSpi.cpp.o: TdSpi.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/gmctp/CppCTP_API/trade/CMakeFiles $(CMAKE_PROGRESS_2)
+	$(CMAKE_COMMAND) -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/CMakeFiles $(CMAKE_PROGRESS_2)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/quant_ctp_trade.dir/TdSpi.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/quant_ctp_trade.dir/TdSpi.cpp.o -c /mnt/hgfs/gmctp/CppCTP_API/trade/TdSpi.cpp
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/quant_ctp_trade.dir/TdSpi.cpp.o -c /mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/TdSpi.cpp
 
 CMakeFiles/quant_ctp_trade.dir/TdSpi.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/quant_ctp_trade.dir/TdSpi.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /mnt/hgfs/gmctp/CppCTP_API/trade/TdSpi.cpp > CMakeFiles/quant_ctp_trade.dir/TdSpi.cpp.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/TdSpi.cpp > CMakeFiles/quant_ctp_trade.dir/TdSpi.cpp.i
 
 CMakeFiles/quant_ctp_trade.dir/TdSpi.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/quant_ctp_trade.dir/TdSpi.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /mnt/hgfs/gmctp/CppCTP_API/trade/TdSpi.cpp -o CMakeFiles/quant_ctp_trade.dir/TdSpi.cpp.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/TdSpi.cpp -o CMakeFiles/quant_ctp_trade.dir/TdSpi.cpp.s
 
 CMakeFiles/quant_ctp_trade.dir/TdSpi.cpp.o.requires:
 .PHONY : CMakeFiles/quant_ctp_trade.dir/TdSpi.cpp.o.requires
@@ -126,6 +126,6 @@ CMakeFiles/quant_ctp_trade.dir/clean:
 .PHONY : CMakeFiles/quant_ctp_trade.dir/clean
 
 CMakeFiles/quant_ctp_trade.dir/depend:
-	cd /mnt/hgfs/gmctp/CppCTP_API/trade && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /mnt/hgfs/gmctp/CppCTP_API/trade /mnt/hgfs/gmctp/CppCTP_API/trade /mnt/hgfs/gmctp/CppCTP_API/trade /mnt/hgfs/gmctp/CppCTP_API/trade /mnt/hgfs/gmctp/CppCTP_API/trade/CMakeFiles/quant_ctp_trade.dir/DependInfo.cmake --color=$(COLOR)
+	cd /mnt/hgfs/CTP/CppCTP/CppCTP_API/trade && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /mnt/hgfs/CTP/CppCTP/CppCTP_API/trade /mnt/hgfs/CTP/CppCTP/CppCTP_API/trade /mnt/hgfs/CTP/CppCTP/CppCTP_API/trade /mnt/hgfs/CTP/CppCTP/CppCTP_API/trade /mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/CMakeFiles/quant_ctp_trade.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/quant_ctp_trade.dir/depend
 

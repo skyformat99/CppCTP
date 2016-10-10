@@ -35,7 +35,7 @@ def RecvN(socket, n):
     totalRecved = 0
     while totalRecved < n:
         onceContent = socket.recv(n - totalRecved)
-        print("onceContent", onceContent)
+        # print("onceContent", onceContent)
         totalContent += onceContent
         totalRecved = len(totalContent)
 
@@ -62,7 +62,7 @@ def write_msg(sockfd, buff):
     data = struct.pack(">13s1B" + str(len(m.buff.encode()) + 1) + "s", m.head.encode(), m.checknum, m.buff.encode());
     # data = struct.pack(">13s1B30720s", m.head.encode(), m.checknum, m.buff.encode())
 
-    print("send data = ", data)
+    # print("send data = ", data)
     #发送数据
     size = sockfd.send(data)
 
@@ -77,16 +77,16 @@ def read_msg(sockfd):
         print("I am here")
     try:
         #接收数据1038个字节(与服务器端统一:13位head+1位checknum+1024数据段)
-        print("read_msg receive %d bytes" % (30 * 1024 + 14))
+        # print("read_msg receive %d bytes" % (30 * 1024 + 14))
         # data = sockfd.recv(30 * 1024 + 14)
         data = RecvN(sockfd, 30 * 1024 + 14)
-        print("len data", len(data))
+        # print("len data", len(data))
     except socket.error as e:
         print(e)
     #解包数据
     head, checknum, buff = struct.unpack(">13s1B"+ str(len(data) - 14) +"s", data)
     # head, checknum, buff = struct.unpack(">13s1B30720s", data)
-    print(head, '\n', checknum, '\n', buff, '\n')
+    # print(head, '\n', checknum, '\n', buff, '\n')
     #将解包的数据封装为Message结构体
     m = Message(head.decode().split('\x00')[0], checknum, buff.decode())
     tmp_checknum = msg_check(m)
@@ -105,10 +105,10 @@ if __name__ == '__main__':
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     send_size = s.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
-    print("send = ", send_size)
+    # print("send = ", send_size)
 
     recv_size = s.getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF)
-    print("recv = ", recv_size)
+    # print("recv = ", recv_size)
 
     # s.setsockopt(socket.SOL_TCP, socket.TCP_NODELAY, 1)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 40 * 1024)
@@ -116,10 +116,10 @@ if __name__ == '__main__':
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     send_size = s.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
-    print("after send = ", send_size)
+    # print("after send = ", send_size)
 
     recv_size = s.getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF)
-    print("after recv = ", recv_size)
+    # print("after recv = ", recv_size)
 
     if s:
         # 连接服务器: IP,port

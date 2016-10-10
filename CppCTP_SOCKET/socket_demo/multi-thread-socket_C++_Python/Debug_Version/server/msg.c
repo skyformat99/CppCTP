@@ -38,8 +38,8 @@ int write_msg(int sockfd, char *buff, size_t len) {
 	memcpy(message.head, "gmqh_sh_2016", strlen("gmqh_sh_2016") + 1);
 	message.checknum = msg_check(&message);
 	//printf("write_msg2 \n");
-	printf("write Message head %s\n", message.head);
-	printf("write Message checknum %d\n", message.checknum);
+	//printf("write Message head %s\n", message.head);
+	//printf("write Message checknum %d\n", message.checknum);
 	if (write(sockfd, &message, sizeof(message)) != sizeof(message)) {
 		return -1;
 	}

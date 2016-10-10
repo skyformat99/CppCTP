@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/mnt/hgfs/gmctp/CppCTP_API/trade/TdSpi.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/TdSpi.h
 map
 -
 string
@@ -22,25 +22,25 @@ time.h
 sys/time.h
 -
 ThostFtdcTraderApi.h
-/mnt/hgfs/gmctp/CppCTP_API/trade/ThostFtdcTraderApi.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/ThostFtdcTraderApi.h
 ThostFtdcUserApiStruct.h
-/mnt/hgfs/gmctp/CppCTP_API/trade/ThostFtdcUserApiStruct.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/ThostFtdcUserApiStruct.h
 
-/mnt/hgfs/gmctp/CppCTP_API/trade/ThostFtdcTraderApi.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/ThostFtdcTraderApi.h
 ThostFtdcUserApiStruct.h
-/mnt/hgfs/gmctp/CppCTP_API/trade/ThostFtdcUserApiStruct.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/ThostFtdcUserApiStruct.h
 
-/mnt/hgfs/gmctp/CppCTP_API/trade/ThostFtdcUserApiDataType.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/ThostFtdcUserApiDataType.h
 
-/mnt/hgfs/gmctp/CppCTP_API/trade/ThostFtdcUserApiStruct.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/ThostFtdcUserApiStruct.h
 ThostFtdcUserApiDataType.h
-/mnt/hgfs/gmctp/CppCTP_API/trade/ThostFtdcUserApiDataType.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/ThostFtdcUserApiDataType.h
 
-/mnt/hgfs/gmctp/CppCTP_API/trade/main.cpp
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/main.cpp
 iostream
 -
 ThostFtdcTraderApi.h
-/mnt/hgfs/gmctp/CppCTP_API/trade/ThostFtdcTraderApi.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/ThostFtdcTraderApi.h
 TdSpi.h
-/mnt/hgfs/gmctp/CppCTP_API/trade/TdSpi.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/TdSpi.h
 

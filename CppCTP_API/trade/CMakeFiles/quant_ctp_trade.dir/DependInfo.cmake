@@ -4,8 +4,8 @@ SET(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 SET(CMAKE_DEPENDS_CHECK_CXX
-  "/mnt/hgfs/gmctp/CppCTP_API/trade/TdSpi.cpp" "/mnt/hgfs/gmctp/CppCTP_API/trade/CMakeFiles/quant_ctp_trade.dir/TdSpi.cpp.o"
-  "/mnt/hgfs/gmctp/CppCTP_API/trade/main.cpp" "/mnt/hgfs/gmctp/CppCTP_API/trade/CMakeFiles/quant_ctp_trade.dir/main.cpp.o"
+  "/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/TdSpi.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/CMakeFiles/quant_ctp_trade.dir/TdSpi.cpp.o"
+  "/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/main.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/CMakeFiles/quant_ctp_trade.dir/main.cpp.o"
   )
 SET(CMAKE_CXX_COMPILER_ID "GNU")
 

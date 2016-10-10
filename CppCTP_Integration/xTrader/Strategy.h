@@ -20,7 +20,7 @@ public:
 
 	Strategy();
 
-	void get_tick(CThostFtdcDepthMarketDataField *pDepthMarketData);
+	void OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData);
 
 	void setTrader(Trader *trader);
 	Trader *getTrader();
@@ -262,6 +262,9 @@ public:
 
 	/// 得到三个数最小值
 	int getMinNum(int num1, int num2, int num3);
+
+	/// 初始化
+	void InitStrategy();
 
 private:
 	Trader *trader;

@@ -775,6 +775,77 @@ void TdSpi::QryInvestorPosition() {
 	delete pQryInvestorPosition;
 }
 
+//查询投资者持仓明细
+void TdSpi::QryInvestorPositionDetail() {
+	USER_PRINT("TdSpi::QryInvestorPositionDetail");
+	CThostFtdcQryInvestorPositionDetailField *pQryInvestorPositionDetail = new CThostFtdcQryInvestorPositionDetailField();
+	this->tdapi->ReqQryInvestorPositionDetail(pQryInvestorPositionDetail, this->getRequestID());
+	delete pQryInvestorPositionDetail;
+}
+
+///请求查询投资者持仓明细响应
+void TdSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+	USER_PRINT("TdSpi::OnRspQryInvestorPositionDetail");
+	if (!this->IsErrorRspInfo(pRspInfo)) {
+		if (pInvestorPositionDetail) {
+			cout << "=================================================================================" << endl;
+			///合约代码
+			cout << "||合约代码:" << pInvestorPositionDetail->InstrumentID << ", ";
+			///经纪公司代码
+			cout << "经纪公司代码:" << pInvestorPositionDetail->BrokerID << ", ";
+			///投资者代码
+			cout << "投资者代码:" << pInvestorPositionDetail->InvestorID << ", ";
+			///投机套保标志
+			cout << "投机套保标志:" << pInvestorPositionDetail->HedgeFlag << ", ";
+			///买卖
+			cout << "买卖:" << pInvestorPositionDetail->Direction << endl;
+			///开仓日期
+			cout << "||开仓日期:" << pInvestorPositionDetail->OpenDate << ", ";
+			///成交编号
+			cout << "成交编号:" << pInvestorPositionDetail->TradeID << ", ";
+			///数量
+			cout << "数量:" << pInvestorPositionDetail->Volume << ", ";
+			///开仓价
+			cout << "开仓价:" << pInvestorPositionDetail->OpenPrice << ", ";
+			///交易日
+			cout << "交易日:" << pInvestorPositionDetail->TradingDay << endl;
+			///结算编号
+			cout << "||结算编号:" << pInvestorPositionDetail->SettlementID << ", ";
+			///成交类型
+			cout << "成交类型:" << pInvestorPositionDetail->TradeType << ", ";
+			///组合合约代码
+			cout << "组合合约代码:" << pInvestorPositionDetail->CombInstrumentID << ", ";
+			///交易所代码
+			cout << "交易所代码:" << pInvestorPositionDetail->ExchangeID << ", ";
+			///逐日盯市平仓盈亏
+			cout << "逐日盯市平仓盈亏:" << pInvestorPositionDetail->CloseProfitByDate << ", ";
+			///逐笔对冲平仓盈亏
+			cout << "逐笔对冲平仓盈亏:" << pInvestorPositionDetail->CloseProfitByTrade << endl;
+			///逐日盯市持仓盈亏
+			cout << "||逐日盯市持仓盈亏:" << pInvestorPositionDetail->PositionProfitByDate << ", ";
+			///逐笔对冲持仓盈亏
+			cout << "逐笔对冲持仓盈亏:" << pInvestorPositionDetail->PositionProfitByTrade << ", ";
+			///投资者保证金
+			cout << "投资者保证金:" << pInvestorPositionDetail->Margin << ", ";
+			///交易所保证金
+			cout << "交易所保证金:" << pInvestorPositionDetail->ExchMargin << ", ";
+			///保证金率
+			cout << "保证金率:" << pInvestorPositionDetail->MarginRateByMoney << endl;
+			///保证金率(按手数)
+			cout << "||保证金率(按手数):" << pInvestorPositionDetail->MarginRateByVolume << ", ";
+			///昨结算价
+			cout << "昨结算价:" << pInvestorPositionDetail->LastSettlementPrice << ", ";
+			///结算价
+			cout << "结算价:" << pInvestorPositionDetail->SettlementPrice << ", ";
+			///平仓量
+			cout << "平仓量:" << pInvestorPositionDetail->CloseVolume << ", ";
+			///平仓金额
+			cout << "平仓金额:" << pInvestorPositionDetail->CloseAmount << endl;
+			cout << "=================================================================================" << endl;
+		}
+	}
+}
+
 //请求查询投资者持仓响应
 void TdSpi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition,
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {

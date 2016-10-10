@@ -9,11 +9,15 @@ Strategy::Strategy() {
 	this->stg_b_order_insert_args = new CThostFtdcInputOrderField();
 }
 
-void Strategy::get_tick(CThostFtdcDepthMarketDataField *pDepthMarketData) {
-	//USER_PRINT(this->getStgInstrumentIdA());
-	//USER_PRINT(this->getStgInstrumentIdB());
-	// Get Own Instrument
+/// 初始化
+void Strategy::InitStrategy() {
+	
+}
 
+void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
+	USER_PRINT(this->getStgInstrumentIdA());
+	USER_PRINT(this->getStgInstrumentIdB());
+	// Get Own Instrument
 
 	if (!strcmp(pDepthMarketData->InstrumentID, this->getStgInstrumentIdA().c_str())) {
 		this->stg_instrument_A_tick = pDepthMarketData;
@@ -23,6 +27,7 @@ void Strategy::get_tick(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 		this->stg_instrument_B_tick = pDepthMarketData;
 	}
 	
+#if 0
 	/// 如果正在交易,继续更新tick进行交易
 	if (this->stg_trade_tasking) {
 		this->Exec_OnTickComing(pDepthMarketData);
@@ -30,6 +35,7 @@ void Strategy::get_tick(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 	else { /// 如果未在交易，那么选择下单算法
 		this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
 	}
+#endif
 
 }
 

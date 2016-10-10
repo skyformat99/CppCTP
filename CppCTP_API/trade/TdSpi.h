@@ -122,6 +122,12 @@ public:
 
 	//查询投资者持仓
 	void QryInvestorPosition();
+	
+	//查询投资者持仓明细
+	void QryInvestorPositionDetail();
+	
+	///请求查询投资者持仓明细响应
+	void OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 	//请求查询投资者持仓响应
 	void OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition,

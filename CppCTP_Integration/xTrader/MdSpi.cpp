@@ -220,7 +220,6 @@ void MdSpi::SubMarket(list<string> *l_instrument) {
 	int i = 0;
 	const char *charResult;
 	for (itor = l_instrument->begin(), i = 0; itor != l_instrument->end(); itor++, i++) {
-		//cout << *itor << endl;
 		USER_PRINT(*itor);
 		charResult = (*itor).c_str();
 		instrumentID[i] = new char[strlen(charResult) + 1];
@@ -256,7 +255,7 @@ void MdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstr
 		cout << "合约代码:" << pSpecificInstrument->InstrumentID << endl;
 		cout << "应答信息:" << pRspInfo->ErrorID << " " << pRspInfo->ErrorMsg << endl;
 		USER_PRINT("sem_post(&submarket_sem) was called!")
-		sem_post(&submarket_sem);
+		//sem_post(&submarket_sem);
 	}
 }
 
@@ -314,20 +313,19 @@ void MdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificIns
 		cout << "取消订阅行情应答" << endl;
 		cout << "取消合约代码:" << pSpecificInstrument->InstrumentID << endl;
 		cout << "取消应答信息:" << pRspInfo->ErrorID << " " << pRspInfo->ErrorMsg << endl;
-		USER_PRINT("sem_post(&unsubmarket_sem) was called!")
-		sem_post(&unsubmarket_sem);
+		//sem_post(&unsubmarket_sem);
 	}
 }
 
 //深度行情接收
 void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 	//USER_PRINT("OnRtnDepthMarketData")
- //   cout << "===========================================" << endl;
- //   //cout << "深度行情" << ", ";
-	//cout << "交易日:" << pDepthMarketData->TradingDay << ", "
-	//<< "合约代码:" << pDepthMarketData->InstrumentID << ", "
-	//<< "最新价:" << pDepthMarketData->LastPrice << ", "
- //   //<< "上次结算价:" << pDepthMarketData->PreSettlementPrice << endl
+    cout << "===========================================" << endl;
+    //cout << "深度行情" << ", ";
+	cout << "交易日:" << pDepthMarketData->TradingDay << ", "
+		<< "合约代码:" << pDepthMarketData->InstrumentID << ", "
+		<< "最新价:" << pDepthMarketData->LastPrice << ", "
+    //<< "上次结算价:" << pDepthMarketData->presettlementprice << endl
  //   //<< "昨收盘:" << pDepthMarketData->PreClosePrice << endl
  //   //<< "数量:" << pDepthMarketData->Volume << endl
  //   //<< "昨持仓量:" << pDepthMarketData->PreOpenInterest << endl
@@ -341,11 +339,11 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
  //   //<< "当日均价:" << pDepthMarketData->AveragePrice << endl
  //   //<< "本次结算价格:" << pDepthMarketData->SettlementPrice << endl
  //   //<< "成交金额:" << pDepthMarketData->Turnover << endl
- //   //<< "持仓量:" << pDepthMarketData->OpenInterest << endl;
+    << "持仓量:" << pDepthMarketData->OpenInterest << endl;
 
 	list<Strategy *>::iterator itor;
 	for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
-		(*itor)->get_tick(pDepthMarketData);
+		(*itor)->OnRtnDepthMarketData(pDepthMarketData);
 	}
 }
 

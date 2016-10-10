@@ -19,6 +19,7 @@ void printMenuEN() {
 	cout << "|u:Qry Investor            |" << endl;
 	cout << "|d:Qry Trade               |" << endl;
 	cout << "|h:Qry Investor Position   |" << endl;
+	cout << "|f:Qry Position Detail     |" << endl;
 	cout << "|==========================|" << endl;
 }
 
@@ -30,6 +31,7 @@ void printMenu() {
 	cout << "|【s】:查询合约信息            |" << endl;
 	cout << "|【d】:查询交易信息            |" << endl;
 	cout << "|【h】:查询持仓信息            |" << endl;
+	cout << "|【f】:查询持仓明细            |" << endl;
 	cout << "|【i】:报单录入                |" << endl;
 	cout << "|【o】:报单查询                |" << endl;
 	cout << "|【a】:撤单操作                |" << endl;
@@ -52,15 +54,16 @@ void printContinueEN() {
 
 int main() {
 
-	//string frontAddr = "tcp://180.168.146.187:10000"; //仿真
-	//string broker_id = "9999";
-	//string user_id = "058176";
-	//string password = "669822";
+	//string frontAddr = "tcp://180.168.146.187:10030"; //仿真
+	string frontAddr = "tcp://180.168.146.187:10000"; //实盘
+	string broker_id = "9999";
+	string user_id = "058176";
+	string password = "669822";
 
-	string frontAddr = "tcp://220.248.44.146:41205"; //实盘
-	string broker_id = "0187";
-	string user_id = "86001525";
-	string password = "206029";
+	//string frontAddr = "tcp://220.248.44.146:41205"; //实盘
+	//string broker_id = "0187";
+	//string user_id = "86001525";
+	//string password = "206029";
 
 
 	CThostFtdcTraderApi *tdapi = CThostFtdcTraderApi::CreateFtdcTraderApi("./conn/user1/");
@@ -466,6 +469,33 @@ int main() {
 			/************************************************************************/
 
 			tdspi->QryInvestorPosition();
+
+			/************************************************************************/
+			/* code finished                                                                     */
+			/************************************************************************/
+			printContinue();
+			getchar();
+			innner_input_c = getchar();
+			if (innner_input_c == 'c') {
+				input_c = ' ';
+				innner_input_c = ' ';
+				printMenu();
+				continue;
+			}
+			else {
+				input_c = ' ';
+				innner_input_c = ' ';
+				printMenu();
+				continue;
+			}
+		}
+		else if (input_c == 'f') {
+			cout << "Qry Investor Position Operation Detail" << endl;
+			/************************************************************************/
+			/* code below here                                                                     */
+			/************************************************************************/
+
+			tdspi->QryInvestorPositionDetail();
 
 			/************************************************************************/
 			/* code finished                                                                     */

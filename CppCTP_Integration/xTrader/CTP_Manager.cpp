@@ -330,6 +330,15 @@ void CTP_Manager::init() {
 		(*user_itor)->getUserTradeSPI()->setListStrategy(this->l_strategys);
 	}
 
+
+	/// 查询合约价格最小跳
+	/// 遍历User,对TdSpi进行Strategy_List赋值
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
+		USER_PRINT((*user_itor)->getUserID());
+		(*user_itor)->getUserTradeSPI()->QryInstrument();
+	}
+
+
 	/// 行情初始化
 	MarketConfig *mc = this->dbm->getOneMarketConfig();
 	if (mc != NULL) {

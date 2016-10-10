@@ -17,7 +17,7 @@ int sockfd;
 
 void sig_handler(int signo) {
 	if (signo == SIGINT) {
-		printf("server close\n");
+		printf("服务端已关闭!!!\n");
 		close(sockfd);
 		exit(1);
 	}
@@ -38,10 +38,11 @@ void out_addr(struct sockaddr_in *clientaddr) {
 void do_service(int fd) {
 	/*和客户端进行读写操作(双向通信)*/
 	char buff[MAX_BUFFER_SIZE];
+	printf("服务端开始监听...\n");
 	while (1)
 	{
 		memset(buff, 0, sizeof(buff));
-		printf("start read and write...\n");
+		
 		size_t size;
 		//printf("sizeof buff is %d = \n", sizeof(buff));
 		if ((size = read_msg(fd, buff, sizeof(buff))) < 0) {
@@ -52,13 +53,14 @@ void do_service(int fd) {
 			break;
 		}
 		else {
-			printf("Server Received = %s\n", buff);
+			printf("服务端收到 = %s\n", buff);
 			//printf("socket_server send size = %d \n", strlen(buff));
 			//printf("socket_server fd = %d \n", fd);
-			printf("socket_server send size = %d \n", sizeof(buff));
-			printf("socket_server send size = %d \n", strlen(buff));
+			//printf("socket_server send size = %d \n", sizeof(buff));
+			//printf("socket_server send size = %d \n", strlen(buff));
 			if (write_msg(fd, buff, sizeof(buff)) < 0) {
-				printf("errorno = %d", errno);
+				printf("先前客户端已断开!!!\n");
+				//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
 				if (errno == EPIPE) {
 					break;
 				}
@@ -80,7 +82,7 @@ void out_fd(int fd) {
 	memset(ip, 0, sizeof(ip));
 	int port = ntohs(addr.sin_port);
 	inet_ntop(AF_INET, &addr.sin_addr.s_addr, ip, sizeof(ip));
-	printf("%16s(%5d) connected!!!\n", ip, port);
+	printf("来自ip地址:%16s(%5d) 已连接!!!\n", ip, port);
 }
 
 void *th_fn(void *arg) {

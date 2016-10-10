@@ -451,6 +451,7 @@ void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *
 }
 
 void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *pTrade){
+#if 1
 	USER_PRINT("User::DB_OnRtnTrade DB Connection!");
 	USER_PRINT(conn);
 	BSONObjBuilder b;
@@ -521,8 +522,8 @@ void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *
 	string time_str = Utils::getNowTimeMs();
 	auto const pos1 = time_str.find_first_of('_');
 	auto const pos = time_str.find_last_of('_');
-	std::cout << pos1 << '\n';
-	std::cout << pos << '\n';
+	std::cout << "pos1" << pos1 << '\n';
+	std::cout << "pos" << pos << '\n';
 	const auto RecTradeTime = time_str.substr(pos1 + 1, pos - 1);
 	const auto RecTradeMicrosecond = time_str.substr(pos + 1);
 	/// ²åÈëÊ±¼ä
@@ -533,6 +534,7 @@ void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *
 	BSONObj p = b.obj();
 	conn->insert(DB_ONRTNTRADE_COLLECTION, p);
 	USER_PRINT("DBManager::DB_OnRtnTrade ok");
+#endif
 }
 
 void User::DB_OrderAction(mongo::DBClientConnection *conn, CThostFtdcInputOrderActionField *pOrderAction){
