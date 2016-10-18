@@ -311,18 +311,28 @@ void CTP_Manager::init() {
 	/// 绑定操作,策略绑定到对应期货账户下
 	list<User *>::iterator user_itor;
 	list<Strategy *>::iterator stg_itor;
+	USER_PRINT("Iterator USERS");
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
+		
 		USER_PRINT((*user_itor)->getUserID());
+
+		USER_PRINT("Iterator STRATEGIES");
 		for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
-			USER_PRINT((*stg_itor)->getUserID());
-			if ((*stg_itor)->getUserID() == (*user_itor)->getUserID()) {
+			USER_PRINT((*stg_itor)->getStgUserId());
+			if ((*stg_itor)->getStgUserId() == (*user_itor)->getUserID()) {
 				USER_PRINT("Strategy Bind To User");
 				(*user_itor)->addStrategyToList((*stg_itor));
+				(*stg_itor)->setStgUser((*user_itor));
+				USER_PRINT("(*stg_itor)->setStgUser((*user_itor))");
+				USER_PRINT((*stg_itor)->getStgUser());
 			}
 		}
 		/// 遍历设值后进行TD初始化
 		this->CreateAccount((*user_itor));
+		sleep(5);
+		std::cout << "Account : " << (*user_itor)->getUserID() << " Init OK!" << std::endl;
 	}
+
 
 	/// 遍历User,对TdSpi进行Strategy_List赋值
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
@@ -338,6 +348,10 @@ void CTP_Manager::init() {
 		(*user_itor)->getUserTradeSPI()->QryInstrument();
 	}
 
+	/// 对策略合约价格最小跳赋值
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
+		(*user_itor)->setStgInstrumnetPriceTick();
+	}
 
 	/// 行情初始化
 	MarketConfig *mc = this->dbm->getOneMarketConfig();

@@ -248,14 +248,12 @@ void MdSpi::UnSubMarket(list<string> *l_instrument) {
 
 //订阅行情应答
 void MdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-	USER_PRINT(bIsLast);
-	if (bIsLast && !(this->IsErrorRspInfo(pRspInfo))) {
-		USER_PRINT("OnRspSubMarketData");
-		cout << "订阅行情应答" << endl;
-		cout << "合约代码:" << pSpecificInstrument->InstrumentID << endl;
-		cout << "应答信息:" << pRspInfo->ErrorID << " " << pRspInfo->ErrorMsg << endl;
-		USER_PRINT("sem_post(&submarket_sem) was called!")
-		//sem_post(&submarket_sem);
+	USER_PRINT("OnRspSubMarketData");
+	if (!(this->IsErrorRspInfo(pRspInfo))) {
+		if (pSpecificInstrument) {
+			cout << "订阅行情应答" << endl;
+			cout << "合约代码:" << pSpecificInstrument->InstrumentID << endl;
+		}
 	}
 }
 
@@ -320,7 +318,7 @@ void MdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificIns
 //深度行情接收
 void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 	//USER_PRINT("OnRtnDepthMarketData")
-    cout << "===========================================" << endl;
+    //cout << "===========================================" << endl;
     //cout << "深度行情" << ", ";
 	cout << "交易日:" << pDepthMarketData->TradingDay << ", "
 		<< "合约代码:" << pDepthMarketData->InstrumentID << ", "
@@ -345,6 +343,7 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
 	for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 		(*itor)->OnRtnDepthMarketData(pDepthMarketData);
 	}
+	//cout << "===========================================" << endl;
 }
 
 //通信断开

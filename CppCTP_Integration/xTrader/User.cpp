@@ -33,6 +33,7 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 	this->TraderID = TraderID;
 	this->l_strategys = new list<Strategy *>();
 	this->stg_map_instrument_action_counter = new map<string, int>();
+	this->stg_order_ref_base = 0;
 }
 
 User::User(string BrokerID, string UserID, int nRequestID) {
@@ -40,8 +41,12 @@ User::User(string BrokerID, string UserID, int nRequestID) {
 	this->UserID = UserID;
 	this->nRequestID = atoi(UserID.c_str());
 	this->isConfirmSettlement = false;
+	this->TradeConn = DBManager::getDBConnection();
+	this->PositionConn = DBManager::getDBConnection();
+	this->OrderConn = DBManager::getDBConnection();
 	this->l_strategys = new list<Strategy *>();
 	this->stg_map_instrument_action_counter = new map<string, int>();
+	this->stg_order_ref_base = 0;
 }
 
 User::~User() {
@@ -165,11 +170,12 @@ void User::init_instrument_id_action_counter(string instrument_id) {
 
 /// 添加对应合约撤单次数计数器,例如"cu1602":1 "cu1701":1
 void User::add_instrument_id_action_counter(string instrument_id) {
+	USER_PRINT("User::add_instrument_id_action_counter");
 	//对某个合约进行加1操作
 	map<string, int>::iterator m_itor;
 	m_itor = this->stg_map_instrument_action_counter->find(instrument_id);
 	if (m_itor == (this->stg_map_instrument_action_counter->end())) {
-		cout << "we do not find" << instrument_id << endl;
+		cout << "we do not find = " << instrument_id << endl;
 		//this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0));
 	}
 	else {
@@ -184,6 +190,31 @@ void User::setStgOrderRefBase(long long stg_order_ref_base) {
 
 long long User::getStgOrderRefBase() {
 	return this->stg_order_ref_base;
+}
+
+/// 设置策略内合约最小跳价格
+void User::setStgInstrumnetPriceTick() {
+	USER_PRINT("User::setStgInstrumnetPriceTick");
+	//1:遍历strategy list
+	list<Strategy *>::iterator stg_itor;
+	list<CThostFtdcInstrumentField *>::iterator instrument_info_itor;
+	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
+		//2:遍历合约信息列表,找到对应合约的最小跳
+		for (instrument_info_itor = this->getUserTradeSPI()->getL_Instruments_Info()->begin();
+			instrument_info_itor != this->getUserTradeSPI()->getL_Instruments_Info()->end();
+			instrument_info_itor++) {
+			if (!strcmp((*stg_itor)->getStgInstrumentIdA().c_str(), (*instrument_info_itor)->InstrumentID)) {
+				USER_PRINT("(*stg_itor)->getStgInstrumentIdA()");
+				USER_PRINT((*stg_itor)->getStgInstrumentIdA());
+				(*stg_itor)->setStgAPriceTick((*instrument_info_itor)->PriceTick);
+			}
+			if (!strcmp((*stg_itor)->getStgInstrumentIdB().c_str(), (*instrument_info_itor)->InstrumentID)) {
+				USER_PRINT("(*stg_itor)->getStgInstrumentIdB()");
+				USER_PRINT((*stg_itor)->getStgInstrumentIdB());
+				(*stg_itor)->setStgBPriceTick((*instrument_info_itor)->PriceTick);
+			}
+		}
+	}
 }
 
 /************************************************************************/
@@ -204,7 +235,8 @@ mongo::DBClientConnection * User::GetOrderConn() {
 /************************************************************************/
 void User::DB_OrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderField *pInputOrder) {
 	USER_PRINT("User::DB_OrderInsert DB Connection!");
-	USER_PRINT(conn);
+	std::cout << "User::DB_OrderInsert conn obj value = " << conn << endl;
+	std::cout << "User::DB_OrderInsert pInputOrder obj value = " << pInputOrder << endl;
 	BSONObjBuilder b;
 
 	/// 交易员id
@@ -274,8 +306,8 @@ void User::DB_OrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderF
 	string time_str = Utils::getNowTimeMs();
 	auto const pos1 = time_str.find_first_of('_');
 	auto const pos = time_str.find_last_of('_');
-	std::cout << pos1 << '\n';
-	std::cout << pos << '\n';
+	//std::cout << pos1 << '\n';
+	//std::cout << pos << '\n';
 	const auto SendOrderTime = time_str.substr(pos1 + 1, pos - 1);
 	const auto SendOrderMicrosecond = time_str.substr(pos + 1);
 	/// 插入时间
@@ -290,7 +322,6 @@ void User::DB_OrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderF
 
 void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *pOrder){
 	USER_PRINT("User::DB_OnRtnOrder DB Connection!");
-	USER_PRINT(conn);
 	BSONObjBuilder b;
 	/// 交易员id
 	b.append("OperatorID", this->getTraderID());
@@ -431,8 +462,8 @@ void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *
 	string time_str = Utils::getNowTimeMs();
 	auto const pos1 = time_str.find_first_of('_');
 	auto const pos = time_str.find_last_of('_');
-	std::cout << pos1 << '\n';
-	std::cout << pos << '\n';
+	//std::cout << pos1 << '\n';
+	//std::cout << pos << '\n';
 	const auto CtpRtnOrderTime = time_str.substr(pos1 + 1, pos - 1);
 	const auto CtpRtnOrderMicrosecond = time_str.substr(pos + 1);
 	/// 插入时间
@@ -451,9 +482,7 @@ void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *
 }
 
 void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *pTrade){
-#if 1
 	USER_PRINT("User::DB_OnRtnTrade DB Connection!");
-	USER_PRINT(conn);
 	BSONObjBuilder b;
 	/// 交易员id
 	b.append("OperatorID", this->getTraderID());
@@ -522,8 +551,8 @@ void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *
 	string time_str = Utils::getNowTimeMs();
 	auto const pos1 = time_str.find_first_of('_');
 	auto const pos = time_str.find_last_of('_');
-	std::cout << "pos1" << pos1 << '\n';
-	std::cout << "pos" << pos << '\n';
+	//std::cout << "pos1" << pos1 << '\n';
+	//std::cout << "pos" << pos << '\n';
 	const auto RecTradeTime = time_str.substr(pos1 + 1, pos - 1);
 	const auto RecTradeMicrosecond = time_str.substr(pos + 1);
 	/// 插入时间
@@ -534,7 +563,6 @@ void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *
 	BSONObj p = b.obj();
 	conn->insert(DB_ONRTNTRADE_COLLECTION, p);
 	USER_PRINT("DBManager::DB_OnRtnTrade ok");
-#endif
 }
 
 void User::DB_OrderAction(mongo::DBClientConnection *conn, CThostFtdcInputOrderActionField *pOrderAction){

@@ -9,6 +9,7 @@ using mongo::BSONArrayBuilder;
 using mongo::BSONObj;
 using mongo::BSONObjBuilder;
 using mongo::BSONElement;
+using mongo::ConnectException;
 using std::cout;
 using std::endl;
 using std::list;
@@ -26,10 +27,21 @@ using std::unique_ptr;
 #define ISNOTACTIVE "0"
 
 DBManager::DBManager() {
-	this->conn = new mongo::DBClientConnection(false, 0, 5);
-	this->conn->connect("localhost");
-	USER_PRINT("Original DB Connection[DBManager::DBManager()]!");
-	USER_PRINT(conn);
+	try
+	{
+		this->conn = new mongo::DBClientConnection(false, 0, 5);
+		this->conn->connect("localhost");
+		USER_PRINT("Original DB Connection[DBManager::DBManager()]!");
+		USER_PRINT(conn);
+	}
+	catch (const mongo::SocketException& e)
+	{
+		std::cout << "MongoDB无法访问!" << std::endl;
+	}
+	catch (const mongo::ConnectException& e) {
+		std::cout << "MongoDB无法访问!" << std::endl;
+	}
+	
 	//USER_PRINT(this->conn);
 }
 
@@ -42,11 +54,23 @@ DBManager::~DBManager() {
 /* static method return mongo connection                                */
 /************************************************************************/
 mongo::DBClientConnection * DBManager::getDBConnection() {
-	mongo::DBClientConnection *conn = new mongo::DBClientConnection(false, 0, 5);
-	conn->connect("localhost");
-	USER_PRINT("Original DB Connection[DBManager::getDBConnection()]!");
-	USER_PRINT(conn);
-	return conn;
+	try
+	{
+		mongo::DBClientConnection *conn = new mongo::DBClientConnection(false, 0, 5);
+		conn->connect("localhost");
+		USER_PRINT("Original DB Connection[DBManager::getDBConnection()]!");
+		USER_PRINT(conn);
+		return conn;
+	}
+	catch (const mongo::SocketException& e)
+	{
+		std::cout << "MongoDB无法访问!" << std::endl;
+		return NULL;
+	}
+	catch (const mongo::ConnectException& e) {
+		std::cout << "MongoDB无法访问!" << std::endl;
+		return NULL;
+	}
 }
 
 void DBManager::CreateTrader(Trader *op) {
@@ -357,7 +381,7 @@ void DBManager::CreateStrategy(Strategy *stg) {
 	}
 	else {
 		BSONObjBuilder b;
-		//增加属性
+		// 增加属性
 		b.append("position_a_sell_today", stg->getStgPositionASellToday());
 		b.append("position_b_sell", stg->getStgPositionBSell());
 		b.append("spread_shift", stg->getStgSpreadShift());

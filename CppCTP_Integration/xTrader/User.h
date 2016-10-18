@@ -70,6 +70,9 @@ public:
 	void setStgOrderRefBase(long long stg_order_ref_base);
 	long long getStgOrderRefBase();
 
+	/// 设置策略内合约最小跳价格
+	void setStgInstrumnetPriceTick();
+
 	/************************************************************************/
 	/* 获取数据库连接                                                         */
 	/************************************************************************/

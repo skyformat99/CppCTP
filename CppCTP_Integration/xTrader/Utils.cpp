@@ -127,7 +127,7 @@ int Utils::timeval_subtract(struct timeval* result, struct timeval* x, struct ti
 }
 
 string Utils::getNowTimeNs() {
-	printf("---------------------------struct timespec---------------------------------------\n");
+	printf("---------------------------时间输出----------------------------------------\n");
 	printf("[time(NULL)]     :     %ld\n", time(NULL));
 	struct timespec ts;
 	clock_gettime(CLOCK_REALTIME, &ts);
@@ -143,16 +143,16 @@ string Utils::getNowTimeNs() {
 }
 
 string Utils::getNowTimeMs() {
-	printf("---------------------------struct timeval----------------------------------------\n");
-	printf("[time(NULL)]    :    %ld\n", time(NULL));
+	//printf("---------------------------时间输出----------------------------------------\n");
+	//printf("[time(NULL)]    :    %ld\n", time(NULL));
 	struct timeval us;
 	gettimeofday(&us, NULL);
-	printf("gettimeofday: tv_sec=%ld, tv_usec=%ld\n", us.tv_sec, us.tv_usec);
+	//printf("gettimeofday: tv_sec=%ld, tv_usec=%ld\n", us.tv_sec, us.tv_usec);
 
 	struct tm t;
 	char date_time[64];
 	strftime(date_time, sizeof(date_time), "%Y-%m-%d %H:%M:%S", localtime_r(&us.tv_sec, &t));
-	printf("gettimeofday: date_time=%s, tv_usec=%ld, tv_msec=%ld\n", date_time, us.tv_usec, us.tv_usec / 1000);
+	//printf("gettimeofday: date_time=%s, tv_usec=%ld, tv_msec=%ld\n", date_time, us.tv_usec, us.tv_usec / 1000);
 	string s = "_";
 	return (s + date_time + s + std::to_string(us.tv_usec));
 }

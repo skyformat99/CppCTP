@@ -233,7 +233,7 @@ public:
 	void OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction);
 
 	//选择下单算法
-	int Select_Order_Algorithm(string stg_order_algorithm);
+	void Select_Order_Algorithm(string stg_order_algorithm);
 
 	//下单算法1
 	void Order_Algorithm_One();
@@ -246,10 +246,11 @@ public:
 	string Generate_Order_Ref();
 
 	/// 执行任务函数
-	void Exec_OrderInsert();			// 报单
+	void Exec_OrderInsert(CThostFtdcInputOrderField *insert_order);			// 报单
 	void Exec_OnRspOrderInsert();		// 报单录入请求
 	void Exec_OnRspOrderAction();		// 报单操作请求响应
-	void Exec_OnRtnOrder(CThostFtdcOrderField *pOrder);				// 保单回报
+	void Exec_OnRtnOrder(CThostFtdcOrderField *pOrder);				// 报单回报
+	void ExEc_OnRtnTrade(CThostFtdcTradeField *pTrade);				// 成交回报
 	void Exec_OnErrRtnOrderInsert();	// 报单录入错误回报
 	void Exec_OnErrRtnOrderAction();	// 报单操作错误回报
 	void Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketData);			// 行情回调,执行交易任务
@@ -259,12 +260,22 @@ public:
 
 	/// 更新持仓量
 	void update_position(CThostFtdcOrderField *pOrder);
+	
+	/// 更新持仓量
+	void update_position(CThostFtdcTradeField *pTrade);
+
 
 	/// 得到三个数最小值
 	int getMinNum(int num1, int num2, int num3);
 
 	/// 初始化
 	void InitStrategy();
+
+	/// 拷贝结构体CThostFtdcDepthMarketDataField
+	void CopyTickData(CThostFtdcDepthMarketDataField *dst, CThostFtdcDepthMarketDataField *src);
+
+	/// 拷贝结构体CThostFtdcOrderField
+	void CopyOrderData(CThostFtdcOrderField *dst, CThostFtdcOrderField *src);
 
 private:
 	Trader *trader;

@@ -57,6 +57,7 @@ TdSpi::TdSpi() {
 	sem_init(&sem_ReqQrySettlementInfo, 0, 1);
 	sem_init(&sem_ReqSettlementInfoConfirm, 0, 1);*/
 	this->l_instruments_info = new list<CThostFtdcInstrumentField *>();
+	this->l_strategys = NULL;
 }
 
 //增加api
@@ -507,121 +508,221 @@ void TdSpi::OnRspQryDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 //响应查询合约
 void TdSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	//USER_PRINT("TdSpi::OnRspQryInstrument")
-	std::cout << "isLast" << bIsLast << endl;
+	//std::cout << "isLast" << bIsLast << endl;
 	if ((!this->IsErrorRspInfo(pRspInfo))) {
-
-		/// 初始化的时候，必须保证l_instruments_info为空
-		if (this->l_instruments_info->size() > 0) {
+		if (pInstrument) {
+			/// 初始化的时候，必须保证l_instruments_info为空
+			/*if (this->l_instruments_info->size() > 0) {
 			list<CThostFtdcInstrumentField *>::iterator instrument_itor;
 			for (instrument_itor = l_instruments_info->begin(); instrument_itor != l_instruments_info->end();) {
-				instrument_itor = l_instruments_info->erase(instrument_itor);
+			instrument_itor = l_instruments_info->erase(instrument_itor);
 			}
+			}*/
+
+			///合约代码
+			///std::cout << "合约代码:" << pInstrument->InstrumentID << ", ";
+			///交易所代码
+			///std::cout << "交易所代码:" << pInstrument->ExchangeID << ", ";
+			///合约名称
+			///std::cout << "合约名称:" << pInstrument->InstrumentName << ", ";
+			///合约在交易所的代码
+			///std::cout << "合约在交易所的代码:" << pInstrument->ExchangeInstID << ", ";
+			///产品代码
+			///std::cout << "产品代码:" << pInstrument->ProductID << ", ";
+			///产品类型
+			///std::cout << "产品类型:" << pInstrument->ProductClass << endl;
+			/*///交割年份
+			std::cout << "交割年份" << pInstrument->DeliveryYear << endl;
+			///交割月
+			std::cout << "交割月" << pInstrument->DeliveryMonth << endl;
+			///市价单最大下单量
+			std::cout << "市价单最大下单量" << pInstrument->MaxMarketOrderVolume << endl;
+			///市价单最小下单量
+			std::cout << "市价单最小下单量" << pInstrument->MinMarketOrderVolume << endl;
+			///限价单最大下单量
+			std::cout << "限价单最大下单量" << pInstrument->MaxLimitOrderVolume << endl;
+			///限价单最小下单量
+			std::cout << "限价单最小下单量" << pInstrument->MinLimitOrderVolume << endl;
+			///合约数量乘数
+			std::cout << "合约数量乘数" << pInstrument->VolumeMultiple << endl;
+			///最小变动价位
+			std::cout << "最小变动价位" << pInstrument->PriceTick << endl;
+			///创建日
+			std::cout << "创建日" << pInstrument->CreateDate << endl;
+			///上市日
+			std::cout << "上市日" << pInstrument->OpenDate << endl;
+			///到期日
+			std::cout << "到期日" << pInstrument->ExpireDate << endl;
+			///开始交割日
+			std::cout << "开始交割日" << pInstrument->StartDelivDate << endl;
+			///结束交割日
+			std::cout << "结束交割日" << pInstrument->EndDelivDate << endl;
+			///合约生命周期状态
+			std::cout << "合约生命周期状态" << pInstrument->InstLifePhase << endl;
+			///当前是否交易
+			std::cout << "当前是否交易" << pInstrument->IsTrading << endl;
+			///持仓类型
+			std::cout << "持仓类型" << pInstrument->PositionType << endl;
+			///持仓日期类型
+			std::cout << "持仓日期类型" << pInstrument->PositionDateType << endl;
+			///多头保证金率
+			std::cout << "多头保证金率" << pInstrument->LongMarginRatio << endl;
+			///空头保证金率
+			std::cout << "空头保证金率" << pInstrument->ShortMarginRatio << endl;
+			///是否使用大额单边保证金算法
+			std::cout << "是否使用大额单边保证金算法" << pInstrument->MaxMarginSideAlgorithm << endl;
+			///基础商品代码
+			std::cout << "基础商品代码" << pInstrument->UnderlyingInstrID << endl;
+			///执行价
+			std::cout << "执行价" << pInstrument->StrikePrice << endl;
+			///期权类型
+			std::cout << "期权类型" << pInstrument->OptionsType << endl;
+			///合约基础商品乘数
+			std::cout << "合约基础商品乘数" << pInstrument->UnderlyingMultiple << endl;
+			///组合类型
+			std::cout << "组合类型" << pInstrument->CombinationType << endl;*/
+
+			CThostFtdcInstrumentField *pInstrument_tmp = new CThostFtdcInstrumentField();
+			/*memset(pInstrument_tmp, 0x00, sizeof(pInstrument_tmp));
+			memcpy(pInstrument_tmp, pInstrument, sizeof(CThostFtdcInstrumentField));*/
+
+			this->CopyInstrumentInfo(pInstrument_tmp, pInstrument);
+
+			/*///合约代码
+			std::cout << "合约代码_tmp:" << pInstrument_tmp->InstrumentID << ", ";
+			///交易所代码
+			std::cout << "交易所代码_tmp:" << pInstrument_tmp->ExchangeID << ", ";
+			///合约名称
+			std::cout << "合约名称_tmp:" << pInstrument_tmp->InstrumentName << ", ";
+			///合约在交易所的代码
+			std::cout << "合约在交易所的代码_tmp:" << pInstrument_tmp->ExchangeInstID << ", ";
+			///产品代码
+			std::cout << "产品代码_tmp:" << pInstrument_tmp->ProductID << ", ";
+			///产品类型
+			std::cout << "产品类型_tmp:" << pInstrument_tmp->ProductClass << endl;*/
+
+			this->l_instruments_info->push_back(pInstrument_tmp);
 		}
-
-		///合约代码
-		std::cout << "合约代码:" << pInstrument->InstrumentID << ", ";
-		///交易所代码
-		std::cout << "交易所代码:" << pInstrument->ExchangeID << ", ";
-		///合约名称
-		std::cout << "合约名称:" << pInstrument->InstrumentName << ", ";
-		///合约在交易所的代码
-		std::cout << "合约在交易所的代码:" << pInstrument->ExchangeInstID << ", ";
-		///产品代码
-		std::cout << "产品代码:" << pInstrument->ProductID << ", ";
-		///产品类型
-		std::cout << "产品类型:" << pInstrument->ProductClass << endl;
-		/*///交割年份
-		std::cout << "交割年份" << pInstrument->DeliveryYear << endl;
-		///交割月
-		std::cout << "交割月" << pInstrument->DeliveryMonth << endl;
-		///市价单最大下单量
-		std::cout << "市价单最大下单量" << pInstrument->MaxMarketOrderVolume << endl;
-		///市价单最小下单量
-		std::cout << "市价单最小下单量" << pInstrument->MinMarketOrderVolume << endl;
-		///限价单最大下单量
-		std::cout << "限价单最大下单量" << pInstrument->MaxLimitOrderVolume << endl;
-		///限价单最小下单量
-		std::cout << "限价单最小下单量" << pInstrument->MinLimitOrderVolume << endl;
-		///合约数量乘数
-		std::cout << "合约数量乘数" << pInstrument->VolumeMultiple << endl;
-		///最小变动价位
-		std::cout << "最小变动价位" << pInstrument->PriceTick << endl;
-		///创建日
-		std::cout << "创建日" << pInstrument->CreateDate << endl;
-		///上市日
-		std::cout << "上市日" << pInstrument->OpenDate << endl;
-		///到期日
-		std::cout << "到期日" << pInstrument->ExpireDate << endl;
-		///开始交割日
-		std::cout << "开始交割日" << pInstrument->StartDelivDate << endl;
-		///结束交割日
-		std::cout << "结束交割日" << pInstrument->EndDelivDate << endl;
-		///合约生命周期状态
-		std::cout << "合约生命周期状态" << pInstrument->InstLifePhase << endl;
-		///当前是否交易
-		std::cout << "当前是否交易" << pInstrument->IsTrading << endl;
-		///持仓类型
-		std::cout << "持仓类型" << pInstrument->PositionType << endl;
-		///持仓日期类型
-		std::cout << "持仓日期类型" << pInstrument->PositionDateType << endl;
-		///多头保证金率
-		std::cout << "多头保证金率" << pInstrument->LongMarginRatio << endl;
-		///空头保证金率
-		std::cout << "空头保证金率" << pInstrument->ShortMarginRatio << endl;
-		///是否使用大额单边保证金算法
-		std::cout << "是否使用大额单边保证金算法" << pInstrument->MaxMarginSideAlgorithm << endl;
-		///基础商品代码
-		std::cout << "基础商品代码" << pInstrument->UnderlyingInstrID << endl;
-		///执行价
-		std::cout << "执行价" << pInstrument->StrikePrice << endl;
-		///期权类型
-		std::cout << "期权类型" << pInstrument->OptionsType << endl;
-		///合约基础商品乘数
-		std::cout << "合约基础商品乘数" << pInstrument->UnderlyingMultiple << endl;
-		///组合类型
-		std::cout << "组合类型" << pInstrument->CombinationType << endl;*/
-
-		CThostFtdcInstrumentField *pInstrument_tmp = new CThostFtdcInstrumentField();
-		memset(pInstrument_tmp, 0x00, sizeof(pInstrument_tmp));
-		memcpy(pInstrument_tmp, pInstrument, sizeof(pInstrument));
-
-		///合约代码
-		std::cout << "合约代码_tmp:" << pInstrument_tmp->InstrumentID << ", ";
-		///交易所代码
-		std::cout << "交易所代码_tmp:" << pInstrument_tmp->ExchangeID << ", ";
-		///合约名称
-		std::cout << "合约名称_tmp:" << pInstrument_tmp->InstrumentName << ", ";
-		///合约在交易所的代码
-		std::cout << "合约在交易所的代码_tmp:" << pInstrument_tmp->ExchangeInstID << ", ";
-		///产品代码
-		std::cout << "产品代码_tmp:" << pInstrument_tmp->ProductID << ", ";
-		///产品类型
-		std::cout << "产品类型_tmp:" << pInstrument_tmp->ProductClass << endl;
-
-		this->l_instruments_info->push_back(pInstrument_tmp);
 	}
+}
+
+//拷贝合约信息
+void TdSpi::CopyInstrumentInfo(CThostFtdcInstrumentField *dst, CThostFtdcInstrumentField *src) {
+	///合约代码
+	strcpy(dst->InstrumentID, src->InstrumentID);
+
+	///交易所代码
+	strcpy(dst->ExchangeID, src->ExchangeID);
+
+	///合约名称
+	TThostFtdcInstrumentNameType	InstrumentName;
+	strcpy(dst->InstrumentName, src->InstrumentName);
+
+	///合约在交易所的代码
+	strcpy(dst->ExchangeInstID, src->ExchangeInstID);
+
+	///产品代码
+	strcpy(dst->ProductID, src->ProductID);
+
+	///产品类型
+	dst->ProductClass = src->ProductClass;
+
+	///交割年份
+	dst->DeliveryYear = src->DeliveryYear;
+
+	///交割月
+	dst->DeliveryMonth = src->DeliveryMonth;
+
+	///市价单最大下单量
+	dst->MaxMarketOrderVolume = src->MaxMarketOrderVolume;
+
+	///市价单最小下单量
+	dst->MinMarketOrderVolume = src->MinMarketOrderVolume;
+
+	///限价单最大下单量
+	dst->MaxLimitOrderVolume = src->MaxLimitOrderVolume;
+
+	///限价单最小下单量
+	dst->MinLimitOrderVolume = src->MinLimitOrderVolume;
+
+	///合约数量乘数
+	dst->VolumeMultiple = src->VolumeMultiple;
+
+	///最小变动价位
+	dst->PriceTick = src->PriceTick;
+
+	///创建日
+	strcpy(dst->CreateDate, src->CreateDate);
+
+	///上市日
+	strcpy(dst->OpenDate, src->OpenDate);
+
+	///到期日
+	strcpy(dst->ExpireDate, src->ExpireDate);
+
+	///开始交割日
+	strcpy(dst->StartDelivDate, src->StartDelivDate);
+
+	///结束交割日
+	strcpy(dst->EndDelivDate, src->EndDelivDate);
+
+	///合约生命周期状态
+	dst->InstLifePhase = src->InstLifePhase;
+
+	///当前是否交易
+	dst->IsTrading = src->IsTrading;
+
+	///持仓类型
+	dst->PositionType = src->PositionType;
+
+	///持仓日期类型
+	dst->PositionDateType = src->PositionDateType;
+
+	///多头保证金率
+	dst->LongMarginRatio = src->LongMarginRatio;
+
+	///空头保证金率
+	dst->ShortMarginRatio = src->ShortMarginRatio;
+
+	///是否使用大额单边保证金算法
+	dst->MaxMarginSideAlgorithm = src->MaxMarginSideAlgorithm;
+
+	///基础商品代码
+	strcpy(dst->UnderlyingInstrID, src->UnderlyingInstrID);
+
+	///执行价
+	dst->StrikePrice = src->StrikePrice;
+
+	///期权类型
+	dst->OptionsType = src->OptionsType;
+
+	///合约基础商品乘数
+	dst->UnderlyingMultiple = src->UnderlyingMultiple;
+
+	///组合类型
+	dst->CombinationType = src->CombinationType;
 }
 
 ///合约交易状态通知
 void TdSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus) {
-	USER_PRINT("TdSpi::OnRtnInstrumentStatus");
+	//USER_PRINT("TdSpi::OnRtnInstrumentStatus");
 	if (pInstrumentStatus) {
-		///交易所代码
-		std::cout << "交易所代码" << pInstrumentStatus->ExchangeID << endl;
-		///合约在交易所的代码
-		std::cout << "合约在交易所的代码" << pInstrumentStatus->ExchangeInstID << endl;
-		///结算组代码
-		std::cout << "结算组代码" << pInstrumentStatus->SettlementGroupID << endl;
-		///合约代码
-		std::cout << "合约代码" << pInstrumentStatus->InstrumentID << endl;
-		///合约交易状态
-		std::cout << "合约交易状态" << pInstrumentStatus->InstrumentStatus << endl;
-		///交易阶段编号
-		std::cout << "交易阶段编号" << pInstrumentStatus->TradingSegmentSN << endl;
-		///进入本状态时间
-		std::cout << "进入本状态时间" << pInstrumentStatus->EnterTime << endl;
-		///进入本状态原因
-		std::cout << "进入本状态原因" << pInstrumentStatus->EnterReason << endl;
+		/////交易所代码
+		//std::cout << "交易所代码" << pInstrumentStatus->ExchangeID << endl;
+		/////合约在交易所的代码
+		//std::cout << "合约在交易所的代码" << pInstrumentStatus->ExchangeInstID << endl;
+		/////结算组代码
+		//std::cout << "结算组代码" << pInstrumentStatus->SettlementGroupID << endl;
+		/////合约代码
+		//std::cout << "合约代码" << pInstrumentStatus->InstrumentID << endl;
+		/////合约交易状态
+		//std::cout << "合约交易状态" << pInstrumentStatus->InstrumentStatus << endl;
+		/////交易阶段编号
+		//std::cout << "交易阶段编号" << pInstrumentStatus->TradingSegmentSN << endl;
+		/////进入本状态时间
+		//std::cout << "进入本状态时间" << pInstrumentStatus->EnterTime << endl;
+		/////进入本状态原因
+		//std::cout << "进入本状态原因" << pInstrumentStatus->EnterReason << endl;
 	}
 }
 
@@ -900,6 +1001,77 @@ void TdSpi::QryInvestorPosition() {
 	CThostFtdcQryInvestorPositionField *pQryInvestorPosition = new CThostFtdcQryInvestorPositionField();
 	this->tdapi->ReqQryInvestorPosition(pQryInvestorPosition, this->getRequestID());
 	delete pQryInvestorPosition;
+}
+
+//查询投资者持仓明细
+void TdSpi::QryInvestorPositionDetail() {
+	USER_PRINT("TdSpi::QryInvestorPositionDetail");
+	CThostFtdcQryInvestorPositionDetailField *pQryInvestorPositionDetail = new CThostFtdcQryInvestorPositionDetailField();
+	this->tdapi->ReqQryInvestorPositionDetail(pQryInvestorPositionDetail, this->getRequestID());
+	delete pQryInvestorPositionDetail;
+}
+
+///请求查询投资者持仓明细响应
+void TdSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+	USER_PRINT("TdSpi::OnRspQryInvestorPositionDetail");
+	if (!this->IsErrorRspInfo(pRspInfo)) {
+		if (pInvestorPositionDetail) {
+			cout << "=================================================================================" << endl;
+			///合约代码
+			cout << "||合约代码:" << pInvestorPositionDetail->InstrumentID << ", ";
+			///经纪公司代码
+			cout << "经纪公司代码:" << pInvestorPositionDetail->BrokerID << ", ";
+			///投资者代码
+			cout << "投资者代码:" << pInvestorPositionDetail->InvestorID << ", ";
+			///投机套保标志
+			cout << "投机套保标志:" << pInvestorPositionDetail->HedgeFlag << ", ";
+			///买卖
+			cout << "买卖:" << pInvestorPositionDetail->Direction << endl;
+			///开仓日期
+			cout << "||开仓日期:" << pInvestorPositionDetail->OpenDate << ", ";
+			///成交编号
+			cout << "成交编号:" << pInvestorPositionDetail->TradeID << ", ";
+			///数量
+			cout << "数量:" << pInvestorPositionDetail->Volume << ", ";
+			///开仓价
+			cout << "开仓价:" << pInvestorPositionDetail->OpenPrice << ", ";
+			///交易日
+			cout << "交易日:" << pInvestorPositionDetail->TradingDay << endl;
+			///结算编号
+			cout << "||结算编号:" << pInvestorPositionDetail->SettlementID << ", ";
+			///成交类型
+			cout << "成交类型:" << pInvestorPositionDetail->TradeType << ", ";
+			///组合合约代码
+			cout << "组合合约代码:" << pInvestorPositionDetail->CombInstrumentID << ", ";
+			///交易所代码
+			cout << "交易所代码:" << pInvestorPositionDetail->ExchangeID << ", ";
+			///逐日盯市平仓盈亏
+			cout << "逐日盯市平仓盈亏:" << pInvestorPositionDetail->CloseProfitByDate << ", ";
+			///逐笔对冲平仓盈亏
+			cout << "逐笔对冲平仓盈亏:" << pInvestorPositionDetail->CloseProfitByTrade << endl;
+			///逐日盯市持仓盈亏
+			cout << "||逐日盯市持仓盈亏:" << pInvestorPositionDetail->PositionProfitByDate << ", ";
+			///逐笔对冲持仓盈亏
+			cout << "逐笔对冲持仓盈亏:" << pInvestorPositionDetail->PositionProfitByTrade << ", ";
+			///投资者保证金
+			cout << "投资者保证金:" << pInvestorPositionDetail->Margin << ", ";
+			///交易所保证金
+			cout << "交易所保证金:" << pInvestorPositionDetail->ExchMargin << ", ";
+			///保证金率
+			cout << "保证金率:" << pInvestorPositionDetail->MarginRateByMoney << endl;
+			///保证金率(按手数)
+			cout << "||保证金率(按手数):" << pInvestorPositionDetail->MarginRateByVolume << ", ";
+			///昨结算价
+			cout << "昨结算价:" << pInvestorPositionDetail->LastSettlementPrice << ", ";
+			///结算价
+			cout << "结算价:" << pInvestorPositionDetail->SettlementPrice << ", ";
+			///平仓量
+			cout << "平仓量:" << pInvestorPositionDetail->CloseVolume << ", ";
+			///平仓金额
+			cout << "平仓金额:" << pInvestorPositionDetail->CloseAmount << endl;
+			cout << "=================================================================================" << endl;
+		}
+	}
 }
 
 //请求查询投资者持仓响应
@@ -1296,11 +1468,10 @@ void TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
 	///Mac地址
 	//TThostFtdcMacAddressType	MacAddress;
 	//sleep(1);
-	USER_PRINT("before ReqOrderInsert");
+
 	this->tdapi->ReqOrderInsert(pInputOrder, 1);
-	USER_PRINT("after ReqOrderInsert");
 	this->current_user->DB_OrderInsert(this->current_user->GetOrderConn(), pInputOrder);
-	delete pInputOrder;
+	//delete pInputOrder;
 }
 
 ///报单录入请求响应
@@ -1498,12 +1669,10 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 				(*itor)->OnRtnOrder(pOrder);
 			}
-
 		}
-	}
- else {
+	} else {
 	 USER_PRINT("OnRtnOrder no pOrder");
- }
+	}
 }
 
 //成交通知
@@ -1512,71 +1681,73 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 	if (pTrade) {
 		cout << "=================================================================================" << endl;
 		///经纪公司代码
-		cout << "||经纪公司代码" << pTrade->BrokerID << ", ";
+		cout << "||经纪公司代码:" << pTrade->BrokerID << ", ";
 		///投资者代码
-		cout << "投资者代码" << pTrade->InvestorID << ", ";
+		cout << "投资者代码:" << pTrade->InvestorID << ", ";
 		///合约代码
-		cout << "合约代码" << pTrade->InstrumentID << ", ";
+		cout << "合约代码:" << pTrade->InstrumentID << ", ";
 		///报单引用
-		cout << "报单引用" << pTrade->OrderRef << ", ";
+		cout << "报单引用:" << pTrade->OrderRef << ", ";
 		///用户代码
-		cout << "用户代码" << pTrade->UserID << endl;
+		cout << "用户代码:" << pTrade->UserID << endl;
 		///交易所代码
-		cout << "||交易所代码" << pTrade->ExchangeID << ", ";
+		cout << "||交易所代码:" << pTrade->ExchangeID << ", ";
 		///成交编号
-		cout << "成交编号" << pTrade->TradeID << ", ";
+		cout << "成交编号:" << pTrade->TradeID << ", ";
 		///买卖方向
-		cout << "买卖方向" << pTrade->Direction << ", ";
+		cout << "买卖方向:" << pTrade->Direction << ", ";
 		///报单编号
-		cout << "报单编号" << pTrade->OrderSysID << ", ";
+		cout << "报单编号:" << pTrade->OrderSysID << ", ";
 		///会员代码
-		cout << "会员代码" << pTrade->ParticipantID << endl;
+		cout << "会员代码:" << pTrade->ParticipantID << endl;
 		///客户代码
-		cout << "||客户代码" << pTrade->ClientID << ", ";
+		cout << "||客户代码:" << pTrade->ClientID << ", ";
 		///交易角色
-		cout << "交易角色" << pTrade->TradingRole << ", ";
+		cout << "交易角色:" << pTrade->TradingRole << ", ";
 		///合约在交易所的代码
-		cout << "合约在交易所的代码" << pTrade->ExchangeInstID << ", ";
+		cout << "合约在交易所的代码:" << pTrade->ExchangeInstID << ", ";
 		///开平标志
-		cout << "开平标志" << pTrade->OffsetFlag << ", ";
+		cout << "开平标志:" << pTrade->OffsetFlag << ", ";
 		///投机套保标志
-		cout << "投机套保标志" << pTrade->HedgeFlag << endl;
+		cout << "投机套保标志:" << pTrade->HedgeFlag << endl;
 		///价格
-		cout << "||价格" << pTrade->Price << ", ";
-		///数量
-		cout << "数量" << pTrade->Volume << ", ";
+		cout << "||价格:" << pTrade->Price << ", ";
+		///数量(本次成交数量，特指本次交易)
+		cout << "数量:" << pTrade->Volume << ", "; //本批成交量
 		///成交时期
-		cout << "成交时期" << pTrade->TradeDate << ", ";
+		cout << "成交时期:" << pTrade->TradeDate << ", ";
 		///成交时间
-		cout << "成交时间" << pTrade->TradeTime << ", ";
+		cout << "成交时间:" << pTrade->TradeTime << ", ";
 		///成交类型
-		cout << "成交类型" << pTrade->TradeType << endl;
+		cout << "成交类型:" << pTrade->TradeType << endl;
 		///成交价来源
-		cout << "||成交价来源" << pTrade->PriceSource << ", ";
+		cout << "||成交价来源:" << pTrade->PriceSource << ", ";
 		///交易所交易员代码
-		cout << "交易所交易员代码" << pTrade->TraderID << ", ";
+		cout << "交易所交易员代码:" << pTrade->TraderID << ", ";
 		///本地报单编号
-		cout << "本地报单编号" << pTrade->OrderLocalID << ", ";
+		cout << "本地报单编号:" << pTrade->OrderLocalID << ", ";
 		///结算会员编号
-		cout << "结算会员编号" << pTrade->ClearingPartID << endl;
+		cout << "结算会员编号:" << pTrade->ClearingPartID << endl;
 		///业务单元
-		cout << "||业务单元" << pTrade->BusinessUnit << ", ";
+		cout << "||业务单元:" << pTrade->BusinessUnit << ", ";
 		///序号
-		cout << "序号" << pTrade->SequenceNo << ", ";
+		cout << "序号:" << pTrade->SequenceNo << ", ";
 		///交易日
-		cout << "交易日" << pTrade->TradingDay << ", ";
+		cout << "交易日:" << pTrade->TradingDay << ", ";
 		///结算编号
-		cout << "结算编号" << pTrade->SettlementID << endl;
+		cout << "结算编号:" << pTrade->SettlementID << endl;
 		///经纪公司报单编号
-		cout << "||经纪公司报单编号" << pTrade->BrokerOrderSeq << ", ";
+		cout << "||经纪公司报单编号:" << pTrade->BrokerOrderSeq << ", ";
 		///成交来源
-		cout << "成交来源" << pTrade->TradeSource << endl;
+		cout << "成交来源:" << pTrade->TradeSource << endl;
 		cout << "=================================================================================" << endl;
 		this->current_user->DB_OnRtnTrade(this->current_user->GetTradeConn(), pTrade);
 
-		list<Strategy *>::iterator itor;
-		for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
-			(*itor)->OnRtnTrade(pTrade);
+		if (this->l_strategys != NULL) {
+			list<Strategy *>::iterator itor;
+			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+				(*itor)->OnRtnTrade(pTrade);
+			}
 		}
 	}
 }
@@ -1770,6 +1941,14 @@ list<Strategy *> * TdSpi::getListStrategy() {
 /// 设置strategy_list
 void TdSpi::setListStrategy(list<Strategy *> *l_strategys) {
 	this->l_strategys = l_strategys;
+}
+
+list<CThostFtdcInstrumentField *> * TdSpi::getL_Instruments_Info() {
+	return this->l_instruments_info;
+}
+
+void TdSpi::setL_Instruments_Info(list<CThostFtdcInstrumentField *> *l_instruments_info) {
+	this->l_instruments_info = l_instruments_info;
 }
 
 //释放api

@@ -54,16 +54,28 @@ void printContinueEN() {
 
 int main() {
 
-	//string frontAddr = "tcp://180.168.146.187:10030"; //仿真
-	string frontAddr = "tcp://180.168.146.187:10000"; //实盘
+//#define EMU 1
+//#define EMU_EMU 1
+
+#ifdef EMU
+
+	#ifdef EMU_EMU
+		/*模拟*/
+		string frontAddr = "tcp://180.168.146.187:10030"; //仿真
+	#else
+		string frontAddr = "tcp://180.168.146.187:10000"; //实盘
+	#endif
+	
 	string broker_id = "9999";
 	string user_id = "058176";
 	string password = "669822";
-
-	//string frontAddr = "tcp://220.248.44.146:41205"; //实盘
-	//string broker_id = "0187";
-	//string user_id = "86001525";
-	//string password = "206029";
+#else
+	/*真实*/
+	string frontAddr = "tcp://101.95.8.190:41205"; //实盘
+	string broker_id = "0187";
+	string user_id = "86001780";
+	string password = "216656";
+#endif
 
 
 	CThostFtdcTraderApi *tdapi = CThostFtdcTraderApi::CreateFtdcTraderApi("./conn/user1/");

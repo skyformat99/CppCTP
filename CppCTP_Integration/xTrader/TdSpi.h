@@ -109,6 +109,9 @@ public:
 	//响应查询合约
 	void OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
+	//拷贝合约信息
+	void CopyInstrumentInfo(CThostFtdcInstrumentField *dst, CThostFtdcInstrumentField *src);
+
 	///合约交易状态通知
 	void OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus);
 
@@ -140,6 +143,12 @@ public:
 
 	//查询投资者持仓
 	void QryInvestorPosition();
+
+	//查询投资者持仓明细
+	void QryInvestorPositionDetail();
+
+	// 请求查询投资者持仓明细响应
+	void OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 	//请求查询投资者持仓响应
 	void OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition,
@@ -230,6 +239,10 @@ public:
 
 	/// 设置strategy_list
 	void setListStrategy(list<Strategy *> *l_strategys);
+
+	list<CThostFtdcInstrumentField *> * getL_Instruments_Info();
+
+	void setL_Instruments_Info(list<CThostFtdcInstrumentField *> *l_instruments_info);
 
 private:
     CThostFtdcTraderApi *tdapi;

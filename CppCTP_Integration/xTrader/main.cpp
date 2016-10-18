@@ -420,8 +420,8 @@ int main() {
 	//mdspi1->setListStrategy(l_strategys);
 
 	//ctp_m->addInstrument("cu1609", ctp_m->getL_Instrument());
-	printWelcome();
-	printMenu();
+	//printWelcome();
+	//printMenu();
 	while (1)
 	{
 		;
