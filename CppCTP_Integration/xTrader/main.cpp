@@ -203,7 +203,7 @@ int main() {
 	//string trade_frontAddr = "tcp://180.169.75.19:41205"; //实盘
 	//string broker_id = "0187";
 	//string user_id = "86001525";
-	//string password = "206029";
+	//string password = "";
 	
 	string market_frontAddr = "tcp://180.168.146.187:10011"; //实盘
 
