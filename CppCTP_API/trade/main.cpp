@@ -74,7 +74,7 @@ int main() {
 	string frontAddr = "tcp://101.95.8.190:41205"; //实盘
 	string broker_id = "0187";
 	string user_id = "86001780";
-	string password = "216656";
+	string password = "";
 #endif
 
 
