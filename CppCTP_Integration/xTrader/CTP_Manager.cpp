@@ -5,6 +5,7 @@
 
 
 CTP_Manager::CTP_Manager() {
+	this->on_off = 0;
 	this->dbm = new DBManager();
 	this->l_user = new list<User *>();
 	this->l_trader = new list<string>();
@@ -297,6 +298,15 @@ MdSpi * CTP_Manager::getMdSpi() {
 	return this->mdspi;
 }
 
+/// 设置开关
+int CTP_Manager::getOn_Off() {
+	return this->on_off;
+}
+
+void CTP_Manager::setOn_Off(int on_off) {
+	this->on_off = on_off;
+}
+
 /// 初始化
 void CTP_Manager::init() {
 	/// 数据库查询所有的Trader
@@ -340,6 +350,7 @@ void CTP_Manager::init() {
 		(*user_itor)->getUserTradeSPI()->setListStrategy(this->l_strategys);
 	}
 
+	/// 第一个元素 this->l_user->front()
 
 	/// 查询合约价格最小跳
 	/// 遍历User,对TdSpi进行Strategy_List赋值

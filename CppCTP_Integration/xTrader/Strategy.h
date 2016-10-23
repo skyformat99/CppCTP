@@ -264,6 +264,9 @@ public:
 	/// 更新持仓量
 	void update_position(CThostFtdcTradeField *pTrade);
 
+	/// 更新持仓明细
+	void update_position_detail(CThostFtdcTradeField *pTrade);
+
 
 	/// 得到三个数最小值
 	int getMinNum(int num1, int num2, int num3);
@@ -276,6 +279,16 @@ public:
 
 	/// 拷贝结构体CThostFtdcOrderField
 	void CopyOrderData(CThostFtdcOrderField *dst, CThostFtdcOrderField *src);
+
+	/// 拷贝结构体CThostFtdcTradeField
+	void CopyTradeData(CThostFtdcTradeField *dst, CThostFtdcTradeField *src);
+
+	/// 设置开关
+	int getOn_Off();
+	void setOn_Off(int on_off);
+
+	/// 更新交易状态
+	void update_task_status();
 
 private:
 	Trader *trader;
@@ -342,8 +355,11 @@ private:
 	CThostFtdcInputOrderField *stg_a_order_insert_args;		// a合约报单参数
 	CThostFtdcInputOrderField *stg_b_order_insert_args;		// b合约报单参数
 	list<CThostFtdcOrderField *> *stg_list_order_pending;	// 挂单列表，报单、成交、撤单回报
+	list<CThostFtdcTradeField *> *stg_list_position_detail; // 持仓明细
 
 	long long stg_order_ref_base; // 报单引用计数
+
+	int on_off; //开关
 
 };
 

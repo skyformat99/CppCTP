@@ -11,6 +11,7 @@
 #include "Trader.h"
 
 using std::map;
+class MdSpi;
 
 class CTP_Manager {
 
@@ -100,6 +101,10 @@ public:
 	/// 初始化
 	void init();
 
+	/// 设置开关
+	int getOn_Off();
+	void setOn_Off(int on_off);
+
 private:
 	Login *login;
 	list<string> *l_instrument;
@@ -111,5 +116,6 @@ private:
 	DBManager *dbm;
 	list<Strategy *> *l_strategys;
 	MdSpi *mdspi;
+	int on_off; //开关
 };
 #endif

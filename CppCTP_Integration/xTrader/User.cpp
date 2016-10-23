@@ -21,6 +21,7 @@
 char codeDst_2[90] = { 0 };
 
 User::User(string frontAddress, string BrokerID, string UserID, string Password, string nRequestID, string TraderID) {
+	this->on_off = 0;
 	this->BrokerID = BrokerID;
 	this->UserID = UserID;
 	this->Password = Password;
@@ -37,6 +38,7 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 }
 
 User::User(string BrokerID, string UserID, int nRequestID) {
+	this->on_off = 0;
 	this->BrokerID = BrokerID;
 	this->UserID = UserID;
 	this->nRequestID = atoi(UserID.c_str());
@@ -1105,3 +1107,19 @@ void User::DB_OnRspQryInvestorPosition(mongo::DBClientConnection *conn, CThostFt
 	conn->insert(DB_ONRSPQRYINVESTORPOSITION, p);
 	USER_PRINT("DBManager::DB_OnRspQryInvestorPosition ok");
 } // 持仓信息
+
+/// 设置开关
+int User::getOn_Off() {
+	return this->on_off;
+}
+void User::setOn_Off(int on_off) {
+	this->on_off = on_off;
+}
+
+/// 设置CTP_Manager
+void User::setCTP_Manager(CTP_Manager *o_ctp) {
+	this->o_ctp = o_ctp;
+}
+CTP_Manager * User::getCTP_Manager() {
+	return this->o_ctp;
+}

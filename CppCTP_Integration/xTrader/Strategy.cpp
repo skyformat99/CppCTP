@@ -3,9 +3,12 @@
 #include "Strategy.h"
 
 Strategy::Strategy() {
+	this->on_off = 0;
+
 	this->l_instruments = new list<string>();
 
 	this->stg_list_order_pending = new list<CThostFtdcOrderField *>();
+	this->stg_list_position_detail = new list<CThostFtdcTradeField *>();
 
 	this->stg_a_order_insert_args = new CThostFtdcInputOrderField();
 	this->stg_b_order_insert_args = new CThostFtdcInputOrderField();
@@ -14,7 +17,6 @@ Strategy::Strategy() {
 	stg_instrument_B_tick = new CThostFtdcDepthMarketDataField();	// B合约tick（第二腿）
 	stg_instrument_A_tick_last = new CThostFtdcDepthMarketDataField();	// A合约tick（第一腿）交易前最后一次
 	stg_instrument_B_tick_last = new CThostFtdcDepthMarketDataField();	// B合约tick（第二腿）交易前最后一次
-
 
 	this->stg_trade_tasking = false;
 }
@@ -309,6 +311,124 @@ void Strategy::CopyOrderData(CThostFtdcOrderField *dst, CThostFtdcOrderField *sr
 	strcpy(dst->MacAddress, src->MacAddress);
 }
 
+/// 拷贝结构体CThostFtdcTradeField
+void Strategy::CopyTradeData(CThostFtdcTradeField *dst, CThostFtdcTradeField *src) {
+	///经纪公司代码
+	strcpy(dst->BrokerID, src->BrokerID);
+
+	///投资者代码
+	strcpy(dst->InvestorID, src->InvestorID);
+
+	///合约代码
+	strcpy(dst->InstrumentID, src->InstrumentID);
+
+	///报单引用
+	strcpy(dst->OrderRef, src->OrderRef);
+
+	///用户代码
+	strcpy(dst->UserID, src->UserID);
+
+	///交易所代码
+	strcpy(dst->ExchangeID, src->ExchangeID);
+
+	///成交编号
+	strcpy(dst->TradeID, src->TradeID);
+
+	///买卖方向
+	dst->Direction = src->Direction;
+
+	///报单编号
+	strcpy(dst->OrderSysID, src->OrderSysID);
+
+	///会员代码
+	strcpy(dst->ParticipantID, src->ParticipantID);
+
+	///客户代码
+	strcpy(dst->ClientID, src->ClientID);
+
+	///交易角色
+	dst->TradingRole = src->TradingRole;
+
+	///合约在交易所的代码
+	strcpy(dst->ExchangeInstID, src->ExchangeInstID);
+
+	///开平标志
+	dst->OffsetFlag = src->OffsetFlag;
+
+	///投机套保标志
+	dst->HedgeFlag = src->HedgeFlag;
+
+	///价格
+	dst->Price = src->Price;
+
+	///数量
+	dst->Volume = src->Volume;
+
+	///成交时期
+	strcpy(dst->TradeDate, src->TradeDate);
+
+	///成交时间
+	strcpy(dst->TradeTime, src->TradeTime);
+
+	///成交类型
+	dst->TradeType = src->TradeType;
+
+	///成交价来源
+	dst->PriceSource = src->PriceSource;
+
+	///交易所交易员代码
+	strcpy(dst->TraderID, src->TraderID);
+
+	///本地报单编号
+	strcpy(dst->OrderLocalID, src->OrderLocalID);
+
+	///结算会员编号
+	strcpy(dst->ClearingPartID, src->ClearingPartID);
+
+	///业务单元
+	strcpy(dst->BusinessUnit, src->BusinessUnit);
+
+	///序号
+	dst->SequenceNo = src->SequenceNo;
+
+	///交易日
+	strcpy(dst->TradingDay, src->TradingDay);
+
+	///结算编号
+	dst->SettlementID = src->SettlementID;
+
+	///经纪公司报单编号
+	dst->BrokerOrderSeq = src->BrokerOrderSeq;
+
+	///成交来源
+	dst->TradeSource = src->TradeSource;
+}
+
+/// 设置开关
+int Strategy::getOn_Off() {
+	return this->on_off;
+}
+
+void Strategy::setOn_Off(int on_off) {
+	this->on_off = on_off;
+}
+
+/// 更新交易状态
+void Strategy::update_task_status() {
+	std::cout << "Before update this.trade_tasking = " << this->stg_trade_tasking << endl;
+	if ((this->stg_position_a_buy_today == this->stg_position_b_sell_today)
+		&& (this->stg_position_a_buy_yesterday == this->stg_position_b_sell_yesterday)
+		&& (this->stg_position_a_sell_today == this->stg_position_b_buy_today)
+		&& (this->stg_position_a_sell_yesterday == this->stg_position_b_buy_yesterday)) {
+			this->stg_trade_tasking = false;
+	}
+	else
+	{
+		this->stg_trade_tasking = true;
+	}
+	std::cout << "After update this.trade_tasking = " << this->stg_trade_tasking << endl;
+}
+
 void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 	//USER_PRINT(this->getStgInstrumentIdA());
 	//USER_PRINT(this->getStgInstrumentIdB());
@@ -355,10 +475,9 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 		return;
 	}
 
-	if ((this->stg_position_a_sell == this->stg_position_b_buy) && (this->stg_position_a_buy == this->stg_position_b_sell)) { // 没有撇腿
-
-	}
-	else {
+	if (!((this->stg_position_a_sell == this->stg_position_b_buy) && 
+		(this->stg_position_a_buy == this->stg_position_b_sell))) {
+		// 有撇腿
 		return;
 	}
 
@@ -429,13 +548,19 @@ void Strategy::Order_Algorithm_One() {
 		return;
 	}
 
-	/// 价差多头卖平
-	/*if ((this->stg_spread_long >= this->stg_sell_close) && (this->stg_position_a_buy > 0) &&
-		(this->stg_position_a_buy == this->stg_position_b_sell) &&
-		((this->stg_position_a_buy + this->stg_position_b_buy) < this->stg_lots)) {*/
-	if ((false) && (this->stg_position_a_buy > 0) &&
-		(this->stg_position_a_buy == this->stg_position_b_sell) &&
-		((this->stg_position_a_buy + this->stg_position_b_buy) < this->stg_lots)) {
+	/// 策略开关，期货账户开关，总开关
+	if (!((this->getOn_Off()) & (this->stg_user->getOn_Off()) & (this->stg_user->getCTP_Manager()->getOn_Off()))) {
+		std::cout << "请检查开关状态!" << std::endl;
+		std::cout << "总开关 = " << this->stg_user->getCTP_Manager()->getOn_Off() << std::endl;
+		std::cout << "账户开关 = " << this->stg_user->getOn_Off() << std::endl;
+		std::cout << "策略开关 = " << this->getOn_Off() << std::endl;
+		return;
+	}
+
+	/// 价差多头卖平(b)
+	if ((this->stg_spread_long >= this->stg_sell_close) 
+		&& (this->stg_position_a_sell == this->stg_position_b_buy)
+		&& (this->stg_position_a_sell > 0)) {
 		/// 市场多头价差大于触发参数， AB持仓量相等且大于0
 		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差多头卖平" << endl;
 
@@ -452,22 +577,17 @@ void Strategy::Order_Algorithm_One() {
 		this->CopyTickData(stg_instrument_A_tick_last, stg_instrument_A_tick);
 		this->CopyTickData(stg_instrument_B_tick_last, stg_instrument_B_tick);
 
-		USER_PRINT("stg_instrument_A_tick_last");
-		USER_PRINT(stg_instrument_A_tick_last);
-		USER_PRINT("stg_instrument_B_tick_last");
-		USER_PRINT(stg_instrument_B_tick_last);
-
 		int order_volume = 0;
 
 		/// 优先平昨仓
 		/// 报单手数：盘口挂单量、每份发单手数、持仓量
-		if (this->stg_position_a_buy_yesterday > 0) {
-			order_volume = this->getMinNum(this->stg_spread_long_volume, this->stg_lots_batch, this->stg_position_a_buy_yesterday);
+		if (this->stg_position_a_sell_yesterday > 0) {
+			order_volume = this->getMinNum(this->stg_spread_short_volume, this->stg_lots_batch, this->stg_position_a_sell_yesterday);
 			this->stg_a_order_insert_args->CombOffsetFlag[0] = '4'; /// 平昨
 			this->stg_b_order_insert_args->CombOffsetFlag[0] = '4'; /// 平昨
 		}
-		else if ((this->stg_position_a_buy_yesterday == 0) && (this->stg_position_a_buy_today > 0)) {
-			order_volume = this->getMinNum(this->stg_spread_long_volume, this->stg_lots_batch, this->stg_position_a_buy_today);
+		else if ((this->stg_position_a_sell_yesterday == 0) && (this->stg_position_a_sell_today > 0)) {
+			order_volume = this->getMinNum(this->stg_spread_short_volume, this->stg_lots_batch, this->stg_position_a_sell_today);
 			this->stg_a_order_insert_args->CombOffsetFlag[0] = '3'; /// 平今
 			this->stg_b_order_insert_args->CombOffsetFlag[0] = '3'; /// 平今
 		}
@@ -489,11 +609,11 @@ void Strategy::Order_Algorithm_One() {
 		// 合约代码
 		std::strcpy(this->stg_a_order_insert_args->InstrumentID, this->stg_instrument_id_A.c_str());
 		// 限价
-		this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->BidPrice1;
+		this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->AskPrice1;
 		// 数量
 		this->stg_a_order_insert_args->VolumeTotalOriginal = order_volume;
 		// 买卖方向
-		this->stg_a_order_insert_args->Direction = '1'; // 0买 1卖
+		this->stg_a_order_insert_args->Direction = '0'; // 0买 1卖
 		// 组合开平标志
 		/// this->stg_a_order_insert_args->CombOffsetFlag[0] = '0';
 		// 组合投机套保标志
@@ -506,11 +626,11 @@ void Strategy::Order_Algorithm_One() {
 		// 合约代码
 		std::strcpy(this->stg_b_order_insert_args->InstrumentID, this->stg_instrument_id_B.c_str());
 		// 限价
-		this->stg_b_order_insert_args->LimitPrice = this->stg_instrument_B_tick->AskPrice1;
+		this->stg_b_order_insert_args->LimitPrice = this->stg_instrument_B_tick->BidPrice1;
 		// 数量
 		//this->stg_b_order_insert_args->VolumeTotalOriginal = order_volume;
 		// 买卖方向
-		this->stg_b_order_insert_args->Direction = '0'; // 0买 1卖
+		this->stg_b_order_insert_args->Direction = '1'; // 0买 1卖
 		// 组合开平标志
 		/// this->stg_b_order_insert_args->CombOffsetFlag[0] = '0'; //组合开平标志0开仓 上期所3平今、4平昨，其他交易所1平仓
 		// 组合投机套保标志
@@ -699,7 +819,7 @@ void Strategy::Order_Algorithm_One() {
 		this->stg_trade_tasking = true;
 	}
 
-	/// 价差空头买开
+	/// 价差空头买开(b)
 	/*else if ((this->stg_spread_short <= this->stg_buy_open) && (this->stg_position_a_buy + this->stg_position_a_sell < this->stg_lots)) {*/
 	else if ((false) && (this->stg_position_a_buy + this->stg_position_a_sell < this->stg_lots)) {
 		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差空头买开" << endl;
@@ -719,7 +839,7 @@ void Strategy::Order_Algorithm_One() {
 		this->CopyTickData(stg_instrument_B_tick_last, stg_instrument_B_tick);
 
 		/// 报单手数：盘口挂单量,每份发单手数,剩余可开仓手数中取最小值
-		int order_volume = this->getMinNum(this->stg_spread_short_volume, this->stg_lots_batch, this->stg_lots - (this->stg_position_a_buy + this->stg_position_b_buy));
+		int order_volume = this->getMinNum(this->stg_spread_long_volume, this->stg_lots_batch, this->stg_lots - (this->stg_position_a_buy + this->stg_position_b_buy));
 
 		if (order_volume <= 0) {
 			std::cout << "发单手数错误值 = " << order_volume << endl;
@@ -740,7 +860,7 @@ void Strategy::Order_Algorithm_One() {
 		// 合约代码
 		std::strcpy(this->stg_a_order_insert_args->InstrumentID, this->stg_instrument_id_A.c_str());
 		// 限价
-		this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->AskPrice1;
+		this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->BidPrice1;
 		// 数量
 		this->stg_a_order_insert_args->VolumeTotalOriginal = order_volume;
 		// 买卖方向
@@ -757,7 +877,7 @@ void Strategy::Order_Algorithm_One() {
 		// 合约代码
 		std::strcpy(this->stg_b_order_insert_args->InstrumentID, this->stg_instrument_id_B.c_str());
 		// 限价
-		this->stg_b_order_insert_args->LimitPrice = this->stg_instrument_B_tick->BidPrice1;
+		this->stg_b_order_insert_args->LimitPrice = this->stg_instrument_B_tick->AskPrice1;
 		// 数量
 		//this->stg_b_order_insert_args->VolumeTotalOriginal = order_volume;
 		// 买卖方向
@@ -842,19 +962,7 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	std::cout << "pOrder->VolumeTraded = " << pOrder->VolumeTraded << std::endl;
 	//更新挂单列表，持仓信息
 	this->update_pending_order_list(pOrder);
-	//this->update_position(pOrder);
-
-	std::cout << "Before update this.trade_tasking = " << this->stg_trade_tasking << endl;
-
-
-	if ((this->stg_position_a_buy == this->stg_position_b_sell) && (this->stg_position_a_sell == this->stg_position_b_buy) && (this->stg_list_order_pending->size() == 0)) {
-		this->stg_trade_tasking = false;
-	}
-	else {
-		this->stg_trade_tasking = true;
-	}
-	
-	std::cout << "After update this.trade_tasking = " << this->stg_trade_tasking << endl;
+	this->update_task_status();
 
 	/// A成交回报,B发送等量的报单
 	if ((!strcmp(pOrder->InstrumentID, this->stg_instrument_id_A.c_str())) && ((pOrder->OrderStatus == '0') || (pOrder->OrderStatus == '1')) && (strlen(pOrder->OrderSysID) != 0)) { //只有全部成交或者部分成交还在队列中
@@ -929,7 +1037,10 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 
 // 成交回报
 void Strategy::ExEc_OnRtnTrade(CThostFtdcTradeField *pTrade) {
+	/*1:更新持仓明细*/
+	this->update_position_detail(pTrade); 
 	this->update_position(pTrade);
+	this->update_task_status();
 }
 
 // 报单录入错误回报
@@ -1277,6 +1388,66 @@ void Strategy::update_position(CThostFtdcTradeField *pTrade) {
 	std::cout << "B合约昨卖 = " << this->stg_position_b_buy_yesterday << std::endl;
 	std::cout << "B合约总卖 = " << this->stg_position_b_sell << std::endl;
 
+}
+
+/// 更新持仓明细
+void Strategy::update_position_detail(CThostFtdcTradeField *pTrade_cal) {
+	CThostFtdcTradeField *pTrade = new CThostFtdcTradeField();
+	memset(pTrade, 0x00, sizeof(CThostFtdcTradeField));
+	this->CopyTradeData(pTrade, pTrade_cal);
+
+
+	// 开仓单,添加到list，添加到list尾部
+	if (pTrade->OffsetFlag == '0') {
+		CThostFtdcTradeField *pTrade_tmp = new CThostFtdcTradeField();
+		memset(pTrade_tmp, 0x00, sizeof(CThostFtdcTradeField));
+		this->CopyTradeData(pTrade_tmp, pTrade_cal);
+
+		this->stg_list_position_detail->push_back(pTrade_tmp);
+	}
+	else if (pTrade->OffsetFlag == '1') { // 平仓单,先开先平的原则从list里删除
+		list<CThostFtdcTradeField *>::iterator Itor;
+		for (Itor = this->stg_list_position_detail->begin(); Itor != this->stg_list_position_detail->end();) {
+			if (pTrade->OffsetFlag == '3') { // 平今
+				if ((!strcmp((*Itor)->TradingDay, pTrade->TradingDay)) 
+					&& (!strcmp((*Itor)->InstrumentID, pTrade->InstrumentID))
+					&& ((*Itor)->HedgeFlag == pTrade->HedgeFlag) 
+					&& ((*Itor)->Direction == pTrade->Direction)) {
+						// pTrade的volume等于持仓明细列表里的volume
+						if (((*Itor)->Volume) == (pTrade->Volume)) {
+							delete (*Itor);
+							Itor = this->stg_list_position_detail->erase(Itor);
+						}
+						else if (((*Itor)->Volume) > (pTrade->Volume)) {
+							(*Itor)->Volume -= pTrade->Volume;
+						}
+						else if (((*Itor)->Volume) < (pTrade->Volume)) {
+							pTrade->Volume -= (*Itor)->Volume;
+							Itor = this->stg_list_position_detail->erase(Itor);
+						}
+				}
+			}
+			else if (pTrade->OffsetFlag == '4') {
+				if ((!strcmp((*Itor)->TradingDay, pTrade->TradingDay))
+					&& (!strcmp((*Itor)->InstrumentID, pTrade->InstrumentID))
+					&& ((*Itor)->HedgeFlag == pTrade->HedgeFlag)
+					&& ((*Itor)->Direction == pTrade->Direction)) {
+						// pTrade的volume等于持仓明细列表里的volume
+						if (((*Itor)->Volume) == (pTrade->Volume)) {
+							delete (*Itor);
+							Itor = this->stg_list_position_detail->erase(Itor);
+						}
+						else if (((*Itor)->Volume) > (pTrade->Volume)) {
+							(*Itor)->Volume -= pTrade->Volume;
+						}
+						else if (((*Itor)->Volume) < (pTrade->Volume)) {
+							pTrade->Volume -= (*Itor)->Volume;
+							Itor = this->stg_list_position_detail->erase(Itor);
+						}
+				}
+			}
+		}
+	}
 }
 
 /// 得到三个数最小值
@@ -1781,6 +1952,9 @@ void Strategy::OrderInsert(User *user, char *InstrumentID, char CombOffsetFlag, 
 //下单响应
 void Strategy::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	USER_PRINT("Strategy::OnRtnOrder");
+
+	
+
 	/// 如果合约在撤单维护列表里，那么撤单次数增加1
 	this->stg_user->add_instrument_id_action_counter(pOrder->InstrumentID);
 	this->Exec_OnRtnOrder(pOrder);

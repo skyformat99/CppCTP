@@ -11,12 +11,15 @@
 #include "Order.h"
 #include "Trader.h"
 #include "Strategy.h"
+#include "CTP_Manager.h"
 
 using namespace mongo;
 using namespace std;
 using std::string;
 using mongo::DBClientConnection;
 using mongo::BSONObjBuilder;
+
+class CTP_Manager;
 
 class User
 {
@@ -95,9 +98,16 @@ public:
 	void DB_OnErrRtnOrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderField *pInputOrder); // 交易所认为报单错误
 	void DB_OnRspQryInvestorPosition(mongo::DBClientConnection *conn, CThostFtdcInvestorPositionField *pInvestorPosition); // 持仓信息
 
+	/// 设置开关
+	int getOn_Off();
+	void setOn_Off(int on_off);
 
+	/// 设置CTP_Manager
+	void setCTP_Manager(CTP_Manager *o_ctp);
+	CTP_Manager *getCTP_Manager();
 
 private:
+	int on_off; //开关
 	string BrokerID;
 	string UserID;
 	string Password;
@@ -117,6 +127,7 @@ private:
 	mongo::DBClientConnection * TradeConn;
 	mongo::DBClientConnection * OrderConn;
 	long long stg_order_ref_base;
+	CTP_Manager *o_ctp;
 };
 
 #endif
