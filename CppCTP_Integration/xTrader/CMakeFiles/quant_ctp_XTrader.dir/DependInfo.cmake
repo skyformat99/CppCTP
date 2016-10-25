@@ -4,19 +4,20 @@ SET(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 SET(CMAKE_DEPENDS_CHECK_CXX
-  "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Algorithm.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.o"
-  "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CTP_Manager.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o"
-  "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/DBManager.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o"
-  "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/FutureAccount.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o"
-  "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MarketConfig.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/MarketConfig.cpp.o"
-  "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/MdSpi.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o"
-  "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Order.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o"
-  "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Strategy.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o"
-  "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/TdSpi.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o"
-  "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Trader.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o"
-  "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/User.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o"
-  "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/Utils.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o"
-  "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/main.cpp" "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o"
+  "/root/xTrader/Algorithm.cpp" "/root/xTrader/CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.o"
+  "/root/xTrader/CTP_Manager.cpp" "/root/xTrader/CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o"
+  "/root/xTrader/DBManager.cpp" "/root/xTrader/CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o"
+  "/root/xTrader/FutureAccount.cpp" "/root/xTrader/CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o"
+  "/root/xTrader/MarketConfig.cpp" "/root/xTrader/CMakeFiles/quant_ctp_XTrader.dir/MarketConfig.cpp.o"
+  "/root/xTrader/MdSpi.cpp" "/root/xTrader/CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o"
+  "/root/xTrader/Order.cpp" "/root/xTrader/CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o"
+  "/root/xTrader/Strategy.cpp" "/root/xTrader/CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o"
+  "/root/xTrader/TdSpi.cpp" "/root/xTrader/CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o"
+  "/root/xTrader/Trader.cpp" "/root/xTrader/CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o"
+  "/root/xTrader/User.cpp" "/root/xTrader/CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o"
+  "/root/xTrader/Utils.cpp" "/root/xTrader/CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o"
+  "/root/xTrader/main.cpp" "/root/xTrader/CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o"
+  "/root/xTrader/msg.cpp" "/root/xTrader/CMakeFiles/quant_ctp_XTrader.dir/msg.cpp.o"
   )
 SET(CMAKE_CXX_COMPILER_ID "GNU")
 

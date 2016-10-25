@@ -1,4 +1,4 @@
-# Install script for directory: /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader
+# Install script for directory: /root/xTrader
 
 # Set the install prefix
 IF(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -38,7 +38,7 @@ ELSE(CMAKE_INSTALL_COMPONENT)
   SET(CMAKE_INSTALL_MANIFEST "install_manifest.txt")
 ENDIF(CMAKE_INSTALL_COMPONENT)
 
-FILE(WRITE "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/${CMAKE_INSTALL_MANIFEST}" "")
+FILE(WRITE "/root/xTrader/${CMAKE_INSTALL_MANIFEST}" "")
 FOREACH(file ${CMAKE_INSTALL_MANIFEST_FILES})
-  FILE(APPEND "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
+  FILE(APPEND "/root/xTrader/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
 ENDFOREACH(file)

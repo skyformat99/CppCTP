@@ -3,6 +3,20 @@
 #include <list>
 #include <mongo/client/dbclient.h>
 #include <stdio.h>
+
+/*socket头文件*/
+#include <netdb.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
+#include <memory.h>
+#include <signal.h>
+#include <time.h>
+#include <pthread.h>
+#include <errno.h>
+#include <arpa/inet.h>  // inet_ntoa
+
 #include "ThostFtdcTraderApi.h"
 #include "TdSpi.h"
 #include "ThostFtdcMdApi.h"
@@ -16,10 +30,99 @@
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+#include "msg.h"
 
 using std::cout;
 using std::cin;
 using namespace rapidjson;
+
+/*宏定义*/
+#define MAXCONNECTIONS 100
+#define MAX_BUFFER_SIZE	30*1024
+
+int sockfd;
+
+/*信号处理*/
+void sig_handler(int signo) {
+	if (signo == SIGINT) {
+		printf("服务端已关闭!!!\n");
+		close(sockfd);
+		exit(1);
+	}
+}
+
+/*输出连接上来的客户端的相关信息*/
+void out_addr(struct sockaddr_in *clientaddr) {
+	//将端口从网络字节序转换成主机字节序
+	int port = ntohs(clientaddr->sin_port);
+	char ip[16];
+	memset(ip, 0, sizeof(ip));
+	//将ip地址从网络字节序转换成点分十进制
+	inet_ntop(AF_INET, &clientaddr->sin_addr.s_addr, ip, sizeof(ip));
+	printf("client: %s(%d) connected\n", ip, port);
+}
+
+/*输出服务器端时间*/
+void do_service(int fd) {
+	/*和客户端进行读写操作(双向通信)*/
+	char buff[MAX_BUFFER_SIZE];
+	printf("服务端开始监听...\n");
+	while (1)
+	{
+		memset(buff, 0, sizeof(buff));
+
+		size_t size;
+		//printf("sizeof buff is %d = \n", sizeof(buff));
+		if ((size = read_msg(fd, buff, sizeof(buff))) < 0) {
+			printf("protocal error");
+			break;
+		}
+		else if (size == 0) {
+			break;
+		}
+		else {
+			printf("服务端收到 = %s\n", buff);
+			//printf("socket_server send size = %d \n", strlen(buff));
+			//printf("socket_server fd = %d \n", fd);
+			//printf("socket_server send size = %d \n", sizeof(buff));
+			//printf("socket_server send size = %d \n", strlen(buff));
+			if (write_msg(fd, buff, sizeof(buff)) < 0) {
+				printf("先前客户端已断开!!!\n");
+				//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
+				if (errno == EPIPE) {
+					break;
+				}
+				perror("protocal error");
+			}
+		}
+	}
+}
+
+/*输出文件描述符*/
+void out_fd(int fd) {
+	struct sockaddr_in addr;
+	socklen_t len = sizeof(addr);
+	//从fd中获取连接的客户端相关信息
+	if (getpeername(fd, (struct sockaddr *)&addr, &len) < 0) {
+		perror("getpeername error");
+		return;
+	}
+	char ip[16];
+	memset(ip, 0, sizeof(ip));
+	int port = ntohs(addr.sin_port);
+	inet_ntop(AF_INET, &addr.sin_addr.s_addr, ip, sizeof(ip));
+	printf("来自ip地址:%16s(%5d) 已连接!!!\n", ip, port);
+}
+
+/*线程调用*/
+void *th_fn(void *arg) {
+	int fd = *(reinterpret_cast<int*>(arg));
+	out_fd(fd);
+	do_service(fd);
+	close(fd);
+
+	return (void *)0;
+}
 
 void printMenuEN() {
 	cout << "|==========================|" << endl;
@@ -142,809 +245,101 @@ void printFutureAccountOperateMenu() {
 	cout << "|==============================|" << endl;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
 
-	/************************************************************************/
-	/* 测试rapid json                                                        */
-	/************************************************************************/
-	// 1. 把 JSON 解析至 DOM。
-	const char* json = "{\"project\":\"rapidjson\",\"stars\":10}";
-
-	const char* json_txt = "{\"Flag\":0,\"VerCode\":112345678,\"UserID\":\"160001\",\"BrokerID\":\"0187\",\"InvestorID\":\"86001234\",\"Strategy\":{\"StrategyID\":[1,\"ON\",\"C\",1],\"ContractA\":\"cu1609\",\"ContractB\":\"cu1608\",\"LotsTotal\":10,\"LotsSingle\":2,\"SpreadSellOpen\":[50,\"ON\"],\"SpreadBuyClose\":[30,\"ON\"],\"SpreadBuyOpen\":[30,\"ON\"],\"SpreadSellClose\":[50,\"ON\"],\"ContractA_ShiftWait\":0,\"ContractB_ShiftWait\":2,\"SpreadShift\":1,\"SpreadSellHold\":[[0,0],[0,0],0],\"SpreadBuyHold\":[[0,0],[0,0],0],\"Msg\":\"nill\"}}";
-
-	Document d;
-	d.Parse(json);
-	// 2. 利用 DOM 作出修改。
-	Value& s = d["stars"];
-	s.SetInt(s.GetInt() + 1);
-	// 3. 把 DOM 转换（stringify）成 JSON。
-	StringBuffer buffer;
-	Writer<StringBuffer> writer(buffer);
-	d.Accept(writer);
-	// Output {"project":"rapidjson","stars":11}
-	std::cout << buffer.GetString() << std::endl;
-
-
-	Document document;
-	if (document.Parse(json_txt).HasParseError()) {
-		std::cout << "Parse Error" << std::endl;
+	if (argc < 2) {
+		printf("usage: %s #port\n", argv[0]);
+		exit(1);
 	}
-	assert(document.HasMember("Flag"));
-	std::cout << "Flag" << document["Flag"].GetInt() << endl;
-	std::cout << "VerCode" << document["VerCode"].GetInt() << endl;
-	std::cout << "BrokerID" << document["BrokerID"].GetString() << endl;
 
-	//const Value& ssh = document["SpreadSellHold"];
-	//std::cout << "" << ssh.IsArray() << std::endl;
-	//std::cout << "" << ssh[0][0].GetInt() << std::endl;
-	//std::cout << "" << ssh[0][1].GetInt() << std::endl;
+	if (signal(SIGINT, sig_handler) == SIG_ERR) {
+		perror("signal sigint error");
+		exit(1);
+	}
 
-	//while (1)
-	//{
-	//	;
-	//}
+	signal(SIGPIPE, SIG_IGN);
 
+	// 初始化mongoDB
 	mongo::client::initialize();
 
-	/************************************************************************/
-	/*   标准CTP：
-			Trade Front：180.168.146.187:10000，
-			Market Front：180.168.146.187:10010；【电信】
-		第二套：
-			交易前置：180.168.146.187:10030，
-			行情前置：180.168.146.187:10031；【7x24】                                                                   */
-	/************************************************************************/
-
-	string trade_frontAddr = "tcp://180.168.146.187:10000"; //仿真
-	string broker_id = "9999";
-	string user_id = "058176";
-	string password = "669822";
-
-	//string trade_frontAddr = "tcp://180.169.75.19:41205"; //实盘
-	//string broker_id = "0187";
-	//string user_id = "86001525";
-	//string password = "";
-	
-	string market_frontAddr = "tcp://180.168.146.187:10011"; //实盘
-
-
-	//CThostFtdcTraderApi *tdapi = CThostFtdcTraderApi::CreateFtdcTraderApi("./conn/user1/");
-	//TdSpi *tdspi = new TdSpi("/conn/user1/");
-
-	#if 0
-	CThostFtdcMdApi *mdapi = CThostFtdcMdApi::CreateFtdcMdApi("./conn/market");
-	MdSpi *mdspi = new MdSpi(mdapi);
-	mdspi->Connect(const_cast<char *>(market_frontAddr.c_str())); //Standard
-	sleep(1);
-	mdspi->Login(const_cast<char *>(broker_id.c_str()), const_cast<char *>(user_id.c_str()), const_cast<char *>(password.c_str()));
-
-	//订阅合约所以数量为3
-	string array[] = { "cu1608", "cu1609", "zn1608", "zn1609" };
-	cout << "total string size is:" << sizeof(array) / sizeof(string) << endl;
-	int size = sizeof(array) / sizeof(string);
-	char **instrumentID = new char *[size];
-	int i;
-	for (i = 0; i < size; i++) {
-		const char *charResult = array[i].c_str();
-		instrumentID[i] = new char[strlen(charResult) + 1];
-		strcpy(instrumentID[i], charResult);
-		//cout << instrumentID[i] << endl;
-		//usleep(500000);
-	}
-
-	//cout << instrumentID << endl;
-	//mdspi->SubMarketData(instrumentID, size);
-
-	sleep(2);
-#endif
-
-	/************************************************************************/
-	/* new multi accout test                                                */
-	/************************************************************************/
-
+	// 初始化CTP_Manager
 	CTP_Manager *ctp_m = new CTP_Manager();
-	//User *user1 = ctp_m->CreateAccount("tcp://180.168.146.187:10000", "9999", "058176", "669822");
-	
-	//sleep(1);
-	
-	//User *user2 = ctp_m->CreateAccount("tcp://180.168.146.187:10000", "9999", "063802", "123456");
-
-	//sleep(3);
-
-	/************************************************************************/
-	/* 测试行情                                                              */
-	/************************************************************************/
-	/*MdSpi *mdspi1 = ctp_m->CreateMd(market_frontAddr, broker_id, user_id, password);
-
-	list<string> l_instrument = ctp_m->addInstrument("cu1609", ctp_m->getL_Instrument());
-	l_instrument = ctp_m->addInstrument("ag1612", l_instrument);
-	l_instrument = ctp_m->addInstrument("cu1609", l_instrument);
-	l_instrument = ctp_m->addInstrument("cu1609", l_instrument);
-	l_instrument = ctp_m->addInstrument("cu1609", l_instrument);
-
-	ctp_m->submarketData(mdspi1, l_instrument);*/
-
-
-	/************************************************************************/
-	/*                                                                      */
-	/************************************************************************/
-
-	//string instrument = "cu1701";
-	//string instrument2 = "cu1609";
-	//user1->getUserTradeSPI()->QryDepthMarketData(instrument);
-	//sleep(1);
-	//user1->getUserTradeSPI()->QryDepthMarketData(instrument2);
-	//sleep(1);
-	////sleep()
-	//user2->getUserTradeSPI()->QryDepthMarketData(instrument);
-	//sleep(1);
-	//user2->getUserTradeSPI()->QryDepthMarketData(instrument2);
-
-	//if (mdapi) {
-	//	mdapi->RegisterSpi(NULL);
-	//	mdapi->Release();
-	//}
-	//if (mdspi) {
-	//	delete mdspi;
-	//}
-
-	/************************************************************************/
-	/* 测试DBmanager                                                         */
-	/************************************************************************/
-	
-	//DBManager *dbm = new DBManager();
-
-	//MarketConfig *mc = new MarketConfig("1", "tcp://180.168.146.187:10011", "9999", "058176", "123456");
-	//dbm->CreateMarketConfig(mc);
-	//dbm->DeleteMarketConfig(mc);
-	//dbm->UpdateMarketConfig(mc);
-	//MarketConfig *mc = dbm->getOneMarketConfig();
-	//cout << "Got The PassWord = " << mc->getPassword() << endl;
-
 
 	// 程序入口，初始化资源
-	ctp_m->init();
+	//ctp_m->init();
 
-	//Trader *op = new Trader();
-	//op->setIsActive("1");
-	//op->setTraderID("1111");
-	//op->setPassword("xxxx");
-	//op->setTraderName("lucas");
-	/// 增加策略
-	//Strategy *stg = new Strategy();
+	/*步骤1:创建socket(套接字)*/
+	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
-	//stg->setStgAWaitPriceTick(1);
-	//stg->setStgBWaitPriceTick(0);
-	//stg->setStgBuyClose(0);
-	//stg->setStgBuyOpen(-9000);
-	//stg->setStgInstrumentIdA("cu1711");
-	//stg->setStgInstrumentIdB("cu1712");
-	//stg->setStgIsActive(true);
-	//stg->setStgLots(10);
-	//stg->setStgLotsBatch(10);
-	//stg->setStgOnlyClose(false);
-	//stg->setStgOrderActionTiresLimit(400);
-	//stg->setStgOrderAlgorithm("01");
-	//stg->setStgPositionABuy(0);
-	//stg->setStgPositionABuyToday(0);
-	//stg->setStgPositionABuyYesterday(0);
-	//stg->setStgPositionASell(0);
-	//stg->setStgPositionASellToday(0);
-	//stg->setStgPositionASellYesterday(0);
-	//stg->setStgPositionBBuy(0);
-	//stg->setStgPositionBBuyToday(0);
-	//stg->setStgPositionBBuyYesterday(0);
-	//stg->setStgPositionBSell(0);
-	//stg->setStgPositionBSellToday(0);
-	//stg->setStgPositionBSellYesterday(0);
-	//stg->setStgSellClose(9000);
-	//stg->setStgSellOpen(-9000);
-	//stg->setStgSpreadShift(0);
-	//stg->setStgStopLoss(0);
-	//stg->setStgStrategyId("02");
-	//stg->setStgTraderId("1601");
-	//stg->setStgUserId("063802");
-	//
-	//dbm->CreateStrategy(stg);
+	/*socket选项设置*/
+	// a：设置套接字的属性使它能够在计算机重启的时候可以再次使用套接字的端口和IP
+	int err, sock_reuse = 1;
+	err = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &sock_reuse, sizeof(sock_reuse));
+	if (err != 0) {
+		printf("SO_REUSEADDR Setting Failed!\n");
+		exit(1);
+	}
+	// b：设置接收缓冲区大小
+	int nRecvBuf = MAX_BUFFER_SIZE; //数据最大长度
+	err = setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, (const char*)&nRecvBuf, sizeof(int));
+	if (err != 0) {
+		printf("SO_RCVBUF Setting Failed!\n");
+		exit(1);
+	}
+	// c：设置发送缓冲区大小
+	int nSendBuf = MAX_BUFFER_SIZE; //数据最大长度
+	err = setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, (const char*)&nSendBuf, sizeof(int));
+	if (err != 0) {
+		printf("SO_SNDBUF Setting Failed!\n");
+		exit(1);
+	}
 
-	//dbm->DeleteStrategy(stg);
+	/*步骤2:将socket和地址(包括ip,port)进行绑定*/
+	struct sockaddr_in serveraddr;
+	memset(&serveraddr, 0, sizeof(serveraddr));
+	/*向地址中填入ip,port,internet地址簇类型*/
+	serveraddr.sin_family = AF_INET; //ipv4
+	serveraddr.sin_port = htons(atoi(argv[1])); //port
+	serveraddr.sin_addr.s_addr = INADDR_ANY; //接收所有网卡地址
+	if (bind(sockfd, (struct sockaddr *)&serveraddr, sizeof(serveraddr)) < 0) {
+		perror("bind error");
+		exit(1);
+	}
 
-	//dbm->UpdateStrategy(stg);
+	/*步骤3:调用listen函数启动监听(指定port监听)
+	通知系统去接受来自客户端的连接请求
+	第二个参数:指定队列的长度*/
+	if (listen(sockfd, MAXCONNECTIONS) < 0) {
+		perror("listen error");
+		exit(1);
+	}
 
+	/*步骤4:调用accept函数从队列中获得一个客户端的连接请求，
+	并返回新的socket描述符*/
+	struct sockaddr_in clientaddr;
+	socklen_t clientaddr_len = sizeof(clientaddr);
 
-	///// 更新策略
-	//stg->setStrategyId("2");
-	//stg->setUserID("058176");
-	//stg->setTraderID("1");
-	//stg->setIsActive("1");
+	/*设置线程的分离属性*/
+	pthread_attr_t attr;
+	pthread_attr_init(&attr);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
-	//dbm->UpdateStrategy(stg);
-
-	///// 删除策略
-	//dbm->DeleteStrategy(stg);
-
-	///// 获取所有的策略
-	//list<Strategy *> *l_strategys = new list<Strategy *>();
-	//dbm->getAllStragegy(l_strategys);
-	//cout << "l_strategys size = " << l_strategys->size() << endl;
-
-	
-
-	//dbm->CreateTrader(op);
-	//dbm->DeleteTrader(op);
-	//dbm->UpdateTrader(op);
-	//dbm->SearchTraderByTraderID("1111");
-	//dbm->SearchTraderByTraderName("lucas");
-	//dbm->SearchTraderByTraderIdAndPassword("1111", "xxxx");
-	//cout << dbm->FindTraderByTraderIdAndPassword("1", "xxxx") << endl;
-
-	//FutureAccount *fa = new FutureAccount();
-	//fa->setBrokerID("9999");
-	//fa->setIsActive("1");
-	//fa->setTrader(op);
-	//fa->setUserID("058176");
-	//fa->setPassword("123456");
-	//fa->setFrontAddress("tcp://180.168.146.187:10011");
-
-	//dbm->CreateFutureAccount(op, fa);
-	//dbm->DeleteFutureAccount(op, fa);
-	//dbm->UpdateFutureAccount(op, fa);
-	//dbm->SearchFutrueByTraderID(op->getTraderID());
-	//dbm->SearchFutrueByUserID(fa->getUserID());
-
-	//list<FutureAccount *> *l_futureaccount = new list<FutureAccount *>();
-	//ctp_m->getDBManager()->SearchFutrueListByTraderID("1", l_futureaccount);
-	//list<FutureAccount *>::iterator itor;
-	//for (itor = l_futureaccount->begin(); itor != l_futureaccount->end(); itor++) {
-	//	cout << "l_futureaccount member : " << (*itor)->getUserID() << endl;
-	//}
-
-	string chooice;
-	string userid; //期货账户id
-
-	
-	Trader *op = new Trader();
-	FutureAccount *fa = new FutureAccount();
-	//list<FutureAccount *> *l_futureaccount = new list<FutureAccount *>();
-	
-	/*订阅行情*/
-
-	//MdSpi *mdspi1 = ctp_m->CreateMd(market_frontAddr, broker_id, user_id, password);
-
-	list<string> l_Sub_instrument;
-	list<string> l_UnSub_instrument;
-	/// 所有的策略列表
-	//list<Strategy *> *l_strategys = new list<Strategy *>();
-	//ctp_m->getDBManager()->getAllStragegy(l_strategys);
-
-	//mdspi1->setListStrategy(l_strategys);
-
-	//ctp_m->addInstrument("cu1609", ctp_m->getL_Instrument());
-	//printWelcome();
-	//printMenu();
 	while (1)
 	{
-		;
-	}
-	cin >> chooice;
-	
-#if 0
-	while (chooice != "q") {
-		/************************************************************************/
-		/* 交易员登陆           CreateMd                                          */
-		/************************************************************************/
-		if (chooice == "1") {
-			string traderid;
-			string traderpassword;
-			bool flag;
-			cout << "请输入交易员账号:" << endl;
-			cin >> traderid;
-			cout << "请输入交易员密码:" << endl;
-			cin >> traderpassword;
-
-			flag = ctp_m->TraderLogin(traderid, traderpassword);
-			if (flag) { //交易员登陆成功
-				printLoginSuccessMenu();
-				printFutureAccountListMenu();
-				op->setTraderID(traderid);
-				op->setPassword(traderpassword);
-
-				bool create_flag = false;
-				create_flag = ctp_m->checkInLTrader(traderid);
-				list<FutureAccount *> *l_futureaccount = new list<FutureAccount *>();
-				ctp_m->getDBManager()->SearchFutrueListByTraderID(traderid, l_futureaccount);
-				list<FutureAccount *>::iterator itor;
-				for (itor = l_futureaccount->begin(); itor != l_futureaccount->end(); itor++) {
-					cout << "【期货账户 : " << (*itor)->getUserID() << ", "
-						<< "经纪公司ID : " << (*itor)->getBrokerID() << ", "
-						<< "密码 : " << (*itor)->getPassword() << ", "
-						<< "交易前置地址 : " << (*itor)->getFrontAddress() << "】" << endl;
-					if (!create_flag) {
-						//将已登录的账户存入登陆列表里
-						ctp_m->addTraderToLTrader(traderid);
-					}
-				}
-
-				/************************************************************************/
-				/* 进入交易员操作界面                                                      */
-				/************************************************************************/
-				printLoginTraderOperatorMenu();
-				cin >> chooice;
-
-				while (chooice != "q") {
-					if (chooice == "1") {
-						cout << "账户查询" << endl;
-						list<string> *l_trader = ctp_m->getL_Trader();
-						list<string>::iterator itor;
-						for (itor = l_trader->begin(); itor != l_trader->end(); itor++) {
-							// 打印交易员id
-							cout << "【交易员账户 : " << (*itor) << "】" << endl;
-							//根据交易员id获取账户
-							list<FutureAccount *> *l_futureaccount = new list<FutureAccount *>();
-							ctp_m->getDBManager()->SearchFutrueListByTraderID((*itor), l_futureaccount);
-							list<FutureAccount *>::iterator inner_itor;
-							for (inner_itor = l_futureaccount->begin(); inner_itor != l_futureaccount->end(); inner_itor++) {
-								cout << "【期货账户:" << (*inner_itor)->getUserID() << "】" << endl;
-							}
-							delete l_futureaccount;
-						}
-					}
-					else if (chooice == "2") {
-						cout << "持仓查询" << endl;
-						//根据不同的期货账户User查找对应的持仓信息
-						if (ctp_m->getL_User()->size() == 0) {
-							cout << "NULL" << endl;
-						}
-						else {
-							cout << "NOT NULL" << endl;
-							list<User *>::iterator itor;
-							for (itor = ctp_m->getL_User()->begin(); itor != ctp_m->getL_User()->end(); itor++) {
-								cout << "【期货账户:" << (*itor)->getUserID() << "】" << endl;
-								(*itor)->getUserTradeSPI()->QryInvestorPosition();
-								sleep(1);
-								(*itor)->getUserTradeSPI()->QryInvestor();
-							}
-						}
-						
-					}
-					else if (chooice == "3") {
-						cout << "报单查询" << endl;
-						cout << "请输入期货账户ID" << endl;
-						cin >> userid;
-						//根据不同的期货账户User查找对应的持仓信息
-						if (ctp_m->getL_User()->size() == 0) {
-							cout << "NULL" << endl;
-						}
-						else {
-							cout << "NOT NULL" << endl;
-							list<User *>::iterator itor;
-							for (itor = ctp_m->getL_User()->begin(); itor != ctp_m->getL_User()->end(); itor++) {
-								cout << "【期货账户:" << (*itor)->getUserID() << "】" << endl;
-								if ((*itor)->getUserID() == userid) {
-									(*itor)->getUserTradeSPI()->QryOrder();
-								}
-							}
-						}
-					}
-					else if (chooice == "4") {
-						cout << "成交查询" << endl;
-						cout << "请输入期货账户ID" << endl;
-						cin >> userid;
-						//根据不同的期货账户User查找对应的持仓信息
-						if (ctp_m->getL_User()->size() == 0) {
-							cout << "NULL" << endl;
-						}
-						else {
-							cout << "NOT NULL" << endl;
-							list<User *>::iterator itor;
-							for (itor = ctp_m->getL_User()->begin(); itor != ctp_m->getL_User()->end(); itor++) {
-								cout << "【期货账户:" << (*itor)->getUserID() << "】" << endl;
-								if ((*itor)->getUserID() == userid) { //成交查询
-									(*itor)->getUserTradeSPI();
-								}
-							}
-						}
-					}
-					else if (chooice == "5") {
-						cout << "报单" << endl;
-						cout << "请输入期货账户ID" << endl;
-						cin >> userid;
-						//根据不同的期货账户User查找对应的持仓信息
-						if (ctp_m->getL_User()->size() == 0) {
-							cout << "NULL" << endl;
-						}
-						else {
-							cout << "NOT NULL" << endl;
-							list<User *>::iterator itor;
-							for (itor = ctp_m->getL_User()->begin(); itor != ctp_m->getL_User()->end(); itor++) {
-								cout << "【期货账户:" << (*itor)->getUserID() << "】" << endl;
-								if ((*itor)->getUserID() == userid) { // 开始下单
-									/*order insert*/
-									string order_InstrumentID;
-									char order_CombOffsetFlag;
-									char order_Direction;
-									int order_Volume;
-									double order_Price;
-									string order_OrderRef;
-
-									cout << "Order Insert Operation" << endl;
-									/************************************************************************/
-									/* Code Below  Order Insert                                             */
-									/************************************************************************/
-									cout << "Please input instrumentID, such as cu1609, zn1701..." << endl;
-									cin >> order_InstrumentID;
-									cout << "Please input Comboffsetflag" << endl;
-									cout << "0:Open 1:Close 2:ForceClose 3:CloseToday 4:CloseYesterday" << endl;
-									cin >> order_CombOffsetFlag;
-									cout << "Please input Direction" << endl;
-									cout << "0:Buy 1:Sell" << endl;
-									cin >> order_Direction;
-									cout << "Please input Volume, such as 10, 50, 100..." << endl;
-									cin >> order_Volume;
-									cout << "Please input Price" << endl;
-									cin >> order_Price;
-									cout << "Please input OrderRef, such as 1, 2, 3 or user specific" << endl;
-									cin >> order_OrderRef;
-
-									cout << "order_InstrumentID = " << order_InstrumentID << endl;
-									cout << "order_CombOffsetFlag = " << order_CombOffsetFlag << endl;
-									cout << "order_Direction = " << order_Direction << endl;
-									cout << "order_Volume = " << order_Volume << endl;
-									cout << "order_Price = " << order_Price << endl;
-									cout << "order_OrderRef = " << order_OrderRef << endl;
-									
-									(*itor)->getUserTradeSPI()->OrderInsert((*itor), const_cast<char *>(order_InstrumentID.c_str()), order_CombOffsetFlag, order_Direction, order_Volume, order_Price, order_OrderRef);
-								}
-							}
-						}
-
-					}
-					else if (chooice == "6") {
-						cout << "撤单" << endl;
-						cout << "请输入期货账户ID" << endl;
-						cin >> userid;
-						//根据不同的期货账户User查找对应的持仓信息
-						if (ctp_m->getL_User()->size() == 0) {
-							cout << "NULL" << endl;
-						}
-						else {
-							cout << "NOT NULL" << endl;
-							list<User *>::iterator itor;
-							for (itor = ctp_m->getL_User()->begin(); itor != ctp_m->getL_User()->end(); itor++) {
-								cout << "【期货账户:" << (*itor)->getUserID() << "】" << endl;
-								if ((*itor)->getUserID() == userid) { // 开始撤单
-									/*order action delete*/
-									string action_ExchangeId;
-									int action_int_ExchangeId;
-									string action_OrderRef;
-									string action_OrderSysId;
-
-									cout << "撤单操作" << endl;
-									/************************************************************************/
-									/* Code Below  Order Action                                             */
-									/************************************************************************/
-									cout << "请选择期货交易所" << endl;
-									cout << "1:上海期货交易所 2:大连商品交易所 3:郑州商品交易所 4:中国金融期货交易所" << endl;
-									cin >> action_int_ExchangeId;
-									cout << "请输入报单引用" << endl;
-									cin >> action_OrderRef;
-									cout << "请输入报单编号" << endl;
-									cin.ignore(0x7fffffff, '\n');
-									getline(cin, action_OrderSysId);
-
-									switch (action_int_ExchangeId)
-									{
-									case 1:action_ExchangeId = "SHFE"; break;
-									case 2:action_ExchangeId = "DCE"; break;
-									case 3:action_ExchangeId = "CZCE"; break;
-									case 4:action_ExchangeId = "CFFEX"; break;
-									default:
-										action_ExchangeId = "";
-										break;
-									}
-
-									cout << "action_ExchangeId = " << action_ExchangeId << endl;
-									cout << "action_OrderRef = " << action_OrderRef << endl;
-									cout << "action_OrderSysId = " << action_OrderSysId << endl;
-
-									(*itor)->getUserTradeSPI()->OrderAction(action_ExchangeId, action_OrderRef, action_OrderSysId);
-								}
-							}
-						}
-					}
-					else if (chooice == "7") {
-						cout << "订阅行情" << endl;
-						string instrumentid;
-						cout << "请输入你要订阅的合约id，例如cu1609" << endl;
-						cin >> instrumentid;
-						l_Sub_instrument = ctp_m->addSubInstrument(instrumentid, l_Sub_instrument);
-						int count = ctp_m->calInstrument(instrumentid, l_Sub_instrument);
-						USER_PRINT(count);
-						if (count == 0 || count == 1) {
-							ctp_m->SubmarketData(ctp_m->getMdSpi(), l_Sub_instrument);
-						}
-						else {
-							cout << "已经订阅该行情!" << endl;
-						}
-						
-					}
-					else if (chooice == "8") {
-						cout << "退订行情" << endl;
-						string instrumentid;
-						cout << "请输入你要退订的合约id，例如cu1609" << endl;
-						cin >> instrumentid;
-						l_Sub_instrument = ctp_m->delSubInstrument(instrumentid, l_Sub_instrument);
-						if ((ctp_m->calInstrument(instrumentid, l_Sub_instrument) <= 0)) { // 如果合约列表里没有了该项,那么就取消订阅
-							l_UnSub_instrument = ctp_m->addUnSubInstrument(instrumentid, l_UnSub_instrument);
-							if (l_UnSub_instrument.size() > 0) {
-								cout << "l_UnSub_instrument NOT NULL" << endl;
-							}
-							else {
-								cout << "l_UnSub_instrument NULL" << endl;
-							}
-							ctp_m->UnSubmarketData(ctp_m->getMdSpi(), l_UnSub_instrument);
-						}
-					}
-					else {
-						printErrorInputMenu();
-					}
-					/************************************************************************/
-					/* 进入交易员操作界面                                                      */
-					/************************************************************************/
-					printLoginTraderOperatorMenu();
-					cin >> chooice;
-				}
-
-			}
-			else { //登陆失败打印登陆失败菜单
-				printLoginFailedMenu();
-			}
-			
+		int fd = accept(sockfd, NULL, NULL);
+		if (fd < 0) {
+			perror("accept error");
+			continue;
 		}
-		/************************************************************************/
-		/* 管理员登陆                                                             */
-		/************************************************************************/
-		else if (chooice == "2") {
-			string adminid;
-			string adminpassword;
-			bool flag;
-			cout << "请输入管理员账号:" << endl;
-			cin >> adminid;
-			cout << "请输入管理员密码:" << endl;
-			cin >> adminpassword;
-			
-			flag = ctp_m->AdminLogin(adminid, adminpassword);
-			if (flag) {
-				printLoginSuccessMenu();
-				printAdminOperateMenu();
-				cin >> chooice;
-				while (chooice != "q")
-				{
-					if (chooice == "1") { //交易员管理
-						cout << "交易员管理" << endl;
-						printTraderOperateMenu();
-						cin >> chooice;
-						while (chooice != "q") {
-							if (chooice == "1") { //查询交易员
-								//ctp_m->getDBManager()->getAllTrader();
-								printTraderAccoutListMenu();
-								//ctp_m->getDBManager()->getAllTrader();
-							}
-							else if (chooice == "2") { //增加交易员
-
-								cout << "当前系统已存在交易员" << endl;
-								//ctp_m->getDBManager()->getAllTrader();
-								printTraderAccoutListMenu();
-								//ctp_m->getDBManager()->getAllTrader();
-
-								string tradername;
-								string password;
-								string traderid;
-								string isactive;
-								cout << "请输入交易员ID:" << endl;
-								cin >> traderid;
-								cout << "请输入交易员名字:" << endl;
-								cin >> tradername;
-								cout << "请输入交易员密码:" << endl;
-								cin >> password;
-								op->setTraderID(traderid);
-								op->setTraderName(tradername);
-								op->setPassword(password);
-								
-								//ctp_m->getDBManager()->CreateTrader(op);
-								ctp_m->getDBManager()->CreateTrader(op);
-
-								//delete op;
-							}
-							else if (chooice == "3") { //删除交易员
-								cout << "当前系统已存在交易员" << endl;
-								//打印当前存在的交易员
-								printTraderAccoutListMenu();
-								//ctp_m->getDBManager()->getAllTrader();
-
-								string traderid;
-								cout << "请输入要删除的交易员的ID" << endl;
-								cin >> traderid;
-								op->setTraderID(traderid);
-								ctp_m->getDBManager()->DeleteTrader(op);
-								
-							}
-							else if (chooice == "4") { //修改交易员
-								cout << "当前系统已存在交易员" << endl;
-								//打印当前存在的交易员
-								printTraderAccoutListMenu();
-								//ctp_m->getDBManager()->getAllTrader();
-
-								string tradername;
-								string password;
-								string traderid;
-								string new_traderid;
-								string isactive;
-								cout << "请输入交易员ID:" << endl;
-								cin >> traderid;
-								cout << "请输入交易员名字:" << endl;
-								cin >> tradername;
-								cout << "请输入交易员密码:" << endl;
-								cin >> password;
-								cout << "请输入交易员新ID:" << endl;
-								cin >> new_traderid;
-								cout << "请输入交易员激活状态" << endl;
-								cin >> isactive;
-								op->setTraderID(new_traderid);
-								op->setTraderName(tradername);
-								op->setPassword(password);
-								op->setIsActive(isactive);
-								ctp_m->getDBManager()->UpdateTrader(traderid, op);
-
-							}
-							else { //输入错误
-								printErrorInputMenu();
-							}
-							//继续在交易员管理进行循环
-							printTraderOperateMenu();
-							cin >> chooice;
-						}
-					}
-					else if (chooice == "2") { //期货账户管理
-						cout << "期货账户管理" << endl;
-						printFutureAccountOperateMenu();
-						cin >> chooice;
-						while (chooice != "q") {
-							if (chooice == "1") { //查询期货账户
-								printFutureAccountListMenu();
-								//ctp_m->getDBManager()->getAllFutureAccount();
-							}
-							else if (chooice == "2") { //增加期货账户
-								cout << "当前系统已存在交易员" << endl;
-								//打印当前存在的交易员
-								printTraderAccoutListMenu();
-								//ctp_m->getDBManager()->getAllTrader();
-
-								cout << "当前系统已存在期货账户" << endl;
-								//打印当前存在的期货账户
-								printFutureAccountListMenu();
-								//ctp_m->getDBManager()->getAllFutureAccount();
-
-								string userID;
-								string password;
-								string brokerID;
-								string traderID;
-								string frontAddress;
-								string isActive;
-								cout << "请输入所属交易员ID:" << endl;
-								cin >> traderID;
-								cout << "请输入期货账户ID:" << endl;
-								cin >> userID;
-								cout << "请输入密码:" << endl;
-								cin >> password;
-								cout << "请输入BrokerID:" << endl;
-								cin >> brokerID;
-								cout << "请输入交易行情前置地址:" << endl;
-								cin >> frontAddress;
-								//cout << "请输入是否激活" << endl;
-								//cin >> isActive;
-								
-								fa->setUserID(userID);
-								fa->setPassword(password);
-								fa->setBrokerID(brokerID);
-								fa->setTraderID(traderID);
-								fa->setFrontAddress(frontAddress);
-								//fa->setIsActive(isActive);
-								op->setTraderID(traderID);
-
-								ctp_m->getDBManager()->CreateFutureAccount(op, fa);
-
-							}
-							else if (chooice == "3") { //删除期货账户
-								cout << "当前系统已存在期货账户" << endl;
-								//打印当前存在的期货账户
-								printFutureAccountListMenu();
-								//ctp_m->getDBManager()->getAllFutureAccount();
-
-								string userID;
-								cout << "请输入账户ID:" << endl;
-								cin >> userID;
-
-								fa->setUserID(userID);
-								ctp_m->getDBManager()->DeleteFutureAccount(fa);
-							}
-							else if (chooice == "4") { //修改期货账户
-								cout << "当前系统已存在交易员" << endl;
-								//打印当前存在的交易员
-								printTraderAccoutListMenu();
-								//ctp_m->getDBManager()->getAllTrader();
-
-								cout << "当前系统已存在期货账户" << endl;
-								//打印当前存在的期货账户
-								printFutureAccountListMenu();
-								//ctp_m->getDBManager()->getAllFutureAccount();
-
-								string userID;
-								string new_userID;
-								string password;
-								string brokerID;
-								string traderID;
-								string frontAddress;
-								string isActive;
-								cout << "请输入所属交易员ID:" << endl;
-								cin >> traderID;
-								cout << "请输入期货账户ID:" << endl;
-								cin >> userID;
-								cout << "请输入密码:" << endl;
-								cin >> password;
-								cout << "请输入BrokerID:" << endl;
-								cin >> brokerID;
-								cout << "请输入账户新ID:" << endl;
-								cin >> new_userID;
-								cout << "请输入交易行情前置地址:" << endl;
-								cin >> frontAddress;
-								cout << "请输入是否激活" << endl;
-								cin >> isActive;
-
-								fa->setUserID(new_userID);
-								fa->setPassword(password);
-								fa->setBrokerID(brokerID);
-								fa->setTraderID(traderID);
-								fa->setFrontAddress(frontAddress);
-								fa->setIsActive(isActive);
-								op->setTraderID(traderID);
-
-
-								ctp_m->getDBManager()->UpdateFutureAccount(userID, op, fa);
-							}
-							else { //输入错误
-								printErrorInputMenu();
-							}
-							//继续在期货账户管理进行循环
-							printFutureAccountOperateMenu();
-							cin >> chooice;
-						}
-					}
-					else {
-						printErrorInputMenu();
-					}
-					/************************************************************************/
-					/* 进入管理员操作菜单                                                      */
-					/************************************************************************/
-					printAdminOperateMenu();
-					cin >> chooice;
-				}
-
-
-
-			}
-			else {
-				printLoginFailedMenu();
-			}
+		/*步骤5:启动子线程去调用IO函数(read/write)和连接的客户端进行双向通信*/
+		pthread_t th;
+		int err;
+		/*以分离状态启动子线程*/
+		if ((err = pthread_create(&th, &attr, th_fn, &fd)) != 0) {
+			perror("pthread create error");
 		}
-		else {
-			printErrorInputMenu();
-		}
-
-		printMenu();
-		cin >> chooice;
+		pthread_attr_destroy(&attr);
 	}
 
-#endif
 	return 0;
 }

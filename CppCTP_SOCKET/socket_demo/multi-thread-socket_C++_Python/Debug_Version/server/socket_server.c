@@ -9,10 +9,12 @@
 #include <time.h>
 #include <pthread.h>
 #include <errno.h>
+#include <arpa/inet.h>  // inet_ntoa
 #include "msg.h"
 
 #define MAXCONNECTIONS 100
 #define MAX_BUFFER_SIZE	30*1024
+
 int sockfd;
 
 void sig_handler(int signo) {

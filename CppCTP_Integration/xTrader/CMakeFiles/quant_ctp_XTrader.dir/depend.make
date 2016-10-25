@@ -188,6 +188,7 @@ CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: Trader.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: User.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: Utils.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: main.cpp
+CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: msg.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: rapidjson/allocators.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: rapidjson/document.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: rapidjson/encodedstream.h
@@ -212,4 +213,7 @@ CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: rapidjson/reader.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: rapidjson/stream.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: rapidjson/stringbuffer.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: rapidjson/writer.h
+
+CMakeFiles/quant_ctp_XTrader.dir/msg.cpp.o: msg.cpp
+CMakeFiles/quant_ctp_XTrader.dir/msg.cpp.o: msg.h
 

@@ -29,6 +29,14 @@ RAPIDJSON_DIAG_PUSH
 #ifdef _MSC_VER
 RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
 RAPIDJSON_DIAG_OFF(4244) // conversion from kXxxFlags to 'uint16_t', possible loss of data
+#ifdef _MINWINDEF_       // see: http://stackoverflow.com/questions/22744262/cant-call-stdmax-because-minwindef-h-defines-max
+#ifndef NOMINMAX
+#pragma push_macro("min")
+#pragma push_macro("max")
+#undef min
+#undef max
+#endif
+#endif
 #endif
 
 #ifdef __clang__
@@ -671,6 +679,9 @@ public:
 
     //! Constructor for double value.
     explicit GenericValue(double d) RAPIDJSON_NOEXCEPT : data_() { data_.n.d = d; data_.f.flags = kNumberDoubleFlag; }
+
+    //! Constructor for float value.
+    explicit GenericValue(float f) RAPIDJSON_NOEXCEPT : data_() { data_.n.d = static_cast<double>(f); data_.f.flags = kNumberDoubleFlag; }
 
     //! Constructor for constant string (i.e. do not make a copy of string)
     GenericValue(const Ch* s, SizeType length) RAPIDJSON_NOEXCEPT : data_() { SetStringRaw(StringRef(s, length)); }
@@ -1671,7 +1682,7 @@ public:
     GenericValue& SetInt64(int64_t i64)     { this->~GenericValue(); new (this) GenericValue(i64);  return *this; }
     GenericValue& SetUint64(uint64_t u64)   { this->~GenericValue(); new (this) GenericValue(u64);  return *this; }
     GenericValue& SetDouble(double d)       { this->~GenericValue(); new (this) GenericValue(d);    return *this; }
-    GenericValue& SetFloat(float f)         { this->~GenericValue(); new (this) GenericValue(f);    return *this; }
+    GenericValue& SetFloat(float f)         { this->~GenericValue(); new (this) GenericValue(static_cast<double>(f)); return *this; }
 
     //@}
 
@@ -2570,6 +2581,12 @@ private:
 };
 
 RAPIDJSON_NAMESPACE_END
+#ifdef _MINWINDEF_       // see: http://stackoverflow.com/questions/22744262/cant-call-stdmax-because-minwindef-h-defines-max
+#ifndef NOMINMAX
+#pragma pop_macro("min")
+#pragma pop_macro("max")
+#endif
+#endif
 RAPIDJSON_DIAG_POP
 
 #endif // RAPIDJSON_DOCUMENT_H_

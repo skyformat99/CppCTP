@@ -10,7 +10,7 @@ The output was:
 
 Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
 
-The C compiler identification is GNU, found in "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/2.8.12.2/CompilerIdC/a.out"
+The C compiler identification is GNU, found in "/root/xTrader/CMakeFiles/2.8.12.2/CompilerIdC/a.out"
 
 Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
 Compiler: /usr/bin/c++ 
@@ -23,38 +23,44 @@ The output was:
 
 Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
 
-The CXX compiler identification is GNU, found in "/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/2.8.12.2/CompilerIdCXX/a.out"
+The CXX compiler identification is GNU, found in "/root/xTrader/CMakeFiles/2.8.12.2/CompilerIdCXX/a.out"
 
 Determining if the C compiler works passed with the following output:
-Change Dir: /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp
+Change Dir: /root/xTrader/CMakeFiles/CMakeTmp
 
-Run Build Command:/usr/bin/gmake "cmTryCompileExec3038776965/fast"
+Run Build Command:/usr/bin/gmake "cmTryCompileExec3699976245/fast"
 gmake[1]: Entering directory `/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp'
-/usr/bin/gmake -f CMakeFiles/cmTryCompileExec3038776965.dir/build.make CMakeFiles/cmTryCompileExec3038776965.dir/build
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec3699976245.dir/build.make CMakeFiles/cmTryCompileExec3699976245.dir/build
+gmake[1]: Warning: File `Makefile' has modification time 45 s in the future
 gmake[2]: Entering directory `/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp'
-/usr/bin/cmake -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp/CMakeFiles 1
-Building C object CMakeFiles/cmTryCompileExec3038776965.dir/testCCompiler.c.o
-/usr/bin/cc    -o CMakeFiles/cmTryCompileExec3038776965.dir/testCCompiler.c.o   -c /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp/testCCompiler.c
-Linking C executable cmTryCompileExec3038776965
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3038776965.dir/link.txt --verbose=1
-/usr/bin/cc       CMakeFiles/cmTryCompileExec3038776965.dir/testCCompiler.c.o  -o cmTryCompileExec3038776965 -rdynamic 
+gmake[2]: Warning: File `CMakeFiles/cmTryCompileExec3699976245.dir/flags.make' has modification time 45 s in the future
+/usr/bin/cmake -E cmake_progress_report /root/xTrader/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec3699976245.dir/testCCompiler.c.o
+/usr/bin/cc    -o CMakeFiles/cmTryCompileExec3699976245.dir/testCCompiler.c.o   -c /root/xTrader/CMakeFiles/CMakeTmp/testCCompiler.c
+Linking C executable cmTryCompileExec3699976245
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3699976245.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTryCompileExec3699976245.dir/testCCompiler.c.o  -o cmTryCompileExec3699976245 -rdynamic 
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
 gmake[2]: Leaving directory `/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp'
+gmake[1]: warning:  Clock skew detected.  Your build may be incomplete.
 gmake[1]: Leaving directory `/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp'
 
 
 Detecting C compiler ABI info compiled with the following output:
-Change Dir: /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp
+Change Dir: /root/xTrader/CMakeFiles/CMakeTmp
 
-Run Build Command:/usr/bin/gmake "cmTryCompileExec954267918/fast"
+Run Build Command:/usr/bin/gmake "cmTryCompileExec803169287/fast"
 gmake[1]: Entering directory `/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp'
-/usr/bin/gmake -f CMakeFiles/cmTryCompileExec954267918.dir/build.make CMakeFiles/cmTryCompileExec954267918.dir/build
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec803169287.dir/build.make CMakeFiles/cmTryCompileExec803169287.dir/build
+gmake[1]: Warning: File `Makefile' has modification time 45 s in the future
 gmake[2]: Entering directory `/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp'
-/usr/bin/cmake -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp/CMakeFiles 1
-Building C object CMakeFiles/cmTryCompileExec954267918.dir/CMakeCCompilerABI.c.o
-/usr/bin/cc    -o CMakeFiles/cmTryCompileExec954267918.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake/Modules/CMakeCCompilerABI.c
-Linking C executable cmTryCompileExec954267918
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec954267918.dir/link.txt --verbose=1
-/usr/bin/cc     -v CMakeFiles/cmTryCompileExec954267918.dir/CMakeCCompilerABI.c.o  -o cmTryCompileExec954267918 -rdynamic  
+gmake[2]: Warning: File `CMakeFiles/cmTryCompileExec803169287.dir/flags.make' has modification time 45 s in the future
+/usr/bin/cmake -E cmake_progress_report /root/xTrader/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec803169287.dir/CMakeCCompilerABI.c.o
+/usr/bin/cc    -o CMakeFiles/cmTryCompileExec803169287.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake/Modules/CMakeCCompilerABI.c
+Linking C executable cmTryCompileExec803169287
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec803169287.dir/link.txt --verbose=1
+/usr/bin/cc     -v CMakeFiles/cmTryCompileExec803169287.dir/CMakeCCompilerABI.c.o  -o cmTryCompileExec803169287 -rdynamic  
 Using built-in specs.
 Target: x86_64-redhat-linux
 Configured with: ../configure --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=http://bugzilla.redhat.com/bugzilla --enable-bootstrap --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-languages=c,c++,objc,obj-c++,java,fortran,ada --enable-java-awt=gtk --disable-dssi --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-1.5.0.0/jre --enable-libgcj-multifile --enable-java-maintainer-mode --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --disable-libjava-multilib --with-ppl --with-cloog --with-tune=generic --with-arch_32=i686 --build=x86_64-redhat-linux
@@ -62,26 +68,30 @@ Thread model: posix
 gcc version 4.4.7 20120313 (Red Hat 4.4.7-4) (GCC) 
 COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/:/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec954267918' '-rdynamic' '-mtune=generic'
- /usr/libexec/gcc/x86_64-redhat-linux/4.4.7/collect2 --eh-frame-hdr --build-id -m elf_x86_64 --hash-style=gnu -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTryCompileExec954267918 /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crt1.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtbegin.o -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../.. CMakeFiles/cmTryCompileExec954267918.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtend.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec803169287' '-rdynamic' '-mtune=generic'
+ /usr/libexec/gcc/x86_64-redhat-linux/4.4.7/collect2 --eh-frame-hdr --build-id -m elf_x86_64 --hash-style=gnu -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTryCompileExec803169287 /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crt1.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtbegin.o -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../.. CMakeFiles/cmTryCompileExec803169287.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtend.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crtn.o
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
 gmake[2]: Leaving directory `/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp'
+gmake[1]: warning:  Clock skew detected.  Your build may be incomplete.
 gmake[1]: Leaving directory `/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp'
 
 
 Parsed C implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
-  ignore line: [Change Dir: /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp]
+  ignore line: [Change Dir: /root/xTrader/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command:/usr/bin/gmake "cmTryCompileExec954267918/fast"]
+  ignore line: [Run Build Command:/usr/bin/gmake "cmTryCompileExec803169287/fast"]
   ignore line: [gmake[1]: Entering directory `/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp']
-  ignore line: [/usr/bin/gmake -f CMakeFiles/cmTryCompileExec954267918.dir/build.make CMakeFiles/cmTryCompileExec954267918.dir/build]
+  ignore line: [/usr/bin/gmake -f CMakeFiles/cmTryCompileExec803169287.dir/build.make CMakeFiles/cmTryCompileExec803169287.dir/build]
+  ignore line: [gmake[1]: Warning: File `Makefile' has modification time 45 s in the future]
   ignore line: [gmake[2]: Entering directory `/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp']
-  ignore line: [/usr/bin/cmake -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp/CMakeFiles 1]
-  ignore line: [Building C object CMakeFiles/cmTryCompileExec954267918.dir/CMakeCCompilerABI.c.o]
-  ignore line: [/usr/bin/cc    -o CMakeFiles/cmTryCompileExec954267918.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake/Modules/CMakeCCompilerABI.c]
-  ignore line: [Linking C executable cmTryCompileExec954267918]
-  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec954267918.dir/link.txt --verbose=1]
-  ignore line: [/usr/bin/cc     -v CMakeFiles/cmTryCompileExec954267918.dir/CMakeCCompilerABI.c.o  -o cmTryCompileExec954267918 -rdynamic  ]
+  ignore line: [gmake[2]: Warning: File `CMakeFiles/cmTryCompileExec803169287.dir/flags.make' has modification time 45 s in the future]
+  ignore line: [/usr/bin/cmake -E cmake_progress_report /root/xTrader/CMakeFiles/CMakeTmp/CMakeFiles 1]
+  ignore line: [Building C object CMakeFiles/cmTryCompileExec803169287.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/bin/cc    -o CMakeFiles/cmTryCompileExec803169287.dir/CMakeCCompilerABI.c.o   -c /usr/share/cmake/Modules/CMakeCCompilerABI.c]
+  ignore line: [Linking C executable cmTryCompileExec803169287]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec803169287.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/cc     -v CMakeFiles/cmTryCompileExec803169287.dir/CMakeCCompilerABI.c.o  -o cmTryCompileExec803169287 -rdynamic  ]
   ignore line: [Using built-in specs.]
   ignore line: [Target: x86_64-redhat-linux]
   ignore line: [Configured with: ../configure --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=http://bugzilla.redhat.com/bugzilla --enable-bootstrap --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-languages=c,c++,objc,obj-c++,java,fortran,ada --enable-java-awt=gtk --disable-dssi --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-1.5.0.0/jre --enable-libgcj-multifile --enable-java-maintainer-mode --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --disable-libjava-multilib --with-ppl --with-cloog --with-tune=generic --with-arch_32=i686 --build=x86_64-redhat-linux]
@@ -89,8 +99,8 @@ Parsed C implicit link information from above output:
   ignore line: [gcc version 4.4.7 20120313 (Red Hat 4.4.7-4) (GCC) ]
   ignore line: [COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/:/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/]
   ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../:/lib/:/usr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec954267918' '-rdynamic' '-mtune=generic']
-  link line: [ /usr/libexec/gcc/x86_64-redhat-linux/4.4.7/collect2 --eh-frame-hdr --build-id -m elf_x86_64 --hash-style=gnu -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTryCompileExec954267918 /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crt1.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtbegin.o -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../.. CMakeFiles/cmTryCompileExec954267918.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtend.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crtn.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec803169287' '-rdynamic' '-mtune=generic']
+  link line: [ /usr/libexec/gcc/x86_64-redhat-linux/4.4.7/collect2 --eh-frame-hdr --build-id -m elf_x86_64 --hash-style=gnu -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTryCompileExec803169287 /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crt1.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtbegin.o -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../.. CMakeFiles/cmTryCompileExec803169287.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtend.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crtn.o]
     arg [/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/collect2] ==> ignore
     arg [--eh-frame-hdr] ==> ignore
     arg [--build-id] ==> ignore
@@ -101,7 +111,7 @@ Parsed C implicit link information from above output:
     arg [-dynamic-linker] ==> ignore
     arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTryCompileExec954267918] ==> ignore
+    arg [cmTryCompileExec803169287] ==> ignore
     arg [/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crt1.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crti.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtbegin.o] ==> ignore
@@ -111,7 +121,7 @@ Parsed C implicit link information from above output:
     arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
     arg [-L/usr/lib/../lib64] ==> dir [/usr/lib/../lib64]
     arg [-L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../..] ==> dir [/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../..]
-    arg [CMakeFiles/cmTryCompileExec954267918.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [CMakeFiles/cmTryCompileExec803169287.dir/CMakeCCompilerABI.c.o] ==> ignore
     arg [-lgcc] ==> lib [gcc]
     arg [--as-needed] ==> ignore
     arg [-lgcc_s] ==> lib [gcc_s]
@@ -139,35 +149,41 @@ Parsed C implicit link information from above output:
 
 
 Determining if the CXX compiler works passed with the following output:
-Change Dir: /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp
+Change Dir: /root/xTrader/CMakeFiles/CMakeTmp
 
-Run Build Command:/usr/bin/gmake "cmTryCompileExec2689931683/fast"
+Run Build Command:/usr/bin/gmake "cmTryCompileExec1440557375/fast"
 gmake[1]: Entering directory `/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp'
-/usr/bin/gmake -f CMakeFiles/cmTryCompileExec2689931683.dir/build.make CMakeFiles/cmTryCompileExec2689931683.dir/build
+gmake[1]: Warning: File `Makefile' has modification time 45 s in the future
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec1440557375.dir/build.make CMakeFiles/cmTryCompileExec1440557375.dir/build
 gmake[2]: Entering directory `/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp'
-/usr/bin/cmake -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp/CMakeFiles 1
-Building CXX object CMakeFiles/cmTryCompileExec2689931683.dir/testCXXCompiler.cxx.o
-/usr/bin/c++     -o CMakeFiles/cmTryCompileExec2689931683.dir/testCXXCompiler.cxx.o -c /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
-Linking CXX executable cmTryCompileExec2689931683
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec2689931683.dir/link.txt --verbose=1
-/usr/bin/c++        CMakeFiles/cmTryCompileExec2689931683.dir/testCXXCompiler.cxx.o  -o cmTryCompileExec2689931683 -rdynamic 
+gmake[2]: Warning: File `CMakeFiles/cmTryCompileExec1440557375.dir/flags.make' has modification time 45 s in the future
+/usr/bin/cmake -E cmake_progress_report /root/xTrader/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec1440557375.dir/testCXXCompiler.cxx.o
+/usr/bin/c++     -o CMakeFiles/cmTryCompileExec1440557375.dir/testCXXCompiler.cxx.o -c /root/xTrader/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTryCompileExec1440557375
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec1440557375.dir/link.txt --verbose=1
+/usr/bin/c++        CMakeFiles/cmTryCompileExec1440557375.dir/testCXXCompiler.cxx.o  -o cmTryCompileExec1440557375 -rdynamic 
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
 gmake[2]: Leaving directory `/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp'
+gmake[1]: warning:  Clock skew detected.  Your build may be incomplete.
 gmake[1]: Leaving directory `/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp'
 
 
 Detecting CXX compiler ABI info compiled with the following output:
-Change Dir: /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp
+Change Dir: /root/xTrader/CMakeFiles/CMakeTmp
 
-Run Build Command:/usr/bin/gmake "cmTryCompileExec3492849290/fast"
+Run Build Command:/usr/bin/gmake "cmTryCompileExec684976920/fast"
 gmake[1]: Entering directory `/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp'
-/usr/bin/gmake -f CMakeFiles/cmTryCompileExec3492849290.dir/build.make CMakeFiles/cmTryCompileExec3492849290.dir/build
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec684976920.dir/build.make CMakeFiles/cmTryCompileExec684976920.dir/build
+gmake[1]: Warning: File `Makefile' has modification time 45 s in the future
 gmake[2]: Entering directory `/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp'
-/usr/bin/cmake -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp/CMakeFiles 1
-Building CXX object CMakeFiles/cmTryCompileExec3492849290.dir/CMakeCXXCompilerABI.cpp.o
-/usr/bin/c++     -o CMakeFiles/cmTryCompileExec3492849290.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp
-Linking CXX executable cmTryCompileExec3492849290
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3492849290.dir/link.txt --verbose=1
-/usr/bin/c++      -v CMakeFiles/cmTryCompileExec3492849290.dir/CMakeCXXCompilerABI.cpp.o  -o cmTryCompileExec3492849290 -rdynamic  
+gmake[2]: Warning: File `CMakeFiles/cmTryCompileExec684976920.dir/flags.make' has modification time 45 s in the future
+/usr/bin/cmake -E cmake_progress_report /root/xTrader/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec684976920.dir/CMakeCXXCompilerABI.cpp.o
+/usr/bin/c++     -o CMakeFiles/cmTryCompileExec684976920.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp
+Linking CXX executable cmTryCompileExec684976920
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec684976920.dir/link.txt --verbose=1
+/usr/bin/c++      -v CMakeFiles/cmTryCompileExec684976920.dir/CMakeCXXCompilerABI.cpp.o  -o cmTryCompileExec684976920 -rdynamic  
 Using built-in specs.
 Target: x86_64-redhat-linux
 Configured with: ../configure --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=http://bugzilla.redhat.com/bugzilla --enable-bootstrap --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-languages=c,c++,objc,obj-c++,java,fortran,ada --enable-java-awt=gtk --disable-dssi --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-1.5.0.0/jre --enable-libgcj-multifile --enable-java-maintainer-mode --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --disable-libjava-multilib --with-ppl --with-cloog --with-tune=generic --with-arch_32=i686 --build=x86_64-redhat-linux
@@ -175,26 +191,30 @@ Thread model: posix
 gcc version 4.4.7 20120313 (Red Hat 4.4.7-4) (GCC) 
 COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/:/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../:/lib/:/usr/lib/
-COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec3492849290' '-rdynamic' '-shared-libgcc' '-mtune=generic'
- /usr/libexec/gcc/x86_64-redhat-linux/4.4.7/collect2 --eh-frame-hdr --build-id -m elf_x86_64 --hash-style=gnu -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTryCompileExec3492849290 /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crt1.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtbegin.o -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../.. CMakeFiles/cmTryCompileExec3492849290.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtend.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec684976920' '-rdynamic' '-shared-libgcc' '-mtune=generic'
+ /usr/libexec/gcc/x86_64-redhat-linux/4.4.7/collect2 --eh-frame-hdr --build-id -m elf_x86_64 --hash-style=gnu -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTryCompileExec684976920 /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crt1.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtbegin.o -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../.. CMakeFiles/cmTryCompileExec684976920.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtend.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crtn.o
+gmake[2]: warning:  Clock skew detected.  Your build may be incomplete.
 gmake[2]: Leaving directory `/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp'
+gmake[1]: warning:  Clock skew detected.  Your build may be incomplete.
 gmake[1]: Leaving directory `/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp'
 
 
 Parsed CXX implicit link information from above output:
   link line regex: [^( *|.*[/\])(ld|([^/\]+-)?ld|collect2)[^/\]*( |$)]
-  ignore line: [Change Dir: /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp]
+  ignore line: [Change Dir: /root/xTrader/CMakeFiles/CMakeTmp]
   ignore line: []
-  ignore line: [Run Build Command:/usr/bin/gmake "cmTryCompileExec3492849290/fast"]
+  ignore line: [Run Build Command:/usr/bin/gmake "cmTryCompileExec684976920/fast"]
   ignore line: [gmake[1]: Entering directory `/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp']
-  ignore line: [/usr/bin/gmake -f CMakeFiles/cmTryCompileExec3492849290.dir/build.make CMakeFiles/cmTryCompileExec3492849290.dir/build]
+  ignore line: [/usr/bin/gmake -f CMakeFiles/cmTryCompileExec684976920.dir/build.make CMakeFiles/cmTryCompileExec684976920.dir/build]
+  ignore line: [gmake[1]: Warning: File `Makefile' has modification time 45 s in the future]
   ignore line: [gmake[2]: Entering directory `/mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp']
-  ignore line: [/usr/bin/cmake -E cmake_progress_report /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/CMakeTmp/CMakeFiles 1]
-  ignore line: [Building CXX object CMakeFiles/cmTryCompileExec3492849290.dir/CMakeCXXCompilerABI.cpp.o]
-  ignore line: [/usr/bin/c++     -o CMakeFiles/cmTryCompileExec3492849290.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
-  ignore line: [Linking CXX executable cmTryCompileExec3492849290]
-  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec3492849290.dir/link.txt --verbose=1]
-  ignore line: [/usr/bin/c++      -v CMakeFiles/cmTryCompileExec3492849290.dir/CMakeCXXCompilerABI.cpp.o  -o cmTryCompileExec3492849290 -rdynamic  ]
+  ignore line: [gmake[2]: Warning: File `CMakeFiles/cmTryCompileExec684976920.dir/flags.make' has modification time 45 s in the future]
+  ignore line: [/usr/bin/cmake -E cmake_progress_report /root/xTrader/CMakeFiles/CMakeTmp/CMakeFiles 1]
+  ignore line: [Building CXX object CMakeFiles/cmTryCompileExec684976920.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/usr/bin/c++     -o CMakeFiles/cmTryCompileExec684976920.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Linking CXX executable cmTryCompileExec684976920]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec684976920.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/c++      -v CMakeFiles/cmTryCompileExec684976920.dir/CMakeCXXCompilerABI.cpp.o  -o cmTryCompileExec684976920 -rdynamic  ]
   ignore line: [Using built-in specs.]
   ignore line: [Target: x86_64-redhat-linux]
   ignore line: [Configured with: ../configure --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=http://bugzilla.redhat.com/bugzilla --enable-bootstrap --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-languages=c,c++,objc,obj-c++,java,fortran,ada --enable-java-awt=gtk --disable-dssi --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-1.5.0.0/jre --enable-libgcj-multifile --enable-java-maintainer-mode --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --disable-libjava-multilib --with-ppl --with-cloog --with-tune=generic --with-arch_32=i686 --build=x86_64-redhat-linux]
@@ -202,8 +222,8 @@ Parsed CXX implicit link information from above output:
   ignore line: [gcc version 4.4.7 20120313 (Red Hat 4.4.7-4) (GCC) ]
   ignore line: [COMPILER_PATH=/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/:/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/:/usr/libexec/gcc/x86_64-redhat-linux/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/]
   ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../:/lib/:/usr/lib/]
-  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec3492849290' '-rdynamic' '-shared-libgcc' '-mtune=generic']
-  link line: [ /usr/libexec/gcc/x86_64-redhat-linux/4.4.7/collect2 --eh-frame-hdr --build-id -m elf_x86_64 --hash-style=gnu -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTryCompileExec3492849290 /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crt1.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtbegin.o -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../.. CMakeFiles/cmTryCompileExec3492849290.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtend.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crtn.o]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTryCompileExec684976920' '-rdynamic' '-shared-libgcc' '-mtune=generic']
+  link line: [ /usr/libexec/gcc/x86_64-redhat-linux/4.4.7/collect2 --eh-frame-hdr --build-id -m elf_x86_64 --hash-style=gnu -export-dynamic -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTryCompileExec684976920 /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crt1.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtbegin.o -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../.. CMakeFiles/cmTryCompileExec684976920.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtend.o /usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crtn.o]
     arg [/usr/libexec/gcc/x86_64-redhat-linux/4.4.7/collect2] ==> ignore
     arg [--eh-frame-hdr] ==> ignore
     arg [--build-id] ==> ignore
@@ -214,7 +234,7 @@ Parsed CXX implicit link information from above output:
     arg [-dynamic-linker] ==> ignore
     arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
     arg [-o] ==> ignore
-    arg [cmTryCompileExec3492849290] ==> ignore
+    arg [cmTryCompileExec684976920] ==> ignore
     arg [/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crt1.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../lib64/crti.o] ==> ignore
     arg [/usr/lib/gcc/x86_64-redhat-linux/4.4.7/crtbegin.o] ==> ignore
@@ -224,7 +244,7 @@ Parsed CXX implicit link information from above output:
     arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
     arg [-L/usr/lib/../lib64] ==> dir [/usr/lib/../lib64]
     arg [-L/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../..] ==> dir [/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../..]
-    arg [CMakeFiles/cmTryCompileExec3492849290.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [CMakeFiles/cmTryCompileExec684976920.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
     arg [-lstdc++] ==> lib [stdc++]
     arg [-lm] ==> lib [m]
     arg [-lgcc_s] ==> lib [gcc_s]

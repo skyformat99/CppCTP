@@ -42,10 +42,10 @@ EQUALS = =
 CMAKE_EDIT_COMMAND = /usr/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader
+CMAKE_SOURCE_DIR = /root/xTrader
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader
+CMAKE_BINARY_DIR = /root/xTrader
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -72,9 +72,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/xTrader/CMakeFiles /root/xTrader/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/xTrader/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -426,6 +426,30 @@ main.cpp.s:
 	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+msg.o: msg.cpp.o
+.PHONY : msg.o
+
+# target to build an object file
+msg.cpp.o:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/msg.cpp.o
+.PHONY : msg.cpp.o
+
+msg.i: msg.cpp.i
+.PHONY : msg.i
+
+# target to preprocess a source file
+msg.cpp.i:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/msg.cpp.i
+.PHONY : msg.cpp.i
+
+msg.s: msg.cpp.s
+.PHONY : msg.s
+
+# target to generate assembly for a file
+msg.cpp.s:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/msg.cpp.s
+.PHONY : msg.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -474,6 +498,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... msg.o"
+	@echo "... msg.i"
+	@echo "... msg.s"
 .PHONY : help
 
 
