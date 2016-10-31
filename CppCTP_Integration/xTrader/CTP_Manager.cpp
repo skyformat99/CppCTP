@@ -1,11 +1,24 @@
+#include <errno.h>
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
 #include "CTP_Manager.h"
 #include "User.h"
 #include "Utils.h"
 #include "Debug.h"
+#include "msg.h"
 
+using namespace rapidjson;
+
+static DBManager *static_dbm = new DBManager();
+
+#define MSG_SEND_FLAG 1
+
+int server_msg_ref = 0;
 
 CTP_Manager::CTP_Manager() {
 	this->on_off = 0;
+	//this->dbm = new DBManager();
 	this->dbm = new DBManager();
 	this->l_user = new list<User *>();
 	this->l_trader = new list<string>();
@@ -32,18 +45,18 @@ bool CTP_Manager::AdminLogin(string adminid, string password) {
 User * CTP_Manager::CreateAccount(User *user) {
 	USER_PRINT("CTP_Manager::CreateAccount");
 	//tcp://180.168.146.187:10030 //24H
-	//tcp://180.168.146.187:10000 //ÊµÅÌ·ÂÕæ
+	//tcp://180.168.146.187:10000 //å®ç›˜ä»¿çœŸ
 
 	if (user != NULL) {
 		TdSpi *tdspi = new TdSpi();
 
 		//User *user = new User(td_frontAddress, td_broker, td_user, td_pass, td_user, TraderID);
 
-		/*ÉèÖÃapi*/
+		/*è®¾ç½®api*/
 		string flowpath = "conn/td/" + user->getUserID() + "/";
 		int flag = Utils::CreateFolder(flowpath.c_str());
 		if (flag != 0) {
-			cout << "ÎŞ·¨´´½¨ÓÃ»§Á÷ÎÄ¼ş!" << endl;
+			cout << "æ— æ³•åˆ›å»ºç”¨æˆ·æµæ–‡ä»¶!" << endl;
 			return NULL;
 		}
 		else {
@@ -83,11 +96,11 @@ MdSpi * CTP_Manager::CreateMd(string md_frontAddress, string md_broker, string m
 	int pos = md_frontAddress.find_first_of(':', 0);
 	md_frontAddress.replace(pos, 1, "_");
 
-	/*ÉèÖÃapi*/
+	/*è®¾ç½®api*/
 	string flowpath = "conn/md/" + md_frontAddress + "/";
 	int flag = Utils::CreateFolder(flowpath.c_str());
 	if (flag != 0) {
-		cout << "ÎŞ·¨´´½¨ĞĞÇéÁ÷ÎÄ¼ş!" << endl;
+		cout << "æ— æ³•åˆ›å»ºè¡Œæƒ…æµæ–‡ä»¶!" << endl;
 		return NULL;
 	} else {
 		mdapi = CThostFtdcMdApi::CreateFtdcMdApi(flowpath.c_str());
@@ -101,17 +114,17 @@ MdSpi * CTP_Manager::CreateMd(string md_frontAddress, string md_broker, string m
 	return mdspi;
 }
 
-/// ÊÍ·Å
+/// é‡Šæ”¾
 void CTP_Manager::ReleaseAccount(User *user) {
 	if (user) {
-		// ÊÍ·ÅUserApi
+		// é‡Šæ”¾UserApi
 		if (user->getUserTradeAPI())
 		{
 			user->getUserTradeAPI()->RegisterSpi(NULL);
 			user->getUserTradeAPI()->Release();
 			user->setUserTradeAPI(NULL);
 		}
-		// ÊÍ·ÅUserSpiÊµÀı   
+		// é‡Šæ”¾UserSpiå®ä¾‹   
 		if (user->getUserTradeSPI())
 		{
 			delete user->getUserTradeSPI();
@@ -120,21 +133,21 @@ void CTP_Manager::ReleaseAccount(User *user) {
 	}
 }
 
-/// ¶©ÔÄĞĞÇé
+/// è®¢é˜…è¡Œæƒ…
 void CTP_Manager::SubmarketData(MdSpi *mdspi, list<string> *l_instrument) {
 	if (mdspi && (l_instrument->size() > 0)) {
 		mdspi->SubMarket(l_instrument);
 	}
 }
 
-/// ÍË¶©ºÏÔ¼
+/// é€€è®¢åˆçº¦
 void CTP_Manager::UnSubmarketData(MdSpi *mdspi, string instrumentID, list<string > *l_unsubinstrument) {
 	if (mdspi && (this->l_instrument->size() > 0)) {
-		/// ´ÓºÏÔ¼ÁĞ±íÀïÉ¾³ıÒ»¸ö
+		/// ä»åˆçº¦åˆ—è¡¨é‡Œåˆ é™¤ä¸€ä¸ª
 		this->delSubInstrument(instrumentID, this->l_instrument);
-		/// Í³¼ÆºÏÔ¼µÄ¸öÊı
+		/// ç»Ÿè®¡åˆçº¦çš„ä¸ªæ•°
 		int count = this->calInstrument(instrumentID, this->l_instrument);
-		/// Èç¹ûºÏÔ¼¸öÊıÎª0,±ØĞëÍË¶©
+		/// å¦‚æœåˆçº¦ä¸ªæ•°ä¸º0,å¿…é¡»é€€è®¢
 		if (count == 0) {
 			this->l_unsubinstrument->push_back(instrumentID);
 			mdspi->UnSubMarket(this->l_unsubinstrument);
@@ -143,14 +156,14 @@ void CTP_Manager::UnSubmarketData(MdSpi *mdspi, string instrumentID, list<string
 	}
 }
 
-/// Ìí¼Ó¶©ÔÄºÏÔ¼
+/// æ·»åŠ è®¢é˜…åˆçº¦
 list<string> * CTP_Manager::addSubInstrument(string instrumentID, list<string > *l_instrument) {
 	l_instrument->push_back(instrumentID);
 	USER_PRINT(l_instrument->size());
 	return l_instrument;
 }
 
-/// É¾³ı¶©ÔÄºÏÔ¼
+/// åˆ é™¤è®¢é˜…åˆçº¦
 list<string> * CTP_Manager::delSubInstrument(string instrumentID, list<string > *l_instrument) {
 	USER_PRINT(l_instrument->size());
 	if (l_instrument->size() > 0) {
@@ -175,7 +188,7 @@ list<string> * CTP_Manager::delSubInstrument(string instrumentID, list<string > 
 	return l_instrument;
 }
 
-/// Í³¼ÆºÏÔ¼ÊıÁ¿
+/// ç»Ÿè®¡åˆçº¦æ•°é‡
 int CTP_Manager::calInstrument(string instrumentID, list<string> *l_instrument) {
 	int count = 0;
 	if (l_instrument->size() > 0) {
@@ -193,7 +206,7 @@ int CTP_Manager::calInstrument(string instrumentID, list<string> *l_instrument) 
 	return count;
 }
 
-/// ÍË¶©ºÏÔ¼Ôö¼Ó
+/// é€€è®¢åˆçº¦å¢åŠ 
 list<string> CTP_Manager::addUnSubInstrument(string instrumentID, list<string> l_instrument) {
 	if (l_instrument.size() > 0) {
 		l_instrument.clear();
@@ -202,22 +215,22 @@ list<string> CTP_Manager::addUnSubInstrument(string instrumentID, list<string> l
 	return l_instrument;
 }
 
-/// µÃµ½l_instrument
+/// å¾—åˆ°l_instrument
 list<string> * CTP_Manager::getL_Instrument() {
 	return this->l_instrument;
 }
 
-/// µÃµ½Êı¾İ¿â²Ù×÷¶ÔÏó
+/// å¾—åˆ°æ•°æ®åº“æ“ä½œå¯¹è±¡
 DBManager * CTP_Manager::getDBManager() {
 	return this->dbm;
 }
 
-/// ÉèÖÃl_trader
+/// è®¾ç½®l_trader
 void CTP_Manager::addTraderToLTrader(string trader) {
 	this->l_trader->push_back(trader);
 }
 
-/// »ñÈ¡traderÊÇ·ñÔÚl_traderÀï
+/// è·å–traderæ˜¯å¦åœ¨l_traderé‡Œ
 bool CTP_Manager::checkInLTrader(string trader) {
 	bool flag = false;
 	list<string>::iterator Itor;
@@ -229,17 +242,17 @@ bool CTP_Manager::checkInLTrader(string trader) {
 	return flag;
 }
 
-/// µÃµ½l_trader
+/// å¾—åˆ°l_trader
 list<string> *CTP_Manager::getL_Trader() {
 	return this->l_trader;
 }
 
-/// µÃµ½l_obj_trader
+/// å¾—åˆ°l_obj_trader
 list<Trader *> * CTP_Manager::getL_Obj_Trader() {
 	return this->l_obj_trader;
 }
 
-/// ÒÆ³ıÔªËØ
+/// ç§»é™¤å…ƒç´ 
 void CTP_Manager::removeFromLTrader(string trader) {
 	list<string>::iterator Itor;
 	for (Itor = this->l_trader->begin(); Itor != this->l_trader->end();) {
@@ -252,7 +265,7 @@ void CTP_Manager::removeFromLTrader(string trader) {
 	}
 }
 
-/// Ôö¼ÓÓÃ»§ÆÚ»õÕË»§
+/// å¢åŠ ç”¨æˆ·æœŸè´§è´¦æˆ·
 void CTP_Manager::addFuturesToTrader(string traderid, User *user) {
 	map<string, list<User *> *>::iterator m_itor;
 	m_itor = this->m_trader.find(traderid);
@@ -268,37 +281,37 @@ void CTP_Manager::addFuturesToTrader(string traderid, User *user) {
 		
 }
 
-/// »ñÈ¡ÆÚ»õÕË»§map
+/// è·å–æœŸè´§è´¦æˆ·map
 map<string, list<User *> *> CTP_Manager::getTraderMap() {
 	return this->m_trader;
 }
 
-/// ·µ»ØÓÃ»§ÁĞ±í
+/// è¿”å›ç”¨æˆ·åˆ—è¡¨
 list<User *> *CTP_Manager::getL_User() {
 	return this->l_user;
 }
 
-/// µÃµ½strategy_list
+/// å¾—åˆ°strategy_list
 list<Strategy *> * CTP_Manager::getListStrategy() {
 	return this->l_strategys;
 }
 
-/// ÉèÖÃstrategy_list
+/// è®¾ç½®strategy_list
 void CTP_Manager::setListStrategy(list<Strategy *> *l_strategys) {
 	this->l_strategys = l_strategys;
 }
 
-/// ÉèÖÃmdspi
+/// è®¾ç½®mdspi
 void CTP_Manager::setMdSpi(MdSpi *mdspi) {
 	this->mdspi = mdspi;
 }
 
-/// »ñµÃmdspi
+/// è·å¾—mdspi
 MdSpi * CTP_Manager::getMdSpi() {
 	return this->mdspi;
 }
 
-/// ÉèÖÃ¿ª¹Ø
+/// è®¾ç½®å¼€å…³
 int CTP_Manager::getOn_Off() {
 	return this->on_off;
 }
@@ -307,27 +320,321 @@ void CTP_Manager::setOn_Off(int on_off) {
 	this->on_off = on_off;
 }
 
-/// ³õÊ¼»¯
+/// å¤„ç†å®¢æˆ·ç«¯å‘æ¥çš„æ¶ˆæ¯
+void CTP_Manager::HandleMessage(int fd, char *msg_tmp) {
+	//std::cout << "HandleMessage fd = " << fd << std::endl;
+	std::cout << "æœåŠ¡ç«¯æ”¶åˆ°çš„æ•°æ® = " << msg_tmp << std::endl;
+
+	const char *rsp_msg;
+
+	rapidjson::Document doc;
+	rapidjson::Document build_doc;
+	rapidjson::StringBuffer buffer;
+	rapidjson::Writer<StringBuffer> writer(buffer);
+
+	//doc.Parse(msg);
+
+	char msg[sizeof(msg_tmp)];
+	memset(msg, 0x00, sizeof(msg));
+	strcpy(msg, msg_tmp);
+
+	if (doc.ParseInsitu(msg).HasParseError()) {
+		std::cout << "json parse error" << std::endl;
+		return;
+	}
+	
+	if (!doc.HasMember("MsgType")) {
+		std::cout << "json had no msgtype" << std::endl;
+		return;
+	}
+
+	rapidjson::Value& s = doc["MsgType"];
+
+	int msgtype = s.GetInt();
+
+	if (msgtype == 1) { // TraderInfo
+		std::cout << "è¯·æ±‚äº¤æ˜“ç™»å½•..." << std::endl;
+		rapidjson::Value &TraderID = doc["TraderID"];
+		rapidjson::Value &Password = doc["Password"];
+		rapidjson::Value &MsgRef = doc["MsgRef"];
+		rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
+		rapidjson::Value &MsgSrc = doc["MsgSrc"];
+		string s_TraderID = TraderID.GetString();
+		string s_Password = Password.GetString();
+		int i_MsgRef = MsgRef.GetInt();
+		int i_MsgSendFlag = MsgSendFlag.GetInt();
+		int i_MsgSrc = MsgSrc.GetInt();
+		
+		std::cout << "æ”¶åˆ°äº¤æ˜“å‘˜ID = " << s_TraderID << std::endl;
+		std::cout << "æ”¶åˆ°äº¤æ˜“å‘˜å¯†ç  = " << s_Password << std::endl;
+
+		bool isTraderExists = static_dbm->FindTraderByTraderIdAndPassword(s_TraderID, s_Password);
+		if (isTraderExists) { // ç”¨æˆ·å­˜åœ¨
+			std::cout << "äº¤æ˜“å‘˜å­˜åœ¨..." << std::endl;
+			build_doc.SetObject();
+			rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
+			build_doc.AddMember("MsgRef", server_msg_ref++, allocator);
+			build_doc.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator);
+			build_doc.AddMember("MsgType", 1, allocator);
+			build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
+			build_doc.AddMember("MsgResult", 0, allocator);
+			build_doc.AddMember("MsgErrorReason", "", allocator);
+			build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
+		}
+		else {
+			std::cout << "äº¤æ˜“å‘˜ä¸å­˜åœ¨..." << std::endl;
+			build_doc.SetObject();
+			rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
+
+			build_doc.AddMember("MsgRef", server_msg_ref++, allocator);
+			build_doc.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator);
+			build_doc.AddMember("MsgType", 1, allocator);
+			build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
+			build_doc.AddMember("MsgResult", 1, allocator);
+			build_doc.AddMember("MsgErrorReason", "No Trader Find!", allocator);
+			build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
+		}
+	}
+	else if (msgtype == 2) { // UserInfo
+		std::cout << "è¯·æ±‚è´¦æˆ·ä¿¡æ¯..." << std::endl;
+		rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
+		rapidjson::Value &TraderID = doc["TraderID"];
+		rapidjson::Value &MsgRef = doc["MsgRef"];
+		rapidjson::Value &MsgSrc = doc["MsgSrc"];
+
+		string s_TraderID = TraderID.GetString();
+		int i_MsgRef = MsgRef.GetInt();
+		int i_MsgSendFlag = MsgSendFlag.GetInt();
+		int i_MsgSrc = MsgSrc.GetInt();
+
+		std::cout << "æ”¶åˆ°äº¤æ˜“å‘˜ID = " << s_TraderID << std::endl;
+		list<FutureAccount *> l_futureaccount;
+		static_dbm->SearchFutrueListByTraderID(s_TraderID, &l_futureaccount);
+
+		/*æ„å»ºUserInfoçš„Json*/
+		build_doc.SetObject();
+		rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
+		build_doc.AddMember("MsgRef", server_msg_ref++, allocator);
+		build_doc.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator);
+		build_doc.AddMember("MsgType", 2, allocator);
+		build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
+		build_doc.AddMember("MsgResult", 0, allocator);
+		build_doc.AddMember("MsgErrorReason", "", allocator);
+		//åˆ›å»ºInfoæ•°ç»„
+		rapidjson::Value info_array(rapidjson::kArrayType);
+
+		list<FutureAccount *>::iterator future_itor;
+		for (future_itor = l_futureaccount.begin(); future_itor != l_futureaccount.end(); future_itor++) {
+
+			rapidjson::Value info_object(rapidjson::kObjectType);
+			info_object.SetObject();
+			info_object.AddMember("brokerid", rapidjson::StringRef((*future_itor)->getBrokerID().c_str()), allocator);
+			info_object.AddMember("traderid", rapidjson::StringRef((*future_itor)->getTraderID().c_str()), allocator);
+			info_object.AddMember("password", rapidjson::StringRef((*future_itor)->getPassword().c_str()), allocator);
+			info_object.AddMember("userid", rapidjson::StringRef((*future_itor)->getUserID().c_str()), allocator);
+			info_object.AddMember("frontaddress", rapidjson::StringRef((*future_itor)->getFrontAddress().c_str()), allocator);
+
+			info_array.PushBack(info_object, allocator);
+		}
+
+		build_doc.AddMember("Info", info_array, allocator);
+		build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
+
+	}
+	else if (msgtype == 3) { // åˆ›å»ºStrategyInfo
+		std::cout << "è¯·æ±‚æŸ¥è¯¢ç­–ç•¥ä¿¡æ¯..." << std::endl;
+
+		rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
+		rapidjson::Value &TraderID = doc["TraderID"];
+		rapidjson::Value &MsgRef = doc["MsgRef"];
+		rapidjson::Value &MsgSrc = doc["MsgSrc"];
+		rapidjson::Value &UserID = doc["UserID"];
+
+		string s_TraderID = TraderID.GetString();
+		int i_MsgRef = MsgRef.GetInt();
+		int i_MsgSendFlag = MsgSendFlag.GetInt();
+		int i_MsgSrc = MsgSrc.GetInt();
+		string s_UserID = UserID.GetString();
+
+		std::cout << "æ”¶åˆ°äº¤æ˜“å‘˜ID = " << s_TraderID << std::endl;
+		std::cout << "æ”¶åˆ°æœŸè´§è´¦æˆ·ID = " << s_UserID << std::endl;
+
+		list<Strategy *> l_strategys;
+		static_dbm->getAllStrategy(&l_strategys, s_TraderID, s_UserID);
+
+		/*æ„å»ºStrategyInfoçš„Json*/
+		build_doc.SetObject();
+		rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
+		build_doc.AddMember("MsgRef", server_msg_ref++, allocator);
+		build_doc.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator);
+		build_doc.AddMember("MsgType", 3, allocator);
+		build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
+		build_doc.AddMember("MsgResult", 0, allocator);
+		build_doc.AddMember("MsgErrorReason", "", allocator);
+		//åˆ›å»ºInfoæ•°ç»„
+		rapidjson::Value info_array(rapidjson::kArrayType);
+
+		list<Strategy *>::iterator stg_itor;
+		for (stg_itor = l_strategys.begin(); stg_itor != l_strategys.end(); stg_itor++) {
+
+			rapidjson::Value info_object(rapidjson::kObjectType);
+			info_object.SetObject();
+			info_object.AddMember("position_a_sell_today", (*stg_itor)->getStgPositionASellToday(), allocator);
+			info_object.AddMember("position_b_sell", (*stg_itor)->getStgPositionBSell(), allocator);
+			info_object.AddMember("spread_shift", (*stg_itor)->getStgSpreadShift(), allocator);
+			info_object.AddMember("position_b_sell_today", (*stg_itor)->getStgPositionBSellToday(), allocator);
+			info_object.AddMember("position_b_buy_today", (*stg_itor)->getStgPositionBBuyToday(), allocator);
+			info_object.AddMember("position_a_sell", (*stg_itor)->getStgPositionASell(), allocator);
+			info_object.AddMember("buy_close", (*stg_itor)->getStgBuyClose(), allocator);
+			info_object.AddMember("stop_loss", (*stg_itor)->getStgStopLoss(), allocator);
+			info_object.AddMember("position_b_buy_yesterday", (*stg_itor)->getStgPositionBBuyYesterday(), allocator);
+			info_object.AddMember("is_active", (*stg_itor)->isStgIsActive(), allocator);
+			info_object.AddMember("position_b_sell_yesterday", (*stg_itor)->getStgPositionBSellYesterday(), allocator);
+			info_object.AddMember("strategy_id", rapidjson::StringRef((*stg_itor)->getStgStrategyId().c_str()), allocator);
+			info_object.AddMember("position_b_buy", (*stg_itor)->getStgPositionBBuy(), allocator);
+			info_object.AddMember("lots_batch", (*stg_itor)->getStgLotsBatch(), allocator);
+			info_object.AddMember("position_a_buy", (*stg_itor)->getStgPositionABuy(), allocator);
+			info_object.AddMember("sell_open", (*stg_itor)->getStgSellOpen(), allocator);
+			info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator);
+			info_object.AddMember("trader_id", rapidjson::StringRef((*stg_itor)->getStgTraderId().c_str()), allocator);
+			info_object.AddMember("order_action_tires_limit", (*stg_itor)->getStgOrderActionTiresLimit(), allocator);
+			info_object.AddMember("sell_close", (*stg_itor)->getStgSellClose(), allocator);
+			info_object.AddMember("buy_open", (*stg_itor)->getStgBuyOpen(), allocator);
+			info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator);
+			
+			rapidjson::Value instrument_array(rapidjson::kArrayType);
+			for (int j = 0; j < 2; j++) {
+				rapidjson::Value instrument_object(rapidjson::kObjectType);
+				instrument_object.SetObject();
+				if (j == 0) {
+					instrument_object.SetString(rapidjson::StringRef((*stg_itor)->getStgInstrumentIdA().c_str()));
+				}
+				else if (j == 1) {
+					instrument_object.SetString(rapidjson::StringRef((*stg_itor)->getStgInstrumentIdB().c_str()));
+				}
+
+				instrument_array.PushBack(instrument_object, allocator);
+			}
+			info_object.AddMember("list_instrument_id", instrument_array, allocator);
+			info_object.AddMember("position_a_buy_yesterday", (*stg_itor)->getStgPositionABuyYesterday(), allocator);
+			info_object.AddMember("user_id", rapidjson::StringRef((*stg_itor)->getStgUserId().c_str()), allocator);
+			info_object.AddMember("position_a_buy_today", (*stg_itor)->getStgPositionABuyToday(), allocator);
+			info_object.AddMember("position_a_sell_yesterday", (*stg_itor)->getStgPositionASellYesterday(), allocator);
+			info_object.AddMember("lots", (*stg_itor)->getStgLots(), allocator);
+			info_object.AddMember("a_wait_price_tick", (*stg_itor)->getStgAWaitPriceTick(), allocator);
+			info_object.AddMember("b_wait_price_tick", (*stg_itor)->getStgBWaitPriceTick(), allocator);
+
+			info_array.PushBack(info_object, allocator);
+		}
+
+		build_doc.AddMember("Info", info_array, allocator);
+		build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
+		
+	}
+	else if (msgtype == 4) { // marketè¡Œæƒ…æ¥å£å‚æ•°ä¿¡æ¯
+		std::cout << "è¯·æ±‚è¡Œæƒ…æ¥å£é…ç½®ä¿¡æ¯..." << std::endl;
+
+		rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
+		rapidjson::Value &TraderID = doc["TraderID"];
+		rapidjson::Value &MsgRef = doc["MsgRef"];
+		rapidjson::Value &MsgSrc = doc["MsgSrc"];
+
+		string s_TraderID = TraderID.GetString();
+		int i_MsgRef = MsgRef.GetInt();
+		int i_MsgSendFlag = MsgSendFlag.GetInt();
+		int i_MsgSrc = MsgSrc.GetInt();
+
+		std::cout << "æ”¶åˆ°äº¤æ˜“å‘˜ID = " << s_TraderID << std::endl;
+
+		list<MarketConfig *> l_marketconfig;
+		static_dbm->getAllMarketConfig(&l_marketconfig);
+
+		/*æ„å»ºMarketInfoçš„Json*/
+		build_doc.SetObject();
+		rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
+		build_doc.AddMember("MsgRef", server_msg_ref++, allocator);
+		build_doc.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator);
+		build_doc.AddMember("MsgType", 4, allocator);
+		build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
+		build_doc.AddMember("MsgResult", 0, allocator);
+		build_doc.AddMember("MsgErrorReason", "", allocator);
+		//åˆ›å»ºInfoæ•°ç»„
+		rapidjson::Value info_array(rapidjson::kArrayType);
+
+		list<MarketConfig *>::iterator market_itor;
+		for (market_itor = l_marketconfig.begin(); market_itor != l_marketconfig.end(); market_itor++) {
+
+			rapidjson::Value info_object(rapidjson::kObjectType);
+			info_object.SetObject();
+			info_object.AddMember("brokerid", rapidjson::StringRef((*market_itor)->getMarketID().c_str()), allocator);
+			info_object.AddMember("traderid", rapidjson::StringRef((*market_itor)->getMarketFrontAddr().c_str()), allocator);
+			info_object.AddMember("password", rapidjson::StringRef((*market_itor)->getBrokerID().c_str()), allocator);
+			info_object.AddMember("userid", rapidjson::StringRef((*market_itor)->getUserID().c_str()), allocator);
+			info_object.AddMember("frontaddress", rapidjson::StringRef((*market_itor)->getPassword().c_str()), allocator);
+
+			info_array.PushBack(info_object, allocator);
+		}
+
+		build_doc.AddMember("Info", info_array, allocator);
+		build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
+
+		
+	}
+	else if (msgtype == 5) { // ä¿®æ”¹Strategyï¼ˆä¿®æ”¹Strategyå‚æ•°ï¼‰
+		std::cout << "è¯·æ±‚ç­–ç•¥ä¿®æ”¹..." << std::endl;
+	}
+	else if (msgtype == 6) { // æ–°å»ºStrategyï¼ˆä¿®æ”¹Strategyå‚æ•°ï¼‰
+		std::cout << "æ–°å»ºç­–ç•¥..." << std::endl;
+	}
+	else if (msgtype == 7) { // åˆ é™¤Strategyï¼ˆä¿®æ”¹Strategyå‚æ•°ï¼‰
+		std::cout << "åˆ é™¤ç­–ç•¥..." << std::endl;
+	}
+	else {
+		std::cout << "è¯·æ±‚ç±»å‹é”™è¯¯!" << endl;
+	}
+
+	
+	build_doc.Accept(writer);
+	//rsp_msg = const_cast<char *>(buffer.GetString());
+	std::cout << "æœåŠ¡ç«¯å“åº”æ•°æ® = " << buffer.GetString() << std::endl;
+	if (buffer.GetString() == NULL) {
+		std::cout << "æœåŠ¡ç«¯æ”¶åˆ°é”™è¯¯ç±»å‹!" << std::endl;
+	}
+	else {
+		if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
+			printf("å…ˆå‰å®¢æˆ·ç«¯å·²æ–­å¼€!!!\n");
+			//printf("errorno = %d, å…ˆå‰å®¢æˆ·ç«¯å·²æ–­å¼€!!!\n", errno);
+			if (errno == EPIPE) {
+				std::cout << "EPIPE" << std::endl;
+				//break;
+			}
+			perror("protocal error");
+		}
+	}
+	
+}
+
+/// åˆå§‹åŒ–
 void CTP_Manager::init() {
-	/// Êı¾İ¿â²éÑ¯ËùÓĞµÄTrader
+	/// æ•°æ®åº“æŸ¥è¯¢æ‰€æœ‰çš„Trader
 	this->dbm->getAllTrader(this->l_trader);
 
-	/// ²éÑ¯ËùÓĞµÄ²ßÂÔ
-	this->dbm->getAllStragegy(this->l_strategys);
+	/// æŸ¥è¯¢æ‰€æœ‰çš„ç­–ç•¥
+	this->dbm->getAllStrategy(this->l_strategys);
 
-	/// ²éÑ¯ËùÓĞµÄÆÚ»õÕË»§
+	/// æŸ¥è¯¢æ‰€æœ‰çš„æœŸè´§è´¦æˆ·
 	this->dbm->getAllFutureAccount(this->l_user);
 
-	/// °ó¶¨²Ù×÷,²ßÂÔ°ó¶¨µ½¶ÔÓ¦ÆÚ»õÕË»§ÏÂ
+	/// ç»‘å®šæ“ä½œ,ç­–ç•¥ç»‘å®šåˆ°å¯¹åº”æœŸè´§è´¦æˆ·ä¸‹
 	list<User *>::iterator user_itor;
 	list<Strategy *>::iterator stg_itor;
 	USER_PRINT("Iterator USERS");
-	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // ±éÀúUser
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // éå†User
 		
 		USER_PRINT((*user_itor)->getUserID());
 
 		USER_PRINT("Iterator STRATEGIES");
-		for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // ±éÀúStrategy
+		for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // éå†Strategy
 			USER_PRINT((*stg_itor)->getStgUserId());
 			if ((*stg_itor)->getStgUserId() == (*user_itor)->getUserID()) {
 				USER_PRINT("Strategy Bind To User");
@@ -337,49 +644,49 @@ void CTP_Manager::init() {
 				USER_PRINT((*stg_itor)->getStgUser());
 			}
 		}
-		/// ±éÀúÉèÖµºó½øĞĞTD³õÊ¼»¯
+		/// éå†è®¾å€¼åè¿›è¡ŒTDåˆå§‹åŒ–
 		this->CreateAccount((*user_itor));
 		sleep(5);
 		std::cout << "Account : " << (*user_itor)->getUserID() << " Init OK!" << std::endl;
 	}
 
 
-	/// ±éÀúUser,¶ÔTdSpi½øĞĞStrategy_List¸³Öµ
-	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // ±éÀúUser
+	/// éå†User,å¯¹TdSpiè¿›è¡ŒStrategy_Listèµ‹å€¼
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // éå†User
 		USER_PRINT((*user_itor)->getUserID());
 		(*user_itor)->getUserTradeSPI()->setListStrategy(this->l_strategys);
 	}
 
-	/// µÚÒ»¸öÔªËØ this->l_user->front()
+	/// ç¬¬ä¸€ä¸ªå…ƒç´  this->l_user->front()
 
-	/// ²éÑ¯ºÏÔ¼¼Û¸ñ×îĞ¡Ìø
-	/// ±éÀúUser,¶ÔTdSpi½øĞĞStrategy_List¸³Öµ
-	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // ±éÀúUser
+	/// æŸ¥è¯¢åˆçº¦ä»·æ ¼æœ€å°è·³
+	/// éå†User,å¯¹TdSpiè¿›è¡ŒStrategy_Listèµ‹å€¼
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // éå†User
 		USER_PRINT((*user_itor)->getUserID());
 		(*user_itor)->getUserTradeSPI()->QryInstrument();
 	}
 
-	/// ¶Ô²ßÂÔºÏÔ¼¼Û¸ñ×îĞ¡Ìø¸³Öµ
-	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // ±éÀúUser
+	/// å¯¹ç­–ç•¥åˆçº¦ä»·æ ¼æœ€å°è·³èµ‹å€¼
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // éå†User
 		(*user_itor)->setStgInstrumnetPriceTick();
 	}
 
-	/// ĞĞÇé³õÊ¼»¯
+	/// è¡Œæƒ…åˆå§‹åŒ–
 	MarketConfig *mc = this->dbm->getOneMarketConfig();
 	if (mc != NULL) {
 		this->mdspi = this->CreateMd(mc->getMarketFrontAddr(), mc->getBrokerID(), mc->getUserID(), mc->getPassword());
 		if (this->mdspi != NULL) {
-			/// Ïòmdspi¸³Öµstrategys
+			/// å‘mdspièµ‹å€¼strategys
 			this->mdspi->setListStrategy(this->l_strategys);
-			/// ¶©ÔÄºÏÔ¼
-			for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // ±éÀúStrategy
+			/// è®¢é˜…åˆçº¦
+			for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // éå†Strategy
 				USER_PRINT((*stg_itor)->getStgInstrumentIdA());
 				USER_PRINT((*stg_itor)->getStgInstrumentIdB());
-				/// Ìí¼Ó²ßÂÔµÄºÏÔ¼µ½l_instrument
+				/// æ·»åŠ ç­–ç•¥çš„åˆçº¦åˆ°l_instrument
 				this->addSubInstrument((*stg_itor)->getStgInstrumentIdA(), this->l_instrument);
 				this->addSubInstrument((*stg_itor)->getStgInstrumentIdB(), this->l_instrument);
 			}
-			/// ¶©ÔÄºÏÔ¼
+			/// è®¢é˜…åˆçº¦
 			this->SubmarketData(this->mdspi, this->l_instrument);
 		}
 	}

@@ -75,7 +75,7 @@ public:
 	void CreateStrategy(Strategy *stg);
 	void DeleteStrategy(Strategy *stg);
 	void UpdateStrategy(Strategy *stg);
-	void getAllStragegy(list<Strategy *> *l_strategys);
+	void getAllStrategy(list<Strategy *> *l_strategys, string traderid = "", string userid = "");
 
 	/************************************************************************/
 	/* 创建MD配置

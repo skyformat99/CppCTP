@@ -81,19 +81,20 @@ void do_service(int fd) {
 			break;
 		}
 		else {
-			printf("服务端收到 = %s\n", buff);
+			//printf("服务端收到 = %s\n", buff);
+			CTP_Manager::HandleMessage(fd, buff);
 			//printf("socket_server send size = %d \n", strlen(buff));
 			//printf("socket_server fd = %d \n", fd);
 			//printf("socket_server send size = %d \n", sizeof(buff));
 			//printf("socket_server send size = %d \n", strlen(buff));
-			if (write_msg(fd, buff, sizeof(buff)) < 0) {
-				printf("先前客户端已断开!!!\n");
-				//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
-				if (errno == EPIPE) {
-					break;
-				}
-				perror("protocal error");
-			}
+			//if (write_msg(fd, buff, sizeof(buff)) < 0) {
+			//	printf("先前客户端已断开!!!\n");
+			//	//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
+			//	if (errno == EPIPE) {
+			//		break;
+			//	}
+			//	perror("protocal error");
+			//}
 		}
 	}
 }

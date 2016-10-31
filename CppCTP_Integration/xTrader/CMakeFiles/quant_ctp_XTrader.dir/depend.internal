@@ -24,6 +24,31 @@ CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o
  /root/xTrader/Trader.h
  /root/xTrader/User.h
  /root/xTrader/Utils.h
+ /root/xTrader/msg.h
+ /root/xTrader/rapidjson/allocators.h
+ /root/xTrader/rapidjson/document.h
+ /root/xTrader/rapidjson/encodedstream.h
+ /root/xTrader/rapidjson/encodings.h
+ /root/xTrader/rapidjson/error/error.h
+ /root/xTrader/rapidjson/internal/biginteger.h
+ /root/xTrader/rapidjson/internal/diyfp.h
+ /root/xTrader/rapidjson/internal/dtoa.h
+ /root/xTrader/rapidjson/internal/ieee754.h
+ /root/xTrader/rapidjson/internal/itoa.h
+ /root/xTrader/rapidjson/internal/meta.h
+ /root/xTrader/rapidjson/internal/pow10.h
+ /root/xTrader/rapidjson/internal/stack.h
+ /root/xTrader/rapidjson/internal/strfunc.h
+ /root/xTrader/rapidjson/internal/strtod.h
+ /root/xTrader/rapidjson/internal/swap.h
+ /root/xTrader/rapidjson/memorystream.h
+ /root/xTrader/rapidjson/msinttypes/inttypes.h
+ /root/xTrader/rapidjson/msinttypes/stdint.h
+ /root/xTrader/rapidjson/rapidjson.h
+ /root/xTrader/rapidjson/reader.h
+ /root/xTrader/rapidjson/stream.h
+ /root/xTrader/rapidjson/stringbuffer.h
+ /root/xTrader/rapidjson/writer.h
 CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o
  /root/xTrader/Algorithm.h
  /root/xTrader/CTP_Manager.h

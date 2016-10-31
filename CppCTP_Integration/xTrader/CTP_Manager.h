@@ -105,6 +105,9 @@ public:
 	int getOn_Off();
 	void setOn_Off(int on_off);
 
+	/// 处理客户端发来的消息
+	static void HandleMessage(int fd, char *msg);
+
 private:
 	Login *login;
 	list<string> *l_instrument;

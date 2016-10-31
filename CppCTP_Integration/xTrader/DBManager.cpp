@@ -173,7 +173,7 @@ bool DBManager::FindTraderByTraderIdAndPassword(string traderid, string password
 	bool flag = false;
 
 	count_number = this->conn->count(DB_OPERATOR_COLLECTION,
-		BSON("traderid" << traderid << "password" << password));
+		BSON("traderid" << traderid << "password" << password << "isactive" << ISACTIVE));
 
 	if (count_number == 0) {
 		flag = false;
@@ -312,7 +312,11 @@ void DBManager::SearchFutrueListByTraderID(string traderid, list<FutureAccount *
 	Itor = l_futureaccount->erase(Itor);
 	}*/
 	if (l_futureaccount->size() > 0) {
-		l_futureaccount->clear();
+		list<FutureAccount *>::iterator future_itor;
+		for (future_itor = l_futureaccount->begin(); future_itor != l_futureaccount->end();) {
+			delete (*future_itor);
+			future_itor = l_futureaccount->erase(future_itor);
+		}
 	}
 
 	unique_ptr<DBClientCursor> cursor =
@@ -486,7 +490,7 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 		cout << "Strategy ID Not Exists!" << endl;
 	}
 }
-void DBManager::getAllStragegy(list<Strategy *> *l_strategys) {
+void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, string userid) {
 	/// 初始化的时候，必须保证list为空
 	if (l_strategys->size() > 0) {
 		list<Strategy *>::iterator Itor;
@@ -495,8 +499,21 @@ void DBManager::getAllStragegy(list<Strategy *> *l_strategys) {
 		}
 	}
 
-	unique_ptr<DBClientCursor> cursor =
-		this->conn->query(DB_STRATEGY_COLLECTION);
+	unique_ptr<DBClientCursor> cursor;
+
+	if (traderid.compare("")) { //如果traderid不为空
+		
+		if (userid.compare("")) { //如果userid不为空
+			cursor = this->conn->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid));
+		}
+		else {
+			cursor = this->conn->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("trader_id" << traderid));
+		}
+	}
+	else {
+		cursor = this->conn->query(DB_STRATEGY_COLLECTION);
+	}
+		
 	while (cursor->more()) {
 		BSONObj p = cursor->next();
 		Strategy *stg = new Strategy();
@@ -663,7 +680,7 @@ void DBManager::getAllMarketConfig(list<MarketConfig *> *l_marketconfig) {
 	}
 	else {
 		unique_ptr<DBClientCursor> cursor =
-			this->conn->query(DB_MARKETCONFIG_COLLECTION);
+			this->conn->query(DB_MARKETCONFIG_COLLECTION, MONGO_QUERY("isactive" << ISACTIVE));
 		while (cursor->more()) {
 			BSONObj p = cursor->next();
 			cout << "*" << "market_id:" << p.getStringField("market_id") << "  "

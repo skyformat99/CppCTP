@@ -728,7 +728,7 @@ void TdSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentSt
 
 //查询报单
 void TdSpi::QryOrder() {
-	USER_PRINT("TdSpi::QryOrder")
+	USER_PRINT("TdSpi::QryOrder");
 	CThostFtdcQryOrderField *pQryOrder = new CThostFtdcQryOrderField();
 	//strcpy(pQryOrder->BrokerID, const_cast<char *>(this->getBrokerID().c_str()));
 	//strcpy(pQryOrder->InvestorID, const_cast<char *>(this->getUserID().c_str()));
@@ -739,7 +739,7 @@ void TdSpi::QryOrder() {
 
 //响应查询报单;
 void TdSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-	USER_PRINT("TdSpi::OnRspQryOrder")
+	USER_PRINT("TdSpi::OnRspQryOrder");
 	if (!pOrder) {
 		std::cout << "None Order Return!" << endl;
 	}
@@ -884,7 +884,7 @@ void TdSpi::QryInstrumentMarginRate() {
 
 ///请求查询合约保证金率响应
 void TdSpi::OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateField *pInstrumentMarginRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-	USER_PRINT("TdSpi::OnRspQryInstrumentMarginRate")
+	USER_PRINT("TdSpi::OnRspQryInstrumentMarginRate");
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (pInstrumentMarginRate) {
 			std::cout << "=================================================================================" << endl;
@@ -923,7 +923,7 @@ void TdSpi::QryInstrumentCommissionRate() {
 
 ///请求查询合约手续费率响应
 void TdSpi::OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissionRateField *pInstrumentCommissionRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-	USER_PRINT("TdSpi::OnRspQryInstrumentCommissionRate")
+	USER_PRINT("TdSpi::OnRspQryInstrumentCommissionRate");
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (pInstrumentCommissionRate) {
 			///合约代码
@@ -952,7 +952,7 @@ void TdSpi::OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissionRateF
 
 //查询投资者
 void TdSpi::QryInvestor() {
-	USER_PRINT("TdSpi::QryInvestor")
+	USER_PRINT("TdSpi::QryInvestor");
 	CThostFtdcQryInvestorField *pQryInvestor = new CThostFtdcQryInvestorField();
 	this->tdapi->ReqQryInvestor(pQryInvestor, this->getRequestID());
 	delete pQryInvestor;
@@ -960,7 +960,7 @@ void TdSpi::QryInvestor() {
 
 //查询投资者响应
 void TdSpi::OnRspQryInvestor(CThostFtdcInvestorField *pInvestor, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-	USER_PRINT("TdSpi::OnRspQryInvestor")
+	USER_PRINT("TdSpi::OnRspQryInvestor");
 	if (!this->IsErrorRspInfo(pRspInfo)) {
 		if (pInvestor) {
 			std::cout << "=================================================================================" << endl;
@@ -1182,7 +1182,7 @@ void TdSpi::QryTradingAccount() {
 
 //查询账号资金响应
 void TdSpi::OnRspQryTradingAccount(CThostFtdcTradingAccountField *pTradingAccount, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-	USER_PRINT("TdSpi::OnRspQryTradingAccount")
+	USER_PRINT("TdSpi::OnRspQryTradingAccount");
 	if (!this->IsErrorRspInfo(pRspInfo)) {
 		if (pTradingAccount) {
 			std::cout << "=================================================================================" << endl;
@@ -1812,7 +1812,7 @@ void TdSpi::OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction, CThost
 
 //登出
 void TdSpi::Logout(char *BrokerID, char *UserID) {
-	USER_PRINT("TdSpi::Logout")
+	USER_PRINT("TdSpi::Logout");
 	CThostFtdcUserLogoutField *pUserLogout = new CThostFtdcUserLogoutField();
 	strcpy(pUserLogout->BrokerID, BrokerID);
 	strcpy(pUserLogout->UserID, UserID);
@@ -1834,7 +1834,7 @@ void TdSpi::OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout,
 
 //等待线程结束
 void TdSpi::Join() {
-	USER_PRINT("TdSpi::Join()")
+	USER_PRINT("TdSpi::Join()");
 	this->tdapi->Join();
 }
 
@@ -1953,7 +1953,7 @@ void TdSpi::setL_Instruments_Info(list<CThostFtdcInstrumentField *> *l_instrumen
 
 //释放api
 void TdSpi::Release() {
-	USER_PRINT("TdSpi::Release")
+	USER_PRINT("TdSpi::Release");
 	//this->tdapi->Release();
 	if (this->tdapi) {
 		this->tdapi->RegisterSpi(NULL);
