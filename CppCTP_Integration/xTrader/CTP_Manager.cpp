@@ -582,22 +582,51 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp) {
 	}
 	else if (msgtype == 5) { // 修改Strategy（修改Strategy参数）
 		std::cout << "请求策略修改..." << std::endl;
+
+		rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
+		rapidjson::Value &TraderID = doc["TraderID"];
+		rapidjson::Value &MsgRef = doc["MsgRef"];
+		rapidjson::Value &MsgSrc = doc["MsgSrc"];
+		rapidjson::Value &UserID = doc["UserID"];
+		rapidjson::Value &infoArray = doc["Info"];
+
+		string s_TraderID = TraderID.GetString();
+		int i_MsgRef = MsgRef.GetInt();
+		int i_MsgSendFlag = MsgSendFlag.GetInt();
+		int i_MsgSrc = MsgSrc.GetInt();
+		string s_UserID = UserID.GetString();
+
+		std::cout << "收到交易员ID = " << s_TraderID << std::endl;
+		std::cout << "收到期货账户ID = " << s_UserID << std::endl;
+
+		if (infoArray.IsArray()) {
+			for (int i = 0; i < infoArray.Size(); i++) {
+				const Value& object = infoArray[i];
+				std::string q_user_id = object["user_id"].GetString();
+				std::string q_strategy_id = object["strategy_id"].GetString();
+			}
+		}
+
+
 	}
 	else if (msgtype == 6) { // 新建Strategy（修改Strategy参数）
 		std::cout << "新建策略..." << std::endl;
+
+
 	}
 	else if (msgtype == 7) { // 删除Strategy（修改Strategy参数）
 		std::cout << "删除策略..." << std::endl;
 	}
 	else {
 		std::cout << "请求类型错误!" << endl;
+		//return;
 	}
 
 	
 	build_doc.Accept(writer);
 	//rsp_msg = const_cast<char *>(buffer.GetString());
 	std::cout << "服务端响应数据 = " << buffer.GetString() << std::endl;
-	if (buffer.GetString() == NULL) {
+	if (strlen(buffer.GetString()) < 0) {
 		std::cout << "服务端收到错误类型!" << std::endl;
 	}
 	else {
