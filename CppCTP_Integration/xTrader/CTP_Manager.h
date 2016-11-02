@@ -106,7 +106,7 @@ public:
 	void setOn_Off(int on_off);
 
 	/// 处理客户端发来的消息
-	static void HandleMessage(int fd, char *msg);
+	static void HandleMessage(int fd, char *msg, CTP_Manager *ctp_m);
 
 private:
 	Login *login;

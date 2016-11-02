@@ -41,6 +41,7 @@ using namespace rapidjson;
 #define MAX_BUFFER_SIZE	30*1024
 
 int sockfd;
+CTP_Manager *ctp_m = NULL;
 
 /*信号处理*/
 void sig_handler(int signo) {
@@ -82,7 +83,7 @@ void do_service(int fd) {
 		}
 		else {
 			//printf("服务端收到 = %s\n", buff);
-			CTP_Manager::HandleMessage(fd, buff);
+			CTP_Manager::HandleMessage(fd, buff, ctp_m);
 			//printf("socket_server send size = %d \n", strlen(buff));
 			//printf("socket_server fd = %d \n", fd);
 			//printf("socket_server send size = %d \n", sizeof(buff));
@@ -264,10 +265,10 @@ int main(int argc, char *argv[]) {
 	mongo::client::initialize();
 
 	// 初始化CTP_Manager
-	CTP_Manager *ctp_m = new CTP_Manager();
+	ctp_m = new CTP_Manager();
 
 	// 程序入口，初始化资源
-	//ctp_m->init();
+	ctp_m->init();
 
 	/*步骤1:创建socket(套接字)*/
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);

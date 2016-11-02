@@ -407,7 +407,7 @@ void DBManager::CreateStrategy(Strategy *stg) {
 		b.append("order_action_tires_limit", stg->getStgOrderActionTiresLimit());
 		b.append("sell_close", stg->getStgSellClose());
 		b.append("buy_open", stg->getStgBuyOpen());
-		b.append("only_close", stg->isStgOnlyClose());
+		//b.append("only_close", stg->isStgOnlyClose());
 
 		// 创建一个数组对象
 		BSONArrayBuilder bab;
@@ -423,6 +423,7 @@ void DBManager::CreateStrategy(Strategy *stg) {
 		b.append("lots", stg->getStgLotsBatch());
 		b.append("a_wait_price_tick", stg->getStgAWaitPriceTick());
 		b.append("b_wait_price_tick", stg->getStgBWaitPriceTick());
+		b.append("StrategyOnoff", stg->getOn_Off());
 
 		BSONObj p = b.obj();
 
@@ -448,11 +449,16 @@ void DBManager::DeleteStrategy(Strategy *stg) {
 void DBManager::UpdateStrategy(Strategy *stg) {
 	int count_number = 0;
 
+	std::cout << "DBManager::UpdateStrategy" << std::endl;
+
+
 	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
-		BSON("strategy_id" << stg->getStgStrategyId()));
+		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str()));
+
+	std::cout << "count_number = " << count_number << std::endl;
 
 	if (count_number > 0) {
-		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str())), BSON("$set" << BSON("position_a_sell_today" << stg->getStgPositionASellToday() 
+		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str())), BSON("$set" << BSON("position_a_sell_today" << stg->getStgPositionASellToday() 
 			<< "position_b_sell" << stg->getStgPositionBSell() 
 			<< "spread_shift" << stg->getStgSpreadShift()
 			<< "position_b_sell_today" << stg->getStgPositionBSellToday()
@@ -473,7 +479,7 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 			<< "order_action_tires_limit" << stg->getStgOrderActionTiresLimit() 
 			<< "sell_close" << stg->getStgSellClose() 
 			<< "buy_open" << stg->getStgBuyOpen() 
-			<< "only_close" << stg->isStgOnlyClose() 
+			//<< "only_close" << stg->isStgOnlyClose() 
 			<< "position_a_buy_yesterday" << stg->getStgPositionABuyYesterday() 
 			<< "user_id" << stg->getStgUserId() 
 			<< "position_a_buy_today" << stg->getStgPositionABuyToday() 
@@ -481,6 +487,7 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 			<< "lots" << stg->getStgLotsBatch() 
 			<< "a_wait_price_tick" << stg->getStgAWaitPriceTick() 
 			<< "b_wait_price_tick" << stg->getStgBWaitPriceTick()
+			<< "StrategyOnoff" << stg->getOn_Off()
 			<< "list_instrument_id" << BSON_ARRAY(stg->getStgInstrumentIdA() << stg->getStgInstrumentIdB()))));
 
 		USER_PRINT("DBManager::UpdateStrategy ok");
@@ -495,6 +502,7 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 	if (l_strategys->size() > 0) {
 		list<Strategy *>::iterator Itor;
 		for (Itor = l_strategys->begin(); Itor != l_strategys->end();) {
+			delete (*Itor);
 			Itor = l_strategys->erase(Itor);
 		}
 	}
@@ -546,6 +554,7 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 		cout << "lots = " << p.getIntField("lots") << ", ";
 		cout << "a_wait_price_tick = " << p.getField("a_wait_price_tick").Double() << ", ";
 		cout << "b_wait_price_tick = " << p.getField("b_wait_price_tick").Double() << ", ";
+		cout << "StrategyOnoff = " << p.getField("StrategyOnoff").Int() << endl;
 
 		stg->setStgAWaitPriceTick(p.getField("a_wait_price_tick").Double());
 		stg->setStgBWaitPriceTick(p.getField("b_wait_price_tick").Double());
@@ -576,6 +585,7 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 		stg->setStgStrategyId(p.getStringField("strategy_id"));
 		stg->setStgTraderId(p.getStringField("trader_id"));
 		stg->setStgUserId(p.getStringField("user_id"));
+		stg->setOn_Off(p.getField("StrategyOnoff").Int());
 
 
 		vector<BSONElement> elements = p["list_instrument_id"].Array();

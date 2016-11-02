@@ -482,7 +482,7 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 	}
 
 	if (stg_order_algorithm == ALGORITHM_ONE) { //下单算法1
-		this->Order_Algorithm_One();
+		//this->Order_Algorithm_One();
 	}
 	else if (stg_order_algorithm == ALGORITHM_TWO) { // 下单算法2
 		this->Order_Algorithm_Two();
