@@ -41,7 +41,7 @@ public:
 	void SearchTraderByTraderID(string traderid);
 	void SearchTraderByTraderName(string tradername);
 	void SearchTraderByTraderIdAndPassword(string traderid, string password);
-	bool FindTraderByTraderIdAndPassword(string traderid, string password);
+	bool FindTraderByTraderIdAndPassword(string traderid, string password, Trader *op);
 	void getAllTrader(list<string> *l_trader);
 
 

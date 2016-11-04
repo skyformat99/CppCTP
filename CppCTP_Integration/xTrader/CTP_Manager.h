@@ -21,7 +21,7 @@ public:
 	bool CheckIn(Login *login);
 
 	/// trader login
-	bool TraderLogin(string traderid, string password);
+	bool TraderLogin(string traderid, string password, Trader *op);
 
 	/// admin login
 	bool AdminLogin(string adminid, string password);
