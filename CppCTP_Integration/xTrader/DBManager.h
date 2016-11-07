@@ -43,6 +43,7 @@ public:
 	void SearchTraderByTraderIdAndPassword(string traderid, string password);
 	bool FindTraderByTraderIdAndPassword(string traderid, string password, Trader *op);
 	void getAllTrader(list<string> *l_trader);
+	void getAllObjTrader(list<Trader *> *l_obj_trader);
 
 
 	/************************************************************************/
@@ -78,6 +79,19 @@ public:
 	void getAllStrategy(list<Strategy *> *l_strategys, string traderid = "", string userid = "");
 
 	/************************************************************************/
+	/* 创建策略(昨仓)
+	   删除策略(昨仓)
+	   更新策略(昨仓)
+	   查找策略(昨仓)			                                                */
+	/************************************************************************/
+	void CreateStrategyYesterday(Strategy *stg);
+	void DeleteStrategyYesterday(Strategy *stg);
+	void UpdateStrategyYesterday(Strategy *stg);
+	void getAllStrategyYesterday(list<Strategy *> *l_strategys, string traderid = "", string userid = "");
+	void getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Strategy *> *l_strategys, string traderid = "", string userid = "", string strategyid = "");
+
+
+	/************************************************************************/
 	/* 创建MD配置
 	   删除MD配置
 	   更新MD配置
@@ -89,6 +103,8 @@ public:
 	void UpdateMarketConfig(MarketConfig *mc);
 	void getAllMarketConfig(list<MarketConfig *> *l_marketconfig);
 	MarketConfig *getOneMarketConfig();
+
+
 	
 
 	void setConn(mongo::DBClientConnection *conn);

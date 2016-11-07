@@ -437,21 +437,21 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 	if (!strcmp(pDepthMarketData->InstrumentID, this->getStgInstrumentIdA().c_str())) {
 		//USER_PRINT("stg_instrument_A_tick ask_volume bid_volume");
 		this->CopyTickData(stg_instrument_A_tick, pDepthMarketData);
-		std::cout << "stg_instrument_A_tick = " << stg_instrument_A_tick->InstrumentID << endl;
-		std::cout << "stg_instrument_A_tick->AskVolume1 = " << stg_instrument_A_tick->AskVolume1 << endl;
-		std::cout << "stg_instrument_A_tick->BidVolume1 = " << stg_instrument_A_tick->BidVolume1 << endl;
-		std::cout << "stg_instrument_A_tick->AskPrice1 = " << stg_instrument_A_tick->AskPrice1 << endl;
-		std::cout << "stg_instrument_A_tick->BidPrice1 = " << stg_instrument_A_tick->BidPrice1 << endl;
+		//std::cout << "stg_instrument_A_tick = " << stg_instrument_A_tick->InstrumentID << endl;
+		//std::cout << "stg_instrument_A_tick->AskVolume1 = " << stg_instrument_A_tick->AskVolume1 << endl;
+		//std::cout << "stg_instrument_A_tick->BidVolume1 = " << stg_instrument_A_tick->BidVolume1 << endl;
+		//std::cout << "stg_instrument_A_tick->AskPrice1 = " << stg_instrument_A_tick->AskPrice1 << endl;
+		//std::cout << "stg_instrument_A_tick->BidPrice1 = " << stg_instrument_A_tick->BidPrice1 << endl;
 	}
 	else if (!strcmp(pDepthMarketData->InstrumentID, this->getStgInstrumentIdB().c_str()))
 	{
 		//USER_PRINT("stg_instrument_B_tick ask_volume bid_volume");
 		this->CopyTickData(stg_instrument_B_tick, pDepthMarketData);
-		std::cout << "stg_instrument_B_tick = " << stg_instrument_B_tick->InstrumentID << endl;
-		std::cout << "stg_instrument_B_tick->AskVolume1 = " << stg_instrument_B_tick->AskVolume1 << endl;
-		std::cout << "stg_instrument_B_tick->BidVolume1 = " << stg_instrument_B_tick->BidVolume1 << endl;
-		std::cout << "stg_instrument_B_tick->AskPrice1 = " << stg_instrument_B_tick->AskPrice1 << endl;
-		std::cout << "stg_instrument_B_tick->BidPrice1 = " << stg_instrument_B_tick->BidPrice1 << endl;
+		//std::cout << "stg_instrument_B_tick = " << stg_instrument_B_tick->InstrumentID << endl;
+		//std::cout << "stg_instrument_B_tick->AskVolume1 = " << stg_instrument_B_tick->AskVolume1 << endl;
+		//std::cout << "stg_instrument_B_tick->BidVolume1 = " << stg_instrument_B_tick->BidVolume1 << endl;
+		//std::cout << "stg_instrument_B_tick->AskPrice1 = " << stg_instrument_B_tick->AskPrice1 << endl;
+		//std::cout << "stg_instrument_B_tick->BidPrice1 = " << stg_instrument_B_tick->BidPrice1 << endl;
 	}	
 	/// 如果正在交易,继续更新tick进行交易
 	if (this->stg_trade_tasking) {
@@ -464,7 +464,7 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 
 //选择下单算法
 void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
-	USER_PRINT("Strategy::Select_Order_Algorithm");
+	//USER_PRINT("Strategy::Select_Order_Algorithm");
 	int select_num;
 	//如果正在交易,直接返回0
 	if (this->stg_trade_tasking) {
@@ -547,6 +547,8 @@ void Strategy::Order_Algorithm_One() {
 	{
 		return;
 	}
+
+	std::cout << "策略开关,期货账户开关,总开关" << std::endl;
 
 	/// 策略开关，期货账户开关，总开关
 	if (!((this->getOn_Off()) & (this->stg_user->getOn_Off()) & (this->stg_user->getCTP_Manager()->getOn_Off()))) {

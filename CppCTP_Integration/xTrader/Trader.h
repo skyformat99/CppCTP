@@ -33,12 +33,16 @@ public:
 	void addUserToLUser(User *user);
 	void getLUser();
 
+	void setOn_Off(int on_off);
+	int getOn_Off();
+
 private:
 	string tradername;
 	string password;
 	string traderid;
 	string isactive;
 	list<User *> l_user;
+	int on_off;
 };
 
 

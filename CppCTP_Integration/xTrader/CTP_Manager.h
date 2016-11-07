@@ -89,6 +89,9 @@ public:
 	/// 得到strategy_list
 	list<Strategy *> *getListStrategy();
 
+	/// 得到strategy_list
+	list<Strategy *> *getListStrategyYesterday();
+
 	/// 设置strategy_list
 	void setListStrategy(list<Strategy *> *l_strategys);
 
@@ -118,6 +121,7 @@ private:
 	map<string, list<User *> *> m_trader;
 	DBManager *dbm;
 	list<Strategy *> *l_strategys;
+	list<Strategy *> *l_strategys_yesterday;
 	MdSpi *mdspi;
 	int on_off; //开关
 };

@@ -8,6 +8,7 @@ Trader::Trader(string traderid, string password, string tradername, string isact
 	this->password = password;
 	this->tradername = tradername;
 	this->isactive = isactive;
+	this->on_off = 0;
 }
 
 Trader::Trader() {
@@ -15,6 +16,7 @@ Trader::Trader() {
 	this->password = "";
 	this->tradername = "";
 	this->isactive = ISACTIVE;
+	this->on_off = 0;
 }
 
 Trader::~Trader() {
@@ -48,4 +50,11 @@ void Trader::setTraderID(string traderid) {
 }
 string Trader::getTraderID() {
 	return this->traderid;
+}
+
+void Trader::setOn_Off(int on_off) {
+	this->on_off = on_off;
+}
+int Trader::getOn_Off() {
+	return this->on_off;
 }
