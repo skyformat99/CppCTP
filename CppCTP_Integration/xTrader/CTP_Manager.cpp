@@ -43,13 +43,15 @@ bool CTP_Manager::AdminLogin(string adminid, string password) {
 	return this->dbm->FindAdminByAdminIdAndPassword(adminid, password);
 }
 
-User * CTP_Manager::CreateAccount(User *user) {
+User * CTP_Manager::CreateAccount(User *user, list<Strategy *> *l_strategys) {
 	USER_PRINT("CTP_Manager::CreateAccount");
 	//tcp://180.168.146.187:10030 //24H
 	//tcp://180.168.146.187:10000 //实盘仿真
 
 	if (user != NULL) {
 		TdSpi *tdspi = new TdSpi();
+
+		tdspi->setListStrategy(l_strategys); // 初始化策略给到位
 
 		//User *user = new User(td_frontAddress, td_broker, td_user, td_pass, td_user, TraderID);
 
@@ -62,7 +64,7 @@ User * CTP_Manager::CreateAccount(User *user) {
 		}
 		else {
 			CThostFtdcTraderApi *tdapi = CThostFtdcTraderApi::CreateFtdcTraderApi(flowpath.c_str());
-			cout << tdapi << endl;
+			cout << "TdApi初始化完成... tdapi = " << tdapi << endl;
 			if (!tdapi) {
 				return NULL;
 			}
@@ -73,23 +75,18 @@ User * CTP_Manager::CreateAccount(User *user) {
 		}
 
 		sleep(1);
-		user->getUserTradeSPI()->Connect(user);
+		user->getUserTradeSPI()->Connect(user); // 连接
 		sleep(1);
-		user->getUserTradeSPI()->Login(user);
+		user->getUserTradeSPI()->Login(user); // 登陆
 		sleep(1);
-		user->getUserTradeSPI()->QrySettlementInfoConfirm(user);
+		user->getUserTradeSPI()->QrySettlementInfoConfirm(user); // 确认交易结算
 
-		
-		//tdspi->QrySettlementInfo(user);
-		//sleep(6);
-		//string instrument = "cu1609";
-		//user->getUserTradeSPI()->OrderInsert(user, const_cast<char *>(instrument.c_str()), '0', '0', 20, 39000, "1");
 	}
 
 	return user;
 }
 
-MdSpi * CTP_Manager::CreateMd(string md_frontAddress, string md_broker, string md_user, string md_pass) {
+MdSpi * CTP_Manager::CreateMd(string md_frontAddress, string md_broker, string md_user, string md_pass, list<Strategy *> *l_strategys) {
 	MdSpi *mdspi = NULL;
 	CThostFtdcMdApi *mdapi = NULL;
 	string conn_md_frontAddress = md_frontAddress;
@@ -106,11 +103,13 @@ MdSpi * CTP_Manager::CreateMd(string md_frontAddress, string md_broker, string m
 	} else {
 		mdapi = CThostFtdcMdApi::CreateFtdcMdApi(flowpath.c_str());
 		mdspi = new MdSpi(mdapi);
+		mdspi->setListStrategy(l_strategys); // 初始化策略给到位
 	}
 	USER_PRINT(const_cast<char *>(conn_md_frontAddress.c_str()));
-	mdspi->Connect(const_cast<char *>(conn_md_frontAddress.c_str()));
+	mdspi->Connect(const_cast<char *>(conn_md_frontAddress.c_str())); // 连接
 	sleep(1);
-	mdspi->Login(const_cast<char *>(md_broker.c_str()), const_cast<char *>(md_user.c_str()), const_cast<char *>(md_pass.c_str()));
+	mdspi->Login(const_cast<char *>(md_broker.c_str()), const_cast<char *>(md_user.c_str()), const_cast<char *>(md_pass.c_str())); // 登陆
+	sleep(1);
 
 	return mdspi;
 }
@@ -1295,14 +1294,15 @@ void CTP_Manager::init() {
 
 	this->dbm->getAllObjTrader(this->l_obj_trader);
 
+	/// 查询所有的期货账户
+	this->dbm->getAllFutureAccount(this->l_user);
+
 	/// 查询所有的策略
 	this->dbm->getAllStrategy(this->l_strategys);
 
 	/// 查询昨仓持仓
 	this->dbm->getAllStrategyYesterday(this->l_strategys_yesterday);
-
-	/// 查询所有的期货账户
-	this->dbm->getAllFutureAccount(this->l_user);
+	
 
 	/// 绑定操作,策略绑定到对应期货账户下
 	list<User *>::iterator user_itor;
@@ -1311,52 +1311,49 @@ void CTP_Manager::init() {
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
 		
 		USER_PRINT((*user_itor)->getUserID());
+		
+		(*user_itor)->setCTP_Manager(this); //每个user对象设置CTP_Manager对象
 
-		USER_PRINT("Iterator STRATEGIES");
 		for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
 			USER_PRINT((*stg_itor)->getStgUserId());
 			if ((*stg_itor)->getStgUserId() == (*user_itor)->getUserID()) {
 				USER_PRINT("Strategy Bind To User");
-				(*user_itor)->addStrategyToList((*stg_itor));
-				(*stg_itor)->setStgUser((*user_itor));
+				(*user_itor)->addStrategyToList((*stg_itor)); // 将策略添加到期货账户策略列表里
+				(*stg_itor)->setStgUser((*user_itor)); // 策略设置自己的期货账户对象
 				USER_PRINT("(*stg_itor)->setStgUser((*user_itor))");
 				USER_PRINT((*stg_itor)->getStgUser());
 			}
 		}
 		/// 遍历设值后进行TD初始化
-		this->CreateAccount((*user_itor));
-		sleep(5);
-		std::cout << "Account : " << (*user_itor)->getUserID() << " Init OK!" << std::endl;
+		this->CreateAccount((*user_itor), this->l_strategys);
+		std::cout << "账户 : " << (*user_itor)->getUserID() << " 初始化完成!" << std::endl;
+		sleep(3);
 	}
 
 
-	/// 遍历User,对TdSpi进行Strategy_List赋值
-	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
-		USER_PRINT((*user_itor)->getUserID());
-		(*user_itor)->getUserTradeSPI()->setListStrategy(this->l_strategys);
+	/// 合约查询后对策略合约最小跳进行赋值
+	this->l_user->front()->getUserTradeSPI()->QryInstrument();
+	sleep(3);
+
+	list<CThostFtdcInstrumentField *> *l_instruments_info = this->l_user->front()->getUserTradeSPI()->getL_Instruments_Info();
+
+	if (l_instruments_info != NULL) {
+		for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
+			(*user_itor)->getUserTradeSPI()->setL_Instruments_Info(l_instruments_info);
+			(*user_itor)->setStgInstrumnetPriceTick(); // 对策略合约价格最小跳赋值
+		}
 	}
-
-	/// 第一个元素 this->l_user->front()
-
-	/// 查询合约价格最小跳
-	/// 遍历User,对TdSpi进行Strategy_List赋值
-	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
-		USER_PRINT((*user_itor)->getUserID());
-		(*user_itor)->getUserTradeSPI()->QryInstrument();
-	}
-
-	/// 对策略合约价格最小跳赋值
-	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
-		(*user_itor)->setStgInstrumnetPriceTick();
+	else {
+		std::cout << "策略最小跳价格获取失败!!!" << std::endl;
 	}
 
 	/// 行情初始化
 	MarketConfig *mc = this->dbm->getOneMarketConfig();
 	if (mc != NULL) {
-		this->mdspi = this->CreateMd(mc->getMarketFrontAddr(), mc->getBrokerID(), mc->getUserID(), mc->getPassword());
+		this->mdspi = this->CreateMd(mc->getMarketFrontAddr(), mc->getBrokerID(), mc->getUserID(), mc->getPassword(), this->l_strategys);
 		if (this->mdspi != NULL) {
 			/// 向mdspi赋值strategys
-			this->mdspi->setListStrategy(this->l_strategys);
+			//this->mdspi->setListStrategy(this->l_strategys);
 			/// 订阅合约
 			for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
 				USER_PRINT((*stg_itor)->getStgInstrumentIdA());

@@ -30,10 +30,10 @@ public:
 	int submarketData(char *instrument[]);
 
 	/// 创建交易对象并且登陆
-	User * CreateAccount(User *user);
+	User * CreateAccount(User *user, list<Strategy *> *l_strategys);
 
 	/// 创建行情
-	MdSpi * CreateMd(string td_frontAddress, string td_broker, string td_user, string td_pass);
+	MdSpi * CreateMd(string td_frontAddress, string td_broker, string td_user, string td_pass, list<Strategy *> *l_strategys);
 
 	///释放
 	void ReleaseAccount(User *user);
