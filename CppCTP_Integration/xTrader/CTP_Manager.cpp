@@ -1077,6 +1077,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						std::cout << "找到需要开关的交易员ID" << std::endl;
 						(*trader_itor)->setOn_Off(i_OnOff);
 						bFind = true;
+						// 更新数据库
+						static_dbm->UpdateTrader((*trader_itor)->getTraderID(), (*trader_itor));
 					}
 				}
 
@@ -1131,6 +1133,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						std::cout << "找到需要开关的期货账户ID" << std::endl;
 						(*user_itor)->setOn_Off(i_OnOff);
 						bFind = true;
+						//更新数据库
+						static_dbm->UpdateFutureAccount((*user_itor));
 					}
 				}
 

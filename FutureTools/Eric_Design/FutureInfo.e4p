@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Project SYSTEM "Project-5.1.dtd">
+<!-- eric project file for project FutureInfo -->
+<!-- Saved: 2016-11-12, 14:50:38 -->
+<!-- Copyright (C) 2016 Lucas.Yuan, ypf1990@foxmail.com -->
+<Project version="5.1">
+  <Language>en_US</Language>
+  <Hash>6c5d5056737ce6f09d2c31e996e9927794b5df6c</Hash>
+  <ProgLanguage mixed="0">Python3</ProgLanguage>
+  <ProjectType>Qt4</ProjectType>
+  <Description>展示交易所最新资讯的小工具。</Description>
+  <Version>0.1</Version>
+  <Author>Lucas.Yuan</Author>
+  <Email>ypf1990@foxmail.com</Email>
+  <Eol index="-1"/>
+  <Sources>
+    <Source>FutureTab.py</Source>
+    <Source>InfoContent.py</Source>
+    <Source>ToolWindow.py</Source>
+    <Source>Ui_FutureTab.py</Source>
+    <Source>Ui_InfoContent.py</Source>
+    <Source>Ui_ToolWindow.py</Source>
+    <Source>__init__.py</Source>
+  </Sources>
+  <Forms>
+    <Form>FutureTab.ui</Form>
+    <Form>InfoContent.ui</Form>
+    <Form>ToolWindow.ui</Form>
+  </Forms>
+  <Translations/>
+  <Resources/>
+  <Interfaces/>
+  <Others/>
+  <Vcs>
+    <VcsType>None</VcsType>
+  </Vcs>
+  <FiletypeAssociations>
+    <FiletypeAssociation pattern="*.idl" type="INTERFACES"/>
+    <FiletypeAssociation pattern="*.py" type="SOURCES"/>
+    <FiletypeAssociation pattern="*.py3" type="SOURCES"/>
+    <FiletypeAssociation pattern="*.pyw" type="SOURCES"/>
+    <FiletypeAssociation pattern="*.pyw3" type="SOURCES"/>
+    <FiletypeAssociation pattern="*.qm" type="TRANSLATIONS"/>
+    <FiletypeAssociation pattern="*.qrc" type="RESOURCES"/>
+    <FiletypeAssociation pattern="*.ts" type="TRANSLATIONS"/>
+    <FiletypeAssociation pattern="*.ui" type="FORMS"/>
+  </FiletypeAssociations>
+</Project>

@@ -74,6 +74,7 @@ mongo::DBClientConnection * DBManager::getDBConnection() {
 	}
 }
 
+// ´´½¨Trader
 void DBManager::CreateTrader(Trader *op) {
 	
 	int count_number = 0;
@@ -89,6 +90,7 @@ void DBManager::CreateTrader(Trader *op) {
 		b.append("traderid", op->getTraderID());
 		b.append("password", op->getPassword());
 		b.append("isactive", op->getIsActive());
+		b.append("on_off", op->getOn_Off());
 		BSONObj p = b.obj();
 
 		conn->insert(DB_OPERATOR_COLLECTION, p);
@@ -122,7 +124,7 @@ void DBManager::UpdateTrader(string traderid, Trader *op) {
 		BSON("traderid" << traderid));
 
 	if (count_number > 0) {
-		this->conn->update(DB_OPERATOR_COLLECTION, BSON("traderid" << (traderid.c_str())), BSON("$set" << BSON("tradername" << op->getTraderName() << "traderid" << op->getTraderID() << "password" << op->getPassword() << "isactive" << op->getIsActive())));
+		this->conn->update(DB_OPERATOR_COLLECTION, BSON("traderid" << (traderid.c_str())), BSON("$set" << BSON("tradername" << op->getTraderName() << "traderid" << op->getTraderID() << "password" << op->getPassword() << "on_off" << op->getOn_Off() << "isactive" << op->getIsActive())));
 		USER_PRINT("DBManager::UpdateOperator ok");
 	}
 	else
@@ -140,6 +142,7 @@ void DBManager::SearchTraderByTraderID(string traderid) {
 		cout << "username = " << p.getStringField("tradername") << endl;
 		cout << "password = " << p.getStringField("password") << endl;
 		cout << "isactive = " << p.getStringField("isactive") << endl;
+		cout << "on_off = " << p.getIntField("on_off") << endl;
 	}
 	USER_PRINT("DBManager::SearchTraderByTraderID ok");
 }
@@ -152,6 +155,7 @@ void DBManager::SearchTraderByTraderName(string tradername) {
 		cout << "tradername = " << p.getStringField("tradername") << endl;
 		cout << "password = " << p.getStringField("password") << endl;
 		cout << "isactive = " << p.getStringField("isactive") << endl;
+		cout << "on_off = " << p.getIntField("on_off") << endl;
 	}
 	USER_PRINT("DBManager::SearchTraderByTraderName ok");
 }
@@ -165,6 +169,7 @@ void DBManager::SearchTraderByTraderIdAndPassword(string traderid, string passwo
 		cout << "tradername = " << p.getStringField("tradername") << endl;
 		cout << "password = " << p.getStringField("password") << endl;
 		cout << "isactive = " << p.getStringField("isactive") << endl;
+		cout << "on_off = " << p.getIntField("on_off") << endl;
 	}
 	USER_PRINT("DBManager::SearchTraderByTraderIdAndPassword ok");
 }
@@ -188,9 +193,11 @@ bool DBManager::FindTraderByTraderIdAndPassword(string traderid, string password
 			cout << "tradername = " << p.getStringField("tradername") << endl;
 			cout << "password = " << p.getStringField("password") << endl;
 			cout << "isactive = " << p.getStringField("isactive") << endl;
+			cout << "on_off = " << p.getIntField("on_off") << endl;
 			op->setTraderID(p.getStringField("traderid"));
 			op->setTraderName(p.getStringField("tradername"));
 			op->setPassword(p.getStringField("password"));
+			op->setOn_Off(p.getIntField("on_off"));
 		}
 
 
@@ -223,7 +230,8 @@ void DBManager::getAllTrader(list<string> *l_trader) {
 			cout << "*" << "traderid:" << p.getStringField("traderid") << "  "
 				<< "tradername:" << p.getStringField("tradername") << "  "
 				<< "password:" << p.getStringField("password") << "  "
-				<< "isactive:" << p.getStringField("isactive") << "*" << endl;
+				<< "isactive:" << p.getStringField("isactive") << " "
+				<< "on_off" << p.getIntField("on_off") << "*" << endl;
 
 			l_trader->push_back(p.getStringField("traderid"));
 		}
@@ -255,12 +263,14 @@ void DBManager::getAllObjTrader(list<Trader *> *l_trader) {
 			cout << "*" << "traderid:" << p.getStringField("traderid") << "  "
 				<< "tradername:" << p.getStringField("tradername") << "  "
 				<< "password:" << p.getStringField("password") << "  "
-				<< "isactive:" << p.getStringField("isactive") << "*" << endl;
+				<< "isactive:" << p.getStringField("isactive") << " "
+				<< "on_off" << p.getIntField("on_off") << "*" << endl;
 
 			op->setTraderID(p.getStringField("traderid"));
 			op->setTraderName(p.getStringField("tradername"));
 			op->setPassword(p.getStringField("password"));
 			op->setIsActive(p.getStringField("isactive"));
+			op->setOn_Off(p.getIntField("on_off"));
 
 			l_trader->push_back(op);
 		}
@@ -312,6 +322,7 @@ void DBManager::CreateFutureAccount(Trader *op, FutureAccount *fa) {
 				b.append("userid", fa->getUserID());
 				b.append("frontaddress", fa->getFrontAddress());
 				b.append("isactive", fa->getIsActive());
+				b.append("on_off", op->getOn_Off());
 
 				BSONObj p = b.obj();
 				conn->insert(DB_FUTUREACCOUNT_COLLECTION, p);
@@ -324,8 +335,8 @@ void DBManager::DeleteFutureAccount(FutureAccount *fa) {
 	this->conn->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (fa->getUserID().c_str())), BSON("$set" << BSON("isactive" << ISNOTACTIVE)));
 	USER_PRINT("DBManager::DeleteFutureAccount ok");
 }
-void DBManager::UpdateFutureAccount(string userid, Trader *op, FutureAccount *fa) {
-	this->conn->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (userid.c_str())), BSON("$set" << BSON("userid" << fa->getUserID() << "brokerid" << fa->getBrokerID() << "traderid" << op->getTraderID() << "password" << fa->getPassword() << "frontaddress" << fa->getFrontAddress() << "isactive" << fa->getIsActive())));
+void DBManager::UpdateFutureAccount(User *u) {
+	this->conn->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (u->getUserID().c_str())), BSON("$set" << BSON("userid" << u->getUserID() << "brokerid" << u->getBrokerID() << "traderid" << u->getTraderID() << "password" << u->getPassword() << "frontaddress" << u->getFrontAddress() << "isactive" << u->getIsActive() << "on_off" << u->getOn_Off())));
 	USER_PRINT("DBManager::UpdateOperator ok");
 }
 void DBManager::SearchFutrueByUserID(string userid) {
@@ -338,6 +349,7 @@ void DBManager::SearchFutrueByUserID(string userid) {
 		cout << "password = " << p.getStringField("password") << endl;
 		cout << "userid = " << p.getStringField("userid") << endl;
 		cout << "isactive = " << p.getStringField("isactive") << endl;
+		cout << "on_off = " << p.getIntField("on_off") << endl;
 	}
 	USER_PRINT("DBManager::SearchFutrueByUserID ok");
 }
@@ -353,6 +365,7 @@ void DBManager::SearchFutrueByTraderID(string traderid) {
 		cout << "userid = " << p.getStringField("userid") << endl;
 		cout << "frontAddress = " << p.getStringField("frontaddress") << endl;
 		cout << "isactive = " << p.getStringField("isactive") << endl;
+		cout << "on_off = " << p.getIntField("on_off") << endl;
 	}
 	USER_PRINT("DBManager::SearchFutrueByTraderName ok");
 }
@@ -388,6 +401,7 @@ void DBManager::SearchFutrueListByTraderID(string traderid, list<FutureAccount *
 		fa->setUserID(p.getStringField("userid"));
 		fa->setFrontAddress(p.getStringField("frontaddress"));
 		fa->setIsActive(p.getStringField("isactive"));
+		fa->setOn_Off(p.getIntField("on_off"));
 		l_futureaccount->push_back(fa);
 	}
 	USER_PRINT("DBManager::SearchFutrueByTraderName ok");
@@ -418,7 +432,7 @@ void DBManager::getAllFutureAccount(list<User *> *l_user) {
 				<< "userid:" << p.getStringField("userid") << "  "
 				<< "frontAddress:" << p.getStringField("frontaddress") << "  "
 				<< "isactive:" << p.getStringField("isactive") << "*" << endl;
-			User *user = new User(p.getStringField("frontaddress"), p.getStringField("brokerid"), p.getStringField("userid"), p.getStringField("password"), p.getStringField("userid"), p.getStringField("traderid"));
+			User *user = new User(p.getStringField("frontaddress"), p.getStringField("brokerid"), p.getStringField("userid"), p.getStringField("password"), p.getStringField("userid"), p.getIntField("on_off"), p.getStringField("traderid"));
 			l_user->push_back(user);
 		}
 		

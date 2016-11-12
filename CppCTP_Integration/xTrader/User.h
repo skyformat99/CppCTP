@@ -24,7 +24,7 @@ class CTP_Manager;
 class User
 {
 public:
-	User(string frontAddress, string BrokerID, string UserID, string Password, string nRequestID, string TraderID = "");
+	User(string frontAddress, string BrokerID, string UserID, string Password, string nRequestID, int on_off, string TraderID = "");
 	User(string BrokerID, string UserID, int nRequestID);
 	~User();
 	string getBrokerID();
@@ -106,6 +106,9 @@ public:
 	void setCTP_Manager(CTP_Manager *o_ctp);
 	CTP_Manager *getCTP_Manager();
 
+	void setIsActive(string isActive);
+	string getIsActive();
+
 private:
 	int on_off; //¿ª¹Ø
 	string BrokerID;
@@ -128,6 +131,7 @@ private:
 	mongo::DBClientConnection * OrderConn;
 	long long stg_order_ref_base;
 	CTP_Manager *o_ctp;
+	string isActive;
 };
 
 #endif

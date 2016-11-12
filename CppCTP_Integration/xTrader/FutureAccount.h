@@ -29,6 +29,9 @@ public:
 	void setFrontAddress(string frontAddress);
 	string getFrontAddress();
 
+	void setOn_Off(int on_off);
+	int getOn_Off();
+
 private:
 	string userID;
 	string password;
@@ -37,6 +40,7 @@ private:
 	string frontAddress;
 	Trader *op;
 	string isActive;
+	int on_off;
 };
 
 #endif

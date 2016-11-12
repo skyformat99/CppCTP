@@ -61,7 +61,7 @@ public:
 	/************************************************************************/
 	void CreateFutureAccount(Trader *op, FutureAccount *fa);
 	void DeleteFutureAccount(FutureAccount *fa);
-	void UpdateFutureAccount(string userid, Trader *op, FutureAccount *fa);
+	void UpdateFutureAccount(User *u);
 	void SearchFutrueByUserID(string userid);
 	void SearchFutrueByTraderID(string traderid);
 	void SearchFutrueListByTraderID(string traderid, list<FutureAccount *> *l_futureaccount);

@@ -20,8 +20,8 @@
 //×ªÂëÊý×é
 char codeDst_2[90] = { 0 };
 
-User::User(string frontAddress, string BrokerID, string UserID, string Password, string nRequestID, string TraderID) {
-	this->on_off = 0;
+User::User(string frontAddress, string BrokerID, string UserID, string Password, string nRequestID, int on_off, string TraderID) {
+	this->on_off = on_off;
 	this->BrokerID = BrokerID;
 	this->UserID = UserID;
 	this->Password = Password;
@@ -1122,4 +1122,11 @@ void User::setCTP_Manager(CTP_Manager *o_ctp) {
 }
 CTP_Manager * User::getCTP_Manager() {
 	return this->o_ctp;
+}
+
+void User::setIsActive(string isActive) {
+	this->isActive = isActive;
+}
+string User::getIsActive() {
+	return this->isActive;
 }

@@ -17,6 +17,7 @@ FutureAccount::FutureAccount(string frontAddress, string userID, string password
 	this->traderID = traderID;
 	this->isActive = isActive;
 	this->brokerID = brokerID;
+	this->on_off = 1;
 }
 FutureAccount::~FutureAccount() {
 	delete this;
@@ -69,4 +70,11 @@ void FutureAccount::setFrontAddress(string frontAddress) {
 }
 string FutureAccount::getFrontAddress() {
 	return this->frontAddress;
+}
+
+void FutureAccount::setOn_Off(int on_off) {
+	this->on_off = on_off;
+}
+int FutureAccount::getOn_Off() {
+	return this->on_off;
 }
