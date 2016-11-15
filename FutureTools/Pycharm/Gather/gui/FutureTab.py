@@ -63,6 +63,7 @@ class FutureTab(QWidget, Ui_FutureTab):
     def set_init_data(self, data, pipe):
         self.tableWidget.clearContents()
         self.table_data = data
+        print("table_data", self.table_data)
         self.pipeline = pipe
         i = 1
         for row_item in data:
@@ -80,10 +81,10 @@ class FutureTab(QWidget, Ui_FutureTab):
                 isread_item.setIcon(QtGui.QIcon('img/read.png'))
 
 
-
             self.tableWidget.setItem(i, 0, id_item)
             self.tableWidget.setItem(i, 1, title_item)
             self.tableWidget.setItem(i, 2, pubtime_item)
+            # self.tableWidget.setColumnHidden(0, True)
 
             self.tableWidget.setItem(i, 3, isread_item)
             i = i + 1

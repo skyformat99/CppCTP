@@ -8,6 +8,7 @@ from PipeLine import PipeLine
 class InfoParser():
     def __init__(self, pipeline):
         self.pipeline = pipeline
+        self.catchcount = time.mktime(datetime.datetime.now().timetuple())
 
     def SH_getPageLink(self, url):
         stop_flag = False
@@ -35,6 +36,7 @@ class InfoParser():
                             info_item.setTitle(item.find("a").get_text())
                             info_item.setLink(item_url)
                             info_item.setPubtime(cmp_str_time)
+                            info_item.setCatchTime(self.catchcount)
                             if content == None:
                                 info_item.setContent("公告内容为空")
                             else:
@@ -45,6 +47,7 @@ class InfoParser():
                         else:
                             stop_flag = True
                     if (stop_flag == True):
+                        self.catchcount += 1
                         return
                     else:
                         page_item = bsObj.find("div", {"class": {"page-no"}}).findAll("a")[2]

@@ -1,5 +1,5 @@
 class Info():
-    def __init__(self, exchange_name, title='', pubtime='', link='', content='', isread=0):
+    def __init__(self, exchange_name, title='', pubtime='', link='', content='' , isread=0):
         self.title = title
         self.pubtime = pubtime
         self.link = link
@@ -12,6 +12,12 @@ class Info():
 
     def getTitle(self):
         return self.title
+
+    def setCatchTime(self, catchtime):
+        self.catchtime = catchtime
+
+    def getCatchTime(self):
+        return self.catchtime
 
     def setPubtime(self, pubtime):
         self.pubtime = pubtime

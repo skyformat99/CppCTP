@@ -12,11 +12,13 @@ class PipeLine():
 
         self.conn = sqlite3.connect('data.db')
         print("成功打开数据库")
+        #sql_del="DROP TABLE IF EXISTS tbl_test;"
         try:
             self.conn.execute('''
                               CREATE TABLE IF NOT EXISTS INFODATA
                               (ID INTEGER PRIMARY KEY AUTOINCREMENT,
                               TITLE CHAR(300) NOT NULL,
+                              CATCHTIME REAL NOT NULL,
                               PUBTIME CHAR(50) NOT NULL,
                               LINK CHAR(300) NOT NULL,
                               CONTENT TEXT NOT NULL,
@@ -37,7 +39,7 @@ class PipeLine():
 
     def saveInfo(self, obj):
         if (self.countInfo(obj.getLink()) <= 0):
-            sql_statement = "INSERT INTO INFODATA(TITLE,PUBTIME,LINK,CONTENT,ISREAD,EXCHANGENAME) VALUES('" + obj.getTitle() + "','" + obj.getPubtime() + "','" + obj.getLink() + "','" + obj.getContent() + "'," + str(obj.getIsread()) + ",'" + obj.getExchangeName() + "')"
+            sql_statement = "INSERT INTO INFODATA(TITLE,CATCHTIME,PUBTIME,LINK,CONTENT,ISREAD,EXCHANGENAME) VALUES('" + obj.getTitle() + "'," + str(obj.getCatchTime()) + ",'" + obj.getPubtime() + "','" + obj.getLink() + "','" + obj.getContent() + "'," + str(obj.getIsread()) + ",'" + obj.getExchangeName() + "')"
             self.conn.execute(sql_statement)
             self.conn.commit()
         else:
@@ -51,18 +53,19 @@ class PipeLine():
         return count
 
     def getInfo(self, exchangename, pageNumber = 0, pagesize = 20):
-        sql_statement = "SELECT * FROM INFODATA WHERE EXCHANGENAME= '"+ exchangename +"' limit " + str(pageNumber * pagesize -1) + ", " + str(pagesize)
+        #sql_statement = "SELECT * FROM INFODATA WHERE EXCHANGENAME= '"+ exchangename +"' limit " + str(pageNumber * pagesize -1) + ", " + str(pagesize)
+        sql_statement = "SELECT * FROM INFODATA  WHERE EXCHANGENAME= '"+ exchangename +"' ORDER BY CATCHTIME DESC, id ASC limit " + str(pageNumber * pagesize -1) + ", " + str(pagesize)
         cursor = self.conn.execute(sql_statement)
         rowlist = []
         for row in cursor:
             dict_row = {}
             dict_row['id'] = row[0]
             dict_row['title'] = row[1]
-            dict_row['pubtime'] = row[2]
-            dict_row['link'] = row[3]
-            dict_row['content'] = row[4]
-            dict_row['isread'] = row[5]
-            dict_row['exchangename'] = row[6]
+            dict_row['pubtime'] = row[3]
+            dict_row['link'] = row[4]
+            dict_row['content'] = row[5]
+            dict_row['isread'] = row[6]
+            dict_row['exchangename'] = row[7]
             rowlist.append(dict_row)
 
         if (exchangename == 'SH'):
