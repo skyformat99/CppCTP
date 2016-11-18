@@ -527,7 +527,22 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					info_object.AddMember("order_action_tires_limit", (*stg_itor)->getStgOrderActionTiresLimit(), allocator);
 					info_object.AddMember("sell_close", (*stg_itor)->getStgSellClose(), allocator);
 					info_object.AddMember("buy_open", (*stg_itor)->getStgBuyOpen(), allocator);
-					//info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator);
+					info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator);
+
+					/*新增字段*/
+					info_object.AddMember("trade_model", rapidjson::StringRef((*stg_itor)->getStgTradeModel().c_str()), allocator);
+					info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator);
+					info_object.AddMember("hold_profit", (*stg_itor)->getStgHoldProfit(), allocator);
+					info_object.AddMember("close_profit", (*stg_itor)->getStgCloseProfit(), allocator);
+					info_object.AddMember("commission", (*stg_itor)->getStgCommission(), allocator);
+					info_object.AddMember("position", (*stg_itor)->getStgPosition(), allocator);
+					info_object.AddMember("position_buy", (*stg_itor)->getStgPositionBuy(), allocator);
+					info_object.AddMember("position_sell", (*stg_itor)->getStgPositionSell(), allocator);
+					info_object.AddMember("trade_volume", (*stg_itor)->getStgTradeVolume(), allocator);
+					info_object.AddMember("amount", (*stg_itor)->getStgAmount(), allocator);
+					info_object.AddMember("average_shift", (*stg_itor)->getStgAverageShift(), allocator);
+
+
 
 					rapidjson::Value instrument_array(rapidjson::kArrayType);
 					for (int j = 0; j < 2; j++) {
@@ -675,7 +690,21 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								(*stg_itor)->setStgOrderActionTiresLimit(object["order_action_tires_limit"].GetInt());
 								(*stg_itor)->setStgSellClose(object["sell_close"].GetDouble());
 								(*stg_itor)->setStgBuyOpen(object["buy_open"].GetDouble());
-								//(*stg_itor)->setStgOnlyClose(object["only_close"].GetBool());
+								(*stg_itor)->setStgOnlyClose(object["only_close"].GetInt());
+
+								/*新增字段*/
+
+								(*stg_itor)->setStgTradeModel(object["trade_model"].GetString());
+								(*stg_itor)->setStgOrderAlgorithm(object["order_algorithm"].GetString());
+								(*stg_itor)->setStgHoldProfit(object["hold_profit"].GetDouble());
+								(*stg_itor)->setStgCloseProfit(object["close_profit"].GetDouble());
+								(*stg_itor)->setStgCommisstion(object["commission"].GetDouble());
+								(*stg_itor)->setStgPosition(object["position"].GetInt());
+								(*stg_itor)->setStgPositionBuy(object["position_buy"].GetInt());
+								(*stg_itor)->setStgPositionSell(object["position_sell"].GetInt());
+								(*stg_itor)->setStgTradeVolume(object["trade_volume"].GetInt());
+								(*stg_itor)->setStgAmount(object["amount"].GetDouble());
+								(*stg_itor)->setStgAverageShift(object["average_shift"].GetDouble());
 
 
 								//遍历list_instrument_id
@@ -729,7 +758,21 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								create_info_object.AddMember("order_action_tires_limit", (*stg_itor)->getStgOrderActionTiresLimit(), allocator);
 								create_info_object.AddMember("sell_close", (*stg_itor)->getStgSellClose(), allocator);
 								create_info_object.AddMember("buy_open", (*stg_itor)->getStgBuyOpen(), allocator);
-								//info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator);
+								create_info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator);
+
+								/*新增字段*/
+								create_info_object.AddMember("trade_model", rapidjson::StringRef((*stg_itor)->getStgTradeModel().c_str()), allocator);
+								create_info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator);
+								create_info_object.AddMember("hold_profit", (*stg_itor)->getStgHoldProfit(), allocator);
+								create_info_object.AddMember("close_profit", (*stg_itor)->getStgCloseProfit(), allocator);
+								create_info_object.AddMember("commission", (*stg_itor)->getStgCommission(), allocator);
+								create_info_object.AddMember("position", (*stg_itor)->getStgPosition(), allocator);
+								create_info_object.AddMember("position_buy", (*stg_itor)->getStgPositionBuy(), allocator);
+								create_info_object.AddMember("position_sell", (*stg_itor)->getStgPositionSell(), allocator);
+								create_info_object.AddMember("trade_volume", (*stg_itor)->getStgTradeVolume(), allocator);
+								create_info_object.AddMember("amount", (*stg_itor)->getStgAmount(), allocator);
+								create_info_object.AddMember("average_shift", (*stg_itor)->getStgAverageShift(), allocator);
+
 
 								rapidjson::Value instrument_array(rapidjson::kArrayType);
 								for (int j = 0; j < 2; j++) {
@@ -832,7 +875,21 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						new_stg->setStgOrderActionTiresLimit(object["order_action_tires_limit"].GetInt());
 						new_stg->setStgSellClose(object["sell_close"].GetDouble());
 						new_stg->setStgBuyOpen(object["buy_open"].GetDouble());
-						//new_stg->setStgOnlyClose(object["only_close"].GetBool());
+						new_stg->setStgOnlyClose(object["only_close"].GetInt());
+
+						/*新增字段*/
+						new_stg->setStgTradeModel(object["trade_model"].GetString());
+						new_stg->setStgOrderAlgorithm(object["order_algorithm"].GetString());
+						new_stg->setStgHoldProfit(object["hold_profit"].GetDouble());
+						new_stg->setStgCloseProfit(object["close_profit"].GetDouble());
+						new_stg->setStgCommisstion(object["commission"].GetDouble());
+						new_stg->setStgPosition(object["position"].GetInt());
+						new_stg->setStgPositionBuy(object["position_buy"].GetInt());
+						new_stg->setStgPositionSell(object["position_sell"].GetInt());
+						new_stg->setStgTradeVolume(object["trade_volume"].GetInt());
+						new_stg->setStgAmount(object["amount"].GetDouble());
+						new_stg->setStgAverageShift(object["average_shift"].GetDouble());
+
 
 
 						//遍历list_instrument_id
@@ -993,7 +1050,20 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								create_info_object.AddMember("order_action_tires_limit", (*stg_itor)->getStgOrderActionTiresLimit(), allocator);
 								create_info_object.AddMember("sell_close", (*stg_itor)->getStgSellClose(), allocator);
 								create_info_object.AddMember("buy_open", (*stg_itor)->getStgBuyOpen(), allocator);
-								//info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator);
+								create_info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator);
+
+								/*新增字段*/
+								create_info_object.AddMember("trade_model", rapidjson::StringRef((*stg_itor)->getStgTradeModel().c_str()), allocator);
+								create_info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator);
+								create_info_object.AddMember("hold_profit", (*stg_itor)->getStgHoldProfit(), allocator);
+								create_info_object.AddMember("close_profit", (*stg_itor)->getStgCloseProfit(), allocator);
+								create_info_object.AddMember("commission", (*stg_itor)->getStgCommission(), allocator);
+								create_info_object.AddMember("position", (*stg_itor)->getStgPosition(), allocator);
+								create_info_object.AddMember("position_buy", (*stg_itor)->getStgPositionBuy(), allocator);
+								create_info_object.AddMember("position_sell", (*stg_itor)->getStgPositionSell(), allocator);
+								create_info_object.AddMember("trade_volume", (*stg_itor)->getStgTradeVolume(), allocator);
+								create_info_object.AddMember("amount", (*stg_itor)->getStgAmount(), allocator);
+								create_info_object.AddMember("average_shift", (*stg_itor)->getStgAverageShift(), allocator);
 
 								rapidjson::Value instrument_array(rapidjson::kArrayType);
 								for (int j = 0; j < 2; j++) {
@@ -1214,7 +1284,21 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						create_info_object.AddMember("order_action_tires_limit", (*stg_itor)->getStgOrderActionTiresLimit(), allocator);
 						create_info_object.AddMember("sell_close", (*stg_itor)->getStgSellClose(), allocator);
 						create_info_object.AddMember("buy_open", (*stg_itor)->getStgBuyOpen(), allocator);
-						//info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator);
+						create_info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator);
+
+						/*新增字段*/
+						create_info_object.AddMember("trade_model", rapidjson::StringRef((*stg_itor)->getStgTradeModel().c_str()), allocator);
+						create_info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator);
+						create_info_object.AddMember("hold_profit", (*stg_itor)->getStgHoldProfit(), allocator);
+						create_info_object.AddMember("close_profit", (*stg_itor)->getStgCloseProfit(), allocator);
+						create_info_object.AddMember("commission", (*stg_itor)->getStgCommission(), allocator);
+						create_info_object.AddMember("position", (*stg_itor)->getStgPosition(), allocator);
+						create_info_object.AddMember("position_buy", (*stg_itor)->getStgPositionBuy(), allocator);
+						create_info_object.AddMember("position_sell", (*stg_itor)->getStgPositionSell(), allocator);
+						create_info_object.AddMember("trade_volume", (*stg_itor)->getStgTradeVolume(), allocator);
+						create_info_object.AddMember("amount", (*stg_itor)->getStgAmount(), allocator);
+						create_info_object.AddMember("average_shift", (*stg_itor)->getStgAverageShift(), allocator);
+
 
 						rapidjson::Value instrument_array(rapidjson::kArrayType);
 						for (int j = 0; j < 2; j++) {

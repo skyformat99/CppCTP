@@ -473,7 +473,21 @@ void DBManager::CreateStrategy(Strategy *stg) {
 		b.append("order_action_tires_limit", stg->getStgOrderActionTiresLimit());
 		b.append("sell_close", stg->getStgSellClose());
 		b.append("buy_open", stg->getStgBuyOpen());
-		//b.append("only_close", stg->isStgOnlyClose());
+		b.append("only_close", stg->isStgOnlyClose());
+
+		/*新增字段*/
+		b.append("trade_model", stg->getStgTradeModel());
+		b.append("order_algorithm", stg->getStgOrderAlgorithm());
+		b.append("hold_profit", stg->getStgHoldProfit());
+		b.append("close_profit", stg->getStgCloseProfit());
+		b.append("commission", stg->getStgCommission());
+		b.append("position", stg->getStgPosition());
+		b.append("position_buy", stg->getStgPositionBuy());
+		b.append("positon_sell", stg->getStgPositionSell());
+		b.append("trade_volume", stg->getStgTradeVolume());
+		b.append("amount", stg->getStgAmount());
+		b.append("average_shift", stg->getStgAverageShift());
+
 
 		// 创建一个数组对象
 		BSONArrayBuilder bab;
@@ -545,7 +559,20 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 			<< "order_action_tires_limit" << stg->getStgOrderActionTiresLimit() 
 			<< "sell_close" << stg->getStgSellClose() 
 			<< "buy_open" << stg->getStgBuyOpen() 
-			//<< "only_close" << stg->isStgOnlyClose() 
+			<< "only_close" << stg->isStgOnlyClose()
+			
+			<< "trade_model" << stg->getStgTradeModel()
+			<< "order_algorithm" << stg->getStgOrderAlgorithm()
+			<< "hold_profit" << stg->getStgHoldProfit()
+			<< "close_profit" << stg->getStgCloseProfit()
+			<< "commission" << stg->getStgCommission()
+			<< "position" << stg->getStgPosition()
+			<< "position_buy" << stg->getStgPositionBuy()
+			<< "position_sell" << stg->getStgPositionSell()
+			<< "trade_volume" << stg->getStgTradeVolume()
+			<< "amount" << stg->getStgAmount()
+			<< "average_shift" << stg->getStgAverageShift()
+
 			<< "position_a_buy_yesterday" << stg->getStgPositionABuyYesterday() 
 			<< "user_id" << stg->getStgUserId() 
 			<< "position_a_buy_today" << stg->getStgPositionABuyToday() 
@@ -612,7 +639,22 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 		cout << "order_action_tires_limit = " << p.getIntField("order_action_tires_limit") << ", ";
 		cout << "sell_close = " << p.getField("sell_close").Double() << ", ";
 		cout << "buy_open = " << p.getField("buy_open").Double() << ", ";
-		//cout << "only_close = " << p.getField("only_close").Bool() << ", ";
+		cout << "only_close = " << p.getIntField("only_close") << ", ";
+
+		/*新增字段*/
+
+		cout << "trade_model" << p.getStringField("trade_model") << ", ";
+		cout << "order_algorithm" << p.getStringField("order_algorithm") << ", ";
+		cout << "hold_profit" << p.getField("hold_profit").Double() << ", ";
+		cout << "close_profit" << p.getField("close_profit").Double() << ", ";
+		cout << "commission" << p.getField("commission").Double() << ", ";
+		cout << "position" << p.getIntField("position") << ", ";
+		cout << "position_buy" << p.getIntField("position_buy") << ", ";
+		cout << "position_sell" << p.getIntField("position_sell") << ", ";
+		cout << "trade_volume" << p.getIntField("trade_volume") << ", ";
+		cout << "amount" << p.getField("amount").Double() << ", ";
+		cout << "average_shift" << p.getField("average_shift").Double() << ", ";
+
 		cout << "position_a_buy_yesterday = " << p.getIntField("position_a_buy_yesterday") << ", ";
 		cout << "user_id = " << p.getStringField("user_id") << ", "; // string type
 		cout << "position_a_buy_today = " << p.getIntField("position_a_buy_today") << ", ";
@@ -629,7 +671,21 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 		stg->setStgIsActive(p.getField("is_active").Bool());
 		stg->setStgLots(p.getIntField("lots"));
 		stg->setStgLotsBatch(p.getIntField("lots_batch"));
-		//stg->setStgOnlyClose(p.getField("only_close").Bool());
+		stg->setStgOnlyClose(p.getIntField("only_close"));
+
+		/*新增*/
+		stg->setStgTradeModel(p.getStringField("trade_model"));
+		stg->setStgOrderAlgorithm(p.getStringField("order_algorithm"));
+		stg->setStgHoldProfit(p.getField("hold_profit").Double());
+		stg->setStgCloseProfit(p.getField("close_profit").Double());
+		stg->setStgCommisstion(p.getField("commission").Double());
+		stg->setStgPosition(p.getIntField("position"));
+		stg->setStgPositionBuy(p.getIntField("position_buy"));
+		stg->setStgPositionSell(p.getIntField("position_sell"));
+		stg->setStgTradeVolume(p.getIntField("trade_volume"));
+		stg->setStgAmount(p.getField("amount").Double());
+		stg->setStgAverageShift(p.getField("average_shift").Double());
+
 		stg->setStgOrderActionTiresLimit(p.getIntField("order_action_tires_limit"));
 		stg->setStgOrderAlgorithm(p.getStringField("order_algorithm"));
 		stg->setStgPositionABuy(p.getIntField("position_a_buy"));
@@ -684,7 +740,7 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 void DBManager::CreateStrategyYesterday(Strategy *stg) {
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_STRATEGY_YESTERDAY_COLLECTION,
+	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
 		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str())));
 
 	if (count_number > 0) {
@@ -714,7 +770,21 @@ void DBManager::CreateStrategyYesterday(Strategy *stg) {
 		b.append("order_action_tires_limit", stg->getStgOrderActionTiresLimit());
 		b.append("sell_close", stg->getStgSellClose());
 		b.append("buy_open", stg->getStgBuyOpen());
-		//b.append("only_close", stg->isStgOnlyClose());
+		b.append("only_close", stg->isStgOnlyClose());
+
+		/*新增字段*/
+		b.append("trade_model", stg->getStgTradeModel());
+		b.append("order_algorithm", stg->getStgOrderAlgorithm());
+		b.append("hold_profit", stg->getStgHoldProfit());
+		b.append("close_profit", stg->getStgCloseProfit());
+		b.append("commission", stg->getStgCommission());
+		b.append("position", stg->getStgPosition());
+		b.append("position_buy", stg->getStgPositionBuy());
+		b.append("positon_sell", stg->getStgPositionSell());
+		b.append("trade_volume", stg->getStgTradeVolume());
+		b.append("amount", stg->getStgAmount());
+		b.append("average_shift", stg->getStgAverageShift());
+
 
 		// 创建一个数组对象
 		BSONArrayBuilder bab;
@@ -734,7 +804,7 @@ void DBManager::CreateStrategyYesterday(Strategy *stg) {
 
 		BSONObj p = b.obj();
 
-		conn->insert(DB_STRATEGY_YESTERDAY_COLLECTION, p);
+		conn->insert(DB_STRATEGY_COLLECTION, p);
 		USER_PRINT("DBManager::CreateStrategy ok");
 	}
 }
@@ -742,11 +812,11 @@ void DBManager::CreateStrategyYesterday(Strategy *stg) {
 void DBManager::DeleteStrategyYesterday(Strategy *stg) {
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_STRATEGY_YESTERDAY_COLLECTION,
+	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
 		BSON("strategy_id" << stg->getStgStrategyId().c_str() << "user_id" << stg->getStgUserId().c_str()));
 
 	if (count_number > 0) {
-		this->conn->update(DB_STRATEGY_YESTERDAY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId())), BSON("$set" << BSON("is_active" << false)));
+		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId())), BSON("$set" << BSON("is_active" << false)));
 		USER_PRINT("DBManager::DeleteStrategy ok");
 	}
 	else {
@@ -760,13 +830,13 @@ void DBManager::UpdateStrategyYesterday(Strategy *stg) {
 	std::cout << "DBManager::UpdateStrategy" << std::endl;
 
 
-	count_number = this->conn->count(DB_STRATEGY_YESTERDAY_COLLECTION,
+	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
 		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str()));
 
 	std::cout << "count_number = " << count_number << std::endl;
 
 	if (count_number > 0) {
-		this->conn->update(DB_STRATEGY_YESTERDAY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str())), BSON("$set" << BSON("position_a_sell_today" << stg->getStgPositionASellToday()
+		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str())), BSON("$set" << BSON("position_a_sell_today" << stg->getStgPositionASellToday()
 			<< "position_b_sell" << stg->getStgPositionBSell()
 			<< "spread_shift" << stg->getStgSpreadShift()
 			<< "position_b_sell_today" << stg->getStgPositionBSellToday()
@@ -787,7 +857,20 @@ void DBManager::UpdateStrategyYesterday(Strategy *stg) {
 			<< "order_action_tires_limit" << stg->getStgOrderActionTiresLimit()
 			<< "sell_close" << stg->getStgSellClose()
 			<< "buy_open" << stg->getStgBuyOpen()
-			//<< "only_close" << stg->isStgOnlyClose() 
+			<< "only_close" << stg->isStgOnlyClose()
+
+			<< "trade_model" << stg->getStgTradeModel()
+			<< "order_algorithm" << stg->getStgOrderAlgorithm()
+			<< "hold_profit" << stg->getStgHoldProfit()
+			<< "close_profit" << stg->getStgCloseProfit()
+			<< "commission" << stg->getStgCommission()
+			<< "position" << stg->getStgPosition()
+			<< "position_buy" << stg->getStgPositionBuy()
+			<< "position_sell" << stg->getStgPositionSell()
+			<< "trade_volume" << stg->getStgTradeVolume()
+			<< "amount" << stg->getStgAmount()
+			<< "average_shift" << stg->getStgAverageShift()
+
 			<< "position_a_buy_yesterday" << stg->getStgPositionABuyYesterday()
 			<< "user_id" << stg->getStgUserId()
 			<< "position_a_buy_today" << stg->getStgPositionABuyToday()
@@ -821,14 +904,14 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 	if (traderid.compare("")) { //如果traderid不为空
 
 		if (userid.compare("")) { //如果userid不为空
-			cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid));
+			cursor = this->conn->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid));
 		}
 		else {
-			cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid));
+			cursor = this->conn->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("trader_id" << traderid));
 		}
 	}
 	else {
-		cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION);
+		cursor = this->conn->query(DB_STRATEGY_COLLECTION);
 	}
 
 	while (cursor->more()) {
@@ -855,7 +938,22 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 		cout << "order_action_tires_limit = " << p.getIntField("order_action_tires_limit") << ", ";
 		cout << "sell_close = " << p.getField("sell_close").Double() << ", ";
 		cout << "buy_open = " << p.getField("buy_open").Double() << ", ";
-		//cout << "only_close = " << p.getField("only_close").Bool() << ", ";
+		cout << "only_close = " << p.getIntField("only_close") << ", ";
+
+		/*新增字段*/
+
+		cout << "trade_model" << p.getStringField("trade_model") << ", ";
+		cout << "order_algorithm" << p.getStringField("order_algorithm") << ", ";
+		cout << "hold_profit" << p.getField("hold_profit").Double() << ", ";
+		cout << "close_profit" << p.getField("close_profit").Double() << ", ";
+		cout << "commission" << p.getField("commission").Double() << ", ";
+		cout << "position" << p.getIntField("position") << ", ";
+		cout << "position_buy" << p.getIntField("position_buy") << ", ";
+		cout << "position_sell" << p.getIntField("position_sell") << ", ";
+		cout << "trade_volume" << p.getIntField("trade_volume") << ", ";
+		cout << "amount" << p.getField("amount").Double() << ", ";
+		cout << "average_shift" << p.getField("average_shift").Double() << ", ";
+
 		cout << "position_a_buy_yesterday = " << p.getIntField("position_a_buy_yesterday") << ", ";
 		cout << "user_id = " << p.getStringField("user_id") << ", "; // string type
 		cout << "position_a_buy_today = " << p.getIntField("position_a_buy_today") << ", ";
@@ -872,7 +970,21 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 		stg->setStgIsActive(p.getField("is_active").Bool());
 		stg->setStgLots(p.getIntField("lots"));
 		stg->setStgLotsBatch(p.getIntField("lots_batch"));
-		//stg->setStgOnlyClose(p.getField("only_close").Bool());
+		stg->setStgOnlyClose(p.getIntField("only_close"));
+
+		/*新增*/
+		stg->setStgTradeModel(p.getStringField("trade_model"));
+		stg->setStgOrderAlgorithm(p.getStringField("order_algorithm"));
+		stg->setStgHoldProfit(p.getField("hold_profit").Double());
+		stg->setStgCloseProfit(p.getField("close_profit").Double());
+		stg->setStgCommisstion(p.getField("commission").Double());
+		stg->setStgPosition(p.getField("position").Int());
+		stg->setStgPositionBuy(p.getField("position_buy").Int());
+		stg->setStgPositionSell(p.getField("position_sell").Int());
+		stg->setStgTradeVolume(p.getField("trade_volume").Int());
+		stg->setStgAmount(p.getField("amount").Double());
+		stg->setStgAverageShift(p.getField("average_shift").Double());
+
 		stg->setStgOrderActionTiresLimit(p.getIntField("order_action_tires_limit"));
 		stg->setStgOrderAlgorithm(p.getStringField("order_algorithm"));
 		stg->setStgPositionABuy(p.getIntField("position_a_buy"));
@@ -973,7 +1085,24 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 		cout << "order_action_tires_limit = " << p.getIntField("order_action_tires_limit") << ", ";
 		cout << "sell_close = " << p.getField("sell_close").Double() << ", ";
 		cout << "buy_open = " << p.getField("buy_open").Double() << ", ";
-		//cout << "only_close = " << p.getField("only_close").Bool() << ", ";
+		cout << "only_close = " << p.getIntField("only_close") << ", ";
+
+
+		/*新增字段*/
+
+		cout << "trade_model" << p.getStringField("trade_model") << ", ";
+		cout << "order_algorithm" << p.getStringField("order_algorithm") << ", ";
+		cout << "hold_profit" << p.getField("hold_profit").Double() << ", ";
+		cout << "close_profit" << p.getField("close_profit").Double() << ", ";
+		cout << "commission" << p.getField("commission").Double() << ", ";
+		cout << "position" << p.getIntField("position") << ", ";
+		cout << "position_buy" << p.getIntField("position_buy") << ", ";
+		cout << "position_sell" << p.getIntField("position_sell") << ", ";
+		cout << "trade_volume" << p.getIntField("trade_volume") << ", ";
+		cout << "amount" << p.getField("amount").Double() << ", ";
+		cout << "average_shift" << p.getField("average_shift").Double() << ", ";
+
+
 		cout << "position_a_buy_yesterday = " << p.getIntField("position_a_buy_yesterday") << ", ";
 		cout << "user_id = " << p.getStringField("user_id") << ", "; // string type
 		cout << "position_a_buy_today = " << p.getIntField("position_a_buy_today") << ", ";
@@ -990,7 +1119,25 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 		stg->setStgIsActive(p.getField("is_active").Bool());
 		stg->setStgLots(p.getIntField("lots"));
 		stg->setStgLotsBatch(p.getIntField("lots_batch"));
-		//stg->setStgOnlyClose(p.getField("only_close").Bool());
+		stg->setStgOnlyClose(p.getIntField("only_close"));
+
+
+
+		/*新增*/
+		stg->setStgTradeModel(p.getStringField("trade_model"));
+		stg->setStgOrderAlgorithm(p.getStringField("order_algorithm"));
+		stg->setStgHoldProfit(p.getField("hold_profit").Double());
+		stg->setStgCloseProfit(p.getField("close_profit").Double());
+		stg->setStgCommisstion(p.getField("commission").Double());
+		stg->setStgPosition(p.getIntField("position"));
+		stg->setStgPositionBuy(p.getIntField("position_buy"));
+		stg->setStgPositionSell(p.getIntField("position_sell"));
+		stg->setStgTradeVolume(p.getIntField("trade_volume"));
+		stg->setStgAmount(p.getField("amount").Double());
+		stg->setStgAverageShift(p.getField("average_shift").Double());
+
+
+
 		stg->setStgOrderActionTiresLimit(p.getIntField("order_action_tires_limit"));
 		stg->setStgOrderAlgorithm(p.getStringField("order_algorithm"));
 		stg->setStgPositionABuy(p.getIntField("position_a_buy"));

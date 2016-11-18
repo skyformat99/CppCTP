@@ -106,14 +106,12 @@ public:
 	int getStgLotsBatch();
 	void setStgLotsBatch(int stgLotsBatch);
 
-	bool isStgOnlyClose();
-	void setStgOnlyClose(bool stgOnlyClose);
+	int isStgOnlyClose();
+	void setStgOnlyClose(int stgOnlyClose);
 
 	int getStgOrderActionTiresLimit();
 	void setStgOrderActionTiresLimit(int stgOrderActionTiresLimit);
 
-	string getStgOrderAlgorithm();
-	void setStgOrderAlgorithm(string stgOrderAlgorithm);
 
 	string getStgOrderRefA();
 	void setStgOrderRefA(string stgOrderRefA);
@@ -290,6 +288,57 @@ public:
 	/// 更新交易状态
 	void update_task_status();
 
+	/// 交易模型
+	void setStgTradeModel(string stg_trade_model);
+
+	string getStgTradeModel();
+
+	string getStgOrderAlgorithm();			// 下单算法
+
+	void setStgOrderAlgorithm(string stg_order_algorithm);
+
+	double getStgHoldProfit();				// 持仓盈亏
+
+	void setStgHoldProfit(double stg_hold_profit);
+
+	double getStgCloseProfit();			// 平仓盈亏
+
+	void setStgCloseProfit(double stg_close_profit);
+
+	double getStgCommission();				// 手续费
+
+	void setStgCommisstion(double stg_commission);
+
+	int getStgPosition();					// 总持仓
+
+	void setStgPosition(int stg_position);
+
+	int getStgPositionBuy();				// 买持仓
+
+	void setStgPositionBuy(int stg_position_buy);
+
+	int getStgPositionSell();				// 卖持仓
+	
+	int setStgPositionSell(int stg_position_sell);
+
+	int getStgTradeVolume();				// 成交量
+
+	int setStgTradeVolume(int stg_trade_volume);
+
+	double getStgAmount();					// 成交金额
+
+	void setStgAmount(double stg_amount);
+
+	double getStgAverageShift();			// 平均滑点
+
+	void setStgAverageShift(double stg_average_shift);
+
+	void setInit_Finished(bool init_finished);
+
+	bool getInit_Finished();
+
+	void init_today_position();
+
 private:
 	Trader *trader;
 	User *user;
@@ -304,7 +353,6 @@ private:
 	string stg_trader_id;		// 交易员账户id
 	string stg_user_id;			// user_id
 	string stg_strategy_id;		// 策略id
-	string stg_order_algorithm;	// 下单算法选择标志位
 	string stg_instrument_id_A;	// 合约A
 	string stg_instrument_id_B;	// 合约B
 
@@ -320,7 +368,20 @@ private:
 	int stg_lots_batch;					// 每批下单手数
 	bool stg_is_active;					// 策略开关状态
 	int stg_order_action_tires_limit;	// 撤单次数限制
-	bool stg_only_close;				// 只能平仓
+	int stg_only_close;					// 只能平仓
+	
+	/*新增字段*/
+	string stg_trade_model;				// 交易模型
+	string stg_order_algorithm;			// 下单算法
+	double stg_hold_profit;				// 持仓盈亏
+	double stg_close_profit;			// 平仓盈亏
+	double stg_commission;				// 手续费
+	int stg_position;					// 总持仓
+	int stg_position_buy;				// 买持仓
+	int stg_position_sell;				// 卖持仓
+	int stg_trade_volume;				// 成交量
+	double stg_amount;					// 成交金额
+	double stg_average_shift;			// 平均滑点
 
 	int stg_position_a_buy_today;		// A合约买持仓今仓
 	int stg_position_a_buy_yesterday;	// A合约买持仓昨仓
@@ -360,6 +421,8 @@ private:
 	long long stg_order_ref_base; // 报单引用计数
 
 	int on_off; //开关
+
+	bool init_finished;
 
 };
 

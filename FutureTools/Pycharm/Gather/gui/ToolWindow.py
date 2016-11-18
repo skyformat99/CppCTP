@@ -92,6 +92,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     QtGui.QApplication.setQuitOnLastWindowClosed(False)
+
+    # style sheet
+    file = QtCore.QFile('img/silvery.css')
+
+    file.open(QtCore.QFile.ReadOnly)
+    styleSheet = file.readAll().data().decode("utf-8")
+    file.close()
+
+    QtGui.qApp.setStyleSheet(styleSheet)
+
+
+
     # 爬虫目标地址
     sh_url = "http://www.shfe.com.cn/news/notice/"
 

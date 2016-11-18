@@ -19,7 +19,10 @@ Strategy::Strategy() {
 	stg_instrument_B_tick_last = new CThostFtdcDepthMarketDataField();	// B合约tick（第二腿）交易前最后一次
 
 	this->stg_trade_tasking = false;
+	init_finished = false;
 }
+
+
 
 /// 初始化
 void Strategy::InitStrategy() {
@@ -427,6 +430,110 @@ void Strategy::update_task_status() {
 		this->stg_trade_tasking = true;
 	}
 	std::cout << "After update this.trade_tasking = " << this->stg_trade_tasking << endl;
+}
+
+/// 交易模型
+void Strategy::setStgTradeModel(string stg_trade_model) {
+	this->stg_trade_model = stg_trade_model;
+}
+
+string Strategy::getStgTradeModel() {
+	return this->stg_trade_model;
+}
+
+string Strategy::getStgOrderAlgorithm() {
+	return this->stg_order_algorithm;
+}		// 下单算法
+
+void Strategy::setStgOrderAlgorithm(string stg_order_algorithm) {
+	this->stg_order_algorithm = stg_order_algorithm;
+}
+
+double Strategy::getStgHoldProfit() {
+	return this->stg_hold_profit;
+}				// 持仓盈亏
+
+void Strategy::setStgHoldProfit(double stg_hold_profit) {
+	this->stg_hold_profit = stg_hold_profit;
+}
+
+double Strategy::getStgCloseProfit() {
+	return this->stg_close_profit;
+}			// 平仓盈亏
+
+void Strategy::setStgCloseProfit(double stg_close_profit) {
+	this->stg_close_profit = stg_close_profit;
+}
+
+double Strategy::getStgCommission() {
+	return this->stg_commission;
+}				// 手续费
+
+void Strategy::setStgCommisstion(double stg_commission) {
+	this->stg_commission = stg_commission;
+}
+
+int Strategy::getStgPosition() {
+	return this->stg_position;
+}					// 总持仓
+
+void Strategy::setStgPosition(int stg_position) {
+	this->stg_position = stg_position;
+}
+
+int Strategy::getStgPositionBuy() {
+	return this->stg_position_buy;
+}				// 买持仓
+
+void Strategy::setStgPositionBuy(int stg_position_buy) {
+	this->stg_position_buy = stg_position_buy;
+}
+
+int Strategy::getStgPositionSell() {
+	return this->stg_position_sell;
+}				// 卖持仓
+
+int Strategy::setStgPositionSell(int stg_position_sell) {
+	this->stg_position_sell = stg_position_sell;
+}
+
+int Strategy::getStgTradeVolume() {
+	return this->stg_trade_volume;
+}			// 成交量
+
+int Strategy::setStgTradeVolume(int stg_trade_volume) {
+	this->stg_trade_volume = stg_trade_volume;
+}
+
+double Strategy::getStgAmount() {
+	return this->stg_amount;
+}					// 成交金额
+
+void Strategy::setStgAmount(double stg_amount) {
+	this->stg_amount = stg_amount;
+}
+
+double Strategy::getStgAverageShift() { // 平均滑点
+	return this->stg_average_shift;
+}
+	
+
+void Strategy::setStgAverageShift(double stg_average_shift) {
+	this->stg_average_shift = stg_average_shift;
+}
+
+void Strategy::setInit_Finished(bool init_finished) {
+	this->init_finished = init_finished;
+}
+
+bool Strategy::getInit_Finished() {
+	return this->init_finished;
+}
+
+
+// 初始化今仓
+void Strategy::init_today_position() {
+
 }
 
 void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
@@ -1684,11 +1791,11 @@ void Strategy::setStgLotsBatch(int stgLotsBatch) {
 	stg_lots_batch = stgLotsBatch;
 }
 
-bool Strategy::isStgOnlyClose() {
+int Strategy::isStgOnlyClose() {
 	return stg_only_close;
 }
 
-void Strategy::setStgOnlyClose(bool stgOnlyClose) {
+void Strategy::setStgOnlyClose(int stgOnlyClose) {
 	stg_only_close = stgOnlyClose;
 }
 
@@ -1698,14 +1805,6 @@ int Strategy::getStgOrderActionTiresLimit() {
 
 void Strategy::setStgOrderActionTiresLimit(int stgOrderActionTiresLimit) {
 	stg_order_action_tires_limit = stgOrderActionTiresLimit;
-}
-
-string Strategy::getStgOrderAlgorithm() {
-	return stg_order_algorithm;
-}
-
-void Strategy::setStgOrderAlgorithm(string stgOrderAlgorithm) {
-	stg_order_algorithm = stgOrderAlgorithm;
 }
 
 string Strategy::getStgOrderRefA() {
