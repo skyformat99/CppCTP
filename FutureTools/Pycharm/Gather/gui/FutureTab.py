@@ -9,6 +9,7 @@ from PyQt4.QtCore import pyqtSlot
 from PyQt4.QtGui import QWidget
 from InfoContent import InfoContent
 from Ui_FutureTab import Ui_FutureTab
+from PipeLine import PipeLine
 
 
 class FutureTab(QWidget, Ui_FutureTab):
@@ -59,34 +60,36 @@ class FutureTab(QWidget, Ui_FutureTab):
     def updateReadStatus(self, id, isread):
         self.pipeline.updateInfo(id, isread)
 
+    def clear_tab_data(self):
+        for i in range(20):
+            self.tableWidget.item(i, 0).setText("")
+            self.tableWidget.item(i, 1).setText("")
+            self.tableWidget.item(i, 2).setText("")
+            self.tableWidget.item(i, 3).setIcon(QtGui.QIcon(''))
+
 
     def set_init_data(self, data, pipe):
-        self.tableWidget.clearContents()
+        # print("FutureTab set_init_data")
+        self.clear_tab_data()
         self.table_data = data
-        print("table_data", self.table_data)
+        # print("table_data", self.table_data)
         self.pipeline = pipe
-        i = 1
+        i = 0
         for row_item in data:
-            id_item = QtGui.QTableWidgetItem(str(row_item['id']))
-            title_item = QtGui.QTableWidgetItem(row_item['title'])
-            pubtime_item = QtGui.QTableWidgetItem(row_item['pubtime'])
-            isread_item = QtGui.QTableWidgetItem()
+            # print(self.tableWidget.item(i, 0))
+            self.tableWidget.item(i, 0).setTextAlignment(QtCore.Qt.AlignCenter)
+            self.tableWidget.item(i, 1).setTextAlignment(QtCore.Qt.AlignCenter)
+            self.tableWidget.item(i, 2).setTextAlignment(QtCore.Qt.AlignCenter)
+            self.tableWidget.item(i, 3).setTextAlignment(QtCore.Qt.AlignCenter)
 
-            id_item.setTextAlignment(QtCore.Qt.AlignCenter)
-            isread_item.setTextAlignment(QtCore.Qt.AlignCenter)
+            self.tableWidget.item(i, 0).setText(str(row_item['id']))
+            self.tableWidget.item(i, 1).setText(row_item['title'])
+            self.tableWidget.item(i, 2).setText(row_item['pubtime'])
 
             if (row_item['isread'] == 0):
-                isread_item.setIcon(QtGui.QIcon('img/unread.png'))
+                self.tableWidget.item(i, 3).setIcon(QtGui.QIcon('img/unread.png'))
             else:
-                isread_item.setIcon(QtGui.QIcon('img/read.png'))
-
-
-            self.tableWidget.setItem(i, 0, id_item)
-            self.tableWidget.setItem(i, 1, title_item)
-            self.tableWidget.setItem(i, 2, pubtime_item)
-            # self.tableWidget.setColumnHidden(0, True)
-
-            self.tableWidget.setItem(i, 3, isread_item)
+                self.tableWidget.item(i, 3).setIcon(QtGui.QIcon('img/read.png'))
             i = i + 1
         pass
     def setContentWindow(self, obj):

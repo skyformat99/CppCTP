@@ -1,0 +1,1 @@
+pyinstaller -F -w ToolWindow.py --icon="info.ico"

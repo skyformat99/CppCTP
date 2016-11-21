@@ -1,17 +1,11 @@
 from Info import Info
 import sqlite3
-from gui.FutureTab import FutureTab
 
 class PipeLine():
 
-
-
     def __init__(self, parent=None):
-
-
-
         self.conn = sqlite3.connect('data.db')
-        print("成功打开数据库")
+        # print("成功打开数据库")
         #sql_del="DROP TABLE IF EXISTS tbl_test;"
         try:
             self.conn.execute('''
@@ -26,9 +20,13 @@ class PipeLine():
                               EXCHANGENAME CHAR(50) NOT NULL);''')
         except:
             print("表创建失败!")
+        self.dbCount = 0
 
     def set_SH_FutureTab(self, ftab):
         self.sh_f_tab = ftab
+
+    def set_DL_FutureTab(self, ftab):
+        self.dl_f_tab = ftab
 
     def set_ZZ_FutureTab(self, ftab):
         self.zz_f_tab = ftab
@@ -52,6 +50,21 @@ class PipeLine():
         count = num.fetchone()[0]
         return count
 
+    def countNum(self):
+        from ToolWindow import MainWindow
+        # print("current dbcount = %d" % self.dbCount)
+        sql_statement = "SELECT count(*) FROM INFODATA"
+        num = self.conn.execute(sql_statement)
+        count = num.fetchone()[0]
+        # print("countNum is %d" % count)
+        if (count != self.dbCount):
+            self.mid.getPipeLine().getInfo('SH')
+            self.mid.getPipeLine().getInfo('DL')
+            self.mid.setIs_Check_Info(False)
+            self.mid.showTrayMessage()
+        self.dbCount = count
+        return count
+
     def getInfo(self, exchangename, pageNumber = 0, pagesize = 20):
         #sql_statement = "SELECT * FROM INFODATA WHERE EXCHANGENAME= '"+ exchangename +"' limit " + str(pageNumber * pagesize -1) + ", " + str(pagesize)
         sql_statement = "SELECT * FROM INFODATA  WHERE EXCHANGENAME= '"+ exchangename +"' ORDER BY CATCHTIME DESC, id ASC limit " + str(pageNumber * pagesize -1) + ", " + str(pagesize)
@@ -69,8 +82,11 @@ class PipeLine():
             rowlist.append(dict_row)
 
         if (exchangename == 'SH'):
+            from FutureTab import FutureTab
             self.sh_f_tab.set_init_data(rowlist, self)
-
+        elif (exchangename == 'DL'):
+            from FutureTab import FutureTab
+            self.dl_f_tab.set_init_data(rowlist, self)
 
     def updateInfo(self, id, isread):
         sql_statement = "update INFODATA set isread = " + str(isread) + " where ID =" + str(id)
@@ -79,12 +95,16 @@ class PipeLine():
         self.conn.commit()
 
     def closeDB(self):
+        # print("关闭数据库")
         self.conn.close()
 
 
     def saveItem(obj_info):
 
         pass
+
+    def setMainWindow(self, mid):
+        self.mid = mid
 
 
 if __name__ == '__main__':
