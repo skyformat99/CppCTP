@@ -270,6 +270,21 @@ int main(int argc, char *argv[]) {
 	// 程序入口，初始化资源
 	ctp_m->init();
 
+	/*算法单元测试
+	Algorithm *alg = new Algorithm();
+	alg->setAlgName("01");
+	ctp_m->getDBManager()->CreateAlgorithm(alg);
+	alg->setIsActive("1");
+	ctp_m->getDBManager()->UpdateAlgorithm(alg);
+	list<Algorithm *> l_alg;
+	ctp_m->getDBManager()->getAllAlgorithm(&l_alg);
+	list<Algorithm *>::iterator alg_itor;
+	for (alg_itor = l_alg.begin(); alg_itor != l_alg.end(); alg_itor++) {
+
+	cout << (*alg_itor)->getAlgName() << endl;
+	}*/
+
+
 	/*步骤1:创建socket(套接字)*/
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 

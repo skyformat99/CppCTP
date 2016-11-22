@@ -7,26 +7,10 @@
 #IncludeRegexTransform: 
 
 /root/xTrader/Algorithm.h
-
-/root/xTrader/CTP_Manager.cpp
-errno.h
+string
 -
-rapidjson/document.h
-/root/xTrader/rapidjson/document.h
-rapidjson/writer.h
-/root/xTrader/rapidjson/writer.h
-rapidjson/stringbuffer.h
-/root/xTrader/rapidjson/stringbuffer.h
-CTP_Manager.h
-/root/xTrader/CTP_Manager.h
-User.h
-/root/xTrader/User.h
-Utils.h
-/root/xTrader/Utils.h
-Debug.h
-/root/xTrader/Debug.h
-msg.h
-/root/xTrader/msg.h
+string.h
+-
 
 /root/xTrader/CTP_Manager.h
 list
@@ -45,16 +29,6 @@ DBManager.h
 /root/xTrader/DBManager.h
 Trader.h
 /root/xTrader/Trader.h
-
-/root/xTrader/DBManager.cpp
-mongo/bson/bson.h
--
-iostream
--
-DBManager.h
-/root/xTrader/DBManager.h
-Debug.h
-/root/xTrader/Debug.h
 
 /root/xTrader/DBManager.h
 iostream
@@ -75,12 +49,10 @@ Strategy.h
 /root/xTrader/Strategy.h
 MarketConfig.h
 /root/xTrader/MarketConfig.h
+Algorithm.h
+/root/xTrader/Algorithm.h
 
 /root/xTrader/Debug.h
-
-/root/xTrader/FutureAccount.cpp
-FutureAccount.h
-/root/xTrader/FutureAccount.h
 
 /root/xTrader/FutureAccount.h
 string
@@ -99,14 +71,6 @@ string
 -
 Debug.h
 /root/xTrader/Debug.h
-
-/root/xTrader/MdSpi.cpp
-iostream
--
-string
--
-MdSpi.h
-/root/xTrader/MdSpi.h
 
 /root/xTrader/MdSpi.h
 map
@@ -138,12 +102,6 @@ Strategy.h
 string
 -
 
-/root/xTrader/Strategy.cpp
-sstream
--
-Strategy.h
-/root/xTrader/Strategy.h
-
 /root/xTrader/Strategy.h
 list
 -
@@ -155,24 +113,6 @@ Debug.h
 /root/xTrader/Debug.h
 DBManager.h
 /root/xTrader/DBManager.h
-
-/root/xTrader/TdSpi.cpp
-iostream
--
-cstring
--
-chrono
--
-thread
--
-TdSpi.h
-/root/xTrader/TdSpi.h
-Utils.h
-/root/xTrader/Utils.h
-User.h
-/root/xTrader/User.h
-Debug.h
-/root/xTrader/Debug.h
 
 /root/xTrader/TdSpi.h
 map
@@ -214,12 +154,6 @@ ThostFtdcUserApiStruct.h
 ThostFtdcUserApiDataType.h
 /root/xTrader/ThostFtdcUserApiDataType.h
 
-/root/xTrader/Trader.cpp
-Trader.h
-/root/xTrader/Trader.h
-Debug.h
-/root/xTrader/Debug.h
-
 /root/xTrader/Trader.h
 string
 -
@@ -229,18 +163,6 @@ list
 -
 User.h
 /root/xTrader/User.h
-
-/root/xTrader/User.cpp
-sstream
--
-User.h
-/root/xTrader/User.h
-DBManager.h
-/root/xTrader/DBManager.h
-Debug.h
-/root/xTrader/Debug.h
-Utils.h
-/root/xTrader/Utils.h
 
 /root/xTrader/User.h
 iostream

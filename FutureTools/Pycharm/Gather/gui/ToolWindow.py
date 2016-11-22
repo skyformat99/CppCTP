@@ -81,9 +81,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         from PipeLine import PipeLine
         self.pipeline.closeDB()
         self.trayIcon.hide()
-        self.close()
+
+        del self.sh_ftab
+        del self.dl_ftab
+        del self.win_content
+        del self.spider
+        del self.pipeline
+        self.deleteLater()
+
         # print("haha1")
-        QtGui.qApp.quit()
+        # QtGui.qApp.quit()
+        sys.exit(0)
         # print("haha2")
 
     @pyqtSlot()
@@ -122,6 +130,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 爬虫目标地址
         self.spider = spider
 
+    def setContent(self, win_content):
+        self.win_content = win_content
+
+    def setSHTab(self, sh_ftab):
+        self.sh_ftab = sh_ftab
+
+    def setDLTab(self, dl_ftab):
+        self.dl_ftab = dl_ftab
+
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     QtGui.QApplication.setQuitOnLastWindowClosed(False)
@@ -149,6 +166,7 @@ if __name__ == '__main__':
     info_win = InfoContent()
 
     info_win.move(desRect.left() + 200, 200)
+    mainwin.setContent(info_win)
 
     from FutureTab import FutureTab
     sh_ftab = FutureTab()
@@ -156,6 +174,9 @@ if __name__ == '__main__':
 
     dl_ftab = FutureTab()
     dl_ftab.setContentWindow(info_win)
+
+    mainwin.setSHTab(sh_ftab)
+    mainwin.setDLTab(dl_ftab)
 
     from FutureSpider import InfoParser
     from PipeLine import PipeLine

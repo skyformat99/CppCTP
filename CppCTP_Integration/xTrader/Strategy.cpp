@@ -537,28 +537,28 @@ void Strategy::init_today_position() {
 }
 
 void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
-	USER_PRINT(this->getStgInstrumentIdA());
-	USER_PRINT(this->getStgInstrumentIdB());
+	//USER_PRINT(this->getStgInstrumentIdA());
+	//USER_PRINT(this->getStgInstrumentIdB());
 	// Get Own Instrument
 	//USER_PRINT("Strategy::OnRtnDepthMarketData");
 	if (!strcmp(pDepthMarketData->InstrumentID, this->getStgInstrumentIdA().c_str())) {
 		//USER_PRINT("stg_instrument_A_tick ask_volume bid_volume");
 		this->CopyTickData(stg_instrument_A_tick, pDepthMarketData);
-		std::cout << "stg_instrument_A_tick = " << stg_instrument_A_tick->InstrumentID << endl;
-		std::cout << "stg_instrument_A_tick->AskVolume1 = " << stg_instrument_A_tick->AskVolume1 << endl;
-		std::cout << "stg_instrument_A_tick->BidVolume1 = " << stg_instrument_A_tick->BidVolume1 << endl;
-		std::cout << "stg_instrument_A_tick->AskPrice1 = " << stg_instrument_A_tick->AskPrice1 << endl;
-		std::cout << "stg_instrument_A_tick->BidPrice1 = " << stg_instrument_A_tick->BidPrice1 << endl;
+		//std::cout << "stg_instrument_A_tick = " << stg_instrument_A_tick->InstrumentID << endl;
+		//std::cout << "stg_instrument_A_tick->AskVolume1 = " << stg_instrument_A_tick->AskVolume1 << endl;
+		//std::cout << "stg_instrument_A_tick->BidVolume1 = " << stg_instrument_A_tick->BidVolume1 << endl;
+		//std::cout << "stg_instrument_A_tick->AskPrice1 = " << stg_instrument_A_tick->AskPrice1 << endl;
+		//std::cout << "stg_instrument_A_tick->BidPrice1 = " << stg_instrument_A_tick->BidPrice1 << endl;
 	}
 	else if (!strcmp(pDepthMarketData->InstrumentID, this->getStgInstrumentIdB().c_str()))
 	{
 		//USER_PRINT("stg_instrument_B_tick ask_volume bid_volume");
 		this->CopyTickData(stg_instrument_B_tick, pDepthMarketData);
-		std::cout << "stg_instrument_B_tick = " << stg_instrument_B_tick->InstrumentID << endl;
-		std::cout << "stg_instrument_B_tick->AskVolume1 = " << stg_instrument_B_tick->AskVolume1 << endl;
-		std::cout << "stg_instrument_B_tick->BidVolume1 = " << stg_instrument_B_tick->BidVolume1 << endl;
-		std::cout << "stg_instrument_B_tick->AskPrice1 = " << stg_instrument_B_tick->AskPrice1 << endl;
-		std::cout << "stg_instrument_B_tick->BidPrice1 = " << stg_instrument_B_tick->BidPrice1 << endl;
+		//std::cout << "stg_instrument_B_tick = " << stg_instrument_B_tick->InstrumentID << endl;
+		//std::cout << "stg_instrument_B_tick->AskVolume1 = " << stg_instrument_B_tick->AskVolume1 << endl;
+		//std::cout << "stg_instrument_B_tick->BidVolume1 = " << stg_instrument_B_tick->BidVolume1 << endl;
+		//std::cout << "stg_instrument_B_tick->AskPrice1 = " << stg_instrument_B_tick->AskPrice1 << endl;
+		//std::cout << "stg_instrument_B_tick->BidPrice1 = " << stg_instrument_B_tick->BidPrice1 << endl;
 	}	
 	/// 如果正在交易,继续更新tick进行交易
 	if (this->stg_trade_tasking) {
@@ -605,7 +605,7 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 
 //下单算法1
 void Strategy::Order_Algorithm_One() {
-	USER_PRINT("Order_Algorithm_One");
+	//USER_PRINT("Order_Algorithm_One");
 	// 计算盘口价差，量
 	if ((this->stg_instrument_A_tick->AskPrice1 != 0) &&
 		(this->stg_instrument_A_tick->BidPrice1 != 0) &&
@@ -616,60 +616,60 @@ void Strategy::Order_Algorithm_One() {
 		(this->stg_instrument_B_tick->AskVolume1 != 0) &&
 		(this->stg_instrument_B_tick->BidVolume1 != 0))
 	{
-		std::cout << "计算多头" << endl;
-		std::cout << "A_tick->BidPrice1 = " << this->stg_instrument_A_tick->BidPrice1 << endl;
-		std::cout << "B_tick->AskPrice1 = " << this->stg_instrument_B_tick->AskPrice1 << endl;
+		//std::cout << "计算多头" << endl;
+		//std::cout << "A_tick->BidPrice1 = " << this->stg_instrument_A_tick->BidPrice1 << endl;
+		//std::cout << "B_tick->AskPrice1 = " << this->stg_instrument_B_tick->AskPrice1 << endl;
 		//市场多头价差
 		this->stg_spread_long = this->stg_instrument_A_tick->BidPrice1 - 
 								this->stg_instrument_B_tick->AskPrice1;
 
-		std::cout << "A_tick->BidVolume1 = " << this->stg_instrument_A_tick->BidVolume1 << endl;
-		std::cout << "B_tick->AskVolume1 = " << this->stg_instrument_B_tick->AskVolume1 << endl;
+		//std::cout << "A_tick->BidVolume1 = " << this->stg_instrument_A_tick->BidVolume1 << endl;
+		//std::cout << "B_tick->AskVolume1 = " << this->stg_instrument_B_tick->AskVolume1 << endl;
 
 		//市场多头价差挂单量
 		this->stg_spread_long_volume = std::min(this->stg_instrument_A_tick->BidVolume1,
 			this->stg_instrument_B_tick->AskVolume1);
 
-		std::cout << "stg_spread_long_volume = " << this->stg_spread_long_volume << endl;
+		//std::cout << "stg_spread_long_volume = " << this->stg_spread_long_volume << endl;
 
-		std::cout << "计算空头" << endl;
+		//std::cout << "计算空头" << endl;
 
-		std::cout << "A_tick->AskPrice1 = " << this->stg_instrument_A_tick->AskPrice1 << endl;
-		std::cout << "B_tick->BidPrice1 = " << this->stg_instrument_B_tick->BidPrice1 << endl;
+		//std::cout << "A_tick->AskPrice1 = " << this->stg_instrument_A_tick->AskPrice1 << endl;
+		//std::cout << "B_tick->BidPrice1 = " << this->stg_instrument_B_tick->BidPrice1 << endl;
 		// 市场空头价差
 		this->stg_spread_short = this->stg_instrument_A_tick->AskPrice1 -
 			this->stg_instrument_B_tick->BidPrice1;
 
 
-		std::cout << "A_tick->AskVolume1 = " << this->stg_instrument_A_tick->AskVolume1 << endl;
-		std::cout << "B_tick->BidVolume1 = " << this->stg_instrument_B_tick->BidVolume1 << endl;
+		//std::cout << "A_tick->AskVolume1 = " << this->stg_instrument_A_tick->AskVolume1 << endl;
+		//std::cout << "B_tick->BidVolume1 = " << this->stg_instrument_B_tick->BidVolume1 << endl;
 
 		// 市场空头价差挂单量
 		this->stg_spread_short_volume = std::min(this->stg_instrument_A_tick->AskVolume1,
 			this->stg_instrument_B_tick->BidVolume1);
 
-		std::cout << "stg_spread_short_volume = " << this->stg_spread_short_volume << endl;
+		//std::cout << "stg_spread_short_volume = " << this->stg_spread_short_volume << endl;
 	} 
 	else
 	{
 		return;
 	}
 
-	std::cout << "测试是否是stg_user问题" << std::endl;
+	/*std::cout << "测试是否是stg_user问题" << std::endl;
 	std::cout << "this->stg_user = " << this->stg_user << std::endl;
 	std::cout << "this->stg_user->getCTP_Manager() = " << this->stg_user->getCTP_Manager() << std::endl;
-	std::cout << "策略开关,期货账户开关,总开关" << std::endl;
+	std::cout << "策略开关,期货账户开关,总开关" << std::endl;*/
 
 	/// 策略开关，期货账户开关，总开关
 	if (!((this->getOn_Off()) & (this->stg_user->getOn_Off()) & (this->stg_user->getCTP_Manager()->getOn_Off()))) {
-		std::cout << "请检查开关状态!" << std::endl;
+		/*std::cout << "请检查开关状态!" << std::endl;
 		std::cout << "总开关 = " << this->stg_user->getCTP_Manager()->getOn_Off() << std::endl;
 		std::cout << "账户开关 = " << this->stg_user->getOn_Off() << std::endl;
-		std::cout << "策略开关 = " << this->getOn_Off() << std::endl;
+		std::cout << "策略开关 = " << this->getOn_Off() << std::endl;*/
 		return;
 	}
 
-	std::cout << "策略开关,期货账户开关,总开关22222" << std::endl;
+	//std::cout << "策略开关,期货账户开关,总开关22222" << std::endl;
 
 	/// 价差多头卖平(b)
 	if ((this->stg_spread_long >= this->stg_sell_close) 
@@ -1799,12 +1799,20 @@ void Strategy::setStgOnlyClose(int stgOnlyClose) {
 	stg_only_close = stgOnlyClose;
 }
 
-int Strategy::getStgOrderActionTiresLimit() {
-	return stg_order_action_tires_limit;
+int Strategy::getStgAOrderActionTiresLimit() {
+	return stg_a_order_action_tires_limit;
 }
 
-void Strategy::setStgOrderActionTiresLimit(int stgOrderActionTiresLimit) {
-	stg_order_action_tires_limit = stgOrderActionTiresLimit;
+void Strategy::setStgAOrderActionTiresLimit(int stgOrderActionTiresLimit) {
+	stg_a_order_action_tires_limit = stgOrderActionTiresLimit;
+}
+
+int Strategy::getStgBOrderActionTiresLimit() {
+	return stg_b_order_action_tires_limit;
+}
+
+void Strategy::setStgBOrderActionTiresLimit(int stgOrderActionTiresLimit) {
+	stg_b_order_action_tires_limit = stgOrderActionTiresLimit;
 }
 
 string Strategy::getStgOrderRefA() {

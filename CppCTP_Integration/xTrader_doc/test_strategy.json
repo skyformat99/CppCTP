@@ -45,3 +45,8 @@
 	响应:{"MsgRef":0,"MsgSendFlag":1,"MsgType":9,"TraderID":"1601","UserID":"058176","MsgSrc":0,"MsgResult":0,"MsgErrorReason":"","OnOff":1}
 	错误:{"MsgRef":1,"MsgSendFlag":1,"MsgType":9,"TraderID":"1601","UserID":"058176ddd","MsgSrc":0,"MsgResult":1,"MsgErrorReason":"期货账户开关未开启","OnOff":0}
 	
+查询下单算法:
+	请求:{"MsgRef":1,"MsgSendFlag": 0,"MsgType":11,"TraderID":"1601","MsgSrc":0}
+	响应:{"MsgRef":0,"MsgSendFlag":1,"MsgType":11,"TraderID":"1601","MsgResult":0,"MsgErrorReason":"","Info":[{"name":"01"}],"MsgSrc":0}
+	响应无数据:{"MsgRef":1,"MsgSendFlag":1,"MsgType":11,"TraderID":"1601","MsgResult":0,"MsgErrorReason":"","Info":[],"MsgSrc":0}
+	

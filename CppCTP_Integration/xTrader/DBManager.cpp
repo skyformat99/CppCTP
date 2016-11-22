@@ -24,6 +24,7 @@ using std::unique_ptr;
 #define DB_STRATEGY_COLLECTION            "CTP.strategy"
 #define DB_MARKETCONFIG_COLLECTION        "CTP.marketconfig"
 #define DB_STRATEGY_YESTERDAY_COLLECTION  "CTP.strategy_yesterday"
+#define DB_ALGORITHM_COLLECTION           "CTP.algorithm"
 #define ISACTIVE "1"
 #define ISNOTACTIVE "0"
 
@@ -470,7 +471,8 @@ void DBManager::CreateStrategy(Strategy *stg) {
 		b.append("sell_open", stg->getStgSellOpen());
 		b.append("order_algorithm", stg->getStgOrderAlgorithm());
 		b.append("trader_id", stg->getStgTraderId());
-		b.append("order_action_tires_limit", stg->getStgOrderActionTiresLimit());
+		b.append("a_order_action_limit", stg->getStgAOrderActionTiresLimit());
+		b.append("b_order_action_limit", stg->getStgBOrderActionTiresLimit());
 		b.append("sell_close", stg->getStgSellClose());
 		b.append("buy_open", stg->getStgBuyOpen());
 		b.append("only_close", stg->isStgOnlyClose());
@@ -556,7 +558,8 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 			<< "sell_open" << stg->getStgSellOpen() 
 			<< "order_algorithm" << stg->getStgOrderAlgorithm() 
 			<< "trader_id" << stg->getStgTraderId() 
-			<< "order_action_tires_limit" << stg->getStgOrderActionTiresLimit() 
+			<< "a_order_action_limit" << stg->getStgAOrderActionTiresLimit()
+			<< "b_order_action_limit" << stg->getStgBOrderActionTiresLimit()
 			<< "sell_close" << stg->getStgSellClose() 
 			<< "buy_open" << stg->getStgBuyOpen() 
 			<< "only_close" << stg->isStgOnlyClose()
@@ -636,7 +639,8 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 		cout << "sell_open = " << p.getField("sell_open").Double() << ", ";
 		cout << "order_algorithm = " << p.getStringField("order_algorithm") << ", "; //string type
 		cout << "trader_id = " << p.getStringField("trader_id") << ", "; // string type
-		cout << "order_action_tires_limit = " << p.getIntField("order_action_tires_limit") << ", ";
+		cout << "a_order_action_limit = " << p.getIntField("a_order_action_limit") << ", ";
+		cout << "b_order_action_limit = " << p.getIntField("b_order_action_limit") << ", ";
 		cout << "sell_close = " << p.getField("sell_close").Double() << ", ";
 		cout << "buy_open = " << p.getField("buy_open").Double() << ", ";
 		cout << "only_close = " << p.getIntField("only_close") << ", ";
@@ -686,7 +690,8 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 		stg->setStgAmount(p.getField("amount").Double());
 		stg->setStgAverageShift(p.getField("average_shift").Double());
 
-		stg->setStgOrderActionTiresLimit(p.getIntField("order_action_tires_limit"));
+		stg->setStgAOrderActionTiresLimit(p.getIntField("a_order_action_limit"));
+		stg->setStgBOrderActionTiresLimit(p.getIntField("b_order_action_limit"));
 		stg->setStgOrderAlgorithm(p.getStringField("order_algorithm"));
 		stg->setStgPositionABuy(p.getIntField("position_a_buy"));
 		stg->setStgPositionABuyToday(p.getIntField("position_a_buy_today"));
@@ -767,7 +772,8 @@ void DBManager::CreateStrategyYesterday(Strategy *stg) {
 		b.append("sell_open", stg->getStgSellOpen());
 		b.append("order_algorithm", stg->getStgOrderAlgorithm());
 		b.append("trader_id", stg->getStgTraderId());
-		b.append("order_action_tires_limit", stg->getStgOrderActionTiresLimit());
+		b.append("a_order_action_limit", stg->getStgAOrderActionTiresLimit());
+		b.append("b_order_action_limit", stg->getStgBOrderActionTiresLimit());
 		b.append("sell_close", stg->getStgSellClose());
 		b.append("buy_open", stg->getStgBuyOpen());
 		b.append("only_close", stg->isStgOnlyClose());
@@ -854,7 +860,8 @@ void DBManager::UpdateStrategyYesterday(Strategy *stg) {
 			<< "sell_open" << stg->getStgSellOpen()
 			<< "order_algorithm" << stg->getStgOrderAlgorithm()
 			<< "trader_id" << stg->getStgTraderId()
-			<< "order_action_tires_limit" << stg->getStgOrderActionTiresLimit()
+			<< "a_order_action_limit" << stg->getStgAOrderActionTiresLimit()
+			<< "b_order_action_limit" << stg->getStgBOrderActionTiresLimit()
 			<< "sell_close" << stg->getStgSellClose()
 			<< "buy_open" << stg->getStgBuyOpen()
 			<< "only_close" << stg->isStgOnlyClose()
@@ -935,7 +942,8 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 		cout << "sell_open = " << p.getField("sell_open").Double() << ", ";
 		cout << "order_algorithm = " << p.getStringField("order_algorithm") << ", "; //string type
 		cout << "trader_id = " << p.getStringField("trader_id") << ", "; // string type
-		cout << "order_action_tires_limit = " << p.getIntField("order_action_tires_limit") << ", ";
+		cout << "a_order_action_limit = " << p.getIntField("a_order_action_limit") << ", ";
+		cout << "b_order_action_limit = " << p.getIntField("b_order_action_limit") << ", ";
 		cout << "sell_close = " << p.getField("sell_close").Double() << ", ";
 		cout << "buy_open = " << p.getField("buy_open").Double() << ", ";
 		cout << "only_close = " << p.getIntField("only_close") << ", ";
@@ -985,7 +993,8 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 		stg->setStgAmount(p.getField("amount").Double());
 		stg->setStgAverageShift(p.getField("average_shift").Double());
 
-		stg->setStgOrderActionTiresLimit(p.getIntField("order_action_tires_limit"));
+		stg->setStgAOrderActionTiresLimit(p.getIntField("a_order_action_limit"));
+		stg->setStgBOrderActionTiresLimit(p.getIntField("b_order_action_limit"));
 		stg->setStgOrderAlgorithm(p.getStringField("order_algorithm"));
 		stg->setStgPositionABuy(p.getIntField("position_a_buy"));
 		stg->setStgPositionABuyToday(p.getIntField("position_a_buy_today"));
@@ -1082,7 +1091,8 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 		cout << "sell_open = " << p.getField("sell_open").Double() << ", ";
 		cout << "order_algorithm = " << p.getStringField("order_algorithm") << ", "; //string type
 		cout << "trader_id = " << p.getStringField("trader_id") << ", "; // string type
-		cout << "order_action_tires_limit = " << p.getIntField("order_action_tires_limit") << ", ";
+		cout << "a_order_action_limit = " << p.getIntField("a_order_action_limit") << ", ";
+		cout << "b_order_action_limit = " << p.getIntField("b_order_action_limit") << ", ";
 		cout << "sell_close = " << p.getField("sell_close").Double() << ", ";
 		cout << "buy_open = " << p.getField("buy_open").Double() << ", ";
 		cout << "only_close = " << p.getIntField("only_close") << ", ";
@@ -1138,7 +1148,8 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 
 
 
-		stg->setStgOrderActionTiresLimit(p.getIntField("order_action_tires_limit"));
+		stg->setStgAOrderActionTiresLimit(p.getIntField("a_order_action_limit"));
+		stg->setStgBOrderActionTiresLimit(p.getIntField("b_order_action_limit"));
 		stg->setStgOrderAlgorithm(p.getStringField("order_algorithm"));
 		stg->setStgPositionABuy(p.getIntField("position_a_buy"));
 		stg->setStgPositionABuyToday(p.getIntField("position_a_buy_today"));
@@ -1312,6 +1323,92 @@ MarketConfig * DBManager::getOneMarketConfig() {
 		}
 	}
 	return NULL;
+}
+
+/************************************************************************/
+/*  创建算法
+删除算法
+更新算法
+获取算法															*/
+/************************************************************************/
+void DBManager::CreateAlgorithm(Algorithm *alg) {
+	int count_number = 0;
+
+	count_number = this->conn->count(DB_ALGORITHM_COLLECTION,
+		BSON("name" << alg->getAlgName()));
+
+	if (count_number > 0) {
+		cout << "Algorithm Already Exists!" << endl;
+	}
+	else {
+		BSONObjBuilder b;
+		b.append("name", alg->getAlgName());
+		b.append("isactive", alg->getIsActive());
+		BSONObj p = b.obj();
+
+		conn->insert(DB_ALGORITHM_COLLECTION, p);
+		USER_PRINT("DBManager::CreateAlgorithm ok");
+	}
+
+}
+void DBManager::DeleteAlgorithm(Algorithm *alg) {
+	int count_number = 0;
+
+	count_number = this->conn->count(DB_ALGORITHM_COLLECTION,
+		BSON("name" << alg->getAlgName()));
+
+	if (count_number > 0) {
+		this->conn->update(DB_ALGORITHM_COLLECTION, BSON("name" << (alg->getAlgName().c_str())), BSON("$set" << BSON("isactive" << ISNOTACTIVE)));
+		USER_PRINT("DBManager::DeleteAlgorithm ok");
+	}
+	else {
+		cout << "MarketConfig ID Not Exists!" << endl;
+	}
+}
+void DBManager::UpdateAlgorithm(Algorithm *alg) {
+	int count_number = 0;
+
+	count_number = this->conn->count(DB_ALGORITHM_COLLECTION,
+		BSON("name" << alg->getAlgName()));
+
+	if (count_number > 0) {
+		this->conn->update(DB_ALGORITHM_COLLECTION, BSON("name" << (alg->getAlgName().c_str())), BSON("$set" << BSON("name" << alg->getAlgName() << "isactive" << alg->getIsActive())));
+		USER_PRINT("DBManager::UpdateAlgorithm ok");
+	}
+	else
+	{
+		cout << "Algorithm name Not Exists!" << endl;
+	}
+
+}
+void DBManager::getAllAlgorithm(list<Algorithm *> *l_alg) {
+	/// 初始化的时候，必须保证list为空
+	if (l_alg->size() > 0) {
+		list<Algorithm *>::iterator alg_itor;
+		for (alg_itor = l_alg->begin(); alg_itor != l_alg->end();) {
+			alg_itor = l_alg->erase(alg_itor);
+		}
+	}
+
+	int countnum = this->conn->count(DB_ALGORITHM_COLLECTION);
+	if (countnum == 0) {
+		cout << "DBManager::getAllAlgorithm None!" << endl;
+	}
+	else {
+		unique_ptr<DBClientCursor> cursor =
+			this->conn->query(DB_ALGORITHM_COLLECTION, MONGO_QUERY("isactive" << ISACTIVE));
+		while (cursor->more()) {
+			BSONObj p = cursor->next();
+			cout << "*" << "name:" << p.getStringField("name") << "  "
+				<< "isactive:" << p.getStringField("isactive") << "*" << endl;
+			Algorithm *alg = new Algorithm();
+			alg->setAlgName(p.getStringField("name"));
+			alg->setIsActive(p.getStringField("isactive"));
+
+			l_alg->push_back(alg);
+		}
+		USER_PRINT("DBManager::getAllAlgorithm ok");
+	}
 }
 
 

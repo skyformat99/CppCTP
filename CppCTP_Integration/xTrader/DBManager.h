@@ -11,6 +11,7 @@
 #include "FutureAccount.h"
 #include "Strategy.h"
 #include "MarketConfig.h"
+#include "Algorithm.h"
 
 class Strategy;
 class MarketConfig;
@@ -104,6 +105,16 @@ public:
 	void getAllMarketConfig(list<MarketConfig *> *l_marketconfig);
 	MarketConfig *getOneMarketConfig();
 
+	/************************************************************************/
+	/*  创建算法
+		删除算法
+		更新算法
+		获取算法															*/
+	/************************************************************************/
+	void CreateAlgorithm(Algorithm *alg);
+	void DeleteAlgorithm(Algorithm *alg);
+	void UpdateAlgorithm(Algorithm *alg);
+	void getAllAlgorithm(list<Algorithm *> *l_alg);
 
 	
 

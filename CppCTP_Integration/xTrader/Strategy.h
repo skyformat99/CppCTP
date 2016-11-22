@@ -109,8 +109,11 @@ public:
 	int isStgOnlyClose();
 	void setStgOnlyClose(int stgOnlyClose);
 
-	int getStgOrderActionTiresLimit();
-	void setStgOrderActionTiresLimit(int stgOrderActionTiresLimit);
+	int getStgAOrderActionTiresLimit();
+	void setStgAOrderActionTiresLimit(int stgOrderActionTiresLimit);
+
+	int getStgBOrderActionTiresLimit();
+	void setStgBOrderActionTiresLimit(int stgOrderActionTiresLimit);
 
 
 	string getStgOrderRefA();
@@ -367,7 +370,8 @@ private:
 	int stg_lots;						// 总手
 	int stg_lots_batch;					// 每批下单手数
 	bool stg_is_active;					// 策略开关状态
-	int stg_order_action_tires_limit;	// 撤单次数限制
+	int stg_a_order_action_tires_limit;	// A合约撤单次数限制
+	int stg_b_order_action_tires_limit;	// B合约撤单次数限制
 	int stg_only_close;					// 只能平仓
 	
 	/*新增字段*/

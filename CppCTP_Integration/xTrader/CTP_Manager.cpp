@@ -4,6 +4,7 @@
 #include "rapidjson/stringbuffer.h"
 #include "CTP_Manager.h"
 #include "User.h"
+#include "Algorithm.h"
 #include "Utils.h"
 #include "Debug.h"
 #include "msg.h"
@@ -524,7 +525,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					info_object.AddMember("sell_open", (*stg_itor)->getStgSellOpen(), allocator);
 					info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator);
 					info_object.AddMember("trader_id", rapidjson::StringRef((*stg_itor)->getStgTraderId().c_str()), allocator);
-					info_object.AddMember("order_action_tires_limit", (*stg_itor)->getStgOrderActionTiresLimit(), allocator);
+					info_object.AddMember("a_order_action_limit", (*stg_itor)->getStgAOrderActionTiresLimit(), allocator);
+					info_object.AddMember("b_order_action_limit", (*stg_itor)->getStgBOrderActionTiresLimit(), allocator);
 					info_object.AddMember("sell_close", (*stg_itor)->getStgSellClose(), allocator);
 					info_object.AddMember("buy_open", (*stg_itor)->getStgBuyOpen(), allocator);
 					info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator);
@@ -687,7 +689,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								(*stg_itor)->setStgSellOpen(object["sell_open"].GetDouble());
 								(*stg_itor)->setStgOrderAlgorithm(object["order_algorithm"].GetString());
 								(*stg_itor)->setStgTraderId(object["trader_id"].GetString());
-								(*stg_itor)->setStgOrderActionTiresLimit(object["order_action_tires_limit"].GetInt());
+								(*stg_itor)->setStgAOrderActionTiresLimit(object["a_order_action_limit"].GetInt());
+								(*stg_itor)->setStgBOrderActionTiresLimit(object["b_order_action_limit"].GetInt());
 								(*stg_itor)->setStgSellClose(object["sell_close"].GetDouble());
 								(*stg_itor)->setStgBuyOpen(object["buy_open"].GetDouble());
 								(*stg_itor)->setStgOnlyClose(object["only_close"].GetInt());
@@ -755,7 +758,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								create_info_object.AddMember("sell_open", (*stg_itor)->getStgSellOpen(), allocator);
 								create_info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator);
 								create_info_object.AddMember("trader_id", rapidjson::StringRef((*stg_itor)->getStgTraderId().c_str()), allocator);
-								create_info_object.AddMember("order_action_tires_limit", (*stg_itor)->getStgOrderActionTiresLimit(), allocator);
+								create_info_object.AddMember("a_order_action_limit", (*stg_itor)->getStgAOrderActionTiresLimit(), allocator);
+								create_info_object.AddMember("b_order_action_limit", (*stg_itor)->getStgBOrderActionTiresLimit(), allocator);
 								create_info_object.AddMember("sell_close", (*stg_itor)->getStgSellClose(), allocator);
 								create_info_object.AddMember("buy_open", (*stg_itor)->getStgBuyOpen(), allocator);
 								create_info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator);
@@ -814,8 +818,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
 
 			}
-			else if (msgtype == 6) { // 新建Strategy（修改Strategy参数）
-				std::cout << "新建策略..." << std::endl;
+			else if (msgtype == 6) { // 新建Strategy
+				std::cout << "新建Strategy..." << std::endl;
 
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
@@ -872,7 +876,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						new_stg->setStgSellOpen(object["sell_open"].GetDouble());
 						new_stg->setStgOrderAlgorithm(object["order_algorithm"].GetString());
 						new_stg->setStgTraderId(object["trader_id"].GetString());
-						new_stg->setStgOrderActionTiresLimit(object["order_action_tires_limit"].GetInt());
+						new_stg->setStgAOrderActionTiresLimit(object["a_order_action_limit"].GetInt());
+						new_stg->setStgBOrderActionTiresLimit(object["b_order_action_limit"].GetInt());
 						new_stg->setStgSellClose(object["sell_close"].GetDouble());
 						new_stg->setStgBuyOpen(object["buy_open"].GetDouble());
 						new_stg->setStgOnlyClose(object["only_close"].GetInt());
@@ -941,7 +946,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						create_info_object.AddMember("sell_open", new_stg->getStgSellOpen(), allocator);
 						create_info_object.AddMember("order_algorithm", rapidjson::StringRef(new_stg->getStgOrderAlgorithm().c_str()), allocator);
 						create_info_object.AddMember("trader_id", rapidjson::StringRef(new_stg->getStgTraderId().c_str()), allocator);
-						create_info_object.AddMember("order_action_tires_limit", new_stg->getStgOrderActionTiresLimit(), allocator);
+						create_info_object.AddMember("a_order_action_limit", new_stg->getStgAOrderActionTiresLimit(), allocator);
+						create_info_object.AddMember("b_order_action_limit", new_stg->getStgBOrderActionTiresLimit(), allocator);
 						create_info_object.AddMember("sell_close", new_stg->getStgSellClose(), allocator);
 						create_info_object.AddMember("buy_open", new_stg->getStgBuyOpen(), allocator);
 						//info_object.AddMember("only_close", new_stg->isStgOnlyClose(), allocator);
@@ -1047,7 +1053,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								create_info_object.AddMember("sell_open", (*stg_itor)->getStgSellOpen(), allocator);
 								create_info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator);
 								create_info_object.AddMember("trader_id", rapidjson::StringRef((*stg_itor)->getStgTraderId().c_str()), allocator);
-								create_info_object.AddMember("order_action_tires_limit", (*stg_itor)->getStgOrderActionTiresLimit(), allocator);
+								create_info_object.AddMember("a_order_action_limit", (*stg_itor)->getStgAOrderActionTiresLimit(), allocator);
+								create_info_object.AddMember("b_order_action_limit", (*stg_itor)->getStgBOrderActionTiresLimit(), allocator);
 								create_info_object.AddMember("sell_close", (*stg_itor)->getStgSellClose(), allocator);
 								create_info_object.AddMember("buy_open", (*stg_itor)->getStgBuyOpen(), allocator);
 								create_info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator);
@@ -1281,7 +1288,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						create_info_object.AddMember("sell_open", (*stg_itor)->getStgSellOpen(), allocator);
 						create_info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator);
 						create_info_object.AddMember("trader_id", rapidjson::StringRef((*stg_itor)->getStgTraderId().c_str()), allocator);
-						create_info_object.AddMember("order_action_tires_limit", (*stg_itor)->getStgOrderActionTiresLimit(), allocator);
+						create_info_object.AddMember("a_order_action_limit", (*stg_itor)->getStgAOrderActionTiresLimit(), allocator);
+						create_info_object.AddMember("b_order_action_limit", (*stg_itor)->getStgBOrderActionTiresLimit(), allocator);
 						create_info_object.AddMember("sell_close", (*stg_itor)->getStgSellClose(), allocator);
 						create_info_object.AddMember("buy_open", (*stg_itor)->getStgBuyOpen(), allocator);
 						create_info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator);
@@ -1341,6 +1349,48 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.AddMember("Info", create_info_array, allocator);
 				build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
 
+			}
+			else if (msgtype == 11) { //查询算法
+				std::cout << "请求查询算法..." << std::endl;
+
+				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
+				rapidjson::Value &TraderID = doc["TraderID"];
+				rapidjson::Value &MsgRef = doc["MsgRef"];
+				rapidjson::Value &MsgSrc = doc["MsgSrc"];
+
+				string s_TraderID = TraderID.GetString();
+				int i_MsgRef = MsgRef.GetInt();
+				int i_MsgSendFlag = MsgSendFlag.GetInt();
+				int i_MsgSrc = MsgSrc.GetInt();
+
+				std::cout << "收到交易员ID = " << s_TraderID << std::endl;
+
+				list<Algorithm *> l_alg;
+				static_dbm->getAllAlgorithm(&l_alg);
+
+				/*构建MarketInfo的Json*/
+				build_doc.SetObject();
+				rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
+				build_doc.AddMember("MsgRef", server_msg_ref++, allocator);
+				build_doc.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator);
+				build_doc.AddMember("MsgType", 11, allocator);
+				build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
+				build_doc.AddMember("MsgResult", 0, allocator);
+				build_doc.AddMember("MsgErrorReason", "", allocator);
+				//创建Info数组
+				rapidjson::Value info_array(rapidjson::kArrayType);
+
+				list<Algorithm *>::iterator alg_itor;
+				for (alg_itor = l_alg.begin(); alg_itor != l_alg.end(); alg_itor++) {
+
+					rapidjson::Value info_object(rapidjson::kObjectType);
+					info_object.SetObject();
+					info_object.AddMember("name", rapidjson::StringRef((*alg_itor)->getAlgName().c_str()), allocator);
+					info_array.PushBack(info_object, allocator);
+				}
+
+				build_doc.AddMember("Info", info_array, allocator);
+				build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
 			}
 			else {
 				std::cout << "请求类型错误!" << endl;
