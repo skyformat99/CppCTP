@@ -745,7 +745,7 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 void DBManager::CreateStrategyYesterday(Strategy *stg) {
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
+	count_number = this->conn->count(DB_STRATEGY_YESTERDAY_COLLECTION,
 		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str())));
 
 	if (count_number > 0) {
@@ -818,11 +818,11 @@ void DBManager::CreateStrategyYesterday(Strategy *stg) {
 void DBManager::DeleteStrategyYesterday(Strategy *stg) {
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
+	count_number = this->conn->count(DB_STRATEGY_YESTERDAY_COLLECTION,
 		BSON("strategy_id" << stg->getStgStrategyId().c_str() << "user_id" << stg->getStgUserId().c_str()));
 
 	if (count_number > 0) {
-		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId())), BSON("$set" << BSON("is_active" << false)));
+		this->conn->update(DB_STRATEGY_YESTERDAY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId())), BSON("$set" << BSON("is_active" << false)));
 		USER_PRINT("DBManager::DeleteStrategy ok");
 	}
 	else {
@@ -836,13 +836,13 @@ void DBManager::UpdateStrategyYesterday(Strategy *stg) {
 	std::cout << "DBManager::UpdateStrategy" << std::endl;
 
 
-	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
+	count_number = this->conn->count(DB_STRATEGY_YESTERDAY_COLLECTION,
 		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str()));
 
 	std::cout << "count_number = " << count_number << std::endl;
 
 	if (count_number > 0) {
-		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str())), BSON("$set" << BSON("position_a_sell_today" << stg->getStgPositionASellToday()
+		this->conn->update(DB_STRATEGY_YESTERDAY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str())), BSON("$set" << BSON("position_a_sell_today" << stg->getStgPositionASellToday()
 			<< "position_b_sell" << stg->getStgPositionBSell()
 			<< "spread_shift" << stg->getStgSpreadShift()
 			<< "position_b_sell_today" << stg->getStgPositionBSellToday()
@@ -911,14 +911,14 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 	if (traderid.compare("")) { //如果traderid不为空
 
 		if (userid.compare("")) { //如果userid不为空
-			cursor = this->conn->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid));
+			cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid));
 		}
 		else {
-			cursor = this->conn->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("trader_id" << traderid));
+			cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid));
 		}
 	}
 	else {
-		cursor = this->conn->query(DB_STRATEGY_COLLECTION);
+		cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION);
 	}
 
 	while (cursor->more()) {

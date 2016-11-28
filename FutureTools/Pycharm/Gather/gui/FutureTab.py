@@ -31,8 +31,8 @@ class FutureTab(QWidget, Ui_FutureTab):
         # self.tableWidget.horizontalHeader().setStretchLastSection(True)
         # self.tableWidget.resizeColumnsToContents()
         self.tableWidget.setColumnWidth(0, 70)
-        self.tableWidget.setColumnWidth(1, 530)
-        self.tableWidget.setColumnWidth(2, 100)
+        self.tableWidget.setColumnWidth(1, 510)
+        self.tableWidget.setColumnWidth(2, 120)
         self.tableWidget.setColumnWidth(3, 50)
 
     @pyqtSlot(int, int)

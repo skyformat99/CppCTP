@@ -111,6 +111,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         pass
 
 
+
     def iconActivated(self, reason):
         if reason in (QtGui.QSystemTrayIcon.Trigger, QtGui.QSystemTrayIcon.DoubleClick):
             self.is_check_info = True

@@ -1,18 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Tasks SYSTEM "Tasks-6.0.dtd">
 <!-- eric6 tasks file for project FutureInfo -->
-<!-- Saved: 2016-11-21, 09:53:47 -->
+<!-- Saved: 2016-11-23, 13:35:50 -->
 <Tasks version="6.0">
   <ProjectScanFilter></ProjectScanFilter>
-  <Task priority="1" completed="False" type="1" uid="{984986fc-a94a-42ca-ba86-6767ef0821c3}">
-    <Summary>TODO: not implemented yet</Summary>
-    <Description></Description>
-    <Created>2016-11-12, 14:49:57</Created>
-    <Resource>
-      <Filename>FutureTab.py</Filename>
-      <Linenumber>37</Linenumber>
-    </Resource>
-  </Task>
   <Task priority="1" completed="False" type="1" uid="{9256da20-4736-49a4-9024-e57a8dd189f4}">
     <Summary>TODO: not implemented yet</Summary>
     <Description></Description>
@@ -38,6 +29,15 @@
     <Resource>
       <Filename>ToolWindow.py</Filename>
       <Linenumber>48</Linenumber>
+    </Resource>
+  </Task>
+  <Task priority="1" completed="False" type="1" uid="{13633119-a71d-4802-85ca-8eb6ac0d789e}">
+    <Summary>TODO: not implemented yet</Summary>
+    <Description></Description>
+    <Created>2016-11-23, 13:35:35</Created>
+    <Resource>
+      <Filename>FutureTab.py</Filename>
+      <Linenumber>37</Linenumber>
     </Resource>
   </Task>
 </Tasks>

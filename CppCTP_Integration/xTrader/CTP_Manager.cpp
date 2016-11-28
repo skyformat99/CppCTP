@@ -477,12 +477,14 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				rapidjson::Value &MsgRef = doc["MsgRef"];
 				rapidjson::Value &MsgSrc = doc["MsgSrc"];
 				rapidjson::Value &UserID = doc["UserID"];
+				rapidjson::Value &StrategyID = doc["StrategyID"];
 
 				string s_TraderID = TraderID.GetString();
 				int i_MsgRef = MsgRef.GetInt();
 				int i_MsgSendFlag = MsgSendFlag.GetInt();
 				int i_MsgSrc = MsgSrc.GetInt();
 				string s_UserID = UserID.GetString();
+				string s_StrategyID = StrategyID.GetString();
 
 				std::cout << "收到交易员ID = " << s_TraderID << std::endl;
 				std::cout << "收到期货账户ID = " << s_UserID << std::endl;
@@ -499,6 +501,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
 				build_doc.AddMember("MsgResult", 0, allocator);
 				build_doc.AddMember("MsgErrorReason", "", allocator);
+				build_doc.AddMember("StrategyID", rapidjson::StringRef(s_StrategyID.c_str()), allocator);
 				//创建Info数组
 				rapidjson::Value info_array(rapidjson::kArrayType);
 
@@ -1235,11 +1238,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				rapidjson::Value &MsgRef = doc["MsgRef"];
 				rapidjson::Value &MsgSrc = doc["MsgSrc"];
 				rapidjson::Value &UserID = doc["UserID"];
-				rapidjson::Value &StrategyID = doc["StrategyID"];
 
 				string s_TraderID = TraderID.GetString();
 				string s_UserID = UserID.GetString();
-				string s_StrategyID = StrategyID.GetString();
 				int i_MsgRef = MsgRef.GetInt();
 				int i_MsgSendFlag = MsgSendFlag.GetInt();
 				int i_MsgSrc = MsgSrc.GetInt();
@@ -1249,6 +1250,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				std::cout << "收到交易员ID = " << s_TraderID << std::endl;
 				std::cout << "收到期货账户ID = " << s_UserID << std::endl;
 
+				list<Strategy *> l_strategys;
+				static_dbm->getAllStrategyYesterday(&l_strategys, s_TraderID, s_UserID);
+
 				/*构建策略昨仓Json*/
 				build_doc.SetObject();
 				rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
@@ -1257,14 +1261,13 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.AddMember("MsgType", 10, allocator);
 				build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
 				build_doc.AddMember("UserID", rapidjson::StringRef(s_UserID.c_str()), allocator);
-				build_doc.AddMember("StrategyID", rapidjson::StringRef(s_StrategyID.c_str()), allocator);
 
 				//创建Info数组
 				rapidjson::Value create_info_array(rapidjson::kArrayType);
 
 				list<Strategy *>::iterator stg_itor;
-				for (stg_itor = ctp_m->getListStrategyYesterday()->begin(); stg_itor != ctp_m->getListStrategyYesterday()->end(); stg_itor++) {
-					if (((*stg_itor)->getStgUserId() == s_UserID) && ((*stg_itor)->getStgStrategyId() == s_StrategyID) && ((*stg_itor)->getStgTraderId() == s_TraderID)) {
+				for (stg_itor = l_strategys.begin(); stg_itor != l_strategys.end(); stg_itor++) {
+					if (((*stg_itor)->getStgUserId() == s_UserID) && ((*stg_itor)->getStgTraderId() == s_TraderID)) {
 						std::cout << "找到需要查询的昨仓" << std::endl;
 
 						/*构造内容json*/
@@ -1427,6 +1430,18 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 /// 初始化
 void CTP_Manager::init() {
+
+	/************************************************************************/
+	/* 初始化工作按顺序执行
+	1:查询所有Trader
+	2:查询所有期货账户
+	3:初始化昨仓
+	4:初始化交易SPI
+	5:初始化策略列表合约最小跳
+	6:初始化今仓
+	7:初始化行情SPI*/
+	/************************************************************************/
+
 	/// 数据库查询所有的Trader
 	this->dbm->getAllTrader(this->l_trader);
 
@@ -1435,12 +1450,13 @@ void CTP_Manager::init() {
 	/// 查询所有的期货账户
 	this->dbm->getAllFutureAccount(this->l_user);
 
-	/// 查询所有的策略
+	/// 初始化昨仓数据
+	//this->dbm->getAllStrategyYesterday(this->l_strategys);
 	this->dbm->getAllStrategy(this->l_strategys);
 
-	/// 查询昨仓持仓
+	/// 初始化昨仓数据
 	this->dbm->getAllStrategyYesterday(this->l_strategys_yesterday);
-	
+
 
 	/// 绑定操作,策略绑定到对应期货账户下
 	list<User *>::iterator user_itor;
@@ -1484,6 +1500,9 @@ void CTP_Manager::init() {
 	else {
 		std::cout << "策略最小跳价格获取失败!!!" << std::endl;
 	}
+
+	/// 初始化今仓
+
 
 	/// 行情初始化
 	MarketConfig *mc = this->dbm->getOneMarketConfig();
