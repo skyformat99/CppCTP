@@ -206,6 +206,9 @@ public:
 	void setStgOrderRefBase(long long stg_order_ref_base);
 	long long getStgOrderRefBase();
 
+	void setStgTradingDay(string stg_trading_day);
+	string getStgTradingDay();
+
 	/************************************************************************/
 	/* 交易相关的回报函数                                                      */
 	/************************************************************************/
@@ -386,6 +389,7 @@ private:
 	int stg_trade_volume;				// 成交量
 	double stg_amount;					// 成交金额
 	double stg_average_shift;			// 平均滑点
+	string stg_trading_day;				// 交易日
 
 	int stg_position_a_buy_today;		// A合约买持仓今仓
 	int stg_position_a_buy_yesterday;	// A合约买持仓昨仓

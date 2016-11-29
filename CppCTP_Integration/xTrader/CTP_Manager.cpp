@@ -76,6 +76,7 @@ User * CTP_Manager::CreateAccount(User *user, list<Strategy *> *l_strategys) {
 		}
 
 		sleep(1);
+		std::cout << "CTP_Manager.cpp user address" << user << endl;
 		user->getUserTradeSPI()->Connect(user); // 连接
 		sleep(1);
 		user->getUserTradeSPI()->Login(user); // 登陆
@@ -1474,6 +1475,7 @@ void CTP_Manager::init() {
 				USER_PRINT("Strategy Bind To User");
 				(*user_itor)->addStrategyToList((*stg_itor)); // 将策略添加到期货账户策略列表里
 				(*stg_itor)->setStgUser((*user_itor)); // 策略设置自己的期货账户对象
+				(*stg_itor)->setStgTradingDay((*user_itor)->getTradingDay()); // 更新时间
 				USER_PRINT("(*stg_itor)->setStgUser((*user_itor))");
 				USER_PRINT((*stg_itor)->getStgUser());
 			}

@@ -109,6 +109,9 @@ public:
 	void setIsActive(string isActive);
 	string getIsActive();
 
+	void setTradingDay(string stg_trading_day);
+	string getTradingDay();
+
 private:
 	int on_off; //开关
 	string BrokerID;
@@ -132,6 +135,7 @@ private:
 	long long stg_order_ref_base;
 	CTP_Manager *o_ctp;
 	string isActive;
+	string trading_day;				// 交易日
 };
 
 #endif

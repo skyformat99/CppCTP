@@ -1130,3 +1130,11 @@ void User::setIsActive(string isActive) {
 string User::getIsActive() {
 	return this->isActive;
 }
+
+void User::setTradingDay(string stg_trading_day) {
+	this->trading_day = stg_trading_day;
+}
+
+string User::getTradingDay() {
+	return this->trading_day;
+}

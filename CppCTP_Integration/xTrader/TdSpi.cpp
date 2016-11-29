@@ -175,6 +175,7 @@ void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 		std::cout << "中金所时间" << pRspUserLogin->FFEXTime << ", ";
 		///能源中心时间
 		std::cout << "能源中心时间" << pRspUserLogin->INETime << endl;
+		string s_trading_day = this->tdapi->GetTradingDay();
 		std::cout << "=================================================================================" << endl;
 		
 		this->current_user->setBrokerID(pRspUserLogin->BrokerID);
@@ -183,10 +184,12 @@ void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 		this->current_user->setIsConfirmSettlement(false);
 		this->current_user->setUserTradeAPI(this->tdapi);
 		this->current_user->setUserTradeSPI(this);
+		this->current_user->setTradingDay(s_trading_day);
 
 		this->setIsConfirmSettlement(false);
-
-		std::cout << "this->current_user->getUserID()" << this->current_user->getUserID() << endl;
+		
+		std::cout << "TdSpi.cpp current_user address" << this->current_user << endl;
+		std::cout << "TdSpi.cpp this->current_user->getUserID()" << this->current_user->getUserID() << endl;
 	}
 }
 
@@ -707,22 +710,22 @@ void TdSpi::CopyInstrumentInfo(CThostFtdcInstrumentField *dst, CThostFtdcInstrum
 void TdSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus) {
 	//USER_PRINT("TdSpi::OnRtnInstrumentStatus");
 	if (pInstrumentStatus) {
-		/////交易所代码
-		//std::cout << "交易所代码" << pInstrumentStatus->ExchangeID << endl;
-		/////合约在交易所的代码
-		//std::cout << "合约在交易所的代码" << pInstrumentStatus->ExchangeInstID << endl;
-		/////结算组代码
-		//std::cout << "结算组代码" << pInstrumentStatus->SettlementGroupID << endl;
-		/////合约代码
-		//std::cout << "合约代码" << pInstrumentStatus->InstrumentID << endl;
-		/////合约交易状态
-		//std::cout << "合约交易状态" << pInstrumentStatus->InstrumentStatus << endl;
-		/////交易阶段编号
-		//std::cout << "交易阶段编号" << pInstrumentStatus->TradingSegmentSN << endl;
-		/////进入本状态时间
-		//std::cout << "进入本状态时间" << pInstrumentStatus->EnterTime << endl;
-		/////进入本状态原因
-		//std::cout << "进入本状态原因" << pInstrumentStatus->EnterReason << endl;
+		///交易所代码
+		std::cout << "交易所代码" << pInstrumentStatus->ExchangeID << endl;
+		///合约在交易所的代码
+		std::cout << "合约在交易所的代码" << pInstrumentStatus->ExchangeInstID << endl;
+		///结算组代码
+		std::cout << "结算组代码" << pInstrumentStatus->SettlementGroupID << endl;
+		///合约代码
+		std::cout << "合约代码" << pInstrumentStatus->InstrumentID << endl;
+		///合约交易状态
+		std::cout << "合约交易状态" << pInstrumentStatus->InstrumentStatus << endl;
+		///交易阶段编号
+		std::cout << "交易阶段编号" << pInstrumentStatus->TradingSegmentSN << endl;
+		///进入本状态时间
+		std::cout << "进入本状态时间" << pInstrumentStatus->EnterTime << endl;
+		///进入本状态原因
+		std::cout << "进入本状态原因" << pInstrumentStatus->EnterReason << endl;
 	}
 }
 

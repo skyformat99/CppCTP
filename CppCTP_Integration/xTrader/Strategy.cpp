@@ -2055,6 +2055,14 @@ long long Strategy::getStgOrderRefBase() {
 	return this->stg_order_ref_base;
 }
 
+void Strategy::setStgTradingDay(string stg_trading_day) {
+	this->stg_trading_day = stg_trading_day;
+}
+
+string Strategy::getStgTradingDay() {
+	return this->stg_trading_day;
+}
+
 /************************************************************************/
 /* 交易相关的回报函数                                                      */
 /************************************************************************/

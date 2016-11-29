@@ -506,6 +506,7 @@ void DBManager::CreateStrategy(Strategy *stg) {
 		b.append("a_wait_price_tick", stg->getStgAWaitPriceTick());
 		b.append("b_wait_price_tick", stg->getStgBWaitPriceTick());
 		b.append("StrategyOnoff", stg->getOn_Off());
+		b.append("trading_day", stg->getStgTradingDay());
 
 		BSONObj p = b.obj();
 
@@ -584,6 +585,7 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 			<< "a_wait_price_tick" << stg->getStgAWaitPriceTick() 
 			<< "b_wait_price_tick" << stg->getStgBWaitPriceTick()
 			<< "StrategyOnoff" << stg->getOn_Off()
+			<< "trading_day" << stg->getStgTradingDay()
 			<< "list_instrument_id" << BSON_ARRAY(stg->getStgInstrumentIdA() << stg->getStgInstrumentIdB()))));
 
 		USER_PRINT("DBManager::UpdateStrategy ok");
@@ -667,6 +669,7 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 		cout << "a_wait_price_tick = " << p.getField("a_wait_price_tick").Double() << ", ";
 		cout << "b_wait_price_tick = " << p.getField("b_wait_price_tick").Double() << ", ";
 		cout << "StrategyOnoff = " << p.getField("StrategyOnoff").Int() << endl;
+		cout << "trading_day = " << p.getStringField("trading_day") << endl;
 
 		stg->setStgAWaitPriceTick(p.getField("a_wait_price_tick").Double());
 		stg->setStgBWaitPriceTick(p.getField("b_wait_price_tick").Double());
@@ -689,6 +692,7 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 		stg->setStgTradeVolume(p.getIntField("trade_volume"));
 		stg->setStgAmount(p.getField("amount").Double());
 		stg->setStgAverageShift(p.getField("average_shift").Double());
+		stg->setStgTradingDay(p.getStringField("trading_day"));
 
 		stg->setStgAOrderActionTiresLimit(p.getIntField("a_order_action_limit"));
 		stg->setStgBOrderActionTiresLimit(p.getIntField("b_order_action_limit"));
@@ -807,6 +811,7 @@ void DBManager::CreateStrategyYesterday(Strategy *stg) {
 		b.append("a_wait_price_tick", stg->getStgAWaitPriceTick());
 		b.append("b_wait_price_tick", stg->getStgBWaitPriceTick());
 		b.append("StrategyOnoff", stg->getOn_Off());
+		b.append("trading_day", stg->getStgTradingDay());
 
 		BSONObj p = b.obj();
 
@@ -886,6 +891,7 @@ void DBManager::UpdateStrategyYesterday(Strategy *stg) {
 			<< "a_wait_price_tick" << stg->getStgAWaitPriceTick()
 			<< "b_wait_price_tick" << stg->getStgBWaitPriceTick()
 			<< "StrategyOnoff" << stg->getOn_Off()
+			<< "trading_day" << stg->getStgTradingDay()
 			<< "list_instrument_id" << BSON_ARRAY(stg->getStgInstrumentIdA() << stg->getStgInstrumentIdB()))));
 
 		USER_PRINT("DBManager::UpdateStrategy ok");
@@ -992,6 +998,7 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 		stg->setStgTradeVolume(p.getField("trade_volume").Int());
 		stg->setStgAmount(p.getField("amount").Double());
 		stg->setStgAverageShift(p.getField("average_shift").Double());
+		stg->setStgTradingDay(p.getStringField("trading_day"));
 
 		stg->setStgAOrderActionTiresLimit(p.getIntField("a_order_action_limit"));
 		stg->setStgBOrderActionTiresLimit(p.getIntField("b_order_action_limit"));
@@ -1016,7 +1023,6 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 		stg->setStgTraderId(p.getStringField("trader_id"));
 		stg->setStgUserId(p.getStringField("user_id"));
 		stg->setOn_Off(p.getField("StrategyOnoff").Int());
-
 
 		vector<BSONElement> elements = p["list_instrument_id"].Array();
 		if (elements.size() > 1) {
@@ -1111,6 +1117,7 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 		cout << "trade_volume" << p.getIntField("trade_volume") << ", ";
 		cout << "amount" << p.getField("amount").Double() << ", ";
 		cout << "average_shift" << p.getField("average_shift").Double() << ", ";
+		cout << "trading_day" << p.getStringField("trading_day") << ", ";
 
 
 		cout << "position_a_buy_yesterday = " << p.getIntField("position_a_buy_yesterday") << ", ";
@@ -1145,7 +1152,7 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 		stg->setStgTradeVolume(p.getIntField("trade_volume"));
 		stg->setStgAmount(p.getField("amount").Double());
 		stg->setStgAverageShift(p.getField("average_shift").Double());
-
+		stg->setStgTradingDay(p.getStringField("trading_day"));
 
 
 		stg->setStgAOrderActionTiresLimit(p.getIntField("a_order_action_limit"));

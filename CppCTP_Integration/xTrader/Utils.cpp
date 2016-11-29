@@ -11,6 +11,7 @@
 #include <iconv.h>
 #include <cstring>
 #include <errno.h>
+#include <ctime>
 #include "Utils.h"
 
 //check folder exist
@@ -155,4 +156,19 @@ string Utils::getNowTimeMs() {
 	//printf("gettimeofday: date_time=%s, tv_usec=%ld, tv_msec=%ld\n", date_time, us.tv_usec, us.tv_usec / 1000);
 	string s = "_";
 	return (s + date_time + s + std::to_string(us.tv_usec));
+}
+
+bool Utils::compareTradingDay(const char *compare_day, const char *today) {
+
+	struct tm tm_time1;
+	struct tm tm_time2;
+	strptime(compare_day, "%Y%m%d", &tm_time1);
+	strptime(today, "%Y%m%d", &tm_time2);
+	if (mktime(&tm_time1) < mktime(&tm_time2)) {
+		return true;
+	} else {
+		return false;
+	}
+
+	return false;
 }
