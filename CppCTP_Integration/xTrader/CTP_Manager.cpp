@@ -1267,7 +1267,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 				list<Strategy *>::iterator stg_itor;
 				for (stg_itor = l_strategys.begin(); stg_itor != l_strategys.end(); stg_itor++) {
-					if (((*stg_itor)->getStgUserId() == s_UserID) && ((*stg_itor)->getStgTraderId() == s_TraderID)) {
+					if (((*stg_itor)->getStgTraderId() == s_TraderID)) {
 						std::cout << "找到需要查询的昨仓" << std::endl;
 
 						/*构造内容json*/
@@ -1345,7 +1345,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					build_doc.AddMember("MsgErrorReason", "", allocator);
 				}
 				else {
-					build_doc.AddMember("MsgResult", 1, allocator);
+					build_doc.AddMember("MsgResult", 0, allocator);
 					build_doc.AddMember("MsgErrorReason", "未找到该策略昨仓信息", allocator);
 				}
 
