@@ -931,10 +931,16 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						new_stg->setStgAWaitPriceTick(object["a_wait_price_tick"].GetDouble());
 						new_stg->setStgBWaitPriceTick(object["b_wait_price_tick"].GetDouble());
 						new_stg->setOn_Off(object["StrategyOnoff"].GetInt());
-
-						static_dbm->CreateStrategy(new_stg);
-						std::cout << "Strategy新建完成!" << std::endl;
-						ctp_m->getListStrategy()->push_back(new_stg);
+						int flag = static_dbm->CreateStrategy(new_stg);
+						
+						if (flag) {
+							std::cout << "Strategy已存在无需新建!" << std::endl;
+						}
+						else {
+							std::cout << "Strategy新建完成!" << std::endl;
+							ctp_m->getListStrategy()->push_back(new_stg);
+						}
+						
 
 						/*构造内容json*/
 						rapidjson::Value create_info_object(rapidjson::kObjectType);
@@ -1449,45 +1455,50 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								std::cout << "找到即将修改的Strategy" << std::endl;
 
 								(*stg_itor)->setStgPositionASellToday(object["position_a_sell_today"].GetInt());
-								(*stg_itor)->setStgPositionBSell(object["position_b_sell"].GetInt());
-								(*stg_itor)->setStgSpreadShift(object["spread_shift"].GetDouble());
 								(*stg_itor)->setStgPositionBSellToday(object["position_b_sell_today"].GetInt());
+								(*stg_itor)->setStgPositionABuyToday(object["position_a_buy_today"].GetInt());
 								(*stg_itor)->setStgPositionBBuyToday(object["position_b_buy_today"].GetInt());
 								(*stg_itor)->setStgPositionASell(object["position_a_sell"].GetInt());
-								(*stg_itor)->setStgBuyClose(object["buy_close"].GetDouble());
-								(*stg_itor)->setStgStopLoss(object["stop_loss"].GetDouble());
+								(*stg_itor)->setStgPositionBSell(object["position_b_sell"].GetInt());
+								(*stg_itor)->setStgPositionABuyYesterday(object["position_a_buy_yesterday"].GetInt());
 								(*stg_itor)->setStgPositionBBuyYesterday(object["position_b_buy_yesterday"].GetInt());
-								//(*stg_itor)->setStgIsActive(object["is_active"].GetBool());
+								(*stg_itor)->setStgPositionASellYesterday(object["position_a_sell_yesterday"].GetInt());
 								(*stg_itor)->setStgPositionBSellYesterday(object["position_b_sell_yesterday"].GetInt());
-								(*stg_itor)->setStgStrategyId(object["strategy_id"].GetString());
-								(*stg_itor)->setStgPositionBBuy(object["position_b_buy"].GetInt());
-								(*stg_itor)->setStgLotsBatch(object["lots_batch"].GetInt());
 								(*stg_itor)->setStgPositionABuy(object["position_a_buy"].GetInt());
-								(*stg_itor)->setStgSellOpen(object["sell_open"].GetDouble());
-								(*stg_itor)->setStgOrderAlgorithm(object["order_algorithm"].GetString());
-								(*stg_itor)->setStgTraderId(object["trader_id"].GetString());
-								(*stg_itor)->setStgAOrderActionTiresLimit(object["a_order_action_limit"].GetInt());
-								(*stg_itor)->setStgBOrderActionTiresLimit(object["b_order_action_limit"].GetInt());
-								(*stg_itor)->setStgSellClose(object["sell_close"].GetDouble());
-								(*stg_itor)->setStgBuyOpen(object["buy_open"].GetDouble());
-								(*stg_itor)->setStgOnlyClose(object["only_close"].GetInt());
+								(*stg_itor)->setStgPositionBBuy(object["position_b_buy"].GetInt());
+								(*stg_itor)->setStgPositionBuy(object["position_buy"].GetInt());
+								(*stg_itor)->setStgPositionSell(object["position_sell"].GetInt());
+								(*stg_itor)->setStgPosition(object["position"].GetInt());
+								
+								//(*stg_itor)->setStgSpreadShift(object["spread_shift"].GetDouble());
+								//(*stg_itor)->setStgBuyClose(object["buy_close"].GetDouble());
+								//(*stg_itor)->setStgStopLoss(object["stop_loss"].GetDouble());
+								//(*stg_itor)->setStgIsActive(object["is_active"].GetBool());
+								//(*stg_itor)->setStgStrategyId(object["strategy_id"].GetString());
+								//(*stg_itor)->setStgLotsBatch(object["lots_batch"].GetInt());
+								//(*stg_itor)->setStgSellOpen(object["sell_open"].GetDouble());
+								//(*stg_itor)->setStgOrderAlgorithm(object["order_algorithm"].GetString());
+								//(*stg_itor)->setStgTraderId(object["trader_id"].GetString());
+								//(*stg_itor)->setStgAOrderActionTiresLimit(object["a_order_action_limit"].GetInt());
+								//(*stg_itor)->setStgBOrderActionTiresLimit(object["b_order_action_limit"].GetInt());
+								//(*stg_itor)->setStgSellClose(object["sell_close"].GetDouble());
+								//(*stg_itor)->setStgBuyOpen(object["buy_open"].GetDouble());
+								//(*stg_itor)->setStgOnlyClose(object["only_close"].GetInt());
 
 								/*新增字段*/
 
-								(*stg_itor)->setStgTradeModel(object["trade_model"].GetString());
-								(*stg_itor)->setStgHoldProfit(object["hold_profit"].GetDouble());
-								(*stg_itor)->setStgCloseProfit(object["close_profit"].GetDouble());
-								(*stg_itor)->setStgCommisstion(object["commission"].GetDouble());
-								(*stg_itor)->setStgPosition(object["position"].GetInt());
-								(*stg_itor)->setStgPositionBuy(object["position_buy"].GetInt());
-								(*stg_itor)->setStgPositionSell(object["position_sell"].GetInt());
-								(*stg_itor)->setStgTradeVolume(object["trade_volume"].GetInt());
-								(*stg_itor)->setStgAmount(object["amount"].GetDouble());
-								(*stg_itor)->setStgAverageShift(object["average_shift"].GetDouble());
+								//(*stg_itor)->setStgTradeModel(object["trade_model"].GetString());
+								//(*stg_itor)->setStgHoldProfit(object["hold_profit"].GetDouble());
+								//(*stg_itor)->setStgCloseProfit(object["close_profit"].GetDouble());
+								//(*stg_itor)->setStgCommisstion(object["commission"].GetDouble());
+								
+								//(*stg_itor)->setStgTradeVolume(object["trade_volume"].GetInt());
+								//(*stg_itor)->setStgAmount(object["amount"].GetDouble());
+								//(*stg_itor)->setStgAverageShift(object["average_shift"].GetDouble());
 
 
 								//遍历list_instrument_id
-								const Value& info_object = object["list_instrument_id"];
+								/*const Value& info_object = object["list_instrument_id"];
 								if (info_object.IsArray()) {
 									for (int j = 0; j < info_object.Size(); j++) {
 										std::string instrument = info_object[j].GetString();
@@ -1499,16 +1510,15 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 											(*stg_itor)->setStgInstrumentIdB(instrument);
 										}
 									}
-								}
+								}*/
 
-								(*stg_itor)->setStgPositionABuyYesterday(object["position_a_buy_yesterday"].GetInt());
-								(*stg_itor)->setStgUserId(object["user_id"].GetString());
-								(*stg_itor)->setStgPositionABuyToday(object["position_a_buy_today"].GetInt());
-								(*stg_itor)->setStgPositionASellYesterday(object["position_a_sell_yesterday"].GetInt());
-								(*stg_itor)->setStgLots(object["lots"].GetInt());
-								(*stg_itor)->setStgAWaitPriceTick(object["a_wait_price_tick"].GetDouble());
-								(*stg_itor)->setStgBWaitPriceTick(object["b_wait_price_tick"].GetDouble());
-								(*stg_itor)->setOn_Off(object["StrategyOnoff"].GetInt());
+								
+								//(*stg_itor)->setStgUserId(object["user_id"].GetString());
+								
+								//(*stg_itor)->setStgLots(object["lots"].GetInt());
+								//(*stg_itor)->setStgAWaitPriceTick(object["a_wait_price_tick"].GetDouble());
+								//(*stg_itor)->setStgBWaitPriceTick(object["b_wait_price_tick"].GetDouble());
+								//(*stg_itor)->setOn_Off(object["StrategyOnoff"].GetInt());
 
 								std::cout << "Strategy修改完成!" << std::endl;
 								static_dbm->UpdateStrategy((*stg_itor));

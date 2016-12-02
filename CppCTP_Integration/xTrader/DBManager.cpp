@@ -441,14 +441,16 @@ void DBManager::getAllFutureAccount(list<User *> *l_user) {
 	}
 }
 
-void DBManager::CreateStrategy(Strategy *stg) {
+int DBManager::CreateStrategy(Strategy *stg) {
 	int count_number = 0;
+	int flag = 0;
 
 	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
 		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str())));
 
 	if (count_number > 0) {
 		cout << "Strategy Already Exists!" << endl;
+		flag = 1;
 	}
 	else {
 		BSONObjBuilder b;
@@ -511,7 +513,9 @@ void DBManager::CreateStrategy(Strategy *stg) {
 
 		conn->insert(DB_STRATEGY_COLLECTION, p);
 		USER_PRINT("DBManager::CreateStrategy ok");
+		flag = 0;
 	}
+	return flag;
 }
 
 void DBManager::DeleteStrategy(Strategy *stg) {
