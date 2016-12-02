@@ -111,6 +111,13 @@ public:
 	/// 处理客户端发来的消息
 	static void HandleMessage(int fd, char *msg, CTP_Manager *ctp_m);
 
+	/// 设置交易日
+	void setTradingDay(string trading_day);
+
+	string getTradingDay();
+
+	/// 获得交易日
+
 private:
 	Login *login;
 	list<string> *l_instrument;
@@ -124,5 +131,6 @@ private:
 	list<Strategy *> *l_strategys_yesterday;
 	MdSpi *mdspi;
 	int on_off; //开关
+	string trading_day;
 };
 #endif

@@ -479,7 +479,6 @@ void DBManager::CreateStrategy(Strategy *stg) {
 
 		/*新增字段*/
 		b.append("trade_model", stg->getStgTradeModel());
-		b.append("order_algorithm", stg->getStgOrderAlgorithm());
 		b.append("hold_profit", stg->getStgHoldProfit());
 		b.append("close_profit", stg->getStgCloseProfit());
 		b.append("commission", stg->getStgCommission());
@@ -566,7 +565,6 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 			<< "only_close" << stg->isStgOnlyClose()
 			
 			<< "trade_model" << stg->getStgTradeModel()
-			<< "order_algorithm" << stg->getStgOrderAlgorithm()
 			<< "hold_profit" << stg->getStgHoldProfit()
 			<< "close_profit" << stg->getStgCloseProfit()
 			<< "commission" << stg->getStgCommission()
@@ -650,7 +648,6 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 		/*新增字段*/
 
 		cout << "trade_model" << p.getStringField("trade_model") << ", ";
-		cout << "order_algorithm" << p.getStringField("order_algorithm") << ", ";
 		cout << "hold_profit" << p.getField("hold_profit").Double() << ", ";
 		cout << "close_profit" << p.getField("close_profit").Double() << ", ";
 		cout << "commission" << p.getField("commission").Double() << ", ";
@@ -696,7 +693,6 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 
 		stg->setStgAOrderActionTiresLimit(p.getIntField("a_order_action_limit"));
 		stg->setStgBOrderActionTiresLimit(p.getIntField("b_order_action_limit"));
-		stg->setStgOrderAlgorithm(p.getStringField("order_algorithm"));
 		stg->setStgPositionABuy(p.getIntField("position_a_buy"));
 		stg->setStgPositionABuyToday(p.getIntField("position_a_buy_today"));
 		stg->setStgPositionABuyYesterday(p.getIntField("position_a_buy_yesterday"));
@@ -784,7 +780,6 @@ void DBManager::CreateStrategyYesterday(Strategy *stg) {
 
 		/*新增字段*/
 		b.append("trade_model", stg->getStgTradeModel());
-		b.append("order_algorithm", stg->getStgOrderAlgorithm());
 		b.append("hold_profit", stg->getStgHoldProfit());
 		b.append("close_profit", stg->getStgCloseProfit());
 		b.append("commission", stg->getStgCommission());
@@ -872,7 +867,6 @@ void DBManager::UpdateStrategyYesterday(Strategy *stg) {
 			<< "only_close" << stg->isStgOnlyClose()
 
 			<< "trade_model" << stg->getStgTradeModel()
-			<< "order_algorithm" << stg->getStgOrderAlgorithm()
 			<< "hold_profit" << stg->getStgHoldProfit()
 			<< "close_profit" << stg->getStgCloseProfit()
 			<< "commission" << stg->getStgCommission()
@@ -957,7 +951,6 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 		/*新增字段*/
 
 		cout << "trade_model" << p.getStringField("trade_model") << ", ";
-		cout << "order_algorithm" << p.getStringField("order_algorithm") << ", ";
 		cout << "hold_profit" << p.getField("hold_profit").Double() << ", ";
 		cout << "close_profit" << p.getField("close_profit").Double() << ", ";
 		cout << "commission" << p.getField("commission").Double() << ", ";
@@ -1002,7 +995,6 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 
 		stg->setStgAOrderActionTiresLimit(p.getIntField("a_order_action_limit"));
 		stg->setStgBOrderActionTiresLimit(p.getIntField("b_order_action_limit"));
-		stg->setStgOrderAlgorithm(p.getStringField("order_algorithm"));
 		stg->setStgPositionABuy(p.getIntField("position_a_buy"));
 		stg->setStgPositionABuyToday(p.getIntField("position_a_buy_today"));
 		stg->setStgPositionABuyYesterday(p.getIntField("position_a_buy_yesterday"));
@@ -1107,7 +1099,6 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 		/*新增字段*/
 
 		cout << "trade_model" << p.getStringField("trade_model") << ", ";
-		cout << "order_algorithm" << p.getStringField("order_algorithm") << ", ";
 		cout << "hold_profit" << p.getField("hold_profit").Double() << ", ";
 		cout << "close_profit" << p.getField("close_profit").Double() << ", ";
 		cout << "commission" << p.getField("commission").Double() << ", ";
@@ -1157,7 +1148,6 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 
 		stg->setStgAOrderActionTiresLimit(p.getIntField("a_order_action_limit"));
 		stg->setStgBOrderActionTiresLimit(p.getIntField("b_order_action_limit"));
-		stg->setStgOrderAlgorithm(p.getStringField("order_algorithm"));
 		stg->setStgPositionABuy(p.getIntField("position_a_buy"));
 		stg->setStgPositionABuyToday(p.getIntField("position_a_buy_today"));
 		stg->setStgPositionABuyYesterday(p.getIntField("position_a_buy_yesterday"));

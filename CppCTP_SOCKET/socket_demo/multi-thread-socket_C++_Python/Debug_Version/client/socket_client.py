@@ -126,7 +126,7 @@ if __name__ == '__main__':
         try:
             #进行与服务端的连接(ip地址根据实际情况进行更改)
             s.connect(("10.0.0.49", 8888))
-            #s.connect(("192.168.1.12", 8888))
+            #s.connect(("192.168.1.13", 8888))
         except socket.error as e:
             print("socket error", e)
             sys.exit(1)

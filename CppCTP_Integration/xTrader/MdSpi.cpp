@@ -128,6 +128,8 @@ void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtd
 	if (bIsLast && !(this->IsErrorRspInfo(pRspInfo))) {
 		///交易日
 		cout << "交易日" << pRspUserLogin->TradingDay << ", ";
+
+		
 		///登录成功时间
 		cout << "登录成功时间" << pRspUserLogin->LoginTime << ", ";
 		///经纪公司代码
@@ -153,6 +155,9 @@ void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtd
 		///能源中心时间
 		cout << "能源中心时间" << pRspUserLogin->INETime << endl;
 		this->isLogged = true;
+		string s_trading_day = this->mdapi->GetTradingDay();
+		std::cout << "MdSpi.cpp s_trading_day = " << s_trading_day << std::endl;
+		this->ctp_m->setTradingDay(s_trading_day);
 		sem_post(&login_sem);
 		if (this->isFirstTimeLogged == false) {
 			sem_init(&submarket_sem, 0, 1);
@@ -301,6 +306,13 @@ list<Strategy *> * MdSpi::getListStrategy() {
 /// 设置strategy_list
 void MdSpi::setListStrategy(list<Strategy *> *l_strategys) {
 	this->l_strategys = l_strategys;
+}
+
+void MdSpi::setCtpManager(CTP_Manager *ctp_m) {
+	this->ctp_m = ctp_m;
+}
+CTP_Manager * MdSpi::getCtpManager() {
+	return this->ctp_m;
 }
 
 //取消订阅行情应答

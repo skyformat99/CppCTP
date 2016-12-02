@@ -17,10 +17,13 @@
 #include "ThostFtdcUserApiStruct.h"
 #include "User.h"
 #include "Strategy.h"
+#include "CTP_Manager.h"
 
 
 using std::map;
 using std::string;
+
+class CTP_Manager;
 
 class MdSpi :public CThostFtdcMdSpi{
 
@@ -90,6 +93,9 @@ public:
 	/// 设置strategy_list
 	void setListStrategy(list<Strategy *> *l_strategys);
 
+	void setCtpManager(CTP_Manager *ctp_m);
+	CTP_Manager *getCtpManager();
+
 private:
     CThostFtdcMdApi *mdapi;
     CThostFtdcReqUserLoginField *loginField;
@@ -108,5 +114,6 @@ private:
 	sem_t submarket_sem;
 	sem_t unsubmarket_sem;
 	list<Strategy *> *l_strategys;
+	CTP_Manager *ctp_m;
 };
 #endif //QUANT_CTP_MDSPI_H
