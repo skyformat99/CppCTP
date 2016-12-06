@@ -503,7 +503,7 @@ int DBManager::CreateStrategy(Strategy *stg) {
 		b.append("user_id", stg->getStgUserId());
 		b.append("position_a_buy_today", stg->getStgPositionABuyToday());
 		b.append("position_a_sell_yesterday", stg->getStgPositionASellYesterday());
-		b.append("lots", stg->getStgLotsBatch());
+		b.append("lots", stg->getStgLots());
 		b.append("a_wait_price_tick", stg->getStgAWaitPriceTick());
 		b.append("b_wait_price_tick", stg->getStgBWaitPriceTick());
 		b.append("StrategyOnoff", stg->getOn_Off());
@@ -583,7 +583,7 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 			<< "user_id" << stg->getStgUserId() 
 			<< "position_a_buy_today" << stg->getStgPositionABuyToday() 
 			<< "position_a_sell_yesterday" << stg->getStgPositionASellYesterday() 
-			<< "lots" << stg->getStgLotsBatch() 
+			<< "lots" << stg->getStgLots()
 			<< "a_wait_price_tick" << stg->getStgAWaitPriceTick() 
 			<< "b_wait_price_tick" << stg->getStgBWaitPriceTick()
 			<< "StrategyOnoff" << stg->getOn_Off()
@@ -806,7 +806,7 @@ void DBManager::CreateStrategyYesterday(Strategy *stg) {
 		b.append("user_id", stg->getStgUserId());
 		b.append("position_a_buy_today", stg->getStgPositionABuyToday());
 		b.append("position_a_sell_yesterday", stg->getStgPositionASellYesterday());
-		b.append("lots", stg->getStgLotsBatch());
+		b.append("lots", stg->getStgLots());
 		b.append("a_wait_price_tick", stg->getStgAWaitPriceTick());
 		b.append("b_wait_price_tick", stg->getStgBWaitPriceTick());
 		b.append("StrategyOnoff", stg->getOn_Off());
@@ -885,7 +885,7 @@ void DBManager::UpdateStrategyYesterday(Strategy *stg) {
 			<< "user_id" << stg->getStgUserId()
 			<< "position_a_buy_today" << stg->getStgPositionABuyToday()
 			<< "position_a_sell_yesterday" << stg->getStgPositionASellYesterday()
-			<< "lots" << stg->getStgLotsBatch()
+			<< "lots" << stg->getStgLots()
 			<< "a_wait_price_tick" << stg->getStgAWaitPriceTick()
 			<< "b_wait_price_tick" << stg->getStgBWaitPriceTick()
 			<< "StrategyOnoff" << stg->getOn_Off()
