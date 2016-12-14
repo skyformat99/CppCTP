@@ -75,8 +75,10 @@ public:
 	   查找策略				                                                */
 	/************************************************************************/
 	int CreateStrategy(Strategy *stg);
-	void DeleteStrategy(Strategy *stg);
+	int DeleteStrategy(Strategy *stg);
 	void UpdateStrategy(Strategy *stg);
+	int UpdateStrategyOnOff(Strategy *stg);
+	int UpdateStrategyOnlyCloseOnOff(Strategy *stg);
 	void getAllStrategy(list<Strategy *> *l_strategys, string traderid = "", string userid = "");
 
 	/************************************************************************/

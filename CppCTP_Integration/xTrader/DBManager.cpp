@@ -446,7 +446,7 @@ int DBManager::CreateStrategy(Strategy *stg) {
 	int flag = 0;
 
 	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
-		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str())));
+		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str()) << "is_active" << true));
 
 	if (count_number > 0) {
 		cout << "Strategy Already Exists!" << endl;
@@ -477,7 +477,13 @@ int DBManager::CreateStrategy(Strategy *stg) {
 		b.append("b_order_action_limit", stg->getStgBOrderActionTiresLimit());
 		b.append("sell_close", stg->getStgSellClose());
 		b.append("buy_open", stg->getStgBuyOpen());
+
 		b.append("only_close", stg->isStgOnlyClose());
+		b.append("strategy_on_off", stg->getOn_Off());
+		b.append("sell_open_on_off", stg->getStgSellOpenOnOff());
+		b.append("buy_close_on_off", stg->getStgBuyCloseOnOff());
+		b.append("sell_close_on_off", stg->getStgSellCloseOnOff());
+		b.append("buy_open_on_off", stg->getStgBuyOpenOnOff());
 
 		/*新增字段*/
 		b.append("trade_model", stg->getStgTradeModel());
@@ -486,7 +492,7 @@ int DBManager::CreateStrategy(Strategy *stg) {
 		b.append("commission", stg->getStgCommission());
 		b.append("position", stg->getStgPosition());
 		b.append("position_buy", stg->getStgPositionBuy());
-		b.append("positon_sell", stg->getStgPositionSell());
+		b.append("position_sell", stg->getStgPositionSell());
 		b.append("trade_volume", stg->getStgTradeVolume());
 		b.append("amount", stg->getStgAmount());
 		b.append("average_shift", stg->getStgAverageShift());
@@ -506,7 +512,6 @@ int DBManager::CreateStrategy(Strategy *stg) {
 		b.append("lots", stg->getStgLots());
 		b.append("a_wait_price_tick", stg->getStgAWaitPriceTick());
 		b.append("b_wait_price_tick", stg->getStgBWaitPriceTick());
-		b.append("StrategyOnoff", stg->getOn_Off());
 		b.append("trading_day", stg->getStgTradingDay());
 
 		BSONObj p = b.obj();
@@ -518,20 +523,70 @@ int DBManager::CreateStrategy(Strategy *stg) {
 	return flag;
 }
 
-void DBManager::DeleteStrategy(Strategy *stg) {
+int DBManager::DeleteStrategy(Strategy *stg) {
 	int count_number = 0;
-
+	int flag = 0;
 	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
-		BSON("strategy_id" << stg->getStgStrategyId().c_str() << "user_id" << stg->getStgUserId().c_str()));
+		BSON("strategy_id" << stg->getStgStrategyId().c_str() << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
 
 	if (count_number > 0) {
-		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId())), BSON("$set" << BSON("is_active" << false)));
+		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str()) << "is_active" << true), BSON("$set" << BSON("is_active" << false)));
 		USER_PRINT("DBManager::DeleteStrategy ok");
+		flag = 0;
+	}
+	else {
+		cout << "Strategy Not Exists!" << endl;
+		flag = 1;
+	}
+	return flag;
+}
+
+int DBManager::UpdateStrategyOnOff(Strategy *stg) {
+	int count_number = 0;
+	int flag = 0;
+	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
+		BSON("strategy_id" << stg->getStgStrategyId().c_str() << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
+
+	if (count_number > 0) {
+
+		std::cout << "UpdateStrategyOnOff strategy_id = " << stg->getStgStrategyId() << std::endl;
+		std::cout << "UpdateStrategyOnOff user_id = " << stg->getStgUserId() << std::endl;
+		std::cout << "UpdateStrategyOnOff strategy_on_off = " << stg->getOn_Off() << std::endl;
+
+		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId()) << "is_active" << true), BSON("$set" << BSON("strategy_on_off" << stg->getOn_Off())));
+		USER_PRINT("DBManager::UpdateStrategyOnOff ok");
+		flag = 0;
 	}
 	else {
 		cout << "Strategy ID Not Exists!" << endl;
+		flag = 1;
 	}
+	return flag;
 }
+
+int DBManager::UpdateStrategyOnlyCloseOnOff(Strategy *stg) {
+	int count_number = 0;
+	int flag = 0;
+	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
+		BSON("strategy_id" << stg->getStgStrategyId().c_str() << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
+
+	if (count_number > 0) {
+
+		std::cout << "UpdateStrategyOnlyCloseOnOff strategy_id = " << stg->getStgStrategyId() << std::endl;
+		std::cout << "UpdateStrategyOnlyCloseOnOff user_id = " << stg->getStgUserId() << std::endl;
+		std::cout << "UpdateStrategyOnlyCloseOnOff only_close = " << stg->isStgOnlyClose() << std::endl;
+
+		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId()) << "is_active" << true), BSON("$set" << BSON("only_close" << stg->isStgOnlyClose())));
+		USER_PRINT("DBManager::UpdateStrategyOnlyCloseOnOff ok");
+		flag = 0;
+	}
+	else {
+		cout << "Strategy ID Not Exists!" << endl;
+		flag = 1;
+	}
+	return flag;
+}
+
 void DBManager::UpdateStrategy(Strategy *stg) {
 	int count_number = 0;
 
@@ -539,12 +594,12 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 
 
 	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
-		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str()));
+		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
 
 	std::cout << "count_number = " << count_number << std::endl;
 
 	if (count_number > 0) {
-		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str())), BSON("$set" << BSON("position_a_sell_today" << stg->getStgPositionASellToday() 
+		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true), BSON("$set" << BSON("position_a_sell_today" << stg->getStgPositionASellToday()
 			<< "position_b_sell" << stg->getStgPositionBSell() 
 			<< "spread_shift" << stg->getStgSpreadShift()
 			<< "position_b_sell_today" << stg->getStgPositionBSellToday()
@@ -565,8 +620,14 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 			<< "a_order_action_limit" << stg->getStgAOrderActionTiresLimit()
 			<< "b_order_action_limit" << stg->getStgBOrderActionTiresLimit()
 			<< "sell_close" << stg->getStgSellClose() 
-			<< "buy_open" << stg->getStgBuyOpen() 
+			<< "buy_open" << stg->getStgBuyOpen()
+
 			<< "only_close" << stg->isStgOnlyClose()
+			<< "strategy_on_off" << stg->getOn_Off()
+			<< "sell_open_on_off" << stg->getStgSellOpenOnOff()
+			<< "buy_close_on_off" << stg->getStgBuyCloseOnOff()
+			<< "sell_close_on_off" << stg->getStgSellCloseOnOff()
+			<< "buy_open_on_off" << stg->getStgBuyOpenOnOff()
 			
 			<< "trade_model" << stg->getStgTradeModel()
 			<< "hold_profit" << stg->getStgHoldProfit()
@@ -586,7 +647,6 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 			<< "lots" << stg->getStgLots()
 			<< "a_wait_price_tick" << stg->getStgAWaitPriceTick() 
 			<< "b_wait_price_tick" << stg->getStgBWaitPriceTick()
-			<< "StrategyOnoff" << stg->getOn_Off()
 			<< "trading_day" << stg->getStgTradingDay()
 			<< "list_instrument_id" << BSON_ARRAY(stg->getStgInstrumentIdA() << stg->getStgInstrumentIdB()))));
 
@@ -612,14 +672,14 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 	if (traderid.compare("")) { //如果traderid不为空
 		
 		if (userid.compare("")) { //如果userid不为空
-			cursor = this->conn->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid));
+			cursor = this->conn->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid << "is_active" << true));
 		}
 		else {
-			cursor = this->conn->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("trader_id" << traderid));
+			cursor = this->conn->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "is_active" << true));
 		}
 	}
 	else {
-		cursor = this->conn->query(DB_STRATEGY_COLLECTION);
+		cursor = this->conn->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("is_active" << true));
 	}
 		
 	while (cursor->more()) {
@@ -669,7 +729,7 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 		cout << "lots = " << p.getIntField("lots") << ", ";
 		cout << "a_wait_price_tick = " << p.getField("a_wait_price_tick").Double() << ", ";
 		cout << "b_wait_price_tick = " << p.getField("b_wait_price_tick").Double() << ", ";
-		cout << "StrategyOnoff = " << p.getField("StrategyOnoff").Int() << endl;
+		//cout << "strategy_on_off = " << p.getField("strategy_on_off").Int() << endl;
 		cout << "trading_day = " << p.getStringField("trading_day") << endl;
 
 		stg->setStgAWaitPriceTick(p.getField("a_wait_price_tick").Double());
@@ -679,7 +739,13 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 		stg->setStgIsActive(p.getField("is_active").Bool());
 		stg->setStgLots(p.getIntField("lots"));
 		stg->setStgLotsBatch(p.getIntField("lots_batch"));
+
 		stg->setStgOnlyClose(p.getIntField("only_close"));
+		stg->setOn_Off(p.getIntField("strategy_on_off"));
+		stg->setStgSellOpenOnOff(p.getIntField("sell_open_on_off"));
+		stg->setStgBuyCloseOnOff(p.getIntField("buy_close_on_off"));
+		stg->setStgSellCloseOnOff(p.getIntField("sell_close_on_off"));
+		stg->setStgBuyOpenOnOff(p.getIntField("buy_open_on_off"));
 
 		/*新增*/
 		stg->setStgTradeModel(p.getStringField("trade_model"));
@@ -694,6 +760,9 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 		stg->setStgAmount(p.getField("amount").Double());
 		stg->setStgAverageShift(p.getField("average_shift").Double());
 		stg->setStgTradingDay(p.getStringField("trading_day"));
+
+		std::cout << "after stg->setStgTradingDay = " << stg->getStgTradingDay() << std::endl;
+		std::cout << "address stg = " << stg << std::endl;
 
 		stg->setStgAOrderActionTiresLimit(p.getIntField("a_order_action_limit"));
 		stg->setStgBOrderActionTiresLimit(p.getIntField("b_order_action_limit"));
@@ -716,7 +785,6 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 		stg->setStgStrategyId(p.getStringField("strategy_id"));
 		stg->setStgTraderId(p.getStringField("trader_id"));
 		stg->setStgUserId(p.getStringField("user_id"));
-		stg->setOn_Off(p.getField("StrategyOnoff").Int());
 
 
 		vector<BSONElement> elements = p["list_instrument_id"].Array();
@@ -750,7 +818,7 @@ void DBManager::CreateStrategyYesterday(Strategy *stg) {
 	int count_number = 0;
 
 	count_number = this->conn->count(DB_STRATEGY_YESTERDAY_COLLECTION,
-		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str())));
+		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str()) << "is_active" << true));
 
 	if (count_number > 0) {
 		cout << "Strategy Already Exists!" << endl;
@@ -789,7 +857,7 @@ void DBManager::CreateStrategyYesterday(Strategy *stg) {
 		b.append("commission", stg->getStgCommission());
 		b.append("position", stg->getStgPosition());
 		b.append("position_buy", stg->getStgPositionBuy());
-		b.append("positon_sell", stg->getStgPositionSell());
+		b.append("position_sell", stg->getStgPositionSell());
 		b.append("trade_volume", stg->getStgTradeVolume());
 		b.append("amount", stg->getStgAmount());
 		b.append("average_shift", stg->getStgAverageShift());
@@ -823,10 +891,10 @@ void DBManager::DeleteStrategyYesterday(Strategy *stg) {
 	int count_number = 0;
 
 	count_number = this->conn->count(DB_STRATEGY_YESTERDAY_COLLECTION,
-		BSON("strategy_id" << stg->getStgStrategyId().c_str() << "user_id" << stg->getStgUserId().c_str()));
+		BSON("strategy_id" << stg->getStgStrategyId().c_str() << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
 
 	if (count_number > 0) {
-		this->conn->update(DB_STRATEGY_YESTERDAY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId())), BSON("$set" << BSON("is_active" << false)));
+		this->conn->update(DB_STRATEGY_YESTERDAY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true), BSON("$set" << BSON("is_active" << false)));
 		USER_PRINT("DBManager::DeleteStrategy ok");
 	}
 	else {
@@ -841,7 +909,7 @@ void DBManager::UpdateStrategyYesterday(Strategy *stg) {
 
 
 	count_number = this->conn->count(DB_STRATEGY_YESTERDAY_COLLECTION,
-		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str()));
+		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
 
 	std::cout << "count_number = " << count_number << std::endl;
 
@@ -915,14 +983,14 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 	if (traderid.compare("")) { //如果traderid不为空
 
 		if (userid.compare("")) { //如果userid不为空
-			cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid));
+			cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid << "is_active" << true));
 		}
 		else {
-			cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid));
+			cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "is_active" << true));
 		}
 	}
 	else {
-		cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION);
+		cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("is_active" << true));
 	}
 
 	while (cursor->more()) {
@@ -972,7 +1040,8 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 		cout << "lots = " << p.getIntField("lots") << ", ";
 		cout << "a_wait_price_tick = " << p.getField("a_wait_price_tick").Double() << ", ";
 		cout << "b_wait_price_tick = " << p.getField("b_wait_price_tick").Double() << ", ";
-		cout << "StrategyOnoff = " << p.getField("StrategyOnoff").Int() << endl;
+		//cout << "strategy_on_off = " << p.getField("strategy_on_off").Int() << endl;
+		cout << "trading_day = " << p.getStringField("trading_day") << endl;
 
 		stg->setStgAWaitPriceTick(p.getField("a_wait_price_tick").Double());
 		stg->setStgBWaitPriceTick(p.getField("b_wait_price_tick").Double());
@@ -981,7 +1050,13 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 		stg->setStgIsActive(p.getField("is_active").Bool());
 		stg->setStgLots(p.getIntField("lots"));
 		stg->setStgLotsBatch(p.getIntField("lots_batch"));
+
 		stg->setStgOnlyClose(p.getIntField("only_close"));
+		stg->setOn_Off(p.getIntField("strategy_on_off"));
+		stg->setStgSellOpenOnOff(p.getIntField("sell_open_on_off"));
+		stg->setStgBuyCloseOnOff(p.getIntField("buy_close_on_off"));
+		stg->setStgSellCloseOnOff(p.getIntField("sell_close_on_off"));
+		stg->setStgBuyOpenOnOff(p.getIntField("buy_open_on_off"));
 
 		/*新增*/
 		stg->setStgTradeModel(p.getStringField("trade_model"));
@@ -989,13 +1064,15 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 		stg->setStgHoldProfit(p.getField("hold_profit").Double());
 		stg->setStgCloseProfit(p.getField("close_profit").Double());
 		stg->setStgCommisstion(p.getField("commission").Double());
-		stg->setStgPosition(p.getField("position").Int());
-		stg->setStgPositionBuy(p.getField("position_buy").Int());
-		stg->setStgPositionSell(p.getField("position_sell").Int());
-		stg->setStgTradeVolume(p.getField("trade_volume").Int());
+		stg->setStgPosition(p.getIntField("position"));
+		stg->setStgPositionBuy(p.getIntField("position_buy"));
+		stg->setStgPositionSell(p.getIntField("position_sell"));
+		stg->setStgTradeVolume(p.getIntField("trade_volume"));
 		stg->setStgAmount(p.getField("amount").Double());
 		stg->setStgAverageShift(p.getField("average_shift").Double());
 		stg->setStgTradingDay(p.getStringField("trading_day"));
+
+		std::cout << "after stg->setStgTradingDay = " << stg->getStgTradingDay() << std::endl;
 
 		stg->setStgAOrderActionTiresLimit(p.getIntField("a_order_action_limit"));
 		stg->setStgBOrderActionTiresLimit(p.getIntField("b_order_action_limit"));
@@ -1018,7 +1095,7 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 		stg->setStgStrategyId(p.getStringField("strategy_id"));
 		stg->setStgTraderId(p.getStringField("trader_id"));
 		stg->setStgUserId(p.getStringField("user_id"));
-		stg->setOn_Off(p.getField("StrategyOnoff").Int());
+
 
 		vector<BSONElement> elements = p["list_instrument_id"].Array();
 		if (elements.size() > 1) {
@@ -1037,7 +1114,7 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 		l_strategys->push_back(stg);
 	}
 
-	USER_PRINT("DBManager::getAllStragegy ok");
+	USER_PRINT("DBManager::getAllYesterdayStragegy ok");
 }
 
 void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Strategy *> *l_strategys, string traderid, string userid, string strategyid) {
@@ -1057,19 +1134,19 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 		if (userid.compare("")) { //如果userid不为空
 
 			if (strategyid.compare("")) { //如果strategyid不为空
-				cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid << "strategy_id" << strategyid));
+				cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid << "strategy_id" << strategyid << "is_active" << true));
 			}
 			else {
-				cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid));
+				cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid << "is_active" << true));
 			}
 			
 		}
 		else {
-			cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid));
+			cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "is_active" << true));
 		}
 	}
 	else {
-		cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION);
+		cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("is_active" << true));
 	}
 
 	while (cursor->more()) {
@@ -1305,7 +1382,7 @@ MarketConfig * DBManager::getOneMarketConfig() {
 		cout << "DBManager::getOneMarketConfig None!" << endl;
 	}
 	else {
-		cout << "isactive" << ISACTIVE << endl;
+		cout << "MarketConfig * DBManager::getOneMarketConfig() isactive" << ISACTIVE << endl;
 		BSONObj p = this->conn->findOne(DB_MARKETCONFIG_COLLECTION, BSON("isactive" << ISACTIVE));
 		cout << "market_id = " << p.getStringField("market_id") << endl;
 		if ((strcmp(p.getStringField("market_id"), ""))) {

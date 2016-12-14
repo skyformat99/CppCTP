@@ -244,6 +244,8 @@ public:
 
 	void setL_Instruments_Info(list<CThostFtdcInstrumentField *> *l_instruments_info);
 
+	string getTradingDay();
+
 private:
     CThostFtdcTraderApi *tdapi;
     CThostFtdcReqUserLoginField *loginField;
@@ -255,6 +257,7 @@ private:
 	string BrokerID;
 	string UserID;
 	string Password;
+	string trading_day;
 	char * c_BrokerID;
 	char * c_UserID;
 	char * c_Password;

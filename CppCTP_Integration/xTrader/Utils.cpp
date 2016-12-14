@@ -159,16 +159,22 @@ string Utils::getNowTimeMs() {
 }
 
 bool Utils::compareTradingDay(const char *compare_day, const char *today) {
+	
+	struct tm tm_time = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	struct tm tm_time2 = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-	struct tm tm_time1;
-	struct tm tm_time2;
-	strptime(compare_day, "%Y%m%d", &tm_time1);
+	strptime(compare_day, "%Y%m%d", &tm_time);
+	time_t l_time1 = mktime(&tm_time);
+
 	strptime(today, "%Y%m%d", &tm_time2);
-	if (mktime(&tm_time1) < mktime(&tm_time2)) {
-		return true;
+	time_t l_time2 = mktime(&tm_time2);
+	
+	
+	if (l_time1 >= l_time2) {
+		std::cout << "date is earlier than today!" << std::endl;
+		return true; // 大于当前日期
 	} else {
-		return false;
+		std::cout << "date is later than today!" << std::endl;
+		return false; // 小于当前日期
 	}
-
-	return false;
 }

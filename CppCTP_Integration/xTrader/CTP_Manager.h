@@ -114,9 +114,11 @@ public:
 	/// 设置交易日
 	void setTradingDay(string trading_day);
 
+	/// 获得交易日
 	string getTradingDay();
 
-	/// 获得交易日
+	/// 初始化昨仓
+	void initPosition();
 
 private:
 	Login *login;

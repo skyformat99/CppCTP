@@ -1954,6 +1954,19 @@ void TdSpi::setL_Instruments_Info(list<CThostFtdcInstrumentField *> *l_instrumen
 	this->l_instruments_info = l_instruments_info;
 }
 
+string TdSpi::getTradingDay() {
+	string str_day;
+	if (this->tdapi) {
+		str_day = this->tdapi->GetTradingDay();
+		
+	}
+	else
+	{
+		str_day = "";
+	}
+	return str_day;
+}
+
 //释放api
 void TdSpi::Release() {
 	USER_PRINT("TdSpi::Release");

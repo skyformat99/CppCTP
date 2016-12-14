@@ -52,4 +52,13 @@
 	请求:{"MsgRef":1,"MsgSendFlag": 0,"MsgType":11,"TraderID":"1601","MsgSrc":0}
 	响应:{"MsgRef":0,"MsgSendFlag":1,"MsgType":11,"TraderID":"1601","MsgResult":0,"MsgErrorReason":"","Info":[{"name":"01"}],"MsgSrc":0}
 	响应无数据:{"MsgRef":1,"MsgSendFlag":1,"MsgType":11,"TraderID":"1601","MsgResult":0,"MsgErrorReason":"","Info":[],"MsgSrc":0}
+
+策略开关：
+	请求:{"MsgRef":1,"MsgSendFlag": 0,"MsgType":13,"TraderID":"1602","UserID":"123456","MsgSrc":0, "StrategyID":"01", "OnOff":1}
+
+
+策略只平开关：
+	请求:{"MsgRef":1,"MsgSendFlag": 0,"MsgType":14,"TraderID":"1602","UserID":"123456","MsgSrc":0, "StrategyID":"01", "OnOff":1}
+
+
 	

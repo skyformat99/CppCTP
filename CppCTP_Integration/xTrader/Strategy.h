@@ -291,6 +291,18 @@ public:
 	int getOn_Off();
 	void setOn_Off(int on_off);
 
+	void setStgSellOpenOnOff(int sell_open_on_off);				//卖开-开关
+	int getStgSellOpenOnOff();
+
+	void setStgBuyCloseOnOff(int buy_close_on_off);				//买平-开关
+	int getStgBuyCloseOnOff();
+
+	void setStgBuyOpenOnOff(int buy_open_on_off);				//买开-开关
+	int getStgBuyOpenOnOff();
+
+	void setStgSellCloseOnOff(int sell_close_on_off);			//卖平-开关
+	int getStgSellCloseOnOff();
+
 	/// 更新交易状态
 	void update_task_status();
 
@@ -375,7 +387,7 @@ private:
 	bool stg_is_active;					// 策略开关状态
 	int stg_a_order_action_tires_limit;	// A合约撤单次数限制
 	int stg_b_order_action_tires_limit;	// B合约撤单次数限制
-	int stg_only_close;					// 只能平仓
+	
 	
 	/*新增字段*/
 	string stg_trade_model;				// 交易模型
@@ -428,8 +440,13 @@ private:
 
 	long long stg_order_ref_base; // 报单引用计数
 
-	int on_off; //开关
-
+	int on_off;							//开关
+	int stg_only_close;					//只能平仓
+	int sell_open_on_off;				//卖开-开关
+	int buy_close_on_off;				//买平-开关
+	int buy_open_on_off;				//买开-开关
+	int sell_close_on_off;				//卖平-开关
+	
 	bool init_finished;
 
 };

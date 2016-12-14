@@ -3,7 +3,15 @@
 #include "Strategy.h"
 
 Strategy::Strategy() {
-	this->on_off = 0;
+
+	this->on_off = 0;						//开关					
+	this->stg_only_close = 0;				//只能平仓
+	this->sell_open_on_off = 1;				//卖开-开关
+	this->buy_close_on_off = 1;				//买平-开关
+	this->buy_open_on_off = 1;				//买开-开关
+	this->sell_close_on_off = 1;			//卖平-开关
+	this->stg_is_active = true;				//默认策略均为激活状态
+	this->stg_trading_day = "";
 
 	this->l_instruments = new list<string>();
 
@@ -414,6 +422,38 @@ int Strategy::getOn_Off() {
 
 void Strategy::setOn_Off(int on_off) {
 	this->on_off = on_off;
+}
+
+void Strategy::setStgSellOpenOnOff(int sell_open_on_off) {
+	this->sell_open_on_off = sell_open_on_off;
+}
+
+int Strategy::getStgSellOpenOnOff() {
+	return this->sell_open_on_off;
+}
+
+void Strategy::setStgBuyCloseOnOff(int buy_close_on_off) {
+	this->buy_close_on_off = buy_close_on_off;
+}
+
+int Strategy::getStgBuyCloseOnOff() {
+	return this->buy_close_on_off;
+}
+
+void Strategy::setStgBuyOpenOnOff(int buy_open_on_off) {
+	this->buy_open_on_off = buy_open_on_off;
+}
+
+int Strategy::getStgBuyOpenOnOff() {
+	return this->buy_open_on_off;
+}
+
+void Strategy::setStgSellCloseOnOff(int sell_close_on_off) {
+	this->sell_close_on_off = sell_close_on_off;
+}
+
+int Strategy::getStgSellCloseOnOff() {
+	return this->sell_close_on_off;
 }
 
 /// 更新交易状态
