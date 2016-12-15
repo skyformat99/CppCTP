@@ -118,7 +118,7 @@ public:
 	string getTradingDay();
 
 	/// ³õÊ¼»¯×ò²Ö
-	void initPosition();
+	bool initYesterdayPosition();
 
 private:
 	Login *login;

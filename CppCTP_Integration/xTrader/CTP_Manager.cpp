@@ -1783,21 +1783,100 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 }
 
 /// 初始化昨仓
-void CTP_Manager::initPosition() {
+bool CTP_Manager::initYesterdayPosition() {
+	bool flag = true;
 	list<Strategy *>::iterator stg_itor;
 	list<Strategy *>::iterator stg_itor_yesterday;
-	std::cout << "CTP_Manager.cpp CTP_Manager Get Date = " << this->getTradingDay() << std::endl;
+	std::cout << "系统交易日 = " << this->getTradingDay() << std::endl;
+
 	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
 		// 遍历Strategy
-		std::cout << "l_strategys date = " << (*stg_itor)->getStgTradingDay() << std::endl;
-		std::cout << "l_strategys compare result = " << Utils::compareTradingDay((*stg_itor)->getStgTradingDay().c_str(), this->getTradingDay().c_str()) << std::endl;
+		std::cout << "策略最后更新时间 = " << (*stg_itor)->getStgTradingDay() << std::endl;
+		bool flag = Utils::compareTradingDay((*stg_itor)->getStgTradingDay().c_str(), this->getTradingDay().c_str());
+
+		std::cout << "对比结果 = " << flag << std::endl;
+		std::cout << "今仓 userid = " << (*stg_itor)->getStgUserId() << std::endl;
+		std::cout << "今仓 strategy_id = " << (*stg_itor)->getStgStrategyId() << std::endl;
+
+		if (flag == false) { // 如果时间晚于最新交易日，那么将策略新建到昨仓，并且更新仓位
+
+			// 昨仓变量初始化给今仓
+			(*stg_itor)->setStgPositionABuy((*stg_itor)->getStgPositionABuy());
+			(*stg_itor)->setStgPositionABuyToday(0);
+			(*stg_itor)->setStgPositionABuyYesterday((*stg_itor)->getStgPositionABuy());
+			(*stg_itor)->setStgPositionASell((*stg_itor)->getStgPositionASell());
+			(*stg_itor)->setStgPositionASellToday(0);
+			(*stg_itor)->setStgPositionASellYesterday((*stg_itor)->getStgPositionASell());
+			(*stg_itor)->setStgPositionBBuy((*stg_itor)->getStgPositionBBuy());
+			(*stg_itor)->setStgPositionBBuyToday(0);
+			(*stg_itor)->setStgPositionBBuyYesterday((*stg_itor)->getStgPositionBBuy());
+			(*stg_itor)->setStgPositionBSell((*stg_itor)->getStgPositionBSell());
+			(*stg_itor)->setStgPositionBSellToday(0);
+			(*stg_itor)->setStgPositionBSellYesterday((*stg_itor)->getStgPositionBSell());
+
+			// 更新今仓最新交易时间
+			(*stg_itor)->setStgTradingDay(this->getTradingDay());
+
+			// 更新今仓到数据库
+			this->getDBManager()->UpdateStrategy((*stg_itor));
+
+			for (stg_itor_yesterday = this->l_strategys_yesterday->begin(); stg_itor_yesterday != this->l_strategys_yesterday->end(); stg_itor_yesterday++) {
+				// 遍历Strategy
+				std::cout << "昨仓 userid = " << (*stg_itor_yesterday)->getStgUserId() << std::endl;
+				std::cout << "昨仓 strategy_id = " << (*stg_itor_yesterday)->getStgStrategyId() << std::endl;
+
+				if (((*stg_itor)->getStgUserId() == (*stg_itor_yesterday)->getStgUserId()) && ((*stg_itor)->getStgStrategyId() == (*stg_itor_yesterday)->getStgStrategyId())) {
+					std::cout << "昨仓里找到相同的策略" << std::endl;
+
+					// 删除昨仓
+					this->getDBManager()->DeleteStrategyYesterday((*stg_itor_yesterday));
+
+					// 将初始化的今仓新建为昨仓
+					this->getDBManager()->CreateStrategyYesterday((*stg_itor));
+				}
+				else {
+					std::cout << "昨仓里 未 找到相同的策略" << std::endl;
+					// 将初始化的今仓新建为昨仓
+					this->getDBManager()->CreateStrategyYesterday((*stg_itor));
+				}
+
+			}
+		}
+		else { // 如果时间等于最新交易日,从昨仓取出相同的进行初始化
+			for (stg_itor_yesterday = this->l_strategys_yesterday->begin(); stg_itor_yesterday != this->l_strategys_yesterday->end(); stg_itor_yesterday++) {
+				// 遍历Strategy
+				std::cout << "昨仓 userid = " << (*stg_itor_yesterday)->getStgUserId() << std::endl;
+				std::cout << "昨仓 strategy_id = " << (*stg_itor_yesterday)->getStgStrategyId() << std::endl;
+
+				if (((*stg_itor)->getStgUserId() == (*stg_itor_yesterday)->getStgUserId()) && ((*stg_itor)->getStgStrategyId() == (*stg_itor_yesterday)->getStgStrategyId())) {
+					std::cout << "昨仓里找到相同的策略" << std::endl;
+
+					// 昨仓变量初始化给今仓
+					(*stg_itor)->setStgPositionABuy((*stg_itor_yesterday)->getStgPositionABuy());
+					(*stg_itor)->setStgPositionABuyToday(0);
+					(*stg_itor)->setStgPositionABuyYesterday((*stg_itor_yesterday)->getStgPositionABuy());
+					(*stg_itor)->setStgPositionASell((*stg_itor_yesterday)->getStgPositionASell());
+					(*stg_itor)->setStgPositionASellToday(0);
+					(*stg_itor)->setStgPositionASellYesterday((*stg_itor_yesterday)->getStgPositionASell());
+					(*stg_itor)->setStgPositionBBuy((*stg_itor_yesterday)->getStgPositionBBuy());
+					(*stg_itor)->setStgPositionBBuyToday(0);
+					(*stg_itor)->setStgPositionBBuyYesterday((*stg_itor_yesterday)->getStgPositionBBuy());
+					(*stg_itor)->setStgPositionBSell((*stg_itor_yesterday)->getStgPositionBSell());
+					(*stg_itor)->setStgPositionBSellToday(0);
+					(*stg_itor)->setStgPositionBSellYesterday((*stg_itor_yesterday)->getStgPositionBSell());
+					
+				}
+				else {
+					std::cout << "昨仓里 未 找到相同的策略,初始化有误!" << std::endl;
+					flag = false;
+				}
+
+			}
+		}
+
 	}
 
-	for (stg_itor = this->l_strategys_yesterday->begin(); stg_itor != this->l_strategys_yesterday->end(); stg_itor++) {
-		// 遍历Strategy
-		std::cout << "l_strategys date = " << (*stg_itor)->getStgTradingDay() << std::endl;
-		std::cout << "l_strategys compare result = " << Utils::compareTradingDay((*stg_itor)->getStgTradingDay().c_str(), this->getTradingDay().c_str()) << std::endl;
-	}
+	return flag;
 }
 
 /// 初始化
@@ -1876,7 +1955,10 @@ void CTP_Manager::init() {
 	this->setTradingDay(this->l_user->front()->getUserTradeSPI()->getTradingDay());
 
 
-	this->initPosition();
+	if (!(this->initYesterdayPosition())) {
+		USER_PRINT("初始化仓位失败...");
+		return;
+	}
 
 	/// 行情初始化
 	MarketConfig *mc = this->dbm->getOneMarketConfig();

@@ -16,6 +16,7 @@ public:
 	static string getNowTimeNs();
 	static string getNowTimeMs();
 	static bool compareTradingDay(const char *compare_day, const char *today);
+	static bool compareTradingDaySeconds(const char *compare_day, const char *today);
 };
 
 #endif

@@ -178,3 +178,28 @@ bool Utils::compareTradingDay(const char *compare_day, const char *today) {
 		return false; // 小于当前日期
 	}
 }
+
+bool Utils::compareTradingDaySeconds(const char *compare_day, const char *today) {
+
+	//时间格式：20161216 13:30:00
+
+	struct tm tm_time = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	struct tm tm_time2 = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+	//strptime(compare_day, "%Y%m%d%H%M%S", &tm_time); //时间格式：20161216 13:30:00
+	strptime(compare_day, "%Y%m%d %X", &tm_time);//时间格式：20161216 13:30:00
+	time_t l_time1 = mktime(&tm_time);
+
+	strptime(today, "%Y%m%d %X", &tm_time2);
+	time_t l_time2 = mktime(&tm_time2);
+
+
+	if (l_time1 == l_time2) {
+		std::cout << "date is equal!" << std::endl;
+		return true; // 等于当前日期
+	}
+	else {
+		std::cout << "date is later!" << std::endl;
+		return false; // 小于当前日期
+	}
+}
