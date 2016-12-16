@@ -1880,7 +1880,9 @@ bool CTP_Manager::initYesterdayPosition() {
 }
 
 /// 初始化
-void CTP_Manager::init() {
+bool CTP_Manager::init() {
+
+	bool init_flag = true;
 
 	/************************************************************************/
 	/* 初始化工作按顺序执行
@@ -1955,10 +1957,19 @@ void CTP_Manager::init() {
 	this->setTradingDay(this->l_user->front()->getUserTradeSPI()->getTradingDay());
 
 
+	/// 昨仓初始化
 	if (!(this->initYesterdayPosition())) {
 		USER_PRINT("初始化仓位失败...");
-		return;
+		init_flag = false;
+		return init_flag;
 	}
+	else {
+		USER_PRINT("初始化仓位成功...");
+	}
+
+	/// 初始化今仓
+
+
 
 	/// 行情初始化
 	MarketConfig *mc = this->dbm->getOneMarketConfig();
@@ -1979,4 +1990,6 @@ void CTP_Manager::init() {
 			this->SubmarketData(this->mdspi, this->l_instrument);
 		}
 	}
+
+	return init_flag;
 }

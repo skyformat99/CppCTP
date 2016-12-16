@@ -163,6 +163,8 @@ public:
 	//查询成交单
 	void QryTrade();
 
+	void CopyTradeInfo(CThostFtdcTradeField *dst, CThostFtdcTradeField *src);
+
 	//查询成交单响应
 	void OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 

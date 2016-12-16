@@ -112,6 +112,10 @@ public:
 	void setTradingDay(string stg_trading_day);
 	string getTradingDay();
 
+	void QueryTrade();
+
+	void QueryOrder();
+
 private:
 	int on_off; //¿ª¹Ø
 	string BrokerID;

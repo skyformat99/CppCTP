@@ -102,7 +102,7 @@ public:
 	MdSpi *getMdSpi();
 
 	/// 初始化
-	void init();
+	bool init();
 
 	/// 设置开关
 	int getOn_Off();

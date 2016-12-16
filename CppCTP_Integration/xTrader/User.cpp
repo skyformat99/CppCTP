@@ -1138,3 +1138,11 @@ void User::setTradingDay(string stg_trading_day) {
 string User::getTradingDay() {
 	return this->trading_day;
 }
+
+void User::QueryTrade() {
+	this->UserTradeSPI->QryTrade();
+}
+
+void User::QueryOrder() {
+	this->UserTradeSPI->QryOrder();
+}

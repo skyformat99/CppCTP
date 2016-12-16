@@ -573,7 +573,8 @@ bool Strategy::getInit_Finished() {
 
 // 初始化今仓
 void Strategy::init_today_position() {
-
+	USER_PRINT("init_today_position");
+	this->stg_user->getUserTradeSPI()->QryTrade();
 }
 
 void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
