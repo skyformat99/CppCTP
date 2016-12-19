@@ -58,6 +58,8 @@ TdSpi::TdSpi() {
 	sem_init(&sem_ReqSettlementInfoConfirm, 0, 1);*/
 	this->l_instruments_info = new list<CThostFtdcInstrumentField *>();
 	this->l_strategys = NULL;
+	this->isFirstQryTrade = true;
+	this->l_query_trade = new list<CThostFtdcTradeField *>();
 }
 
 //增加api
@@ -1362,7 +1364,21 @@ void TdSpi::CopyTradeInfo(CThostFtdcTradeField *dst, CThostFtdcTradeField *src) 
 void TdSpi::OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspQryTrade");
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
+		if (this->isFirstQryTrade == false) { //如果新一轮的接收,清空接收list列表
+			//清空
+			if (this->l_query_trade->size() > 0) {
+				list<CThostFtdcTradeField *>::iterator Itor;
+				for (Itor = l_query_trade->begin(); Itor != l_query_trade->end();) {
+					delete (*Itor);
+					Itor = l_query_trade->erase(Itor);
+				}
+			}
+
+			//清空操作后置true
+			this->isFirstQryTrade == true;
+		}
 		if (pTrade) {
+			std::cout << "TdSpi.cpp 接收查询交易是否为最后 = " << bIsLast << std::endl;
 			std::cout << "=================================================================================" << endl;
 			///经纪公司代码
 			std::cout << "||经纪公司代码:" << pTrade->BrokerID << ",";
@@ -1424,8 +1440,18 @@ void TdSpi::OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *
 			std::cout << "经纪公司报单编号:" << pTrade->BrokerOrderSeq << ",";
 			///成交来源
 			std::cout << "成交来源:" << pTrade->TradeSource << endl;
+
+			CThostFtdcTradeField *pTrade_new = new CThostFtdcTradeField();
+			this->CopyTradeInfo(pTrade_new, pTrade);
+
+			this->l_query_trade->push_back(pTrade_new);
+
 			std::cout << "=================================================================================" << endl;
+			if (bIsLast == true) {
+				this->isFirstQryTrade == false;
+			}
 		}
+		
 	}
 }
 
@@ -2029,6 +2055,10 @@ string TdSpi::getTradingDay() {
 		str_day = "";
 	}
 	return str_day;
+}
+
+list<CThostFtdcTradeField *> * TdSpi::getL_query_trade() {
+	return this->l_query_trade;
 }
 
 //释放api

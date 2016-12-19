@@ -357,6 +357,8 @@ public:
 
 	void init_today_position();
 
+	void setL_query_trade(list<CThostFtdcTradeField *> *l_query_trade);
+
 private:
 	Trader *trader;
 	User *user;
@@ -437,6 +439,7 @@ private:
 	CThostFtdcInputOrderField *stg_b_order_insert_args;		// b合约报单参数
 	list<CThostFtdcOrderField *> *stg_list_order_pending;	// 挂单列表，报单、成交、撤单回报
 	list<CThostFtdcTradeField *> *stg_list_position_detail; // 持仓明细
+	list<CThostFtdcTradeField *> *l_query_trade;
 
 	long long stg_order_ref_base; // 报单引用计数
 

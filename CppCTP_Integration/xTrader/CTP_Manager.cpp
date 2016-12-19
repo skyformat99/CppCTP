@@ -1968,7 +1968,9 @@ bool CTP_Manager::init() {
 	}
 
 	/// 初始化今仓
-
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
+		(*user_itor)->getUserTradeSPI()->QryTrade();
+	}
 
 
 	/// 行情初始化

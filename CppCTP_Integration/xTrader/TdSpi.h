@@ -248,6 +248,8 @@ public:
 
 	string getTradingDay();
 
+	list<CThostFtdcTradeField *> *getL_query_trade();
+
 private:
     CThostFtdcTraderApi *tdapi;
     CThostFtdcReqUserLoginField *loginField;
@@ -255,6 +257,7 @@ private:
 	bool isLogged;
 	bool isFirstTimeLogged;
 	bool isConfirmSettlement;
+	bool isFirstQryTrade;
 	int loginRequestID;
 	string BrokerID;
 	string UserID;
@@ -279,6 +282,7 @@ private:
 	int FrontID;
 	int SessionID;
 	list<Strategy *> *l_strategys;
+	list<CThostFtdcTradeField *> *l_query_trade;
 	list<CThostFtdcInstrumentField *> *l_instruments_info;
 };
 
