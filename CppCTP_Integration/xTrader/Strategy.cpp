@@ -581,59 +581,84 @@ void Strategy::setL_query_trade(list<CThostFtdcTradeField *> *l_query_trade) {
 	this->l_query_trade = l_query_trade;
 	// 遍历进行今仓初始化
 
-	if len(self.__dfQryTradeStrategy) > 0:  # strategy的交易记录为0跳过
-# 遍历本策略的trade记录，更新今仓
-	for i in self.__dfQryTradeStrategy.index:
-# A成交
-	if self.__dfQryTradeStrategy['InstrumentID'][i] == self.__list_instrument_id[0]:
-	if self.__dfQryTradeStrategy['OffsetFlag'][i] == '0' : # A开仓成交回报
-	if self.__dfQryTradeStrategy['Direction'][i] == '0':  # A买开仓成交回报
-		self.__position_a_buy_today += self.__dfQryTradeStrategy['Volume'][i]  # 更新持仓
-		elif self.__dfQryTradeStrategy['Direction'][i] == '1':  # A卖开仓成交回报
-		self.__position_a_sell_today += self.__dfQryTradeStrategy['Volume'][i]  # 更新持仓
-		elif self.__dfQryTradeStrategy['OffsetFlag'][i] == '3':  # A平今成交回报
-	if self.__dfQryTradeStrategy['Direction'][i] == '0':  # A买平今成交回报
-		self.__position_a_sell_today -= self.__dfQryTradeStrategy['Volume'][i]  # 更新持仓
-		elif self.__dfQryTradeStrategy['Direction'][i] == '1':  # A卖平今成交回报
-		self.__position_a_buy_today -= self.__dfQryTradeStrategy['Volume'][i]  # 更新持仓
-		elif self.__dfQryTradeStrategy['OffsetFlag'][i] == '4':  # A平昨成交回报
-	if self.__dfQryTradeStrategy['Direction'][i] == '0':  # A买平昨成交回报
-		self.__position_a_sell_yesterday -= self.__dfQryTradeStrategy['Volume'][i]  # 更新持仓
-		elif self.__dfQryTradeStrategy['Direction'][i] == '1':  # A卖平昨成交回报
-		self.__position_a_buy_yesterday -= self.__dfQryTradeStrategy['Volume'][i]  # 更新持仓
-		self.__position_a_buy = self.__position_a_buy_today + self.__position_a_buy_yesterday
-		self.__position_a_sell = self.__position_a_sell_today + self.__position_a_sell_yesterday
-# B成交
-		elif self.__dfQryTradeStrategy['InstrumentID'][i] == self.__list_instrument_id[1]:
-	if self.__dfQryTradeStrategy['OffsetFlag'][i] == '0' : # B开仓成交回报
-	if self.__dfQryTradeStrategy['Direction'][i] == '0':  # B买开仓成交回报
-		self.__position_b_buy_today += self.__dfQryTradeStrategy['Volume'][i]  # 更新持仓
-		elif self.__dfQryTradeStrategy['Direction'][i] == '1':  # B卖开仓成交回报
-		self.__position_b_sell_today += self.__dfQryTradeStrategy['Volume'][i]  # 更新持仓
-		elif self.__dfQryTradeStrategy['OffsetFlag'][i] == '3':  # B平今成交回报
-	if self.__dfQryTradeStrategy['Direction'][i] == '0':  # B买平今成交回报
-		self.__position_b_sell_today -= self.__dfQryTradeStrategy['Volume'][i]  # 更新持仓
-		elif self.__dfQryTradeStrategy['Direction'][i] == '1':  # B卖平今成交回报
-		self.__position_b_buy_today -= self.__dfQryTradeStrategy['Volume'][i]  # 更新持仓
-		elif self.__dfQryTradeStrategy['OffsetFlag'][i] == '4':  # B平昨成交回报
-	if self.__dfQryTradeStrategy['Direction'][i] == '0':  # B买平昨成交回报
-		self.__position_b_sell_yesterday -= self.__dfQryTradeStrategy['Volume'][i]  # 更新持仓
-		elif self.__dfQryTradeStrategy['Direction'][i] == '1':  # B卖平昨成交回报
-		self.__position_b_buy_yesterday -= self.__dfQryTradeStrategy['Volume'][i]  # 更新持仓
-		self.__position_b_buy = self.__position_b_buy_today + self.__position_b_buy_yesterday
-		self.__position_b_sell = self.__position_b_sell_today + self.__position_b_sell_yesterday
-	if Utils.Strategy_print:
-	print("     A合约", self.__list_instrument_id[0], "今买、昨买、总买", self.__position_a_buy_today,
-		self.__position_a_buy_yesterday,
-		self.__position_a_buy, "今卖、昨卖、总卖", self.__position_a_sell_today,
-		self.__position_a_sell_yesterday,
-		self.__position_a_sell)
-		print("     B合约", self.__list_instrument_id[1], "今买、昨买、总买", self.__position_b_buy_today,
-		self.__position_b_buy_yesterday,
-		self.__position_b_buy, "今卖、昨卖、总卖", self.__position_b_sell_today,
-		self.__position_b_sell_yesterday,
-		self.__position_b_sell)
+	if (l_query_trade->size() > 0) {
+		list<CThostFtdcTradeField *>::iterator Itor;
+		for (Itor = l_query_trade->begin(); Itor != l_query_trade->end(); Itor++) {
+			if (strcmp((*Itor)->InstrumentID, this->stg_instrument_id_A.c_str())) {
+				if ((*Itor)->OffsetFlag == '0') { // A开仓成交回报
+					if ((*Itor)->Direction == '0') { /*A买开仓*/
+						this->stg_position_a_buy_today += (*Itor)->Volume;
+					}
+					else if ((*Itor)->Direction == '1') { /*A卖开仓*/
+						this->stg_position_a_sell_today += (*Itor)->Volume;
+					}
+				}
+				else if ((*Itor)->OffsetFlag == '3') { // A平今成交回报
+					if ((*Itor)->Direction == '0') { /*A买平今*/
+						this->stg_position_a_sell_today -= (*Itor)->Volume;
+					}
+					else if ((*Itor)->Direction == '1') { /*A卖平今*/
+						this->stg_position_a_buy_today -= (*Itor)->Volume;
+					}
+				}
+				else if ((*Itor)->OffsetFlag == '4') { // A平昨成交回报
+					if ((*Itor)->Direction == '0') { /*A买平昨*/
+						this->stg_position_a_sell_yesterday -= (*Itor)->Volume;
+					}
+					else if ((*Itor)->Direction == '1') { /*A卖平昨*/
+						this->stg_position_a_buy_yesterday -= (*Itor)->Volume;
+					}
+				}
+				this->stg_position_a_buy = this->stg_position_a_buy_today + this->stg_position_a_buy_yesterday;
+				this->stg_position_a_sell = this->stg_position_a_sell_today + this->stg_position_a_sell_yesterday;
+			}
+			else if (strcmp((*Itor)->InstrumentID, this->stg_instrument_id_B.c_str())) {
+				if ((*Itor)->OffsetFlag == '0') { // B开仓成交回报
+					if ((*Itor)->Direction == '0') { /*B买开仓*/
+						this->stg_position_b_buy_today += (*Itor)->Volume;
+					}
+					else if ((*Itor)->Direction == '1') { /*B卖开仓*/
+						this->stg_position_b_sell_today += (*Itor)->Volume;
+					}
+				}
+				else if ((*Itor)->OffsetFlag == '3') { // B平今成交回报
+					if ((*Itor)->Direction == '0') { /*B买平今*/
+						this->stg_position_b_sell_today -= (*Itor)->Volume;
+					}
+					else if ((*Itor)->Direction == '1') { /*B卖平今*/
+						this->stg_position_b_buy_today -= (*Itor)->Volume;
+					}
+				}
+				else if ((*Itor)->OffsetFlag == '4') { // B平昨成交回报
+					if ((*Itor)->Direction == '0') { /*B买平昨*/
+						this->stg_position_b_sell_yesterday -= (*Itor)->Volume;
+					}
+					else if ((*Itor)->Direction == '1') { /*B卖平昨*/
+						this->stg_position_b_buy_yesterday -= (*Itor)->Volume;
+					}
+				}
+				this->stg_position_b_buy = this->stg_position_b_buy_today + this->stg_position_b_buy_yesterday;
+				this->stg_position_b_sell = this->stg_position_b_sell_today + this->stg_position_b_sell_yesterday;
+			}
 
+			std::cout << "==============================================" << std::endl;
+			std::cout << "A合约 = " << this->stg_instrument_id_A << std::endl;
+			std::cout << "A今买 = " << this->stg_position_a_buy_today << std::endl;
+			std::cout << "A昨买 = " << this->stg_position_a_buy_yesterday << std::endl;
+			std::cout << "A总买 = " << this->stg_position_a_buy << std::endl;
+			std::cout << "A今卖 = " << this->stg_position_a_sell_today << std::endl;
+			std::cout << "A昨卖 = " << this->stg_position_a_sell_yesterday << std::endl;
+			std::cout << "A总卖 = " << this->stg_position_a_sell << std::endl;
+			std::cout << "==============================================" << std::endl;
+			std::cout << "B合约 = " << this->stg_instrument_id_B << std::endl;
+			std::cout << "B今买 = " << this->stg_position_b_buy_today << std::endl;
+			std::cout << "B昨买 = " << this->stg_position_b_buy_yesterday << std::endl;
+			std::cout << "B总买 = " << this->stg_position_b_buy << std::endl;
+			std::cout << "B今卖 = " << this->stg_position_b_sell_today << std::endl;
+			std::cout << "B昨卖 = " << this->stg_position_b_sell_yesterday << std::endl;
+			std::cout << "B总卖 = " << this->stg_position_b_sell << std::endl;
+		}
+	}
 }
 
 void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
