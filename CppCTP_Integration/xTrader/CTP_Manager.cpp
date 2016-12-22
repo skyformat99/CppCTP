@@ -1820,60 +1820,81 @@ bool CTP_Manager::initYesterdayPosition() {
 			// 更新今仓到数据库
 			this->getDBManager()->UpdateStrategy((*stg_itor));
 
-			for (stg_itor_yesterday = this->l_strategys_yesterday->begin(); stg_itor_yesterday != this->l_strategys_yesterday->end(); stg_itor_yesterday++) {
-				// 遍历Strategy
-				std::cout << "昨仓 userid = " << (*stg_itor_yesterday)->getStgUserId() << std::endl;
-				std::cout << "昨仓 strategy_id = " << (*stg_itor_yesterday)->getStgStrategyId() << std::endl;
+			if (this->l_strategys_yesterday->size() > 0) {
+				for (stg_itor_yesterday = this->l_strategys_yesterday->begin(); stg_itor_yesterday != this->l_strategys_yesterday->end(); stg_itor_yesterday++) {
+					// 遍历Strategy
+					std::cout << "昨仓 userid = " << (*stg_itor_yesterday)->getStgUserId() << std::endl;
+					std::cout << "昨仓 strategy_id = " << (*stg_itor_yesterday)->getStgStrategyId() << std::endl;
 
-				if (((*stg_itor)->getStgUserId() == (*stg_itor_yesterday)->getStgUserId()) && ((*stg_itor)->getStgStrategyId() == (*stg_itor_yesterday)->getStgStrategyId())) {
-					std::cout << "昨仓里找到相同的策略" << std::endl;
+					if (((*stg_itor)->getStgUserId() == (*stg_itor_yesterday)->getStgUserId()) && ((*stg_itor)->getStgStrategyId() == (*stg_itor_yesterday)->getStgStrategyId())) {
+						std::cout << "昨仓里找到相同的策略" << std::endl;
 
-					// 删除昨仓
-					this->getDBManager()->DeleteStrategyYesterday((*stg_itor_yesterday));
+						// 删除昨仓
+						this->getDBManager()->DeleteStrategyYesterday((*stg_itor_yesterday));
 
-					// 将初始化的今仓新建为昨仓
-					this->getDBManager()->CreateStrategyYesterday((*stg_itor));
+						// 将初始化的今仓新建为昨仓
+						this->getDBManager()->CreateStrategyYesterday((*stg_itor));
+					}
+					else {
+						std::cout << "昨仓里 未 找到相同的策略" << std::endl;
+						// 将初始化的今仓新建为昨仓
+						this->getDBManager()->CreateStrategyYesterday((*stg_itor));
+					}
+
 				}
-				else {
-					std::cout << "昨仓里 未 找到相同的策略" << std::endl;
-					// 将初始化的今仓新建为昨仓
-					this->getDBManager()->CreateStrategyYesterday((*stg_itor));
-				}
-
 			}
+			else {
+				std::cout << "昨仓策略为空,将初始化今仓更新到昨仓" << std::endl;
+				// 将初始化的今仓新建为昨仓
+				this->getDBManager()->CreateStrategyYesterday((*stg_itor));
+			}
+			
 		}
 		else { // 如果时间等于最新交易日,从昨仓取出相同的进行初始化
-			for (stg_itor_yesterday = this->l_strategys_yesterday->begin(); stg_itor_yesterday != this->l_strategys_yesterday->end(); stg_itor_yesterday++) {
-				// 遍历Strategy
-				std::cout << "昨仓 userid = " << (*stg_itor_yesterday)->getStgUserId() << std::endl;
-				std::cout << "昨仓 strategy_id = " << (*stg_itor_yesterday)->getStgStrategyId() << std::endl;
+			bool is_exists = false;
+			if (this->l_strategys_yesterday->size() > 0) {
+				for (stg_itor_yesterday = this->l_strategys_yesterday->begin(); stg_itor_yesterday != this->l_strategys_yesterday->end(); stg_itor_yesterday++) {
+					// 遍历Strategy
+					std::cout << "昨仓 userid = " << (*stg_itor_yesterday)->getStgUserId() << std::endl;
+					std::cout << "昨仓 strategy_id = " << (*stg_itor_yesterday)->getStgStrategyId() << std::endl;
 
-				if (((*stg_itor)->getStgUserId() == (*stg_itor_yesterday)->getStgUserId()) && ((*stg_itor)->getStgStrategyId() == (*stg_itor_yesterday)->getStgStrategyId())) {
-					std::cout << "昨仓里找到相同的策略" << std::endl;
+					if (((*stg_itor)->getStgUserId() == (*stg_itor_yesterday)->getStgUserId()) && ((*stg_itor)->getStgStrategyId() == (*stg_itor_yesterday)->getStgStrategyId())) {
+						std::cout << "昨仓里找到相同的策略" << std::endl;
 
-					// 昨仓变量初始化给今仓
-					(*stg_itor)->setStgPositionABuy((*stg_itor_yesterday)->getStgPositionABuy());
-					(*stg_itor)->setStgPositionABuyToday(0);
-					(*stg_itor)->setStgPositionABuyYesterday((*stg_itor_yesterday)->getStgPositionABuy());
-					(*stg_itor)->setStgPositionASell((*stg_itor_yesterday)->getStgPositionASell());
-					(*stg_itor)->setStgPositionASellToday(0);
-					(*stg_itor)->setStgPositionASellYesterday((*stg_itor_yesterday)->getStgPositionASell());
-					(*stg_itor)->setStgPositionBBuy((*stg_itor_yesterday)->getStgPositionBBuy());
-					(*stg_itor)->setStgPositionBBuyToday(0);
-					(*stg_itor)->setStgPositionBBuyYesterday((*stg_itor_yesterday)->getStgPositionBBuy());
-					(*stg_itor)->setStgPositionBSell((*stg_itor_yesterday)->getStgPositionBSell());
-					(*stg_itor)->setStgPositionBSellToday(0);
-					(*stg_itor)->setStgPositionBSellYesterday((*stg_itor_yesterday)->getStgPositionBSell());
-					
+						// 昨仓变量初始化给今仓
+						(*stg_itor)->setStgPositionABuy((*stg_itor_yesterday)->getStgPositionABuy());
+						(*stg_itor)->setStgPositionABuyToday(0);
+						(*stg_itor)->setStgPositionABuyYesterday((*stg_itor_yesterday)->getStgPositionABuy());
+						(*stg_itor)->setStgPositionASell((*stg_itor_yesterday)->getStgPositionASell());
+						(*stg_itor)->setStgPositionASellToday(0);
+						(*stg_itor)->setStgPositionASellYesterday((*stg_itor_yesterday)->getStgPositionASell());
+						(*stg_itor)->setStgPositionBBuy((*stg_itor_yesterday)->getStgPositionBBuy());
+						(*stg_itor)->setStgPositionBBuyToday(0);
+						(*stg_itor)->setStgPositionBBuyYesterday((*stg_itor_yesterday)->getStgPositionBBuy());
+						(*stg_itor)->setStgPositionBSell((*stg_itor_yesterday)->getStgPositionBSell());
+						(*stg_itor)->setStgPositionBSellToday(0);
+						(*stg_itor)->setStgPositionBSellYesterday((*stg_itor_yesterday)->getStgPositionBSell());
+
+						is_exists = true;
+					}
+					else {
+						std::cout << "循环中...昨仓里 未 找到相同的策略,初始化有误!" << std::endl;
+					}
+
 				}
-				else {
+				/// 是否找到昨仓里策略,未找到就出错
+				if (!is_exists) {
 					std::cout << "昨仓里 未 找到相同的策略,初始化有误!" << std::endl;
 					flag = false;
+					return flag;
 				}
-
+			}
+			else {
+				std::cout << "昨仓里 未 找到相同的策略,初始化有误!" << std::endl;
+				flag = false;
+				return flag;
 			}
 		}
-
 	}
 
 	return flag;
@@ -1967,9 +1988,15 @@ bool CTP_Manager::init() {
 		USER_PRINT("初始化仓位成功...");
 	}
 
+	list<CThostFtdcTradeField *> *l_query_trade;
 	/// 初始化今仓
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
 		(*user_itor)->getUserTradeSPI()->QryTrade();
+		sleep(1);
+		l_query_trade = (*user_itor)->getUserTradeSPI()->getL_query_trade();
+		for (stg_itor = (*user_itor)->getListStrategy()->begin(); stg_itor != (*user_itor)->getListStrategy()->end(); stg_itor++) { // 遍历Strategy
+			(*stg_itor)->setL_query_trade((*user_itor)->getUserTradeSPI()->getL_query_trade());
+		}
 	}
 
 

@@ -712,22 +712,24 @@ void TdSpi::CopyInstrumentInfo(CThostFtdcInstrumentField *dst, CThostFtdcInstrum
 void TdSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus) {
 	//USER_PRINT("TdSpi::OnRtnInstrumentStatus");
 	if (pInstrumentStatus) {
+		std::cout << "|==================== " << endl;
 		///交易所代码
-		std::cout << "交易所代码" << pInstrumentStatus->ExchangeID << endl;
+		std::cout << "|交易所代码         = " << pInstrumentStatus->ExchangeID << endl;
 		///合约在交易所的代码
-		std::cout << "合约在交易所的代码" << pInstrumentStatus->ExchangeInstID << endl;
+		std::cout << "|合约在交易所的代码 = " << pInstrumentStatus->ExchangeInstID << endl;
 		///结算组代码
-		std::cout << "结算组代码" << pInstrumentStatus->SettlementGroupID << endl;
+		std::cout << "|结算组代码         = " << pInstrumentStatus->SettlementGroupID << endl;
 		///合约代码
-		std::cout << "合约代码" << pInstrumentStatus->InstrumentID << endl;
+		std::cout << "|合约代码           = " << pInstrumentStatus->InstrumentID << endl;
 		///合约交易状态
-		std::cout << "合约交易状态" << pInstrumentStatus->InstrumentStatus << endl;
+		std::cout << "|合约交易状态       = " << pInstrumentStatus->InstrumentStatus << endl;
 		///交易阶段编号
-		std::cout << "交易阶段编号" << pInstrumentStatus->TradingSegmentSN << endl;
+		std::cout << "|交易阶段编号       = " << pInstrumentStatus->TradingSegmentSN << endl;
 		///进入本状态时间
-		std::cout << "进入本状态时间" << pInstrumentStatus->EnterTime << endl;
+		std::cout << "|进入本状态时间     = " << pInstrumentStatus->EnterTime << endl;
 		///进入本状态原因
-		std::cout << "进入本状态原因" << pInstrumentStatus->EnterReason << endl;
+		std::cout << "|进入本状态原因     = " << pInstrumentStatus->EnterReason << endl;
+		std::cout << "|==================== " << endl;
 	}
 }
 

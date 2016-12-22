@@ -882,8 +882,8 @@ void DBManager::CreateStrategyYesterday(Strategy *stg) {
 
 		BSONObj p = b.obj();
 
-		conn->insert(DB_STRATEGY_COLLECTION, p);
-		USER_PRINT("DBManager::CreateStrategy ok");
+		conn->insert(DB_STRATEGY_YESTERDAY_COLLECTION, p);
+		USER_PRINT("DBManager::CreateStrategyYesterday ok");
 	}
 }
 

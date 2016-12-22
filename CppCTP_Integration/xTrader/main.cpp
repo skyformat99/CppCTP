@@ -268,7 +268,10 @@ int main(int argc, char *argv[]) {
 	ctp_m = new CTP_Manager();
 
 	// 程序入口，初始化资源
-	ctp_m->init();
+	if (! ctp_m->init()) {
+		std::cout << "系统初始化失败!" << std::endl;
+		exit(1);
+	}
 
 	/*算法单元测试
 	Algorithm *alg = new Algorithm();

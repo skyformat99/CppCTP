@@ -578,9 +578,10 @@ void Strategy::init_today_position() {
 }
 
 void Strategy::setL_query_trade(list<CThostFtdcTradeField *> *l_query_trade) {
+	USER_PRINT("Strategy::setL_query_trade");
 	this->l_query_trade = l_query_trade;
 	// 遍历进行今仓初始化
-
+	std::cout << "l_query_trade->size() = " << l_query_trade->size()  << std::endl;
 	if (l_query_trade->size() > 0) {
 		list<CThostFtdcTradeField *>::iterator Itor;
 		for (Itor = l_query_trade->begin(); Itor != l_query_trade->end(); Itor++) {
@@ -2199,9 +2200,6 @@ void Strategy::OrderInsert(User *user, char *InstrumentID, char CombOffsetFlag, 
 //下单响应
 void Strategy::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	USER_PRINT("Strategy::OnRtnOrder");
-
-	
-
 	/// 如果合约在撤单维护列表里，那么撤单次数增加1
 	this->stg_user->add_instrument_id_action_counter(pOrder->InstrumentID);
 	this->Exec_OnRtnOrder(pOrder);
