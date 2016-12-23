@@ -478,13 +478,21 @@ void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *
 	/// 插入时间微秒
 	b.append("ExchRtnOrderMicrosecond", CtpRtnOrderMicrosecond);
 
+	/// 客户端账号（也能区分用户身份或交易员身份）:OperatorID
+	b.append("OperatorID", this->getTraderID());
+
+	string temp(pOrder->OrderRef);
+	string result = temp.substr(10, 12);
+	/// 交易策略编号：StrategyID
+	b.append("StrategyID", result);
+
 	BSONObj p = b.obj();
 	conn->insert(DB_ONRTNORDER_COLLECTION, p);
 	USER_PRINT("DBManager::DB_OnRtnOrder ok");
 }
 
 void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *pTrade){
-	USER_PRINT("User::DB_OnRtnTrade DB Connection!");
+	USER_PRINT(DB_ONRTNORDER_COLLECTION"User::DB_OnRtnTrade DB Connection!");
 	BSONObjBuilder b;
 	/// 交易员id
 	b.append("OperatorID", this->getTraderID());
@@ -561,6 +569,14 @@ void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *
 	b.append("RecTradeTime", RecTradeTime);
 	/// 插入时间微秒
 	b.append("RecTradeMicrosecond", RecTradeMicrosecond);
+
+	/// 客户端账号（也能区分用户身份或交易员身份）:OperatorID
+	b.append("OperatorID", this->getTraderID());
+
+	string temp(pTrade->OrderRef);
+	string result = temp.substr(10, 12);
+	/// 交易策略编号：StrategyID
+	b.append("StrategyID", result);
 
 	BSONObj p = b.obj();
 	conn->insert(DB_ONRTNTRADE_COLLECTION, p);
