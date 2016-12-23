@@ -104,12 +104,6 @@ CTP_Manager.h
 string
 -
 
-/root/xTrader/Strategy.cpp
-sstream
--
-Strategy.h
-/root/xTrader/Strategy.h
-
 /root/xTrader/Strategy.h
 list
 -
@@ -172,6 +166,18 @@ list
 User.h
 /root/xTrader/User.h
 
+/root/xTrader/User.cpp
+sstream
+-
+User.h
+/root/xTrader/User.h
+DBManager.h
+/root/xTrader/DBManager.h
+Debug.h
+/root/xTrader/Debug.h
+Utils.h
+/root/xTrader/Utils.h
+
 /root/xTrader/User.h
 iostream
 -
@@ -195,4 +201,8 @@ Strategy.h
 /root/xTrader/Strategy.h
 CTP_Manager.h
 /root/xTrader/CTP_Manager.h
+
+/root/xTrader/Utils.h
+string
+-
 
