@@ -249,8 +249,10 @@ void printFutureAccountOperateMenu() {
 
 int main(int argc, char *argv[]) {
 
-	if (argc < 2) {
-		printf("usage: %s #port\n", argv[0]);
+	if (argc < 3) {
+		printf("usage: %s #port #mode\n", argv[0]);
+		printf("port: 0~65536\n");
+		printf("mode: 1:online 0:offline\n");
 		exit(1);
 	}
 
@@ -266,9 +268,25 @@ int main(int argc, char *argv[]) {
 
 	// 初始化CTP_Manager
 	ctp_m = new CTP_Manager();
+	bool init_flag = true;
+
+	if (!strcmp("1", argv[2])) {
+		init_flag = true;
+		printf("盘中模式... \n");
+	}
+	else if (!strcmp("0", argv[2])) {
+		init_flag = false;
+		printf("离线模式... \n");
+	}
+	else {
+		printf("usage: %s #port #mode\n", argv[0]);
+		printf("port: 0~65536\n");
+		printf("mode: 1:online 0:offline\n");
+		exit(1);
+	}
 
 	// 程序入口，初始化资源
-	if (! ctp_m->init()) {
+	if (!ctp_m->init(init_flag)) {
 		std::cout << "系统初始化失败!" << std::endl;
 		exit(1);
 	}

@@ -408,6 +408,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					build_doc.AddMember("MsgType", 1, allocator);
 					build_doc.AddMember("TraderName", rapidjson::StringRef(op->getTraderName().c_str()), allocator);
 					build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
+					build_doc.AddMember("OnOff", op->getOn_Off(), allocator);
 					build_doc.AddMember("MsgResult", 0, allocator);
 					build_doc.AddMember("MsgErrorReason", "", allocator);
 					build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
@@ -428,7 +429,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						std::cout << "!s_TraderID == ''" << std::endl;
 						build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
 					}
-
+					build_doc.AddMember("OnOff", 0, allocator);
 					build_doc.AddMember("MsgResult", 1, allocator);
 					build_doc.AddMember("MsgErrorReason", "No Trader Find!", allocator);
 					build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
@@ -472,6 +473,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					info_object.AddMember("password", rapidjson::StringRef((*future_itor)->getPassword().c_str()), allocator);
 					info_object.AddMember("userid", rapidjson::StringRef((*future_itor)->getUserID().c_str()), allocator);
 					info_object.AddMember("frontaddress", rapidjson::StringRef((*future_itor)->getFrontAddress().c_str()), allocator);
+					info_object.AddMember("on_off", (*future_itor)->getOn_Off(), allocator);
 
 					info_array.PushBack(info_object, allocator);
 				}
@@ -1901,7 +1903,7 @@ bool CTP_Manager::initYesterdayPosition() {
 }
 
 /// 初始化
-bool CTP_Manager::init() {
+bool CTP_Manager::init(bool is_online) {
 
 	bool init_flag = true;
 
@@ -1915,6 +1917,8 @@ bool CTP_Manager::init() {
 	6:初始化今仓
 	7:初始化行情SPI*/
 	/************************************************************************/
+
+	this->dbm->setIs_Online(is_online);
 
 	/// 数据库查询所有的Trader
 	this->dbm->getAllTrader(this->l_trader);

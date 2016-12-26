@@ -19,10 +19,10 @@ using std::unique_ptr;
 
 
 #define DB_OPERATOR_COLLECTION            "CTP.trader"
-#define DB_FUTUREACCOUNT_COLLECTION       "CTP.futureaccount"
+
 #define DB_ADMIN_COLLECTION               "CTP.admin"
 #define DB_STRATEGY_COLLECTION            "CTP.strategy"
-#define DB_MARKETCONFIG_COLLECTION        "CTP.marketconfig"
+
 #define DB_STRATEGY_YESTERDAY_COLLECTION  "CTP.strategy_yesterday"
 #define DB_ALGORITHM_COLLECTION           "CTP.algorithm"
 #define ISACTIVE "1"
@@ -73,6 +73,17 @@ mongo::DBClientConnection * DBManager::getDBConnection() {
 		std::cout << "MongoDB无法访问!" << std::endl;
 		return NULL;
 	}
+}
+
+/************************************************************************/
+/* 设置交易模式(simnow 盘中/离线                                           */
+/************************************************************************/
+void DBManager::setIs_Online(bool is_online) {
+	this->is_online = is_online;
+}
+
+bool DBManager::getIs_Online() {
+	return this->is_online;
 }
 
 // 创建Trader
@@ -298,6 +309,15 @@ bool DBManager::FindAdminByAdminIdAndPassword(string adminid, string password) {
 
 void DBManager::CreateFutureAccount(Trader *op, FutureAccount *fa) {
 	
+	string DB_FUTUREACCOUNT_COLLECTION;
+	if (this->is_online) {
+		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount";
+	}
+	else
+	{
+		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount_panhou";
+	}
+
 	int count_number = 0;
 	int trader_count_number = 0;
 
@@ -333,14 +353,38 @@ void DBManager::CreateFutureAccount(Trader *op, FutureAccount *fa) {
 	}	
 }
 void DBManager::DeleteFutureAccount(FutureAccount *fa) {
+	string DB_FUTUREACCOUNT_COLLECTION;
+	if (this->is_online) {
+		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount";
+	}
+	else
+	{
+		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount_panhou";
+	}
 	this->conn->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (fa->getUserID().c_str())), BSON("$set" << BSON("isactive" << ISNOTACTIVE)));
 	USER_PRINT("DBManager::DeleteFutureAccount ok");
 }
 void DBManager::UpdateFutureAccount(User *u) {
+	string DB_FUTUREACCOUNT_COLLECTION;
+	if (this->is_online) {
+		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount";
+	}
+	else
+	{
+		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount_panhou";
+	}
 	this->conn->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (u->getUserID().c_str())), BSON("$set" << BSON("userid" << u->getUserID() << "brokerid" << u->getBrokerID() << "traderid" << u->getTraderID() << "password" << u->getPassword() << "frontaddress" << u->getFrontAddress() << "isactive" << u->getIsActive() << "on_off" << u->getOn_Off())));
 	USER_PRINT("DBManager::UpdateOperator ok");
 }
 void DBManager::SearchFutrueByUserID(string userid) {
+	string DB_FUTUREACCOUNT_COLLECTION;
+	if (this->is_online) {
+		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount";
+	}
+	else
+	{
+		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount_panhou";
+	}
 	unique_ptr<DBClientCursor> cursor =
 		this->conn->query(DB_FUTUREACCOUNT_COLLECTION, MONGO_QUERY("userid" << userid));
 	while (cursor->more()) {
@@ -356,6 +400,14 @@ void DBManager::SearchFutrueByUserID(string userid) {
 }
 
 void DBManager::SearchFutrueByTraderID(string traderid) {
+	string DB_FUTUREACCOUNT_COLLECTION;
+	if (this->is_online) {
+		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount";
+	}
+	else
+	{
+		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount_panhou";
+	}
 	unique_ptr<DBClientCursor> cursor =
 		this->conn->query(DB_FUTUREACCOUNT_COLLECTION, MONGO_QUERY("traderid" << traderid));
 	while (cursor->more()) {
@@ -372,7 +424,14 @@ void DBManager::SearchFutrueByTraderID(string traderid) {
 }
 
 void DBManager::SearchFutrueListByTraderID(string traderid, list<FutureAccount *> *l_futureaccount) {
-
+	string DB_FUTUREACCOUNT_COLLECTION;
+	if (this->is_online) {
+		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount";
+	}
+	else
+	{
+		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount_panhou";
+	}
 	/*list<FutureAccount *>::iterator Itor;
 	for (Itor = l_futureaccount->begin(); Itor != l_futureaccount->end();) {
 	Itor = l_futureaccount->erase(Itor);
@@ -409,6 +468,16 @@ void DBManager::SearchFutrueListByTraderID(string traderid, list<FutureAccount *
 }
 
 void DBManager::getAllFutureAccount(list<User *> *l_user) {
+	USER_PRINT(this->is_online);
+	
+	string DB_FUTUREACCOUNT_COLLECTION;
+	if (this->is_online) {
+		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount";
+	}
+	else
+	{
+		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount_panhou";
+	}
 
 	/// 初始化的时候，必须保证list为空
 	if (l_user->size() > 0) {
@@ -1279,6 +1348,16 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 获取一条MD记录															*/
 /************************************************************************/
 void DBManager::CreateMarketConfig(MarketConfig *mc) {
+	string DB_MARKETCONFIG_COLLECTION;
+	if (this->is_online) {
+
+		DB_MARKETCONFIG_COLLECTION = "CTP.marketconfig";
+	}
+	else
+	{
+
+		DB_MARKETCONFIG_COLLECTION = "CTP.marketconfig_panhou";
+	}
 	int count_number = 0;
 
 	count_number = this->conn->count(DB_MARKETCONFIG_COLLECTION,
@@ -1303,6 +1382,14 @@ void DBManager::CreateMarketConfig(MarketConfig *mc) {
 }
 
 void DBManager::DeleteMarketConfig(MarketConfig *mc) {
+	string DB_MARKETCONFIG_COLLECTION;
+	if (this->is_online) {
+		DB_MARKETCONFIG_COLLECTION = "CTP.marketconfig";
+	}
+	else
+	{
+		DB_MARKETCONFIG_COLLECTION = "CTP.marketconfig_panhou";
+	}
 	int count_number = 0;
 
 	count_number = this->conn->count(DB_MARKETCONFIG_COLLECTION,
@@ -1318,6 +1405,14 @@ void DBManager::DeleteMarketConfig(MarketConfig *mc) {
 }
 
 void DBManager::UpdateMarketConfig(MarketConfig *mc) {
+	string DB_MARKETCONFIG_COLLECTION;
+	if (this->is_online) {
+		DB_MARKETCONFIG_COLLECTION = "CTP.marketconfig";
+	}
+	else
+	{
+		DB_MARKETCONFIG_COLLECTION = "CTP.marketconfig_panhou";
+	}
 	int count_number = 0;
 
 	count_number = this->conn->count(DB_MARKETCONFIG_COLLECTION,
@@ -1339,6 +1434,14 @@ void DBManager::UpdateMarketConfig(MarketConfig *mc) {
 }
 
 void DBManager::getAllMarketConfig(list<MarketConfig *> *l_marketconfig) {
+	string DB_MARKETCONFIG_COLLECTION;
+	if (this->is_online) {
+		DB_MARKETCONFIG_COLLECTION = "CTP.marketconfig";
+	}
+	else
+	{
+		DB_MARKETCONFIG_COLLECTION = "CTP.marketconfig_panhou";
+	}
 	/// 初始化的时候，必须保证list为空
 	if (l_marketconfig->size() > 0) {
 		list<MarketConfig *>::iterator market_itor;
@@ -1377,6 +1480,15 @@ void DBManager::getAllMarketConfig(list<MarketConfig *> *l_marketconfig) {
 }
 
 MarketConfig * DBManager::getOneMarketConfig() {
+	USER_PRINT(this->is_online);
+	string DB_MARKETCONFIG_COLLECTION;
+	if (this->is_online) {
+		DB_MARKETCONFIG_COLLECTION = "CTP.marketconfig";
+	}
+	else
+	{
+		DB_MARKETCONFIG_COLLECTION = "CTP.marketconfig_panhou";
+	}
 	int countnum = this->conn->count(DB_MARKETCONFIG_COLLECTION);
 	if (countnum == 0) {
 		cout << "DBManager::getOneMarketConfig None!" << endl;

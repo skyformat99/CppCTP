@@ -30,6 +30,13 @@ public:
 	static mongo::DBClientConnection * getDBConnection();
 
 	/************************************************************************/
+	/* 设置交易模式(simnow 盘中/离线                                           */
+	/************************************************************************/
+	void setIs_Online(bool is_online);
+	bool getIs_Online();
+
+
+	/************************************************************************/
 	/* 创建交易员
 	   删除交易员
 	   更新交易员
@@ -125,6 +132,7 @@ public:
 
 private:
 	mongo::DBClientConnection *conn;
+	bool is_online;
 };
 
 #endif
