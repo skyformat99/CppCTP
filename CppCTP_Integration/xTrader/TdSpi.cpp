@@ -143,7 +143,7 @@ void TdSpi::Login(User *user) {
 ///登录请求响应
 void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
                            CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
-	USER_PRINT("MdSpi::OnRspUserLogin")
+	USER_PRINT("TdSpi::OnRspUserLogin")
 	USER_PRINT(bIsLast)
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		//sem_post(&login_sem);

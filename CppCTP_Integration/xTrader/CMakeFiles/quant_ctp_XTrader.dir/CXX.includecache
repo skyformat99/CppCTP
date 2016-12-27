@@ -52,16 +52,6 @@ DBManager.h
 Trader.h
 /root/xTrader/Trader.h
 
-/root/xTrader/DBManager.cpp
-mongo/bson/bson.h
--
-iostream
--
-DBManager.h
-/root/xTrader/DBManager.h
-Debug.h
-/root/xTrader/Debug.h
-
 /root/xTrader/DBManager.h
 iostream
 -
@@ -147,6 +137,24 @@ Debug.h
 /root/xTrader/Debug.h
 DBManager.h
 /root/xTrader/DBManager.h
+
+/root/xTrader/TdSpi.cpp
+iostream
+-
+cstring
+-
+chrono
+-
+thread
+-
+TdSpi.h
+/root/xTrader/TdSpi.h
+Utils.h
+/root/xTrader/Utils.h
+User.h
+/root/xTrader/User.h
+Debug.h
+/root/xTrader/Debug.h
 
 /root/xTrader/TdSpi.h
 map

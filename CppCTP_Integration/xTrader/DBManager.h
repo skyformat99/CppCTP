@@ -94,8 +94,8 @@ public:
 	   更新策略(昨仓)
 	   查找策略(昨仓)			                                                */
 	/************************************************************************/
-	void CreateStrategyYesterday(Strategy *stg);
-	void DeleteStrategyYesterday(Strategy *stg);
+	int CreateStrategyYesterday(Strategy *stg);
+	int DeleteStrategyYesterday(Strategy *stg);
 	void UpdateStrategyYesterday(Strategy *stg);
 	void getAllStrategyYesterday(list<Strategy *> *l_strategys, string traderid = "", string userid = "");
 	void getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Strategy *> *l_strategys, string traderid = "", string userid = "", string strategyid = "");

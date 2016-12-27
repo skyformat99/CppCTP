@@ -342,6 +342,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 	//std::cout << "HandleMessage fd = " << fd << std::endl;
 	std::cout << "服务端收到的数据 = " << msg_tmp << std::endl;
 	std::cout << "CTP管理类地址 = " << ctp_m << std::endl;
+	static_dbm->setIs_Online(ctp_m->getDBManager()->getIs_Online());
 
 	const char *rsp_msg;
 
@@ -972,8 +973,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						new_stg->setStgBWaitPriceTick(object["b_wait_price_tick"].GetDouble());
 
 						int flag = static_dbm->CreateStrategy(new_stg);
+						int flag1 = static_dbm->CreateStrategyYesterday(new_stg);
 						
-						if (flag) {
+						if (flag || flag1) {
 							std::cout << "Strategy已存在无需新建!" << std::endl;
 							build_doc.AddMember("MsgResult", 1, allocator);
 							build_doc.AddMember("MsgErrorReason", "策略已存在,不能重复创建!", allocator);
@@ -1108,8 +1110,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					if (((*stg_itor)->getStgUserId() == s_UserID) && ((*stg_itor)->getStgStrategyId() == s_StrategyID)) {
 						std::cout << "找到即将删除的Strategy" << std::endl;
 						int flag = static_dbm->DeleteStrategy((*stg_itor));
+						int flag_1 = static_dbm->DeleteStrategyYesterday((*stg_itor));
 
-						if (flag) {
+						if (flag || flag_1) {
 							std::cout << "Strategy未找到删除项!" << std::endl;
 							build_doc.AddMember("MsgResult", 1, allocator);
 							build_doc.AddMember("MsgErrorReason", "未找到删除的策略!", allocator);
@@ -1802,6 +1805,8 @@ bool CTP_Manager::initYesterdayPosition() {
 
 		if (flag == false) { // 如果时间晚于最新交易日，那么将策略新建到昨仓，并且更新仓位
 
+			std::cout << "时间晚于最新交易日，策略新建到昨仓，并且更新仓位" << std::endl;
+
 			// 昨仓变量初始化给今仓
 			(*stg_itor)->setStgPositionABuy((*stg_itor)->getStgPositionABuy());
 			(*stg_itor)->setStgPositionABuyToday(0);
@@ -1838,7 +1843,7 @@ bool CTP_Manager::initYesterdayPosition() {
 						this->getDBManager()->CreateStrategyYesterday((*stg_itor));
 					}
 					else {
-						std::cout << "昨仓里 未 找到相同的策略" << std::endl;
+						//std::cout << "昨仓里 未 找到相同的策略" << std::endl;
 						// 将初始化的今仓新建为昨仓
 						this->getDBManager()->CreateStrategyYesterday((*stg_itor));
 					}
@@ -1853,6 +1858,7 @@ bool CTP_Manager::initYesterdayPosition() {
 			
 		}
 		else { // 如果时间等于最新交易日,从昨仓取出相同的进行初始化
+			std::cout << "策略时间等于最新交易日,从昨仓取出相同的进行初始化" << std::endl;
 			bool is_exists = false;
 			if (this->l_strategys_yesterday->size() > 0) {
 				for (stg_itor_yesterday = this->l_strategys_yesterday->begin(); stg_itor_yesterday != this->l_strategys_yesterday->end(); stg_itor_yesterday++) {
@@ -1880,7 +1886,7 @@ bool CTP_Manager::initYesterdayPosition() {
 						is_exists = true;
 					}
 					else {
-						std::cout << "循环中...昨仓里 未 找到相同的策略,初始化有误!" << std::endl;
+						//std::cout << "循环中...昨仓里 未 找到相同的策略,初始化有误!" << std::endl;
 					}
 
 				}

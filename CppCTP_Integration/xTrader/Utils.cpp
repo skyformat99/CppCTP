@@ -171,10 +171,10 @@ bool Utils::compareTradingDay(const char *compare_day, const char *today) {
 	
 	
 	if (l_time1 >= l_time2) {
-		std::cout << "date is earlier than today!" << std::endl;
+		std::cout << "未来时间!" << std::endl;
 		return true; // 大于当前日期
 	} else {
-		std::cout << "date is later than today!" << std::endl;
+		std::cout << "过去时间!" << std::endl;
 		return false; // 小于当前日期
 	}
 }

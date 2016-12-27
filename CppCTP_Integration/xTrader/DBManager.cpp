@@ -883,14 +883,16 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 更新策略(昨仓)
 查找策略(昨仓)			                                                */
 /************************************************************************/
-void DBManager::CreateStrategyYesterday(Strategy *stg) {
+int DBManager::CreateStrategyYesterday(Strategy *stg) {
 	int count_number = 0;
+	int flag = 0;
 
 	count_number = this->conn->count(DB_STRATEGY_YESTERDAY_COLLECTION,
 		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str()) << "is_active" << true));
 
 	if (count_number > 0) {
 		cout << "Strategy Already Exists!" << endl;
+		flag = 1;
 	}
 	else {
 		BSONObjBuilder b;
@@ -952,12 +954,15 @@ void DBManager::CreateStrategyYesterday(Strategy *stg) {
 		BSONObj p = b.obj();
 
 		conn->insert(DB_STRATEGY_YESTERDAY_COLLECTION, p);
+		flag = 0;
 		USER_PRINT("DBManager::CreateStrategyYesterday ok");
 	}
+	return flag;
 }
 
-void DBManager::DeleteStrategyYesterday(Strategy *stg) {
+int DBManager::DeleteStrategyYesterday(Strategy *stg) {
 	int count_number = 0;
+	int flag = 0;
 
 	count_number = this->conn->count(DB_STRATEGY_YESTERDAY_COLLECTION,
 		BSON("strategy_id" << stg->getStgStrategyId().c_str() << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
@@ -968,7 +973,9 @@ void DBManager::DeleteStrategyYesterday(Strategy *stg) {
 	}
 	else {
 		cout << "Strategy ID Not Exists!" << endl;
+		flag = 1;
 	}
+	return flag;
 }
 
 void DBManager::UpdateStrategyYesterday(Strategy *stg) {
