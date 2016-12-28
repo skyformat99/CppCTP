@@ -52,6 +52,16 @@ DBManager.h
 Trader.h
 /root/xTrader/Trader.h
 
+/root/xTrader/DBManager.cpp
+mongo/bson/bson.h
+-
+iostream
+-
+DBManager.h
+/root/xTrader/DBManager.h
+Debug.h
+/root/xTrader/Debug.h
+
 /root/xTrader/DBManager.h
 iostream
 -
@@ -76,6 +86,10 @@ Algorithm.h
 
 /root/xTrader/Debug.h
 
+/root/xTrader/FutureAccount.cpp
+FutureAccount.h
+/root/xTrader/FutureAccount.h
+
 /root/xTrader/FutureAccount.h
 string
 -
@@ -88,11 +102,23 @@ iostream
 string.h
 -
 
+/root/xTrader/MarketConfig.cpp
+MarketConfig.h
+/root/xTrader/MarketConfig.h
+
 /root/xTrader/MarketConfig.h
 string
 -
 Debug.h
 /root/xTrader/Debug.h
+
+/root/xTrader/MdSpi.cpp
+iostream
+-
+string
+-
+MdSpi.h
+/root/xTrader/MdSpi.h
 
 /root/xTrader/MdSpi.h
 map
@@ -125,6 +151,12 @@ CTP_Manager.h
 /root/xTrader/Order.h
 string
 -
+
+/root/xTrader/Strategy.cpp
+sstream
+-
+Strategy.h
+/root/xTrader/Strategy.h
 
 /root/xTrader/Strategy.h
 list
@@ -196,6 +228,12 @@ ThostFtdcUserApiStruct.h
 ThostFtdcUserApiDataType.h
 /root/xTrader/ThostFtdcUserApiDataType.h
 
+/root/xTrader/Trader.cpp
+Trader.h
+/root/xTrader/Trader.h
+Debug.h
+/root/xTrader/Debug.h
+
 /root/xTrader/Trader.h
 string
 -
@@ -205,6 +243,18 @@ list
 -
 User.h
 /root/xTrader/User.h
+
+/root/xTrader/User.cpp
+sstream
+-
+User.h
+/root/xTrader/User.h
+DBManager.h
+/root/xTrader/DBManager.h
+Debug.h
+/root/xTrader/Debug.h
+Utils.h
+/root/xTrader/Utils.h
 
 /root/xTrader/User.h
 iostream
@@ -233,6 +283,68 @@ CTP_Manager.h
 /root/xTrader/Utils.h
 string
 -
+
+/root/xTrader/main.cpp
+iostream
+-
+string
+-
+list
+-
+mongo/client/dbclient.h
+-
+stdio.h
+-
+netdb.h
+-
+sys/socket.h
+-
+unistd.h
+-
+string.h
+-
+stdlib.h
+-
+memory.h
+-
+signal.h
+-
+time.h
+-
+pthread.h
+-
+errno.h
+-
+arpa/inet.h
+-
+ThostFtdcTraderApi.h
+/root/xTrader/ThostFtdcTraderApi.h
+TdSpi.h
+/root/xTrader/TdSpi.h
+ThostFtdcMdApi.h
+/root/xTrader/ThostFtdcMdApi.h
+MdSpi.h
+/root/xTrader/MdSpi.h
+CTP_Manager.h
+/root/xTrader/CTP_Manager.h
+Utils.h
+/root/xTrader/Utils.h
+Debug.h
+/root/xTrader/Debug.h
+DBManager.h
+/root/xTrader/DBManager.h
+Trader.h
+/root/xTrader/Trader.h
+FutureAccount.h
+/root/xTrader/FutureAccount.h
+rapidjson/document.h
+/root/xTrader/rapidjson/document.h
+rapidjson/writer.h
+/root/xTrader/rapidjson/writer.h
+rapidjson/stringbuffer.h
+/root/xTrader/rapidjson/stringbuffer.h
+msg.h
+/root/xTrader/msg.h
 
 /root/xTrader/msg.h
 sys/types.h

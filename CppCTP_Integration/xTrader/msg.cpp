@@ -3,6 +3,7 @@
 #include <string.h>
 #include <memory.h>
 #include <sys/types.h>
+#include <stdio.h>
 
 /*计算校验码*/
 static unsigned char msg_check(Msg *message) {
@@ -30,19 +31,20 @@ static unsigned char msg_check(Msg *message) {
  * 发送的数据存放在buff中*/
 /************************************************************************/
 int write_msg(int sockfd, char *buff, size_t len) {
-	//printf("write_msg1 \n");
+	printf("write_msg1 \n");
 	Msg message;
 	memset(&message, 0, sizeof(message));
 	//strcpy(message.head, "gmqh_sh_2016");
 	memcpy(message.buff, buff, len);
 	memcpy(message.head, "gmqh_sh_2016", strlen("gmqh_sh_2016") + 1);
 	message.checknum = msg_check(&message);
-	//printf("write_msg2 \n");
-	//printf("write Message head %s\n", message.head);
-	//printf("write Message checknum %d\n", message.checknum);
+	printf("write_msg2 \n");
+	printf("write Message head %s\n", message.head);
+	printf("write Message checknum %d\n", message.checknum);
 	if (write(sockfd, &message, sizeof(message)) != sizeof(message)) {
 		return -1;
 	}
+	printf("write_msg3 \n");
 }
 
 /************************************************************************/

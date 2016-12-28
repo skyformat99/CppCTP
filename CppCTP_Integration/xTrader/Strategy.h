@@ -18,7 +18,7 @@ class Strategy {
 
 public:
 
-	Strategy();
+	Strategy(User *stg_user=NULL);
 
 	void OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData);
 

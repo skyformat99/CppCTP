@@ -329,7 +329,7 @@ void MdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificIns
 
 //深度行情接收
 void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
-	//USER_PRINT("OnRtnDepthMarketData")
+	USER_PRINT("MdSpi::OnRtnDepthMarketData IN");
     //cout << "===========================================" << endl;
     //cout << "深度行情" << ", ";
 	//cout << "交易日:" << pDepthMarketData->TradingDay << ", " << "合约代码:" << pDepthMarketData->InstrumentID << ", " << "最新价:" << pDepthMarketData->LastPrice << ", " << "持仓量:" << pDepthMarketData->OpenInterest << endl;
@@ -351,9 +351,11 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
 
 	list<Strategy *>::iterator itor;
 	for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+		USER_PRINT(((*itor)));
 		(*itor)->OnRtnDepthMarketData(pDepthMarketData);
 	}
 	//cout << "===========================================" << endl;
+	USER_PRINT("MdSpi::OnRtnDepthMarketData OUT");
 }
 
 //通信断开
