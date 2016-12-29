@@ -28,6 +28,7 @@ CTP_Manager::CTP_Manager() {
 	this->l_strategys_yesterday = new list<Strategy *>();
 	this->l_instrument = new list<string>();
 	this->l_unsubinstrument = new list<string>();
+	isClosingSaved = false;
 }
 
 bool CTP_Manager::CheckIn(Login *login) {
@@ -223,6 +224,11 @@ list<string> * CTP_Manager::getL_Instrument() {
 	return this->l_instrument;
 }
 
+/// 得到l_unsubinstrument
+list<string> * CTP_Manager::getL_UnsubInstrument() {
+	return this->l_unsubinstrument;
+}
+
 /// 得到数据库操作对象
 DBManager * CTP_Manager::getDBManager() {
 	return this->dbm;
@@ -307,6 +313,19 @@ list<Strategy *> * CTP_Manager::getListStrategyYesterday() {
 /// 设置strategy_list
 void CTP_Manager::setListStrategy(list<Strategy *> *l_strategys) {
 	this->l_strategys = l_strategys;
+}
+
+/// 保存strategy_list
+void CTP_Manager::saveStrategy() {
+	USER_PRINT("CTP_Manager::saveStrategy");
+	if (!this->isClosingSaved) {
+		list<Strategy *>::iterator stg_itor;
+		USER_PRINT("CTP_Manager::saveStrategy");
+		for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
+			this->dbm->UpdateStrategy((*stg_itor));
+		}
+		this->isClosingSaved = true;
+	}
 }
 
 /// 设置mdspi
@@ -993,7 +1012,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							int flag = static_dbm->CreateStrategy(new_stg);
 							int flag1 = static_dbm->CreateStrategyYesterday(new_stg);
 
-							if (flag || flag1) {
+							if (flag) {
 								std::cout << "Strategy已存在无需新建!" << std::endl;
 								build_doc.AddMember("MsgResult", 1, allocator);
 								build_doc.AddMember("MsgErrorReason", "策略已存在,不能重复创建!", allocator);
@@ -1145,14 +1164,22 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							std::cout << "Strategy未找到删除项!" << std::endl;
 							build_doc.AddMember("MsgResult", 1, allocator);
 							build_doc.AddMember("MsgErrorReason", "未找到删除的策略!", allocator);
-
 						}
 						else {
 							std::cout << "Strategy删除完成!" << std::endl;
 							build_doc.AddMember("MsgResult", 0, allocator);
 							build_doc.AddMember("MsgErrorReason", "", allocator);
-
 						}
+
+
+						// 退订删除的合约
+						ctp_m->UnSubmarketData(ctp_m->getMdSpi(), (*stg_itor)->getStgInstrumentIdA(), ctp_m->getL_UnsubInstrument());
+
+						sleep(1);
+
+						ctp_m->UnSubmarketData(ctp_m->getMdSpi(), (*stg_itor)->getStgInstrumentIdB(), ctp_m->getL_UnsubInstrument());
+
+						// 删除策略
 						delete (*stg_itor);
 						stg_itor = ctp_m->getListStrategy()->erase(stg_itor);
 					}

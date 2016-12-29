@@ -249,6 +249,18 @@ void MdSpi::UnSubMarket(list<string> *l_instrument) {
 	}
 	USER_PRINT(this->mdapi);
 	this->mdapi->UnSubscribeMarketData(instrumentID, size);
+
+	// 析构字符串数组
+	for (i = 0; i < size; i++) {
+		delete[]instrumentID[i];
+	}
+	delete[]instrumentID;
+
+	// 取消订阅列表里清空
+	for (itor = l_instrument->begin(); itor != l_instrument->end();) {
+		(*itor).clear();
+		itor = l_instrument->erase(itor);
+	}
 }
 
 //订阅行情应答

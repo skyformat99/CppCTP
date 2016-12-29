@@ -727,6 +727,14 @@ void TdSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentSt
 		std::cout << "|交易阶段编号       = " << pInstrumentStatus->TradingSegmentSN << endl;
 		///进入本状态时间
 		std::cout << "|进入本状态时间     = " << pInstrumentStatus->EnterTime << endl;
+
+		string status_time(pInstrumentStatus->EnterTime);
+		string real_status_time = this->getTradingDay() + status_time;
+		string localtime = this->getTradingDay() + "15:00:00";
+		if (Utils::compareTradingDaySeconds(real_status_time.c_str(), localtime.c_str())) { // 时间相等进行收盘工作
+			USER_PRINT("收盘了...策略进行保存");
+			this->current_user->getCTP_Manager()->saveStrategy();
+		}
 		///进入本状态原因
 		std::cout << "|进入本状态原因     = " << pInstrumentStatus->EnterReason << endl;
 		std::cout << "|==================== " << endl;

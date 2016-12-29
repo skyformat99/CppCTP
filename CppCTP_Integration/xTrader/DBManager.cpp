@@ -669,7 +669,7 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 
 	if (count_number > 0) {
 		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true), BSON("$set" << BSON("position_a_sell_today" << stg->getStgPositionASellToday()
-			<< "position_b_sell" << stg->getStgPositionBSell() 
+			<< "position_b_sell" << stg->getStgPositionBSell()
 			<< "spread_shift" << stg->getStgSpreadShift()
 			<< "position_b_sell_today" << stg->getStgPositionBSellToday()
 			<< "position_b_buy_today" << stg->getStgPositionBBuyToday()
@@ -680,15 +680,15 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 			<< "is_active" << stg->isStgIsActive()
 			<< "position_b_sell_yesterday" << stg->getStgPositionBSell()
 			<< "strategy_id" << stg->getStgStrategyId()
-			<< "position_b_buy" << stg->getStgPositionBBuy() 
-			<< "lots_batch" << stg->getStgLotsBatch() 
-			<< "position_a_buy" << stg->getStgPositionABuy() 
-			<< "sell_open" << stg->getStgSellOpen() 
-			<< "order_algorithm" << stg->getStgOrderAlgorithm() 
-			<< "trader_id" << stg->getStgTraderId() 
+			<< "position_b_buy" << stg->getStgPositionBBuy()
+			<< "lots_batch" << stg->getStgLotsBatch()
+			<< "position_a_buy" << stg->getStgPositionABuy()
+			<< "sell_open" << stg->getStgSellOpen()
+			<< "order_algorithm" << stg->getStgOrderAlgorithm()
+			<< "trader_id" << stg->getStgTraderId()
 			<< "a_order_action_limit" << stg->getStgAOrderActionTiresLimit()
 			<< "b_order_action_limit" << stg->getStgBOrderActionTiresLimit()
-			<< "sell_close" << stg->getStgSellClose() 
+			<< "sell_close" << stg->getStgSellClose()
 			<< "buy_open" << stg->getStgBuyOpen()
 
 			<< "only_close" << stg->isStgOnlyClose()
@@ -709,12 +709,12 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 			<< "amount" << stg->getStgAmount()
 			<< "average_shift" << stg->getStgAverageShift()
 
-			<< "position_a_buy_yesterday" << stg->getStgPositionABuyYesterday() 
-			<< "user_id" << stg->getStgUserId() 
-			<< "position_a_buy_today" << stg->getStgPositionABuyToday() 
-			<< "position_a_sell_yesterday" << stg->getStgPositionASellYesterday() 
+			<< "position_a_buy_yesterday" << stg->getStgPositionABuyYesterday()
+			<< "user_id" << stg->getStgUserId()
+			<< "position_a_buy_today" << stg->getStgPositionABuyToday()
+			<< "position_a_sell_yesterday" << stg->getStgPositionASellYesterday()
 			<< "lots" << stg->getStgLots()
-			<< "a_wait_price_tick" << stg->getStgAWaitPriceTick() 
+			<< "a_wait_price_tick" << stg->getStgAWaitPriceTick()
 			<< "b_wait_price_tick" << stg->getStgBWaitPriceTick()
 			<< "trading_day" << stg->getStgTradingDay()
 			<< "list_instrument_id" << BSON_ARRAY(stg->getStgInstrumentIdA() << stg->getStgInstrumentIdB()))));
@@ -723,7 +723,7 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 	}
 	else
 	{
-		cout << "Strategy ID Not Exists!" << endl;
+		USER_PRINT("Strategy ID Not Exists!");
 	}
 }
 void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, string userid) {

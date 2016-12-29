@@ -59,6 +59,9 @@ public:
 	/// 得到l_instrument
 	list<string> *getL_Instrument();
 
+	/// 得到l_unsubinstrument
+	list<string> *getL_UnsubInstrument();
+
 	/// 得到数据库操作对象
 	DBManager *getDBManager();
 
@@ -94,6 +97,9 @@ public:
 
 	/// 设置strategy_list
 	void setListStrategy(list<Strategy *> *l_strategys);
+
+	/// 保存strategy_list
+	void saveStrategy();
 
 	/// 设置mdspi
 	void setMdSpi(MdSpi *mdspi);
@@ -134,5 +140,6 @@ private:
 	MdSpi *mdspi;
 	int on_off; //开关
 	string trading_day;
+	bool isClosingSaved;
 };
 #endif

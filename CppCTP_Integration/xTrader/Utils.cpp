@@ -187,10 +187,10 @@ bool Utils::compareTradingDaySeconds(const char *compare_day, const char *today)
 	struct tm tm_time2 = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 	//strptime(compare_day, "%Y%m%d%H%M%S", &tm_time); //时间格式：20161216 13:30:00
-	strptime(compare_day, "%Y%m%d %X", &tm_time);//时间格式：20161216 13:30:00
+	strptime(compare_day, "%Y%m%d%X", &tm_time);//时间格式：20161216 13:30:00
 	time_t l_time1 = mktime(&tm_time);
 
-	strptime(today, "%Y%m%d %X", &tm_time2);
+	strptime(today, "%Y%m%d%X", &tm_time2);
 	time_t l_time2 = mktime(&tm_time2);
 
 
