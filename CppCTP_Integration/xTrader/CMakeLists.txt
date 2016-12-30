@@ -12,6 +12,8 @@
 
 	#source directory(add source files automatically)
 	aux_source_directory(. SOURCE_FILES)
+	#set exe folder
+	set(EXECUTABLE_OUTPUT_PATH ./bin/)
 
     #set extern libraries
     set(LIBRARIES libthostmduserapi.so libthosttraderapi.so libmongoclient.so libboost_thread.so libboost_system.so libboost_regex.so)

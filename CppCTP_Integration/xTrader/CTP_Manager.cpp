@@ -1019,7 +1019,15 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							}
 							else {
 								std::cout << "Strategy新建完成!" << std::endl;
+								/// 将策略加到维护列表里
 								ctp_m->getListStrategy()->push_back(new_stg);
+								/// 订阅合约
+								/// 添加策略的合约到l_instrument
+								ctp_m->addSubInstrument(new_stg->getStgInstrumentIdA(), ctp_m->getL_Instrument());
+								ctp_m->addSubInstrument(new_stg->getStgInstrumentIdB(), ctp_m->getL_Instrument());
+								/// 订阅合约
+								ctp_m->SubmarketData(ctp_m->getMdSpi(), ctp_m->getL_Instrument());
+
 								std::cout << "CTP_Manager包含策略个数 = " << ctp_m->getListStrategy()->size() << std::endl;
 								build_doc.AddMember("MsgResult", 0, allocator);
 								build_doc.AddMember("MsgErrorReason", "", allocator);

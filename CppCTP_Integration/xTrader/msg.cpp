@@ -31,7 +31,7 @@ static unsigned char msg_check(Msg *message) {
  * 发送的数据存放在buff中*/
 /************************************************************************/
 int write_msg(int sockfd, char *buff, size_t len) {
-	printf("write_msg1 \n");
+	printf("开始发消息... \n");
 	Msg message;
 	memset(&message, 0, sizeof(message));
 	//strcpy(message.head, "gmqh_sh_2016");
@@ -44,7 +44,7 @@ int write_msg(int sockfd, char *buff, size_t len) {
 	if (write(sockfd, &message, sizeof(message)) != sizeof(message)) {
 		return -1;
 	}
-	printf("write_msg3 \n");
+	printf("消息发送完毕 \n");
 }
 
 /************************************************************************/

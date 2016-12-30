@@ -13,8 +13,8 @@ FILE(REMOVE_RECURSE
   "CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o"
   "CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o"
   "CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o"
-  "quant_ctp_XTrader.pdb"
-  "quant_ctp_XTrader"
+  "bin/quant_ctp_XTrader.pdb"
+  "bin/quant_ctp_XTrader"
 )
 
 # Per-language clean rules from dependency scanning.
