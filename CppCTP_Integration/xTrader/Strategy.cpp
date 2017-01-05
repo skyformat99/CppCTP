@@ -830,11 +830,15 @@ void Strategy::Order_Algorithm_One() {
 		USER_PRINT("CRASH!!!");
 	}
 	USER_PRINT(this->stg_user->getCTP_Manager()->getOn_Off());
+	//为了测试需要打开开关
+	this->stg_user->getCTP_Manager()->setOn_Off(1);
+	USER_PRINT(this->stg_user->getCTP_Manager()->getOn_Off());
 	USER_PRINT(this->stg_user->getOn_Off());
 	USER_PRINT(this->getOn_Off());
 
 	/// 策略开关，期货账户开关，总开关
 	if (!((this->getOn_Off()) & (this->stg_user->getOn_Off()) & (this->stg_user->getCTP_Manager()->getOn_Off()))) {
+		USER_PRINT("请检查开关状态!");
 		/*std::cout << "请检查开关状态!" << std::endl;
 		std::cout << "总开关 = " << this->stg_user->getCTP_Manager()->getOn_Off() << std::endl;
 		std::cout << "账户开关 = " << this->stg_user->getOn_Off() << std::endl;
