@@ -305,13 +305,17 @@ void User::DB_OrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderF
 	///Mac地址
 	b.append("MacAddress", pInputOrder->MacAddress);
 
-	string time_str = Utils::getNowTimeMs();
-	auto const pos1 = time_str.find_first_of('_');
-	auto const pos = time_str.find_last_of('_');
+	string time_str = string(Utils::getNowTimeMs());
+	int pos1 = time_str.find_first_of('_');
+	int pos = time_str.find_last_of('_');
+	USER_PRINT(time_str);
+	USER_PRINT(time_str.length());
+	USER_PRINT(pos1);
+	USER_PRINT(pos);
 	//std::cout << pos1 << '\n';
 	//std::cout << pos << '\n';
-	const auto SendOrderTime = time_str.substr(pos1 + 1, pos - 1);
-	const auto SendOrderMicrosecond = time_str.substr(pos + 1);
+	string SendOrderTime = time_str.substr(pos1 + 1, pos - 1);
+	string SendOrderMicrosecond = time_str.substr(pos + 1);
 	/// 插入时间
 	b.append("SendOrderTime", SendOrderTime);
 	/// 插入时间微秒
@@ -321,7 +325,8 @@ void User::DB_OrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderF
 	b.append("OperatorID", this->getTraderID());
 
 	string temp(pInputOrder->OrderRef);
-	string result = temp.substr(10, 12);
+	int len_order_ref = temp.length();
+	string result = temp.substr(len_order_ref - 2, 2);
 	/// 交易策略编号：StrategyID
 	b.append("StrategyID", result);
 
@@ -470,12 +475,12 @@ void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *
 	b.append("MacAddress", pOrder->MacAddress);
 
 	string time_str = Utils::getNowTimeMs();
-	auto const pos1 = time_str.find_first_of('_');
-	auto const pos = time_str.find_last_of('_');
+	int pos1 = time_str.find_first_of('_');
+	int pos = time_str.find_last_of('_');
 	//std::cout << pos1 << '\n';
 	//std::cout << pos << '\n';
-	const auto CtpRtnOrderTime = time_str.substr(pos1 + 1, pos - 1);
-	const auto CtpRtnOrderMicrosecond = time_str.substr(pos + 1);
+	string CtpRtnOrderTime = time_str.substr(pos1 + 1, pos - 1);
+	string CtpRtnOrderMicrosecond = time_str.substr(pos + 1);
 	/// 插入时间
 	b.append("CtpRtnOrderTime", CtpRtnOrderTime);
 	/// 插入时间微秒
@@ -490,7 +495,9 @@ void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *
 	b.append("OperatorID", this->getTraderID());
 
 	string temp(pOrder->OrderRef);
-	string result = temp.substr(10, 12);
+	USER_PRINT(temp);
+	int len_order_ref = temp.length();
+	string result = temp.substr(len_order_ref - 2, 2);
 	/// 交易策略编号：StrategyID
 	b.append("StrategyID", result);
 
@@ -566,13 +573,20 @@ void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *
 	b.append("TradeSource", pTrade->TradeSource);
 
 
-	string time_str = Utils::getNowTimeMs();
-	auto const pos1 = time_str.find_first_of('_');
-	auto const pos = time_str.find_last_of('_');
+	string time_str = string(Utils::getNowTimeMs());
+	int pos1 = time_str.find_first_of('_');
+	int pos = time_str.find_last_of('_');
 	//std::cout << "pos1" << pos1 << '\n';
 	//std::cout << "pos" << pos << '\n';
-	const auto RecTradeTime = time_str.substr(pos1 + 1, pos - 1);
-	const auto RecTradeMicrosecond = time_str.substr(pos + 1);
+	USER_PRINT(time_str);
+	USER_PRINT(time_str.length());
+	USER_PRINT(pos1);
+	USER_PRINT(pos);
+	string RecTradeTime = time_str.substr(pos1 + 1, pos - 1);
+	USER_PRINT(RecTradeTime);
+	USER_PRINT(time_str);
+	string RecTradeMicrosecond = time_str.substr(21);
+	USER_PRINT(RecTradeMicrosecond);
 	/// 插入时间
 	b.append("RecTradeTime", RecTradeTime);
 	/// 插入时间微秒
@@ -582,7 +596,12 @@ void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *
 	b.append("OperatorID", this->getTraderID());
 
 	string temp(pTrade->OrderRef);
-	string result = temp.substr(10, 12);
+	USER_PRINT(pTrade->OrderRef);
+	USER_PRINT(temp);
+	USER_PRINT(temp.length());
+	int len_order_ref = temp.length();
+	string result = temp.substr(len_order_ref - 2, 2);
+	USER_PRINT(result);
 	/// 交易策略编号：StrategyID
 	b.append("StrategyID", result);
 

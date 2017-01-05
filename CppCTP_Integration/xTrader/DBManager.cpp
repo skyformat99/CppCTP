@@ -501,6 +501,7 @@ void DBManager::getAllFutureAccount(list<User *> *l_user) {
 				<< "password:" << p.getStringField("password") << "  "
 				<< "userid:" << p.getStringField("userid") << "  "
 				<< "frontAddress:" << p.getStringField("frontaddress") << "  "
+				<< "on_off:" << p.getIntField("on_off") << "  "
 				<< "isactive:" << p.getStringField("isactive") << "*" << endl;
 			User *user = new User(p.getStringField("frontaddress"), p.getStringField("brokerid"), p.getStringField("userid"), p.getStringField("password"), p.getStringField("userid"), p.getIntField("on_off"), p.getStringField("traderid"));
 			l_user->push_back(user);
