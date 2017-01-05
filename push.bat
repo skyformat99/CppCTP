@@ -3,7 +3,7 @@ set t=%time:~0,8%
 set timestamp=%d% %t%
 
 git add .
-git commit -m "%timestamp% backup"
+git commit -m "%timestamp% backup from windows"
 git push origin CppCTP_API_ypf
 echo "Finished Push!"
 pause
