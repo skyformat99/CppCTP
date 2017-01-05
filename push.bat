@@ -5,5 +5,5 @@ set timestamp=%d% %t%
 git add .
 git commit -m "%timestamp% backup"
 git push origin CppCTP_API_ypf
-echo "完成推送..."
+echo "Finished Push!"
 pause
