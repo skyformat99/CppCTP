@@ -6,11 +6,13 @@
 
 ## 编译方法
 ```c++
-cmake .
-make
+sh get.sh
 ```
 
 ##  执行
 ```c++
-./quant_ctp_XTrader
+./bin/quant_ctp_XTrader_no_debug [port] [0|1]
 ```
+其中port是端口
+1对应的是simnow盘中模式
+0对应的是simnow离线模式
