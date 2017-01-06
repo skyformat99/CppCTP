@@ -58,7 +58,7 @@ DBManager::~DBManager() {
 mongo::DBClientConnection * DBManager::getDBConnection() {
 	try
 	{
-		mongo::DBClientConnection *conn = new mongo::DBClientConnection(false, 0, 5);
+		mongo::DBClientConnection *conn = new mongo::DBClientConnection(false, 0, 60);
 		conn->connect("localhost");
 		USER_PRINT("Original DB Connection[DBManager::getDBConnection()]!");
 		USER_PRINT(conn);

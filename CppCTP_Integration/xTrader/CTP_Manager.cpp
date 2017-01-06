@@ -1993,7 +1993,6 @@ bool CTP_Manager::init(bool is_online) {
 
 	/// 数据库查询所有的Trader
 	this->dbm->getAllTrader(this->l_trader);
-
 	this->dbm->getAllObjTrader(this->l_obj_trader);
 
 	/// 查询所有的期货账户
@@ -2003,19 +2002,33 @@ bool CTP_Manager::init(bool is_online) {
 	//this->dbm->getAllStrategyYesterday(this->l_strategys);
 	this->dbm->getAllStrategy(this->l_strategys);
 
-	/// 查询昨仓数据
+	/// 查询昨仓策略
 	this->dbm->getAllStrategyYesterday(this->l_strategys_yesterday);
 
 
-	/// 绑定操作,策略绑定到对应期货账户下
+	/// 绑定操作：账户绑定到对应交易员名下
+	/// 绑定操作：策略绑定到对应期货账户下
 	list<User *>::iterator user_itor;
 	list<Strategy *>::iterator stg_itor;
-	USER_PRINT("Iterator USERS");
+	list<Trader *>::iterator trader_itor;
+
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) {
+		USER_PRINT((*user_itor)->getUserID());
+		USER_PRINT((*user_itor)->getTraderID());
+		(*user_itor)->setCTP_Manager(this); //每个user对象设置CTP_Manager对象
+
+		for (trader_itor = this->l_obj_trader->begin(); trader_itor != this->l_obj_trader->end(); trader_itor++) {
+			USER_PRINT((*trader_itor)->getTraderID());
+			if ((*trader_itor)->getTraderID() == (*user_itor)->getTraderID()) {
+				(*user_itor)->setTrader((*trader_itor));
+			}
+		}
+	}
+
+
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
 		
 		USER_PRINT((*user_itor)->getUserID());
-		
-		(*user_itor)->setCTP_Manager(this); //每个user对象设置CTP_Manager对象
 
 		for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
 			

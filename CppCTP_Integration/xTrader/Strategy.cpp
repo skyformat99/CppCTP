@@ -863,12 +863,12 @@ void Strategy::Order_Algorithm_One() {
 	USER_PRINT(this->stg_user->getCTP_Manager()->getOn_Off());
 	//为了测试需要打开开关
 	//this->stg_user->getCTP_Manager()->setOn_Off(1);
-	USER_PRINT(this->stg_user->getCTP_Manager()->getOn_Off());
+	USER_PRINT(this->stg_user->GetTrader()->getOn_Off());
 	USER_PRINT(this->stg_user->getOn_Off());
 	USER_PRINT(this->getOn_Off());
 
 	/// 策略开关，期货账户开关，总开关
-	if (!((this->getOn_Off()) & (this->stg_user->getOn_Off()) & (this->stg_user->getCTP_Manager()->getOn_Off()))) {
+	if (!((this->getOn_Off()) & (this->stg_user->getOn_Off()) & (this->stg_user->GetTrader()->getOn_Off()))) {
 		USER_PRINT("请检查开关状态!");
 		/*std::cout << "请检查开关状态!" << std::endl;
 		std::cout << "总开关 = " << this->stg_user->getCTP_Manager()->getOn_Off() << std::endl;
@@ -881,7 +881,7 @@ void Strategy::Order_Algorithm_One() {
 	//std::cout << "策略开关,期货账户开关,总开关22222" << std::endl;
 
 	/// 价差多头卖平(b)
-	if ((this->stg_spread_long >= this->stg_sell_close) 
+	if ((this->sell_close_on_off) && (this->stg_spread_long >= this->stg_sell_close) 
 		&& (this->stg_position_a_sell == this->stg_position_b_buy)
 		&& (this->stg_position_a_sell > 0)) {
 		/// 市场多头价差大于触发参数， AB持仓量相等且大于0
@@ -967,7 +967,7 @@ void Strategy::Order_Algorithm_One() {
 	/// 价差空头买平(f)
 	/*else if ((this->stg_spread_short <= this->stg_buy_close) && (this->stg_position_a_sell == this->stg_position_b_buy) &&
 		(this->stg_position_a_sell > 0)) {*/
-	else if ((this->stg_position_a_sell == this->stg_position_b_buy) &&
+	else if ((this->buy_close_on_off) && (this->stg_position_a_sell == this->stg_position_b_buy) &&
 		(this->stg_position_a_sell > 0)) {
 		/// 市场空头价差小于等于触发参数， AB持仓量相等且大于0
 		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差空头买平" << endl;
@@ -1061,7 +1061,7 @@ void Strategy::Order_Algorithm_One() {
 
 	/// 价差多头卖开(f)
 	//else if ((this->stg_spread_long >= this->stg_sell_open) && (this->stg_position_a_buy + this->stg_position_a_sell < this->stg_lots)) {
-	else if ((this->stg_position_a_buy + this->stg_position_a_sell < this->stg_lots)) {
+	else if ((this->sell_open_on_off) && (this->stg_position_a_buy + this->stg_position_a_sell < this->stg_lots)) {
 		/** 市场多头价差大于触发参数
 		A合约买持仓加B合约买小于总仓位**/
 
@@ -1144,7 +1144,7 @@ void Strategy::Order_Algorithm_One() {
 
 	/// 价差空头买开(b)
 	/*else if ((this->stg_spread_short <= this->stg_buy_open) && (this->stg_position_a_buy + this->stg_position_a_sell < this->stg_lots)) {*/
-	else if ((false) && (this->stg_position_a_buy + this->stg_position_a_sell < this->stg_lots)) {
+	else if ((this->buy_open_on_off) && (this->stg_position_a_buy + this->stg_position_a_sell < this->stg_lots)) {
 		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差空头买开" << endl;
 
 
