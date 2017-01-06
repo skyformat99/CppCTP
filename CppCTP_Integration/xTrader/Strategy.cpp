@@ -831,7 +831,7 @@ void Strategy::Order_Algorithm_One() {
 	}
 	USER_PRINT(this->stg_user->getCTP_Manager()->getOn_Off());
 	//为了测试需要打开开关
-	this->stg_user->getCTP_Manager()->setOn_Off(1);
+	//this->stg_user->getCTP_Manager()->setOn_Off(1);
 	USER_PRINT(this->stg_user->getCTP_Manager()->getOn_Off());
 	USER_PRINT(this->stg_user->getOn_Off());
 	USER_PRINT(this->getOn_Off());
