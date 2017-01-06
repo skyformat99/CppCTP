@@ -66,7 +66,8 @@ User * CTP_Manager::CreateAccount(User *user, list<Strategy *> *l_strategys) {
 		}
 		else {
 			CThostFtdcTraderApi *tdapi = CThostFtdcTraderApi::CreateFtdcTraderApi(flowpath.c_str());
-			cout << "TdApi初始化完成... tdapi = " << tdapi << endl;
+			USER_PRINT("TdApi初始化完成...");
+			USER_PRINT(tdapi);
 			if (!tdapi) {
 				return NULL;
 			}

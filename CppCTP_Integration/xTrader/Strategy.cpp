@@ -646,20 +646,51 @@ void Strategy::setL_query_trade(list<CThostFtdcTradeField *> *l_query_trade) {
 
 			std::cout << "==============================================" << std::endl;
 			std::cout << "A合约 = " << this->stg_instrument_id_A << std::endl;
-			std::cout << "A今买 = " << this->stg_position_a_buy_today << std::endl;
-			std::cout << "A昨买 = " << this->stg_position_a_buy_yesterday << std::endl;
-			std::cout << "A总买 = " << this->stg_position_a_buy << std::endl;
-			std::cout << "A今卖 = " << this->stg_position_a_sell_today << std::endl;
-			std::cout << "A昨卖 = " << this->stg_position_a_sell_yesterday << std::endl;
-			std::cout << "A总卖 = " << this->stg_position_a_sell << std::endl;
+			std::cout << "A合约今买 = " << this->stg_position_a_buy_today << ", "
+				<< "A合约昨买 = " << this->stg_position_a_buy_yesterday << ", "
+				<< "A合约总买 = " << this->stg_position_a_buy << ", "
+				<< "A合约今卖 = " << this->stg_position_a_sell_today << ", "
+				<< "A合约昨卖 = " << this->stg_position_a_buy_yesterday << ", "
+				<< "A合约总卖 = " << this->stg_position_a_sell << std::endl;
+
 			std::cout << "==============================================" << std::endl;
 			std::cout << "B合约 = " << this->stg_instrument_id_B << std::endl;
-			std::cout << "B今买 = " << this->stg_position_b_buy_today << std::endl;
-			std::cout << "B昨买 = " << this->stg_position_b_buy_yesterday << std::endl;
-			std::cout << "B总买 = " << this->stg_position_b_buy << std::endl;
-			std::cout << "B今卖 = " << this->stg_position_b_sell_today << std::endl;
-			std::cout << "B昨卖 = " << this->stg_position_b_sell_yesterday << std::endl;
-			std::cout << "B总卖 = " << this->stg_position_b_sell << std::endl;
+			std::cout << "B合约今买 = " << this->stg_position_b_buy_today << ", "
+				<< "B合约昨买 = " << this->stg_position_b_buy_yesterday << ", "
+				<< "B合约总买 = " << this->stg_position_b_buy << ", "
+				<< "B合约今卖 = " << this->stg_position_b_sell_today << ", "
+				<< "B合约昨卖 = " << this->stg_position_b_buy_yesterday << ", "
+				<< "B合约总卖 = " << this->stg_position_b_sell << std::endl;
+
+			USER_PRINT("A合约今买");
+			USER_PRINT(this->stg_position_a_buy_today);
+			USER_PRINT("A合约昨买");
+			USER_PRINT(this->stg_position_a_buy_yesterday);
+			USER_PRINT("A合约总买");
+			USER_PRINT(this->stg_position_a_buy);
+			USER_PRINT("A合约今卖");
+			USER_PRINT(this->stg_position_a_sell_today);
+			USER_PRINT("A合约昨卖");
+			USER_PRINT(this->stg_position_a_sell_yesterday);
+			USER_PRINT("A合约总卖");
+			USER_PRINT(this->stg_position_a_sell);
+
+			USER_PRINT("B合约今买");
+			USER_PRINT(this->stg_position_b_buy_today);
+			USER_PRINT("B合约昨买");
+			USER_PRINT(this->stg_position_b_buy_yesterday);
+			USER_PRINT("B合约总买");
+			USER_PRINT(this->stg_position_b_buy);
+			USER_PRINT("B合约今卖");
+			USER_PRINT(this->stg_position_b_sell_today);
+			USER_PRINT("B合约昨卖");
+			USER_PRINT(this->stg_position_b_sell_yesterday);
+			USER_PRINT("B合约总卖");
+			USER_PRINT(this->stg_position_b_sell);
+
+
+
+
 		}
 	}
 }
@@ -1666,19 +1697,45 @@ void Strategy::update_position(CThostFtdcTradeField *pTrade) {
 		this->stg_position_b_sell = this->stg_position_b_sell_today + this->stg_position_b_sell_yesterday;
 	}
 
-	std::cout << "A合约今买 = " << this->stg_position_a_buy_today << std::endl;
-	std::cout << "A合约昨买 = " << this->stg_position_a_buy_yesterday << std::endl;
-	std::cout << "A合约总买 = " << this->stg_position_a_buy << std::endl;
-	std::cout << "A合约今卖 = " << this->stg_position_a_sell_today << std::endl;
-	std::cout << "A合约昨卖 = " << this->stg_position_a_buy_yesterday << std::endl;
-	std::cout << "A合约总卖 = " << this->stg_position_a_sell << std::endl;
+	std::cout << "A合约今买 = " << this->stg_position_a_buy_today << ", "
+		<< "A合约昨买 = " << this->stg_position_a_buy_yesterday << ", "
+		<< "A合约总买 = " << this->stg_position_a_buy << ", "
+		<< "A合约今卖 = " << this->stg_position_a_sell_today << ", "
+		<< "A合约昨卖 = " << this->stg_position_a_buy_yesterday << ", "
+		<< "A合约总卖 = " << this->stg_position_a_sell << std::endl;
 	
-	std::cout << "B合约今买 = " << this->stg_position_b_buy_today << std::endl;
-	std::cout << "B合约昨买 = " << this->stg_position_b_buy_yesterday << std::endl;
-	std::cout << "B合约总买 = " << this->stg_position_b_buy << std::endl;
-	std::cout << "B合约今卖 = " << this->stg_position_b_sell_today << std::endl;
-	std::cout << "B合约昨卖 = " << this->stg_position_b_buy_yesterday << std::endl;
-	std::cout << "B合约总卖 = " << this->stg_position_b_sell << std::endl;
+	std::cout << "B合约今买 = " << this->stg_position_b_buy_today << ", "
+		<< "B合约昨买 = " << this->stg_position_b_buy_yesterday << ", "
+		<< "B合约总买 = " << this->stg_position_b_buy << ", "
+		<< "B合约今卖 = " << this->stg_position_b_sell_today << ", "
+		<< "B合约昨卖 = " << this->stg_position_b_buy_yesterday << ", "
+		<< "B合约总卖 = " << this->stg_position_b_sell << std::endl;
+
+	USER_PRINT("A合约今买");
+	USER_PRINT(this->stg_position_a_buy_today);
+	USER_PRINT("A合约昨买");
+	USER_PRINT(this->stg_position_a_buy_yesterday);
+	USER_PRINT("A合约总买");
+	USER_PRINT(this->stg_position_a_buy);
+	USER_PRINT("A合约今卖");
+	USER_PRINT(this->stg_position_a_sell_today);
+	USER_PRINT("A合约昨卖");
+	USER_PRINT(this->stg_position_a_sell_yesterday);
+	USER_PRINT("A合约总卖");
+	USER_PRINT(this->stg_position_a_sell);
+
+	USER_PRINT("B合约今买");
+	USER_PRINT(this->stg_position_b_buy_today);
+	USER_PRINT("B合约昨买");
+	USER_PRINT(this->stg_position_b_buy_yesterday);
+	USER_PRINT("B合约总买");
+	USER_PRINT(this->stg_position_b_buy);
+	USER_PRINT("B合约今卖");
+	USER_PRINT(this->stg_position_b_sell_today);
+	USER_PRINT("B合约昨卖");
+	USER_PRINT(this->stg_position_b_sell_yesterday);
+	USER_PRINT("B合约总卖");
+	USER_PRINT(this->stg_position_b_sell);
 
 }
 

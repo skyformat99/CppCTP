@@ -13,6 +13,7 @@
 #include <errno.h>
 #include <ctime>
 #include "Utils.h"
+#include "Debug.h"
 
 //check folder exist
 int Utils::IsFolderExist(const char* path) {
@@ -57,7 +58,7 @@ int Utils::CreateFolder(const char* path) {
 	return 0;
 }
 
-//iInLenµÄ³¤¶È²»°üÀ¨\0£¬Ó¦¸ÃÓÃstrlen¡£·µ»ØÖµÊÇ´¦ÀíºóµÄsOut³¤¶È
+//iInLençš„é•¿åº¦ä¸åŒ…æ‹¬\0ï¼Œåº”è¯¥ç”¨strlenã€‚è¿”å›žå€¼æ˜¯å¤„ç†åŽçš„sOuté•¿åº¦
 int Utils::Utf8ToGb2312(char *sOut, int iMaxOutLen, const char *sIn, int iInLen) {
 	char *pIn = (char *)sIn;
 	char *pOut = sOut;
@@ -83,7 +84,7 @@ int Utils::Utf8ToGb2312(char *sOut, int iMaxOutLen, const char *sIn, int iInLen)
 	return (iMaxOutLen - iLeftLen);
 }
 
-//iInLenµÄ³¤¶È²»°üÀ¨\0£¬Ó¦¸ÃÓÃstrlen¡£·µ»ØÖµÊÇ´¦ÀíºóµÄsOut³¤¶È
+//iInLençš„é•¿åº¦ä¸åŒ…æ‹¬\0ï¼Œåº”è¯¥ç”¨strlenã€‚è¿”å›žå€¼æ˜¯å¤„ç†åŽçš„sOuté•¿åº¦
 int Utils::Gb2312ToUtf8(char *sOut, int iMaxOutLen, const char *sIn, int iInLen) {
 	char *pIn = (char *)sIn;
 	char *pOut = sOut;
@@ -128,7 +129,7 @@ int Utils::timeval_subtract(struct timeval* result, struct timeval* x, struct ti
 }
 
 string Utils::getNowTimeNs() {
-	printf("---------------------------Ê±¼äÊä³ö----------------------------------------\n");
+	printf("---------------------------æ—¶é—´è¾“å‡º----------------------------------------\n");
 	printf("[time(NULL)]     :     %ld\n", time(NULL));
 	struct timespec ts;
 	clock_gettime(CLOCK_REALTIME, &ts);
@@ -144,7 +145,7 @@ string Utils::getNowTimeNs() {
 }
 
 string Utils::getNowTimeMs() {
-	//printf("---------------------------Ê±¼äÊä³ö----------------------------------------\n");
+	//printf("---------------------------æ—¶é—´è¾“å‡º----------------------------------------\n");
 	//printf("[time(NULL)]    :    %ld\n", time(NULL));
 	struct timeval us;
 	gettimeofday(&us, NULL);
@@ -171,23 +172,23 @@ bool Utils::compareTradingDay(const char *compare_day, const char *today) {
 	
 	
 	if (l_time1 >= l_time2) {
-		std::cout << "Î´À´Ê±¼ä!" << std::endl;
-		return true; // ´óÓÚµ±Ç°ÈÕÆÚ
+		USER_PRINT("æœªæ¥æ—¶é—´");
+		return true; // å¤§äºŽå½“å‰æ—¥æœŸ
 	} else {
-		std::cout << "¹ýÈ¥Ê±¼ä!" << std::endl;
-		return false; // Ð¡ÓÚµ±Ç°ÈÕÆÚ
+		USER_PRINT("è¿‡åŽ»æ—¶é—´");
+		return false; // å°äºŽå½“å‰æ—¥æœŸ
 	}
 }
 
 bool Utils::compareTradingDaySeconds(const char *compare_day, const char *today) {
 
-	//Ê±¼ä¸ñÊ½£º20161216 13:30:00
+	//æ—¶é—´æ ¼å¼ï¼š20161216 13:30:00
 
 	struct tm tm_time = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	struct tm tm_time2 = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-	//strptime(compare_day, "%Y%m%d%H%M%S", &tm_time); //Ê±¼ä¸ñÊ½£º20161216 13:30:00
-	strptime(compare_day, "%Y%m%d%X", &tm_time);//Ê±¼ä¸ñÊ½£º20161216 13:30:00
+	//strptime(compare_day, "%Y%m%d%H%M%S", &tm_time); //æ—¶é—´æ ¼å¼ï¼š20161216 13:30:00
+	strptime(compare_day, "%Y%m%d%X", &tm_time);//æ—¶é—´æ ¼å¼ï¼š20161216 13:30:00
 	time_t l_time1 = mktime(&tm_time);
 
 	strptime(today, "%Y%m%d%X", &tm_time2);
@@ -195,11 +196,11 @@ bool Utils::compareTradingDaySeconds(const char *compare_day, const char *today)
 
 
 	if (l_time1 == l_time2) {
-		std::cout << "date is equal!" << std::endl;
-		return true; // µÈÓÚµ±Ç°ÈÕÆÚ
+		USER_PRINT("æ—¥æœŸç›¸ç­‰");
+		return true; // ç­‰äºŽå½“å‰æ—¥æœŸ
 	}
 	else {
-		std::cout << "date is later!" << std::endl;
-		return false; // Ð¡ÓÚµ±Ç°ÈÕÆÚ
+		USER_PRINT("æ—¥æœŸåå°äº†");
+		return false; // å°äºŽå½“å‰æ—¥æœŸ
 	}
 }

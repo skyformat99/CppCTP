@@ -237,8 +237,7 @@ mongo::DBClientConnection * User::GetOrderConn() {
 /************************************************************************/
 void User::DB_OrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderField *pInputOrder) {
 	USER_PRINT("User::DB_OrderInsert DB Connection!");
-	std::cout << "User::DB_OrderInsert conn obj value = " << conn << endl;
-	std::cout << "User::DB_OrderInsert pInputOrder obj value = " << pInputOrder << endl;
+	USER_PRINT(conn);
 	BSONObjBuilder b;
 
 	/// 交易员id
@@ -337,6 +336,7 @@ void User::DB_OrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderF
 
 void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *pOrder){
 	USER_PRINT("User::DB_OnRtnOrder DB Connection!");
+	USER_PRINT(conn);
 	BSONObjBuilder b;
 	/// 交易员id
 	b.append("OperatorID", this->getTraderID());

@@ -1,7 +1,7 @@
 content=`head -n 4 Debug.h | tail -n 1`
-echo $content
+#echo $content
 result=`echo $content | grep "//"`
-echo $result
+#echo $result
 
 if [[ "$result" != "" ]]
 then

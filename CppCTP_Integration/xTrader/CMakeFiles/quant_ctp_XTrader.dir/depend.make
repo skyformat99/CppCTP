@@ -191,6 +191,7 @@ CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o: User.cpp
 CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o: User.h
 CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o: Utils.h
 
+CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o: Debug.h
 CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o: Utils.cpp
 CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o: Utils.h
 

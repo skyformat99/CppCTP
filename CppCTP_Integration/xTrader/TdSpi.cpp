@@ -1573,7 +1573,10 @@ void TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
 	//sleep(1);
 
 	this->tdapi->ReqOrderInsert(pInputOrder, 1);
-	this->current_user->DB_OrderInsert(this->current_user->GetOrderConn(), pInputOrder);
+	USER_PRINT(this->current_user);
+	USER_PRINT(user);
+	//this->current_user->DB_OrderInsert(this->current_user->GetOrderConn(), pInputOrder);
+	user->DB_OrderInsert(user->GetOrderConn(), pInputOrder);
 	//delete pInputOrder;
 }
 
