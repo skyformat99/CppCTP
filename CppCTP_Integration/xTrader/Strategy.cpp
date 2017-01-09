@@ -879,6 +879,55 @@ void Strategy::Order_Algorithm_One() {
 	}
 
 	//std::cout << "策略开关,期货账户开关,总开关22222" << std::endl;
+	USER_PRINT("**********************");
+	USER_PRINT("价差多头卖平");
+	USER_PRINT(this->sell_close_on_off);
+	USER_PRINT(this->stg_spread_long);
+	USER_PRINT(this->stg_sell_close);
+	USER_PRINT(this->stg_position_a_sell);
+	USER_PRINT(this->stg_position_b_buy);
+	USER_PRINT(this->stg_position_a_sell);
+	USER_PRINT("*满足条件：");
+	USER_PRINT(this->sell_close_on_off);
+	USER_PRINT((this->stg_spread_long >= this->stg_sell_close));
+	USER_PRINT((this->stg_position_a_sell == this->stg_position_b_buy));
+	USER_PRINT((this->stg_position_a_sell > 0));
+	USER_PRINT("**********************");
+
+	USER_PRINT("######################");
+	USER_PRINT("价差空头买平");
+	USER_PRINT(this->buy_close_on_off);
+	USER_PRINT(this->stg_position_a_sell);
+	USER_PRINT(this->stg_position_b_buy);
+	USER_PRINT(this->stg_position_a_sell);
+	USER_PRINT("#满足条件：");
+	USER_PRINT(this->buy_close_on_off);
+	USER_PRINT((this->stg_position_a_sell == this->stg_position_b_buy));
+	USER_PRINT((this->stg_position_a_sell > 0));
+	USER_PRINT("######################");
+
+	USER_PRINT("$$$$$$$$$$$$$$$$$$$$$$");
+	USER_PRINT("价差多头卖开");
+	USER_PRINT(this->sell_open_on_off);
+	USER_PRINT(this->stg_position_a_buy);
+	USER_PRINT(this->stg_position_a_sell);
+	USER_PRINT(this->stg_lots);
+	USER_PRINT("$满足条件：");
+	USER_PRINT(this->sell_open_on_off);
+	USER_PRINT(((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots));
+	USER_PRINT("$$$$$$$$$$$$$$$$$$$$$$");
+
+	USER_PRINT("&&&&&&&&&&&&&&&&&&&&&&");
+	USER_PRINT("价差空头买开");
+	USER_PRINT(this->buy_open_on_off);
+	USER_PRINT(this->stg_position_a_buy);
+	USER_PRINT(this->stg_position_a_sell);
+	USER_PRINT(this->stg_lots);
+	USER_PRINT("&满足条件：");
+	USER_PRINT(this->buy_open_on_off);
+	USER_PRINT(((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots));
+	USER_PRINT("&&&&&&&&&&&&&&&&&&&&&&");
+	
 
 	/// 价差多头卖平(b)
 	if ((this->sell_close_on_off) && (this->stg_spread_long >= this->stg_sell_close) 
@@ -1061,7 +1110,7 @@ void Strategy::Order_Algorithm_One() {
 
 	/// 价差多头卖开(f)
 	//else if ((this->stg_spread_long >= this->stg_sell_open) && (this->stg_position_a_buy + this->stg_position_a_sell < this->stg_lots)) {
-	else if ((this->sell_open_on_off) && (this->stg_position_a_buy + this->stg_position_a_sell < this->stg_lots)) {
+	else if ((this->sell_open_on_off) && ((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots)) {
 		/** 市场多头价差大于触发参数
 		A合约买持仓加B合约买小于总仓位**/
 
@@ -1144,7 +1193,7 @@ void Strategy::Order_Algorithm_One() {
 
 	/// 价差空头买开(b)
 	/*else if ((this->stg_spread_short <= this->stg_buy_open) && (this->stg_position_a_buy + this->stg_position_a_sell < this->stg_lots)) {*/
-	else if ((this->buy_open_on_off) && (this->stg_position_a_buy + this->stg_position_a_sell < this->stg_lots)) {
+	else if ((this->buy_open_on_off) && ((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots)) {
 		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差空头买开" << endl;
 
 
@@ -1378,7 +1427,7 @@ void Strategy::Exec_OnErrRtnOrderAction() {
 
 // 行情回调,执行交易任务
 void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketData) {
-	//USER_PRINT("Exec_OnTickComing()");
+	USER_PRINT("Exec_OnTickComing()");
 	list<CThostFtdcOrderField *>::iterator Itor;
 	for (Itor = this->stg_list_order_pending->begin(); Itor != this->stg_list_order_pending->end(); Itor++) {
 		/// A有挂单，判断是否需要撤单

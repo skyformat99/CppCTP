@@ -35,6 +35,7 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 	this->l_strategys = new list<Strategy *>();
 	this->stg_map_instrument_action_counter = new map<string, int>();
 	this->stg_order_ref_base = Utils::strtolonglong(stg_order_ref_base);
+	USER_PRINT(this->stg_order_ref_base);
 }
 
 User::User(string BrokerID, string UserID, int nRequestID, string stg_order_ref_base) {
