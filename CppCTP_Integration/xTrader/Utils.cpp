@@ -204,3 +204,19 @@ bool Utils::compareTradingDaySeconds(const char *compare_day, const char *today)
 		return false; // 小于当前日期
 	}
 }
+
+long long Utils::strtolonglong(string str) {
+	long long result;
+	istringstream is(str);
+	is >> result;
+	return result;
+}
+
+string Utils::longlongtostr(long long num) {
+	ostringstream os;
+	os << num;
+	string result;
+	istringstream is(os.str());
+	is >> result;
+	return result;
+}

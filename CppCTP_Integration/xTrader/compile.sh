@@ -5,7 +5,8 @@ then
 	mode=debug
         time=`date "+%Y-%m-%d_%H-%M-%S"`
         cmake . && make && cd bin && rm -f quant_ctp_XTrader_debug_* && mv quant_ctp_XTrader "quant_ctp_XTrader_${mode}_${time}"
-	echo "Finish Compile, Please check bin directory."
+	#echo "Finish Compile, Please check bin directory."
+	echo -e "\033[31mFinish Compile ${mode} Version! Please Check bin folder.\033[0m"
 elif [[ "$1" == "release" ]]
 then
         echo "Release Mode"
@@ -13,7 +14,8 @@ then
 	mode=no_debug
         time=`date "+%Y-%m-%d_%H-%M-%S"`
         cmake . && make && cd bin && rm -f quant_ctp_XTrader_no_debug_* && mv quant_ctp_XTrader "quant_ctp_XTrader_${mode}_${time}"
-	echo "Finish Compile, Please check bin directory."
+	#echo "Finish Compile, Please check bin directory."
+	echo -e "\033[31mFinish Compile ${mode} Version! Please Check bin folder.\033[0m"
 else
 	echo "Error Input"
 fi

@@ -1577,6 +1577,8 @@ void TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
 	USER_PRINT(user);
 	//this->current_user->DB_OrderInsert(this->current_user->GetOrderConn(), pInputOrder);
 	user->DB_OrderInsert(user->GetOrderConn(), pInputOrder);
+	string orderref = string(pInputOrder->OrderRef);
+	user->DB_UpdateOrderRef(orderref);
 	//delete pInputOrder;
 }
 

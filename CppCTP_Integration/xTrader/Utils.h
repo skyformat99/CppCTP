@@ -1,6 +1,7 @@
 #ifndef QUANT_CTP_UTILS_H
 #define QUANT_CTP_UTILS_H
 #include <string>
+#include <sstream>
 
 using std::string;
 
@@ -17,6 +18,8 @@ public:
 	static string getNowTimeMs();
 	static bool compareTradingDay(const char *compare_day, const char *today);
 	static bool compareTradingDaySeconds(const char *compare_day, const char *today);
+	static long long strtolonglong(string str);
+	static string longlongtostr(long long num);
 };
 
 #endif

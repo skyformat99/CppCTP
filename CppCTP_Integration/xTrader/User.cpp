@@ -20,7 +20,7 @@
 //转码数组
 char codeDst_2[90] = { 0 };
 
-User::User(string frontAddress, string BrokerID, string UserID, string Password, string nRequestID, int on_off, string TraderID) {
+User::User(string frontAddress, string BrokerID, string UserID, string Password, string nRequestID, int on_off, string TraderID, string stg_order_ref_base) {
 	this->on_off = on_off;
 	this->BrokerID = BrokerID;
 	this->UserID = UserID;
@@ -34,10 +34,10 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 	this->TraderID = TraderID;
 	this->l_strategys = new list<Strategy *>();
 	this->stg_map_instrument_action_counter = new map<string, int>();
-	this->stg_order_ref_base = 0;
+	this->stg_order_ref_base = Utils::strtolonglong(stg_order_ref_base);
 }
 
-User::User(string BrokerID, string UserID, int nRequestID) {
+User::User(string BrokerID, string UserID, int nRequestID, string stg_order_ref_base) {
 	this->on_off = 0;
 	this->BrokerID = BrokerID;
 	this->UserID = UserID;
@@ -48,7 +48,7 @@ User::User(string BrokerID, string UserID, int nRequestID) {
 	this->OrderConn = DBManager::getDBConnection();
 	this->l_strategys = new list<Strategy *>();
 	this->stg_map_instrument_action_counter = new map<string, int>();
-	this->stg_order_ref_base = 0;
+	this->stg_order_ref_base = Utils::strtolonglong(stg_order_ref_base);
 }
 
 User::~User() {
@@ -332,6 +332,12 @@ void User::DB_OrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderF
 	BSONObj p = b.obj();
 	conn->insert(DB_ORDERINSERT_COLLECTION, p);
 	USER_PRINT("DBManager::DB_OrderInsert ok");
+}
+
+// 更新报单引用
+void User::DB_UpdateOrderRef(string order_ref_base) {
+	USER_PRINT("User::DB_UpdateOrderRef!");
+	this->dbm->UpdateFutureAccountOrderRef(this, order_ref_base);
 }
 
 void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *pOrder){
@@ -1188,4 +1194,13 @@ void User::QueryTrade() {
 
 void User::QueryOrder() {
 	this->UserTradeSPI->QryOrder();
+}
+
+/// 得到数据库操作对象
+DBManager * User::getDBManager() {
+	return this->dbm;
+}
+
+void User::setDBManager(DBManager *dbm) {
+	this->dbm = dbm;
 }

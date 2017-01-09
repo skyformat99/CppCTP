@@ -376,6 +376,20 @@ void DBManager::UpdateFutureAccount(User *u) {
 	this->conn->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (u->getUserID().c_str())), BSON("$set" << BSON("userid" << u->getUserID() << "brokerid" << u->getBrokerID() << "traderid" << u->getTraderID() << "password" << u->getPassword() << "frontaddress" << u->getFrontAddress() << "isactive" << u->getIsActive() << "on_off" << u->getOn_Off())));
 	USER_PRINT("DBManager::UpdateOperator ok");
 }
+
+void DBManager::UpdateFutureAccountOrderRef(User *u, string order_ref_base) {
+	string DB_FUTUREACCOUNT_COLLECTION;
+	if (this->is_online) {
+		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount";
+	}
+	else
+	{
+		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount_panhou";
+	}
+	this->conn->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (u->getUserID().c_str())), BSON("$set" << BSON("order_ref_base" << order_ref_base)));
+	USER_PRINT("DBManager::UpdateFutureAccountOrderRef ok");
+}
+
 void DBManager::SearchFutrueByUserID(string userid) {
 	string DB_FUTUREACCOUNT_COLLECTION;
 	if (this->is_online) {
@@ -503,7 +517,7 @@ void DBManager::getAllFutureAccount(list<User *> *l_user) {
 				<< "frontAddress:" << p.getStringField("frontaddress") << "  "
 				<< "on_off:" << p.getIntField("on_off") << "  "
 				<< "isactive:" << p.getStringField("isactive") << "*" << endl;
-			User *user = new User(p.getStringField("frontaddress"), p.getStringField("brokerid"), p.getStringField("userid"), p.getStringField("password"), p.getStringField("userid"), p.getIntField("on_off"), p.getStringField("traderid"));
+			User *user = new User(p.getStringField("frontaddress"), p.getStringField("brokerid"), p.getStringField("userid"), p.getStringField("password"), p.getStringField("userid"), p.getIntField("on_off"), p.getStringField("traderid"), p.getStringField("order_ref_base"));
 			l_user->push_back(user);
 		}
 		

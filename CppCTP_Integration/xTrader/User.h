@@ -24,8 +24,8 @@ class CTP_Manager;
 class User
 {
 public:
-	User(string frontAddress, string BrokerID, string UserID, string Password, string nRequestID, int on_off, string TraderID = "");
-	User(string BrokerID, string UserID, int nRequestID);
+	User(string frontAddress, string BrokerID, string UserID, string Password, string nRequestID, int on_off, string TraderID = "", string stg_order_ref_base = "0");
+	User(string BrokerID, string UserID, int nRequestID, string stg_order_ref_base = "0");
 	~User();
 	string getBrokerID();
 	string getUserID();
@@ -97,6 +97,8 @@ public:
 	void DB_OnRspOrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderField *pInputOrder); // CTP认为报单参数错误
 	void DB_OnErrRtnOrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderField *pInputOrder); // 交易所认为报单错误
 	void DB_OnRspQryInvestorPosition(mongo::DBClientConnection *conn, CThostFtdcInvestorPositionField *pInvestorPosition); // 持仓信息
+	// 更新报单引用
+	void DB_UpdateOrderRef(string order_ref_base);
 
 	/// 设置开关
 	int getOn_Off();
@@ -115,6 +117,10 @@ public:
 	void QueryTrade();
 
 	void QueryOrder();
+
+	/// 得到数据库操作对象
+	DBManager *getDBManager();
+	void setDBManager(DBManager *dbm);
 
 private:
 	int on_off; //开关
@@ -136,6 +142,7 @@ private:
 	mongo::DBClientConnection * PositionConn;
 	mongo::DBClientConnection * TradeConn;
 	mongo::DBClientConnection * OrderConn;
+	DBManager *dbm;
 	long long stg_order_ref_base;
 	CTP_Manager *o_ctp;
 	string isActive;

@@ -1870,6 +1870,8 @@ bool CTP_Manager::initYesterdayPosition() {
 
 		if (flag == false) { // 如果时间晚于最新交易日，那么将策略新建到昨仓，并且更新仓位
 
+			this->dbm->UpdateFutureAccountOrderRef((*stg_itor)->getStgUser(), "0");
+
 			std::cout << "时间晚于最新交易日，策略新建到昨仓，并且更新仓位" << std::endl;
 
 			// 昨仓变量初始化给今仓
@@ -2016,6 +2018,7 @@ bool CTP_Manager::init(bool is_online) {
 		USER_PRINT((*user_itor)->getUserID());
 		USER_PRINT((*user_itor)->getTraderID());
 		(*user_itor)->setCTP_Manager(this); //每个user对象设置CTP_Manager对象
+		(*user_itor)->setDBManager(this->dbm); //每个user对象设置DBManager对象
 
 		for (trader_itor = this->l_obj_trader->begin(); trader_itor != this->l_obj_trader->end(); trader_itor++) {
 			USER_PRINT((*trader_itor)->getTraderID());
@@ -2064,7 +2067,6 @@ bool CTP_Manager::init(bool is_online) {
 
 	/// 初始化今仓
 	this->setTradingDay(this->l_user->front()->getUserTradeSPI()->getTradingDay());
-
 
 	/// 昨仓初始化
 	if (!(this->initYesterdayPosition())) {

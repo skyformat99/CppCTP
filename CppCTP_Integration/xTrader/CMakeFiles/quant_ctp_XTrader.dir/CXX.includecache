@@ -317,6 +317,8 @@ Debug.h
 /root/xTrader/Utils.h
 string
 -
+sstream
+-
 
 /root/xTrader/main.cpp
 iostream
