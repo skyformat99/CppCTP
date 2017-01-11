@@ -503,13 +503,13 @@ void DBManager::getAllFutureAccount(list<User *> *l_user) {
 		}
 	}
 
-	int countnum = this->conn->count(DB_FUTUREACCOUNT_COLLECTION);
+	int countnum = this->conn->count(DB_FUTUREACCOUNT_COLLECTION, BSON("isactive" << ISACTIVE));
 	if (countnum == 0) {
 		cout << "DBManager::getAllFutureAccount None!" << endl;
 	}
 	else {
 		unique_ptr<DBClientCursor> cursor =
-			this->conn->query(DB_FUTUREACCOUNT_COLLECTION);
+			this->conn->query(DB_FUTUREACCOUNT_COLLECTION, MONGO_QUERY("isactive" << ISACTIVE));
 		while (cursor->more()) {
 			BSONObj p = cursor->next();
 			cout << "*" << "brokerid:" << p.getStringField("brokerid") << "  "
@@ -518,6 +518,7 @@ void DBManager::getAllFutureAccount(list<User *> *l_user) {
 				<< "userid:" << p.getStringField("userid") << "  "
 				<< "frontAddress:" << p.getStringField("frontaddress") << "  "
 				<< "on_off:" << p.getIntField("on_off") << "  "
+				<< "sessionid:" << p.getIntField("sessionid") << "  "
 				<< "isactive:" << p.getStringField("isactive") << "*" << endl;
 			User *user = new User(p.getStringField("frontaddress"), p.getStringField("brokerid"), p.getStringField("userid"), p.getStringField("password"), p.getStringField("userid"), p.getIntField("on_off"), p.getStringField("traderid"), p.getStringField("order_ref_base"));
 			l_user->push_back(user);

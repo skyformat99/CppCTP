@@ -1206,3 +1206,11 @@ DBManager * User::getDBManager() {
 void User::setDBManager(DBManager *dbm) {
 	this->dbm = dbm;
 }
+
+int User::getSessionID() {
+	return this->SessionID;
+}
+
+void User::setSessionID(int SessionID) {
+	this->SessionID = SessionID;
+}

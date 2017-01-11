@@ -122,6 +122,9 @@ public:
 	DBManager *getDBManager();
 	void setDBManager(DBManager *dbm);
 
+	int getSessionID();
+	void setSessionID(int SessionID);
+
 private:
 	int on_off; //开关
 	string BrokerID;
@@ -147,6 +150,7 @@ private:
 	CTP_Manager *o_ctp;
 	string isActive;
 	string trading_day;				// 交易日
+	int SessionID;	// 会话ID
 };
 
 #endif

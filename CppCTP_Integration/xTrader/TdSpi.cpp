@@ -1779,7 +1779,7 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 			}
 		}
 	} else {
-	 USER_PRINT("OnRtnOrder no pOrder");
+		USER_PRINT("OnRtnOrder no pOrder");
 	}
 }
 
