@@ -282,6 +282,30 @@ Order.cpp.s:
 	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.s
 .PHONY : Order.cpp.s
 
+SessionID.o: SessionID.cpp.o
+.PHONY : SessionID.o
+
+# target to build an object file
+SessionID.cpp.o:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/SessionID.cpp.o
+.PHONY : SessionID.cpp.o
+
+SessionID.i: SessionID.cpp.i
+.PHONY : SessionID.i
+
+# target to preprocess a source file
+SessionID.cpp.i:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/SessionID.cpp.i
+.PHONY : SessionID.cpp.i
+
+SessionID.s: SessionID.cpp.s
+.PHONY : SessionID.s
+
+# target to generate assembly for a file
+SessionID.cpp.s:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/SessionID.cpp.s
+.PHONY : SessionID.cpp.s
+
 Strategy.o: Strategy.cpp.o
 .PHONY : Strategy.o
 
@@ -480,6 +504,9 @@ help:
 	@echo "... Order.o"
 	@echo "... Order.i"
 	@echo "... Order.s"
+	@echo "... SessionID.o"
+	@echo "... SessionID.i"
+	@echo "... SessionID.s"
 	@echo "... Strategy.o"
 	@echo "... Strategy.i"
 	@echo "... Strategy.s"

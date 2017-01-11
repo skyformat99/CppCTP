@@ -12,9 +12,11 @@
 #include "Strategy.h"
 #include "MarketConfig.h"
 #include "Algorithm.h"
+#include "SessionID.h"
 
 class Strategy;
 class MarketConfig;
+class SessionID;
 
 
 using namespace mongo;
@@ -126,6 +128,14 @@ public:
 	void UpdateAlgorithm(Algorithm *alg);
 	void getAllAlgorithm(list<Algorithm *> *l_alg);
 
+	/************************************************************************/
+	/* 创建sessionid
+	   删除sessionid
+	   获取sessionid*/
+	/************************************************************************/
+	void CreateSessionID(SessionID *sid);
+	void DeleteSessionID(SessionID *sid);
+	void getAllSessionID(list<SessionID *> *l_session_id);
 	
 
 	void setConn(mongo::DBClientConnection *conn);

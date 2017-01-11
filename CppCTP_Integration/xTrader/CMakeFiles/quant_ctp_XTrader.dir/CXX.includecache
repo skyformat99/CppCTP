@@ -83,6 +83,8 @@ MarketConfig.h
 /root/xTrader/MarketConfig.h
 Algorithm.h
 /root/xTrader/Algorithm.h
+SessionID.h
+/root/xTrader/SessionID.h
 
 /root/xTrader/Debug.h
 
@@ -150,6 +152,10 @@ CTP_Manager.h
 
 /root/xTrader/Order.h
 string
+-
+
+/root/xTrader/SessionID.h
+iostream
 -
 
 /root/xTrader/Strategy.cpp

@@ -19,10 +19,9 @@ using std::unique_ptr;
 
 
 #define DB_OPERATOR_COLLECTION            "CTP.trader"
-
+#define DB_SESSIONS_COLLECTION            "CTP.sessions"
 #define DB_ADMIN_COLLECTION               "CTP.admin"
 #define DB_STRATEGY_COLLECTION            "CTP.strategy"
-
 #define DB_STRATEGY_YESTERDAY_COLLECTION  "CTP.strategy_yesterday"
 #define DB_ALGORITHM_COLLECTION           "CTP.algorithm"
 #define ISACTIVE "1"
@@ -1624,6 +1623,45 @@ void DBManager::getAllAlgorithm(list<Algorithm *> *l_alg) {
 		}
 		USER_PRINT("DBManager::getAllAlgorithm ok");
 	}
+}
+
+/************************************************************************/
+/* 创建sessionid
+删除sessionid
+获取sessionid*/
+/************************************************************************/
+void DBManager::CreateSessionID(SessionID *sid) {
+
+	int session_id_count_number = 0;
+
+	if (sid != NULL) {
+		session_id_count_number = this->conn->count(DB_SESSIONS_COLLECTION,
+			BSON("sessionid" << sid->getSessionID()));
+		if (session_id_count_number != 0) { //session_id存在
+			std::cout << "Session ID 已经存在了!" << std::endl;
+			return;
+		}
+		else { //SessionID不存在
+			BSONObjBuilder b;
+
+			b.append("userid", sid->getUserID());
+			b.append("sessionid", sid->getSessionID());
+			b.append("frontid", sid->getFrontID());
+
+			BSONObj p = b.obj();
+			conn->insert(DB_SESSIONS_COLLECTION, p);
+			USER_PRINT("DBManager::CreateSessionID ok");
+			
+		}
+	}
+}
+
+void DBManager::DeleteSessionID(SessionID *sid) {
+
+}
+
+void DBManager::getAllSessionID(list<SessionID *> *l_session_id) {
+
 }
 
 
