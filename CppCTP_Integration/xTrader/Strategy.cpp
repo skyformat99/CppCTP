@@ -1288,12 +1288,15 @@ string Strategy::Generate_Order_Ref() {
 	//USER_PRINT("Strategy::Generate_Order_Ref()");
 	//USER_PRINT("this->stg_user");
 	//USER_PRINT(this->stg_user);
+	USER_PRINT(this->stg_user->getStgOrderRefBase());
 	this->stg_user->setStgOrderRefBase(this->stg_user->getStgOrderRefBase() + 1);
 	this->stg_order_ref_base = this->stg_user->getStgOrderRefBase(); // 更新基准数
+	USER_PRINT(this->stg_order_ref_base);
 	string order_ref_base = std::to_string(this->stg_order_ref_base) + this->stg_strategy_id;
+	USER_PRINT(order_ref_base);
 
 	//USER_PRINT("Generate_Order_Ref");
-	USER_PRINT(order_ref_base);
+	//USER_PRINT(order_ref_base);
 
 	//stringstream strValue;
 	//strValue << order_ref_base;

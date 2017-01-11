@@ -338,6 +338,7 @@ void User::DB_OrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderF
 // 更新报单引用
 void User::DB_UpdateOrderRef(string order_ref_base) {
 	USER_PRINT("User::DB_UpdateOrderRef!");
+	USER_PRINT(order_ref_base);
 	this->dbm->UpdateFutureAccountOrderRef(this, order_ref_base);
 }
 
