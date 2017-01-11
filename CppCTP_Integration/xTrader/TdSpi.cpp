@@ -1849,7 +1849,8 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 		///成交来源
 		cout << "成交来源:" << pTrade->TradeSource << endl;
 		cout << "=================================================================================" << endl;
-		this->current_user->DB_OnRtnTrade(this->current_user->GetTradeConn(), pTrade);
+
+		//this->current_user->DB_OnRtnTrade(this->current_user->GetTradeConn(), pTrade);
 
 		if (this->l_strategys != NULL) {
 			list<Strategy *>::iterator itor;
