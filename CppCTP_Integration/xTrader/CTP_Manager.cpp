@@ -28,7 +28,7 @@ CTP_Manager::CTP_Manager() {
 	this->l_strategys_yesterday = new list<Strategy *>();
 	this->l_instrument = new list<string>();
 	this->l_unsubinstrument = new list<string>();
-	this->l_sessions = new list<SessionID *>();
+	this->l_sessions = new list<Session *>();
 	isClosingSaved = false;
 }
 
@@ -2002,7 +2002,7 @@ bool CTP_Manager::init(bool is_online) {
 	this->dbm->getAllFutureAccount(this->l_user);
 
 	/// 查询所有期货账户的sessionid,完成绑定
-	this->dbm->getAllSessionID(this->l_sessions);
+	this->dbm->getAllSession(this->l_sessions);
 	
 	/// 查询策略
 	//this->dbm->getAllStrategyYesterday(this->l_strategys);
@@ -2017,7 +2017,7 @@ bool CTP_Manager::init(bool is_online) {
 	list<User *>::iterator user_itor;
 	list<Strategy *>::iterator stg_itor;
 	list<Trader *>::iterator trader_itor;
-	list<SessionID *>::iterator sid_itor;
+	list<Session *>::iterator sid_itor;
 
 	/// 绑定sessionid到每个期货账户名下
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) {
@@ -2083,8 +2083,28 @@ bool CTP_Manager::init(bool is_online) {
 		std::cout << "策略最小跳价格获取失败!!!" << std::endl;
 	}
 
-	/// 初始化今仓
+	/// 设置时间
 	this->setTradingDay(this->l_user->front()->getUserTradeSPI()->getTradingDay());
+
+	/// session维护，如果不是本交易日的session，就要删除
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) {
+		USER_PRINT((*user_itor)->getUserID());
+		for (sid_itor = (*user_itor)->getL_Sessions()->begin(); sid_itor != (*user_itor)->getL_Sessions()->end();) {
+			USER_PRINT((*sid_itor)->getTradingDay());
+			USER_PRINT(this->getTradingDay());
+			if ((*sid_itor)->getTradingDay() != this->getTradingDay()) {
+				USER_PRINT("日期不等,删除sesson");
+				this->dbm->DeleteSession((*sid_itor));
+				delete (*sid_itor);
+				sid_itor = (*user_itor)->getL_Sessions()->erase(sid_itor);
+			}
+			else
+			{
+				sid_itor++;
+			}
+		}
+	}
+
 
 	/// 昨仓初始化
 	if (!(this->initYesterdayPosition())) {

@@ -51,6 +51,8 @@ DBManager.h
 /root/xTrader/DBManager.h
 Trader.h
 /root/xTrader/Trader.h
+Session.h
+/root/xTrader/Session.h
 
 /root/xTrader/DBManager.cpp
 mongo/bson/bson.h
@@ -83,8 +85,8 @@ MarketConfig.h
 /root/xTrader/MarketConfig.h
 Algorithm.h
 /root/xTrader/Algorithm.h
-SessionID.h
-/root/xTrader/SessionID.h
+Session.h
+/root/xTrader/Session.h
 
 /root/xTrader/Debug.h
 
@@ -154,7 +156,7 @@ CTP_Manager.h
 string
 -
 
-/root/xTrader/SessionID.h
+/root/xTrader/Session.h
 iostream
 -
 
@@ -193,6 +195,8 @@ User.h
 /root/xTrader/User.h
 Debug.h
 /root/xTrader/Debug.h
+Session.h
+/root/xTrader/Session.h
 
 /root/xTrader/TdSpi.h
 map
@@ -285,6 +289,8 @@ Strategy.h
 /root/xTrader/Strategy.h
 CTP_Manager.h
 /root/xTrader/CTP_Manager.h
+Session.h
+/root/xTrader/Session.h
 
 /root/xTrader/Utils.cpp
 stdio.h

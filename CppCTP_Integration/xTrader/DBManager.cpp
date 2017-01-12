@@ -1630,7 +1630,7 @@ void DBManager::getAllAlgorithm(list<Algorithm *> *l_alg) {
 删除sessionid
 获取sessionid*/
 /************************************************************************/
-void DBManager::CreateSessionID(SessionID *sid) {
+void DBManager::CreateSession(Session *sid) {
 
 	int session_id_count_number = 0;
 
@@ -1647,6 +1647,7 @@ void DBManager::CreateSessionID(SessionID *sid) {
 			b.append("userid", sid->getUserID());
 			b.append("sessionid", sid->getSessionID());
 			b.append("frontid", sid->getFrontID());
+			b.append("trading_day", sid->getTradingDay());
 
 			BSONObj p = b.obj();
 			conn->insert(DB_SESSIONS_COLLECTION, p);
@@ -1656,16 +1657,19 @@ void DBManager::CreateSessionID(SessionID *sid) {
 	}
 }
 
-void DBManager::DeleteSessionID(SessionID *sid) {
+void DBManager::DeleteSession(Session *sid) {
 	USER_PRINT("DBManager::DeleteSessionID");
-	this->conn->dropCollection(DB_SESSIONS_COLLECTION);
+	USER_PRINT(sid->getUserID());
+	USER_PRINT(sid->getTradingDay());
+	//this->conn->dropCollection(DB_SESSIONS_COLLECTION);
+	this->conn->remove(DB_SESSIONS_COLLECTION, BSON("sessionid" << sid->getSessionID() << "frontid" << sid->getFrontID()));
 	USER_PRINT("DBManager::DeleteSessionID ok");
 }
 
-void DBManager::getAllSessionID(list<SessionID *> *l_sessions) {
+void DBManager::getAllSession(list<Session *> *l_sessions) {
 	/// 初始化的时候，必须保证list为空
 	if (l_sessions->size() > 0) {
-		list<SessionID *>::iterator Itor;
+		list<Session *>::iterator Itor;
 		for (Itor = l_sessions->begin(); Itor != l_sessions->end();) {
 			Itor = l_sessions->erase(Itor);
 		}
@@ -1684,9 +1688,10 @@ void DBManager::getAllSessionID(list<SessionID *> *l_sessions) {
 			BSONObj p = cursor->next();
 			cout << "*" << "userid:" << p.getStringField("userid") << "  "
 				<< "sessionid:" << p.getIntField("sessionid") << "  "
+				<< "trading_day:" << p.getStringField("trading_day") << "  "
 				<< "frontid:" << p.getIntField("frontid") << endl;
 
-			SessionID *sid = new SessionID(p.getStringField("userid"), p.getIntField("sessionid"), p.getIntField("frontid"));
+			Session *sid = new Session(p.getStringField("userid"), p.getIntField("sessionid"), p.getIntField("frontid"), p.getStringField("trading_day"));
 
 			l_sessions->push_back(sid);
 		}

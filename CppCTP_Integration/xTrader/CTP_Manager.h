@@ -9,6 +9,7 @@
 #include "TdSpi.h"
 #include "DBManager.h"
 #include "Trader.h"
+#include "Session.h"
 
 using std::map;
 class MdSpi;
@@ -141,6 +142,6 @@ private:
 	int on_off; //¿ª¹Ø
 	string trading_day;
 	bool isClosingSaved;
-	list<SessionID *> *l_sessions;
+	list<Session *> *l_sessions;
 };
 #endif

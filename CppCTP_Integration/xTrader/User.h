@@ -12,6 +12,7 @@
 #include "Trader.h"
 #include "Strategy.h"
 #include "CTP_Manager.h"
+#include "Session.h"
 
 using namespace mongo;
 using namespace std;
@@ -20,7 +21,7 @@ using mongo::DBClientConnection;
 using mongo::BSONObjBuilder;
 
 class CTP_Manager;
-class SessionID;
+class Session;
 
 class User
 {
@@ -126,8 +127,8 @@ public:
 	int getSessionID();
 	void setSessionID(int sid);
 
-	list<SessionID *> * getL_Sessions();
-	void setL_Sessions(list<SessionID *> *l_sessions);
+	list<Session *> * getL_Sessions();
+	void setL_Sessions(list<Session *> *l_sessions);
 
 private:
 	int on_off; //开关
@@ -155,7 +156,7 @@ private:
 	string isActive;
 	string trading_day;				// 交易日
 	int sid;	// 会话ID
-	list<SessionID *> *l_sessions;
+	list<Session *> *l_sessions;
 };
 
 #endif

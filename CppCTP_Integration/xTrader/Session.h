@@ -5,12 +5,12 @@
 using namespace std;
 using std::string;
 
-class SessionID
+class Session
 {
 public:
 
-	SessionID(string userid, int sessionid, int frontid);
-	~SessionID();
+	Session(string userid, int sessionid, int frontid, string tradingday);
+	~Session();
 
 	void setUserID(string userid);
 	string getUserID();
@@ -21,10 +21,15 @@ public:
 	void setFrontID(int frontid);
 	int getFrontID();
 
+	void setTradingDay(string tradingday);
+	string getTradingDay();
+
+
 private:
 	string userid;
 	int sessionid;
 	int frontid;
+	string tradingday;
 };
 
 #endif
