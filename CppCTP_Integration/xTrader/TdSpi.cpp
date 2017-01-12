@@ -189,9 +189,11 @@ void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 		this->current_user->setTradingDay(s_trading_day);
 
 		this->setIsConfirmSettlement(false);
-		
-		std::cout << "TdSpi.cpp current_user address" << this->current_user << endl;
-		std::cout << "TdSpi.cpp this->current_user->getUserID()" << this->current_user->getUserID() << endl;
+		SessionID *sid = new
+		this->current_user->getL_Sessions()->push_back()
+
+		USER_PRINT(this->current_user);
+		USER_PRINT(this->current_user->getUserID());
 	}
 }
 

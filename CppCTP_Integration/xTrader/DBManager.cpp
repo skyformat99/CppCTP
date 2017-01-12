@@ -1657,11 +1657,41 @@ void DBManager::CreateSessionID(SessionID *sid) {
 }
 
 void DBManager::DeleteSessionID(SessionID *sid) {
-
+	USER_PRINT("DBManager::DeleteSessionID");
+	this->conn->dropCollection(DB_SESSIONS_COLLECTION);
+	USER_PRINT("DBManager::DeleteSessionID ok");
 }
 
-void DBManager::getAllSessionID(list<SessionID *> *l_session_id) {
+void DBManager::getAllSessionID(list<SessionID *> *l_sessions) {
+	/// 初始化的时候，必须保证list为空
+	if (l_sessions->size() > 0) {
+		list<SessionID *>::iterator Itor;
+		for (Itor = l_sessions->begin(); Itor != l_sessions->end();) {
+			Itor = l_sessions->erase(Itor);
+		}
+	}
 
+	int countnum = this->conn->count(DB_SESSIONS_COLLECTION);
+	USER_PRINT(countnum);
+	if (countnum == 0) {
+		cout << "DBManager::getAllSessionID is NONE!" << endl;
+	}
+	else {
+		unique_ptr<DBClientCursor> cursor =
+			this->conn->query(DB_SESSIONS_COLLECTION);
+		while (cursor->more()) {
+
+			BSONObj p = cursor->next();
+			cout << "*" << "userid:" << p.getStringField("userid") << "  "
+				<< "sessionid:" << p.getIntField("sessionid") << "  "
+				<< "frontid:" << p.getIntField("frontid") << endl;
+
+			SessionID *sid = new SessionID(p.getStringField("userid"), p.getIntField("sessionid"), p.getIntField("frontid"));
+
+			l_sessions->push_back(sid);
+		}
+		USER_PRINT("DBManager::getAllSessionID ok");
+	}
 }
 
 

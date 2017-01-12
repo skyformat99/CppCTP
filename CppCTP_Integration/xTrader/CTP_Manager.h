@@ -141,5 +141,6 @@ private:
 	int on_off; //¿ª¹Ø
 	string trading_day;
 	bool isClosingSaved;
+	list<SessionID *> *l_sessions;
 };
 #endif

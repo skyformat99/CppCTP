@@ -1,5 +1,14 @@
 #include "SessionID.h"
 
+SessionID::SessionID(string userid, int sessionid, int frontid) {
+	this->userid = userid;
+	this->sessionid = sessionid;
+	this->frontid = frontid;
+}
+SessionID::~SessionID() {
+	
+}
+
 void SessionID::setUserID(string userid) {
 	this->userid = userid;
 }

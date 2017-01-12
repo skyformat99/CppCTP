@@ -8,6 +8,10 @@ using std::string;
 class SessionID
 {
 public:
+
+	SessionID(string userid, int sessionid, int frontid);
+	~SessionID();
+
 	void setUserID(string userid);
 	string getUserID();
 

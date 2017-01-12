@@ -135,7 +135,7 @@ public:
 	/************************************************************************/
 	void CreateSessionID(SessionID *sid);
 	void DeleteSessionID(SessionID *sid);
-	void getAllSessionID(list<SessionID *> *l_session_id);
+	void getAllSessionID(list<SessionID *> *l_sessions);
 	
 
 	void setConn(mongo::DBClientConnection *conn);

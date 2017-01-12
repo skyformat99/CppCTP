@@ -20,6 +20,7 @@ using mongo::DBClientConnection;
 using mongo::BSONObjBuilder;
 
 class CTP_Manager;
+class SessionID;
 
 class User
 {
@@ -123,7 +124,10 @@ public:
 	void setDBManager(DBManager *dbm);
 
 	int getSessionID();
-	void setSessionID(int SessionID);
+	void setSessionID(int sid);
+
+	list<SessionID *> * getL_Sessions();
+	void setL_Sessions(list<SessionID *> *l_sessions);
 
 private:
 	int on_off; //开关
@@ -150,7 +154,8 @@ private:
 	CTP_Manager *o_ctp;
 	string isActive;
 	string trading_day;				// 交易日
-	int SessionID;	// 会话ID
+	int sid;	// 会话ID
+	list<SessionID *> *l_sessions;
 };
 
 #endif

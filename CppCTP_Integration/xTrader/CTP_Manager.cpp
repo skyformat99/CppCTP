@@ -28,6 +28,7 @@ CTP_Manager::CTP_Manager() {
 	this->l_strategys_yesterday = new list<Strategy *>();
 	this->l_instrument = new list<string>();
 	this->l_unsubinstrument = new list<string>();
+	this->l_sessions = new list<SessionID *>();
 	isClosingSaved = false;
 }
 
@@ -2000,6 +2001,9 @@ bool CTP_Manager::init(bool is_online) {
 	/// 查询所有的期货账户
 	this->dbm->getAllFutureAccount(this->l_user);
 
+	/// 查询所有期货账户的sessionid,完成绑定
+	this->dbm->getAllSessionID(this->l_sessions);
+	
 	/// 查询策略
 	//this->dbm->getAllStrategyYesterday(this->l_strategys);
 	this->dbm->getAllStrategy(this->l_strategys);
@@ -2013,7 +2017,21 @@ bool CTP_Manager::init(bool is_online) {
 	list<User *>::iterator user_itor;
 	list<Strategy *>::iterator stg_itor;
 	list<Trader *>::iterator trader_itor;
+	list<SessionID *>::iterator sid_itor;
 
+	/// 绑定sessionid到每个期货账户名下
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) {
+		USER_PRINT((*user_itor)->getUserID());
+		for (sid_itor = this->l_sessions->begin(); sid_itor != this->l_sessions->end(); sid_itor++) {
+			USER_PRINT((*sid_itor)->getUserID());
+			if ((*sid_itor)->getUserID() == (*user_itor)->getUserID()) {
+				USER_PRINT("(*sid_itor)->getUserID() == (*user_itor)->getUserID()");
+				(*user_itor)->getL_Sessions()->push_back((*sid_itor));
+			}
+		}
+	}
+
+	/// 绑定交易员和期货账户
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) {
 		USER_PRINT((*user_itor)->getUserID());
 		USER_PRINT((*user_itor)->getTraderID());
@@ -2028,7 +2046,7 @@ bool CTP_Manager::init(bool is_online) {
 		}
 	}
 
-
+	/// 绑定期货账户和策略
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
 		
 		USER_PRINT((*user_itor)->getUserID());

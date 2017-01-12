@@ -33,6 +33,7 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 	this->OrderConn = DBManager::getDBConnection();
 	this->TraderID = TraderID;
 	this->l_strategys = new list<Strategy *>();
+	this->l_sessions = new list<SessionID *>();
 	this->stg_map_instrument_action_counter = new map<string, int>();
 	this->stg_order_ref_base = Utils::strtolonglong(stg_order_ref_base);
 	USER_PRINT(this->stg_order_ref_base);
@@ -48,6 +49,7 @@ User::User(string BrokerID, string UserID, int nRequestID, string stg_order_ref_
 	this->PositionConn = DBManager::getDBConnection();
 	this->OrderConn = DBManager::getDBConnection();
 	this->l_strategys = new list<Strategy *>();
+	this->l_sessions = new list<SessionID *>();
 	this->stg_map_instrument_action_counter = new map<string, int>();
 	this->stg_order_ref_base = Utils::strtolonglong(stg_order_ref_base);
 }
@@ -1208,9 +1210,17 @@ void User::setDBManager(DBManager *dbm) {
 }
 
 int User::getSessionID() {
-	return this->SessionID;
+	return this->sid;
 }
 
 void User::setSessionID(int SessionID) {
-	this->SessionID = SessionID;
+	this->sid = SessionID;
+}
+
+list<SessionID *> * User::getL_Sessions() {
+	return this->l_sessions;
+}
+
+void User::setL_Sessions(list<SessionID *> *l_sessions) {
+	this->l_sessions = l_sessions;
 }
