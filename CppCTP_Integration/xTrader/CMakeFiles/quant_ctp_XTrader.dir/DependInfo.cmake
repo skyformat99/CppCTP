@@ -11,6 +11,7 @@ SET(CMAKE_DEPENDS_CHECK_CXX
   "/root/xTrader/MarketConfig.cpp" "/root/xTrader/CMakeFiles/quant_ctp_XTrader.dir/MarketConfig.cpp.o"
   "/root/xTrader/MdSpi.cpp" "/root/xTrader/CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o"
   "/root/xTrader/Order.cpp" "/root/xTrader/CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o"
+  "/root/xTrader/PositionDetail.cpp" "/root/xTrader/CMakeFiles/quant_ctp_XTrader.dir/PositionDetail.cpp.o"
   "/root/xTrader/Session.cpp" "/root/xTrader/CMakeFiles/quant_ctp_XTrader.dir/Session.cpp.o"
   "/root/xTrader/Strategy.cpp" "/root/xTrader/CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o"
   "/root/xTrader/TdSpi.cpp" "/root/xTrader/CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o"

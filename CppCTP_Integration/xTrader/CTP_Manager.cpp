@@ -1819,6 +1819,61 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//build_doc.AddMember("Info", create_info_array, allocator);
 				build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
 			}
+			else if (msgtype == 16) { // 查询服务端sessions
+				std::cout << "请求服务端sessions信息..." << std::endl;
+				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
+				rapidjson::Value &TraderID = doc["TraderID"];
+				rapidjson::Value &MsgRef = doc["MsgRef"]; 
+				rapidjson::Value &MsgSrc = doc["MsgSrc"];
+				rapidjson::Value &UserID = doc["UserID"];
+
+				string s_TraderID = TraderID.GetString();
+				string s_UserID = UserID.GetString();
+
+				int i_MsgRef = MsgRef.GetInt();
+				int i_MsgSendFlag = MsgSendFlag.GetInt();
+				int i_MsgSrc = MsgSrc.GetInt();
+
+				std::cout << "收到交易员ID = " << s_TraderID << std::endl;
+				std::cout << "收到UserID = " << s_UserID << std::endl;
+				
+				list<Session *>::iterator sid_itor;
+				list<User *>::iterator user_itor;
+
+				/*构建UserInfo的Json*/
+				build_doc.SetObject();
+				rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
+				build_doc.AddMember("MsgRef", server_msg_ref++, allocator);
+				build_doc.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator);
+				build_doc.AddMember("MsgType", 2, allocator);
+				build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
+				build_doc.AddMember("UserID", rapidjson::StringRef(s_UserID.c_str()), allocator);
+				build_doc.AddMember("MsgResult", 0, allocator);
+				build_doc.AddMember("MsgErrorReason", "", allocator);
+				//创建Info数组
+				rapidjson::Value info_array(rapidjson::kArrayType);
+
+				/// session维护，如果不是本交易日的session，就要删除
+				for (user_itor = ctp_m->getL_User()->begin(); user_itor != ctp_m->getL_User()->end(); 
+					user_itor++) {
+					USER_PRINT((*user_itor)->getUserID());
+					if (s_UserID == (*user_itor)->getUserID()) { // 如果用户名一致
+						for (sid_itor = (*user_itor)->getL_Sessions()->begin(); sid_itor != (*user_itor)->getL_Sessions()->end(); sid_itor++) {
+							USER_PRINT("Get Sessions Info");
+							rapidjson::Value info_object(rapidjson::kObjectType);
+							info_object.SetObject();
+							info_object.AddMember("userid", rapidjson::StringRef((*sid_itor)->getUserID().c_str()), allocator);
+							info_object.AddMember("sessionid", (*sid_itor)->getSessionID(), allocator);
+							info_object.AddMember("frontid", (*sid_itor)->getFrontID(), allocator);
+							info_object.AddMember("trading_day", rapidjson::StringRef((*sid_itor)->getTradingDay().c_str()), allocator);
+							info_array.PushBack(info_object, allocator);
+						}
+					}
+				}
+
+				build_doc.AddMember("Info", info_array, allocator);
+				build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
+			}
 			else {
 				std::cout << "请求类型错误!" << endl;
 				/*构建StrategyInfo的Json*/

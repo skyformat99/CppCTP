@@ -117,6 +117,9 @@ CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o: User.h
 CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o: Order.cpp
 CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o: Order.h
 
+CMakeFiles/quant_ctp_XTrader.dir/PositionDetail.cpp.o: PositionDetail.cpp
+CMakeFiles/quant_ctp_XTrader.dir/PositionDetail.cpp.o: PositionDetail.h
+
 CMakeFiles/quant_ctp_XTrader.dir/Session.cpp.o: Session.cpp
 CMakeFiles/quant_ctp_XTrader.dir/Session.cpp.o: Session.h
 
