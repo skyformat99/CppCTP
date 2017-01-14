@@ -2056,6 +2056,13 @@ bool CTP_Manager::init(bool is_online) {
 	/// 查询所有的期货账户
 	this->dbm->getAllFutureAccount(this->l_user);
 
+	if ((this->l_user->size() <= 0) || (this->l_obj_trader->size() <= 0)) {
+		USER_PRINT("期货账户或者交易员账户为空，未能初始化!");
+		std::cout << "期货账户或者交易员账户为空，未能初始化!" << std::endl;
+		init_flag = false;
+		return init_flag;
+	}
+
 	/// 查询所有期货账户的sessionid,完成绑定
 	this->dbm->getAllSession(this->l_sessions);
 	
