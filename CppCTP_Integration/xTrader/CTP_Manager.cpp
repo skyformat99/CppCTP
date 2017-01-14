@@ -1854,10 +1854,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				rapidjson::Value info_array(rapidjson::kArrayType);
 
 				/// session维护，如果不是本交易日的session，就要删除
-				for (user_itor = ctp_m->getL_User()->begin(); user_itor != ctp_m->getL_User()->end(); 
-					user_itor++) {
-					USER_PRINT((*user_itor)->getUserID());
-					if (s_UserID == (*user_itor)->getUserID()) { // 如果用户名一致
+				if (s_UserID == "") {
+					for (user_itor = ctp_m->getL_User()->begin(); user_itor != ctp_m->getL_User()->end();
+						user_itor++) {
+						USER_PRINT((*user_itor)->getUserID());
 						for (sid_itor = (*user_itor)->getL_Sessions()->begin(); sid_itor != (*user_itor)->getL_Sessions()->end(); sid_itor++) {
 							USER_PRINT("Get Sessions Info");
 							rapidjson::Value info_object(rapidjson::kObjectType);
@@ -1870,6 +1870,25 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						}
 					}
 				}
+				else {
+					for (user_itor = ctp_m->getL_User()->begin(); user_itor != ctp_m->getL_User()->end();
+						user_itor++) {
+						USER_PRINT((*user_itor)->getUserID());
+						if (s_UserID == (*user_itor)->getUserID()) { // 如果用户名一致
+							for (sid_itor = (*user_itor)->getL_Sessions()->begin(); sid_itor != (*user_itor)->getL_Sessions()->end(); sid_itor++) {
+								USER_PRINT("Get Sessions Info");
+								rapidjson::Value info_object(rapidjson::kObjectType);
+								info_object.SetObject();
+								info_object.AddMember("userid", rapidjson::StringRef((*sid_itor)->getUserID().c_str()), allocator);
+								info_object.AddMember("sessionid", (*sid_itor)->getSessionID(), allocator);
+								info_object.AddMember("frontid", (*sid_itor)->getFrontID(), allocator);
+								info_object.AddMember("trading_day", rapidjson::StringRef((*sid_itor)->getTradingDay().c_str()), allocator);
+								info_array.PushBack(info_object, allocator);
+							}
+						}
+					}
+				}
+				
 
 				build_doc.AddMember("Info", info_array, allocator);
 				build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
