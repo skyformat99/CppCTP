@@ -173,19 +173,67 @@ void User::init_instrument_id_action_counter(string instrument_id) {
 	this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0)); //第二种map插入方法
 }
 
-/// 添加对应合约撤单次数计数器,例如"cu1602":1 "cu1701":1
-void User::add_instrument_id_action_counter(string instrument_id) {
-	USER_PRINT("User::add_instrument_id_action_counter");
+/// 获得合约撤单次数,例如"cu1710":0
+int User::get_instrument_id_action_counter(string instrument_id) {
+	USER_PRINT("User::get_instrument_id_action_counter");
 	//对某个合约进行加1操作
 	map<string, int>::iterator m_itor;
 	m_itor = this->stg_map_instrument_action_counter->find(instrument_id);
 	if (m_itor == (this->stg_map_instrument_action_counter->end())) {
-		cout << "we do not find = " << instrument_id << endl;
-		//this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0));
+		cout << "撤单列表里不存在该合约 = " << instrument_id << endl;
+		// this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0));
+		// this->init_instrument_id_action_counter(string(pOrder->InstrumentID));
+		return 0;
 	}
 	else {
-		cout << "we find " << instrument_id << endl;
-		m_itor->second += 1;
+		cout << "撤单列表里找到该合约 = " << instrument_id << endl;
+		return m_itor->second;
+	}
+}
+
+/// 添加对应合约撤单次数计数器,例如"cu1602":1 "cu1701":1
+void User::add_instrument_id_action_counter(CThostFtdcOrderField *pOrder) {
+	USER_PRINT("User::add_instrument_id_action_counter");
+
+	if (strlen(pOrder->OrderSysID) == 0) { //只统计针对交易所编码的order
+		return;
+	}
+	if (pOrder->OrderStatus != '5') { //撤单
+		return;
+	}
+
+	if (pOrder->OrderStatus == '5') { // 当收到撤单
+		//对某个合约进行加1操作
+		map<string, int>::iterator m_itor;
+		m_itor = this->stg_map_instrument_action_counter->find(string(pOrder->InstrumentID));
+		if (m_itor == (this->stg_map_instrument_action_counter->end())) {
+			cout << "撤单列表里不存在该合约 = " << pOrder->InstrumentID << endl;
+			cout << "添加 " << pOrder->InstrumentID << " 合约到列表中..." << endl;
+			//this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0));
+			this->init_instrument_id_action_counter(string(pOrder->InstrumentID));
+		}
+		else {
+			cout << "撤单列表里找到该合约 = " << pOrder->InstrumentID << endl;
+			m_itor->second += 1;
+		}
+
+		// 将撤单次数赋予该账户下所有的策略
+		list<Strategy *>::iterator stg_itor;
+		for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
+
+			USER_PRINT((*stg_itor)->getStgInstrumentIdA());
+			USER_PRINT((*stg_itor)->getStgInstrumentIdB());
+			USER_PRINT(pOrder->InstrumentID);
+
+			if (!strcmp((*stg_itor)->getStgInstrumentIdA().c_str(), pOrder->InstrumentID)) {
+				(*stg_itor)->setStgAOrderActionCount(this->get_instrument_id_action_counter(string(pOrder->InstrumentID)));
+			}
+
+			if (!(strcmp((*stg_itor)->getStgInstrumentIdB().c_str(), pOrder->InstrumentID))) {
+				(*stg_itor)->setStgBOrderActionCount(this->get_instrument_id_action_counter(string(pOrder->InstrumentID)));
+			}
+		}
+
 	}
 }
 

@@ -49,6 +49,7 @@ CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o: rapidjson/reader.h
 CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o: rapidjson/stream.h
 CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o: rapidjson/stringbuffer.h
 CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o: rapidjson/writer.h
+CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o: xTradeStruct.h
 
 CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o: Algorithm.h
 CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o: CTP_Manager.h
@@ -69,6 +70,7 @@ CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o: ThostFtdcUserApiDataType.h
 CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o: ThostFtdcUserApiStruct.h
 CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o: Trader.h
 CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o: User.h
+CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o: xTradeStruct.h
 
 CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o: Algorithm.h
 CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o: CTP_Manager.h
@@ -89,6 +91,7 @@ CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o: ThostFtdcUserApiDataType.h
 CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o: ThostFtdcUserApiStruct.h
 CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o: Trader.h
 CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o: User.h
+CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o: xTradeStruct.h
 
 CMakeFiles/quant_ctp_XTrader.dir/MarketConfig.cpp.o: Debug.h
 CMakeFiles/quant_ctp_XTrader.dir/MarketConfig.cpp.o: MarketConfig.cpp
@@ -113,6 +116,7 @@ CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o: ThostFtdcUserApiDataType.h
 CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o: ThostFtdcUserApiStruct.h
 CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o: Trader.h
 CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o: User.h
+CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o: xTradeStruct.h
 
 CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o: Order.cpp
 CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o: Order.h
@@ -142,6 +146,7 @@ CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: ThostFtdcUserApiDataType.h
 CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: ThostFtdcUserApiStruct.h
 CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: Trader.h
 CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: User.h
+CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: xTradeStruct.h
 
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: Algorithm.h
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: CTP_Manager.h
@@ -163,6 +168,7 @@ CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: ThostFtdcUserApiStruct.h
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: Trader.h
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: User.h
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: Utils.h
+CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: xTradeStruct.h
 
 CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o: Algorithm.h
 CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o: CTP_Manager.h
@@ -183,6 +189,7 @@ CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o: ThostFtdcUserApiStruct.h
 CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o: Trader.cpp
 CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o: Trader.h
 CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o: User.h
+CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o: xTradeStruct.h
 
 CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o: Algorithm.h
 CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o: CTP_Manager.h
@@ -204,6 +211,7 @@ CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o: Trader.h
 CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o: User.cpp
 CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o: User.h
 CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o: Utils.h
+CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o: xTradeStruct.h
 
 CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o: Debug.h
 CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o: Utils.cpp
@@ -254,6 +262,7 @@ CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: rapidjson/reader.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: rapidjson/stream.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: rapidjson/stringbuffer.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: rapidjson/writer.h
+CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: xTradeStruct.h
 
 CMakeFiles/quant_ctp_XTrader.dir/msg.cpp.o: msg.cpp
 CMakeFiles/quant_ctp_XTrader.dir/msg.cpp.o: msg.h

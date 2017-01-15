@@ -177,6 +177,8 @@ Debug.h
 /root/xTrader/Debug.h
 DBManager.h
 /root/xTrader/DBManager.h
+xTradeStruct.h
+/root/xTrader/xTradeStruct.h
 
 /root/xTrader/TdSpi.cpp
 iostream
@@ -607,4 +609,8 @@ nmmintrin.h
 -
 emmintrin.h
 -
+
+/root/xTrader/xTradeStruct.h
+ThostFtdcUserApiDataType.h
+/root/xTrader/ThostFtdcUserApiDataType.h
 

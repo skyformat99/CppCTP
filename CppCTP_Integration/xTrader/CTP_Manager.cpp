@@ -1845,7 +1845,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
 				build_doc.AddMember("MsgRef", server_msg_ref++, allocator);
 				build_doc.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator);
-				build_doc.AddMember("MsgType", 2, allocator);
+				build_doc.AddMember("MsgType", 16, allocator);
 				build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
 				build_doc.AddMember("UserID", rapidjson::StringRef(s_UserID.c_str()), allocator);
 				build_doc.AddMember("MsgResult", 0, allocator);

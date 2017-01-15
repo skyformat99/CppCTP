@@ -68,8 +68,11 @@ public:
 	/// 初始化合约撤单次数,例如"cu1601":0 "cu1701":0
 	void init_instrument_id_action_counter(string instrument_id);
 
+	/// 获得合约撤单次数,例如"cu1710":0
+	int get_instrument_id_action_counter(string instrument_id);
+
 	/// 添加对应合约撤单次数计数器,例如"cu1602":1 "cu1701":1
-	void add_instrument_id_action_counter(string instrument_id);
+	void add_instrument_id_action_counter(CThostFtdcOrderField *pOrder);
 
 	/// 报单引用基准
 	void setStgOrderRefBase(long long stg_order_ref_base);

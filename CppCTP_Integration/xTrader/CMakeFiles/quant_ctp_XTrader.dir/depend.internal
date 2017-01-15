@@ -50,6 +50,7 @@ CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o
  /root/xTrader/rapidjson/stream.h
  /root/xTrader/rapidjson/stringbuffer.h
  /root/xTrader/rapidjson/writer.h
+ /root/xTrader/xTradeStruct.h
 CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o
  /root/xTrader/Algorithm.h
  /root/xTrader/CTP_Manager.h
@@ -70,6 +71,7 @@ CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o
  /root/xTrader/ThostFtdcUserApiStruct.h
  /root/xTrader/Trader.h
  /root/xTrader/User.h
+ /root/xTrader/xTradeStruct.h
 CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o
  /root/xTrader/Algorithm.h
  /root/xTrader/CTP_Manager.h
@@ -90,6 +92,7 @@ CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o
  /root/xTrader/ThostFtdcUserApiStruct.h
  /root/xTrader/Trader.h
  /root/xTrader/User.h
+ /root/xTrader/xTradeStruct.h
 CMakeFiles/quant_ctp_XTrader.dir/MarketConfig.cpp.o
  /root/xTrader/Debug.h
  /root/xTrader/MarketConfig.cpp
@@ -114,6 +117,7 @@ CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o
  /root/xTrader/ThostFtdcUserApiStruct.h
  /root/xTrader/Trader.h
  /root/xTrader/User.h
+ /root/xTrader/xTradeStruct.h
 CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o
  /root/xTrader/Order.cpp
  /root/xTrader/Order.h
@@ -143,6 +147,7 @@ CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o
  /root/xTrader/ThostFtdcUserApiStruct.h
  /root/xTrader/Trader.h
  /root/xTrader/User.h
+ /root/xTrader/xTradeStruct.h
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o
  /root/xTrader/Algorithm.h
  /root/xTrader/CTP_Manager.h
@@ -164,6 +169,7 @@ CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o
  /root/xTrader/Trader.h
  /root/xTrader/User.h
  /root/xTrader/Utils.h
+ /root/xTrader/xTradeStruct.h
 CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o
  /root/xTrader/Algorithm.h
  /root/xTrader/CTP_Manager.h
@@ -184,6 +190,7 @@ CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o
  /root/xTrader/Trader.cpp
  /root/xTrader/Trader.h
  /root/xTrader/User.h
+ /root/xTrader/xTradeStruct.h
 CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o
  /root/xTrader/Algorithm.h
  /root/xTrader/CTP_Manager.h
@@ -205,6 +212,7 @@ CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o
  /root/xTrader/User.cpp
  /root/xTrader/User.h
  /root/xTrader/Utils.h
+ /root/xTrader/xTradeStruct.h
 CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o
  /root/xTrader/Debug.h
  /root/xTrader/Utils.cpp
@@ -255,6 +263,7 @@ CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o
  /root/xTrader/rapidjson/stream.h
  /root/xTrader/rapidjson/stringbuffer.h
  /root/xTrader/rapidjson/writer.h
+ /root/xTrader/xTradeStruct.h
 CMakeFiles/quant_ctp_XTrader.dir/msg.cpp.o
  /root/xTrader/msg.cpp
  /root/xTrader/msg.h

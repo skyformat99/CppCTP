@@ -5,6 +5,7 @@
 #include "Algorithm.h"
 #include "Debug.h"
 #include "DBManager.h"
+#include "xTradeStruct.h"
 
 using std::list;
 class DBManager;
@@ -114,6 +115,12 @@ public:
 
 	int getStgBOrderActionTiresLimit();
 	void setStgBOrderActionTiresLimit(int stgOrderActionTiresLimit);
+
+	int getStgAOrderActionCount();
+	void setStgAOrderActionCount(int stg_a_order_action_count);
+
+	int getStgBOrderActionCount();
+	void setStgBOrderActionCount(int stg_b_order_action_count);
 
 
 	string getStgOrderRefA();
@@ -262,14 +269,23 @@ public:
 	/// 更新挂单list
 	void update_pending_order_list(CThostFtdcOrderField *pOrder);
 
-	/// 更新持仓量
+	/// 更新持仓量(Order)
 	void update_position(CThostFtdcOrderField *pOrder);
+
+	/// 更新持仓量(UserOrder)
+	void update_position(USER_CThostFtdcOrderField *pOrder);
 	
-	/// 更新持仓量
+	/// 更新持仓量(Trade)
 	void update_position(CThostFtdcTradeField *pTrade);
 
-	/// 更新持仓明细
+	/// 更新持仓明细(Trade)
 	void update_position_detail(CThostFtdcTradeField *pTrade);
+
+	/// 更新持仓明细(Order)
+	void update_position_detail(USER_CThostFtdcOrderField *pOrder);
+
+	/// 添加字段本次成交量至order构体中
+	void add_VolumeTradedBatch(CThostFtdcOrderField *pOrder, USER_CThostFtdcOrderField *new_Order);
 
 
 	/// 得到三个数最小值
@@ -283,6 +299,8 @@ public:
 
 	/// 拷贝结构体CThostFtdcOrderField
 	void CopyOrderData(CThostFtdcOrderField *dst, CThostFtdcOrderField *src);
+
+	void CopyOrderDataToNew(USER_CThostFtdcOrderField *dst, CThostFtdcOrderField *src);
 
 	/// 拷贝结构体CThostFtdcTradeField
 	void CopyTradeData(CThostFtdcTradeField *dst, CThostFtdcTradeField *src);
@@ -389,7 +407,8 @@ private:
 	bool stg_is_active;					// 策略开关状态
 	int stg_a_order_action_tires_limit;	// A合约撤单次数限制
 	int stg_b_order_action_tires_limit;	// B合约撤单次数限制
-	
+	int stg_a_order_action_count;		// A合约撤单次数
+	int stg_b_order_action_count;		// B合约撤单次数
 	
 	/*新增字段*/
 	string stg_trade_model;				// 交易模型
@@ -439,6 +458,7 @@ private:
 	CThostFtdcInputOrderField *stg_b_order_insert_args;		// b合约报单参数
 	list<CThostFtdcOrderField *> *stg_list_order_pending;	// 挂单列表，报单、成交、撤单回报
 	list<CThostFtdcTradeField *> *stg_list_position_detail; // 持仓明细
+	list<USER_CThostFtdcOrderField *> *stg_list_position_detail_from_order; // 持仓明细
 	list<CThostFtdcTradeField *> *l_query_trade;
 
 	long long stg_order_ref_base; // 报单引用计数
