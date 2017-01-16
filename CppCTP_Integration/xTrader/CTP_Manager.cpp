@@ -26,6 +26,7 @@ CTP_Manager::CTP_Manager() {
 	this->l_obj_trader = new list<Trader *>();
 	this->l_strategys = new list<Strategy *>();
 	this->l_strategys_yesterday = new list<Strategy *>();
+	this->l_posdetail = new list<PositionDetail *>();
 	this->l_instrument = new list<string>();
 	this->l_unsubinstrument = new list<string>();
 	this->l_sessions = new list<Session *>();
@@ -2127,6 +2128,39 @@ bool CTP_Manager::initYesterdayPosition() {
 	return flag;
 }
 
+/// 初始化昨仓明细
+bool CTP_Manager::initYesterdayPositionDetail() {
+	bool flag = false;
+	list<PositionDetail *>::iterator posd_itor;
+	list<Strategy *>::iterator stg_itor;
+	std::cout << "系统交易日 = " << this->getTradingDay() << std::endl;
+
+	/// 遍历策略，遍历昨仓明细，进行绑定
+	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++)
+	{
+		for (posd_itor = this->l_posdetail->begin(); posd_itor != this->l_posdetail->end(); posd_itor++) {
+
+			if (((*stg_itor)->getStgUserId() == (*posd_itor)->getUserID()) && ((*stg_itor)->getStgStrategyId() == (*posd_itor)->getStrategyID())) {
+				USER_PRINT("昨仓明细找到");
+				(*stg_itor)->add_position_detail((*posd_itor));
+				flag = true;
+			}
+		}
+	}
+
+	if ((this->l_posdetail->size() > 0) && flag) {
+		flag = true;
+	}
+	else if ((this->l_posdetail->size() == 0) && (flag == false)) {
+		flag = true;
+	}
+	else
+	{
+		flag = false;
+	}
+	return flag;
+}
+
 /// 初始化
 bool CTP_Manager::init(bool is_online) {
 
@@ -2168,6 +2202,9 @@ bool CTP_Manager::init(bool is_online) {
 
 	/// 查询昨仓策略
 	this->dbm->getAllStrategyYesterday(this->l_strategys_yesterday);
+
+	/// 查询昨仓持仓明细
+	this->dbm->getAllPositionDetail(this->l_posdetail);
 
 
 	/// 绑定操作：账户绑定到对应交易员名下
@@ -2273,6 +2310,18 @@ bool CTP_Manager::init(bool is_online) {
 	else {
 		USER_PRINT("初始化仓位成功...");
 	}
+
+	/// 昨仓持仓明细初始化
+	if (!(this->initYesterdayPositionDetail())) {
+		USER_PRINT("初始化昨仓明细失败...");
+		init_flag = false;
+		return init_flag;
+	}
+	else {
+		USER_PRINT("初始化昨仓明细成功...");
+	}
+
+	//this->initYesterdayPositionDetail();
 
 	list<CThostFtdcTradeField *> *l_query_trade;
 	/// 初始化今仓

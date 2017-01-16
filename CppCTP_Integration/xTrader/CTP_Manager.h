@@ -127,6 +127,9 @@ public:
 	/// 初始化昨仓
 	bool initYesterdayPosition();
 
+	/// 初始化昨仓明细
+	bool initYesterdayPositionDetail();
+
 private:
 	Login *login;
 	list<string> *l_instrument;
@@ -143,5 +146,6 @@ private:
 	string trading_day;
 	bool isClosingSaved;
 	list<Session *> *l_sessions;
+	list<PositionDetail *> *l_posdetail;
 };
 #endif

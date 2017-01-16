@@ -377,6 +377,10 @@ public:
 
 	void setL_query_trade(list<CThostFtdcTradeField *> *l_query_trade);
 
+	void add_position_detail(PositionDetail *posd);
+
+	void CopyPositionData(PositionDetail *posd, USER_CThostFtdcOrderField *order);
+
 private:
 	Trader *trader;
 	User *user;

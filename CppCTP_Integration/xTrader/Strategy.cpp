@@ -889,6 +889,34 @@ void Strategy::setL_query_trade(list<CThostFtdcTradeField *> *l_query_trade) {
 	}
 }
 
+void Strategy::add_position_detail(PositionDetail *posd) {
+	USER_PRINT("Strategy::add_position_detail");
+	USER_CThostFtdcOrderField *new_order = new USER_CThostFtdcOrderField();
+	memset(new_order, 0, sizeof(USER_CThostFtdcOrderField));
+	this->CopyPositionData(posd, new_order);
+	this->stg_list_position_detail_from_order->push_back(new_order);
+}
+
+void Strategy::CopyPositionData(PositionDetail *posd, USER_CThostFtdcOrderField *order) {
+	USER_PRINT("Strategy::CopyPositionData");
+	strcpy(order->InstrumentID, posd->getInstrumentID().c_str());
+	strcpy(order->OrderRef, posd->getOrderRef().c_str());
+	strcpy(order->UserID, posd->getUserID().c_str());
+	order->Direction = posd->getDirection();
+	order->CombOffsetFlag[0] = posd->getCombOffsetFlag().c_str()[0];
+	order->CombHedgeFlag[0] = posd->getCombHedgeFlag().c_str()[0];
+	order->LimitPrice = posd->getLimitPrice();
+	order->VolumeTotalOriginal = posd->getVolumeTotalOriginal();
+	strcpy(order->TradingDay, posd->getTradingDay().c_str());
+	order->OrderStatus = posd->getOrderStatus();
+	order->VolumeTraded = posd->getVolumeTraded();
+	order->VolumeTotal = posd->getVolumeTotal();
+	strcpy(order->InsertDate, posd->getInsertDate().c_str());
+	strcpy(order->InsertTime, posd->getInsertTime().c_str());
+	order->StrategyID = posd->getStrategyID();
+	order->VolumeTradedBatch = posd->getVolumeTradedBatch();
+}
+
 void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 	
 	// Get Own Instrument

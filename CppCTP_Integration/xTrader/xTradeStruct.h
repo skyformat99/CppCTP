@@ -1,7 +1,10 @@
 #ifndef QUANT_XTRADESTRUCT_H
 #define QUANT_XTRADESTRUCT_H
-
+#include <iostream>
 #include "ThostFtdcUserApiDataType.h"
+
+using namespace std;
+using std::string;
 
 ///报单
 struct USER_CThostFtdcOrderField
@@ -14,6 +17,8 @@ struct USER_CThostFtdcOrderField
 	TThostFtdcInstrumentIDType	InstrumentID;
 	///报单引用
 	TThostFtdcOrderRefType	OrderRef;
+	///策略编号
+	string StrategyID;
 	///用户代码
 	TThostFtdcUserIDType	UserID;
 	///报单价格条件
@@ -134,6 +139,7 @@ struct USER_CThostFtdcOrderField
 	TThostFtdcIPAddressType	IPAddress;
 	///Mac地址
 	TThostFtdcMacAddressType	MacAddress;
+
 };
 
 #endif

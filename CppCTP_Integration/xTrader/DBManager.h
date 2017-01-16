@@ -148,7 +148,7 @@ public:
 	void CreatePositionDetail(PositionDetail *posd);
 	void DeletePositionDetail(PositionDetail *posd);
 	void UpdatePositionDetail(PositionDetail *posd);
-	void getAllPositionDetail(list<PositionDetail *> *l_posd, string trader_id, string userid);
+	void getAllPositionDetail(list<PositionDetail *> *l_posd, string trader_id = "", string userid = "");
 
 	void CreatePositionDetailYesterday(PositionDetail *posd);
 	void DeletePositionDetailYesterday(PositionDetail *posd);
