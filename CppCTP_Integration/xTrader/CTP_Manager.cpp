@@ -1839,8 +1839,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				std::cout << "收到交易员ID = " << s_TraderID << std::endl;
 				std::cout << "收到期货账户ID = " << s_UserID << std::endl;
 
-				list<Strategy *> l_strategys;
-				static_dbm->getAllStrategyYesterday(&l_strategys, s_TraderID, s_UserID);
+				list<PositionDetail *> l_posd;
+				static_dbm->getAllPositionDetailYesterday(&l_posd, s_TraderID, s_UserID);
 
 				/*构建策略昨仓Json*/
 				build_doc.SetObject();
@@ -1854,78 +1854,33 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//创建Info数组
 				rapidjson::Value create_info_array(rapidjson::kArrayType);
 
-				list<Strategy *>::iterator stg_itor;
-				for (stg_itor = l_strategys.begin(); stg_itor != l_strategys.end(); stg_itor++) {
-					if (((*stg_itor)->getStgTraderId() == s_TraderID)) {
-						std::cout << "找到需要查询的昨仓" << std::endl;
+				list<PositionDetail *>::iterator pod_itor;
+				for (pod_itor = l_posd.begin(); pod_itor != l_posd.end(); pod_itor++) {
 
-						/*构造内容json*/
-						rapidjson::Value create_info_object(rapidjson::kObjectType);
-						create_info_object.SetObject();
-						create_info_object.AddMember("position_a_sell_today", (*stg_itor)->getStgPositionASellToday(), allocator);
-						create_info_object.AddMember("position_b_sell", (*stg_itor)->getStgPositionBSell(), allocator);
-						create_info_object.AddMember("spread_shift", (*stg_itor)->getStgSpreadShift(), allocator);
-						create_info_object.AddMember("position_b_sell_today", (*stg_itor)->getStgPositionBSellToday(), allocator);
-						create_info_object.AddMember("position_b_buy_today", (*stg_itor)->getStgPositionBBuyToday(), allocator);
-						create_info_object.AddMember("position_a_sell", (*stg_itor)->getStgPositionASell(), allocator);
-						create_info_object.AddMember("buy_close", (*stg_itor)->getStgBuyClose(), allocator);
-						create_info_object.AddMember("stop_loss", (*stg_itor)->getStgStopLoss(), allocator);
-						create_info_object.AddMember("position_b_buy_yesterday", (*stg_itor)->getStgPositionBBuyYesterday(), allocator);
-						//create_info_object.AddMember("is_active", (*stg_itor)->isStgIsActive(), allocator);
-						create_info_object.AddMember("position_b_sell_yesterday", (*stg_itor)->getStgPositionBSellYesterday(), allocator);
-						create_info_object.AddMember("strategy_id", rapidjson::StringRef((*stg_itor)->getStgStrategyId().c_str()), allocator);
-						create_info_object.AddMember("position_b_buy", (*stg_itor)->getStgPositionBBuy(), allocator);
-						create_info_object.AddMember("lots_batch", (*stg_itor)->getStgLotsBatch(), allocator);
-						create_info_object.AddMember("position_a_buy", (*stg_itor)->getStgPositionABuy(), allocator);
-						create_info_object.AddMember("sell_open", (*stg_itor)->getStgSellOpen(), allocator);
-						create_info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator);
-						create_info_object.AddMember("trader_id", rapidjson::StringRef((*stg_itor)->getStgTraderId().c_str()), allocator);
-						create_info_object.AddMember("a_order_action_limit", (*stg_itor)->getStgAOrderActionTiresLimit(), allocator);
-						create_info_object.AddMember("b_order_action_limit", (*stg_itor)->getStgBOrderActionTiresLimit(), allocator);
-						create_info_object.AddMember("sell_close", (*stg_itor)->getStgSellClose(), allocator);
-						create_info_object.AddMember("buy_open", (*stg_itor)->getStgBuyOpen(), allocator);
-						create_info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator);
+					/*构造内容json*/
+					rapidjson::Value create_info_object(rapidjson::kObjectType);
+					create_info_object.SetObject();
 
-						/*新增字段*/
-						create_info_object.AddMember("trade_model", rapidjson::StringRef((*stg_itor)->getStgTradeModel().c_str()), allocator);
-						create_info_object.AddMember("hold_profit", (*stg_itor)->getStgHoldProfit(), allocator);
-						create_info_object.AddMember("close_profit", (*stg_itor)->getStgCloseProfit(), allocator);
-						create_info_object.AddMember("commission", (*stg_itor)->getStgCommission(), allocator);
-						create_info_object.AddMember("position", (*stg_itor)->getStgPosition(), allocator);
-						create_info_object.AddMember("position_buy", (*stg_itor)->getStgPositionBuy(), allocator);
-						create_info_object.AddMember("position_sell", (*stg_itor)->getStgPositionSell(), allocator);
-						create_info_object.AddMember("trade_volume", (*stg_itor)->getStgTradeVolume(), allocator);
-						create_info_object.AddMember("amount", (*stg_itor)->getStgAmount(), allocator);
-						create_info_object.AddMember("average_shift", (*stg_itor)->getStgAverageShift(), allocator);
+					create_info_object.AddMember("instrumentid", rapidjson::StringRef((*pod_itor)->getInstrumentID().c_str()), allocator);
+					create_info_object.AddMember("orderref", rapidjson::StringRef((*pod_itor)->getOrderRef().c_str()), allocator);
+					create_info_object.AddMember("userid", rapidjson::StringRef((*pod_itor)->getUserID().c_str()), allocator);
+					create_info_object.AddMember("direction", (*pod_itor)->getDirection(), allocator);
+					create_info_object.AddMember("comboffsetflag", rapidjson::StringRef((*pod_itor)->getCombOffsetFlag().c_str()), allocator);
+					create_info_object.AddMember("combhedgeflag", rapidjson::StringRef((*pod_itor)->getCombHedgeFlag().c_str()), allocator);
+					create_info_object.AddMember("limitprice", (*pod_itor)->getLimitPrice(), allocator);
+					create_info_object.AddMember("volumetotaloriginal", (*pod_itor)->getVolumeTotalOriginal(), allocator);
+					create_info_object.AddMember("tradingday", rapidjson::StringRef((*pod_itor)->getTradingDay().c_str()), allocator);
+					create_info_object.AddMember("orderstatus", (*pod_itor)->getOrderStatus(), allocator);
+					create_info_object.AddMember("volumetraded", (*pod_itor)->getVolumeTraded(), allocator);
+					create_info_object.AddMember("volumetotal", (*pod_itor)->getVolumeTotal(), allocator);
+					create_info_object.AddMember("insertdate", rapidjson::StringRef((*pod_itor)->getInsertDate().c_str()), allocator);
+					create_info_object.AddMember("inserttime", rapidjson::StringRef((*pod_itor)->getInsertTime().c_str()), allocator);
+					create_info_object.AddMember("strategyid", rapidjson::StringRef((*pod_itor)->getStrategyID().c_str()), allocator);
+					create_info_object.AddMember("volumetradedbatch", (*pod_itor)->getVolumeTradedBatch(), allocator);
 
+					create_info_array.PushBack(create_info_object, allocator);
 
-						rapidjson::Value instrument_array(rapidjson::kArrayType);
-						for (int j = 0; j < 2; j++) {
-							rapidjson::Value instrument_object(rapidjson::kObjectType);
-							instrument_object.SetObject();
-							if (j == 0) {
-								instrument_object.SetString(rapidjson::StringRef((*stg_itor)->getStgInstrumentIdA().c_str()));
-							}
-							else if (j == 1) {
-								instrument_object.SetString(rapidjson::StringRef((*stg_itor)->getStgInstrumentIdB().c_str()));
-							}
-
-							instrument_array.PushBack(instrument_object, allocator);
-						}
-						create_info_object.AddMember("list_instrument_id", instrument_array, allocator);
-						create_info_object.AddMember("position_a_buy_yesterday", (*stg_itor)->getStgPositionABuyYesterday(), allocator);
-						create_info_object.AddMember("user_id", rapidjson::StringRef((*stg_itor)->getStgUserId().c_str()), allocator);
-						create_info_object.AddMember("position_a_buy_today", (*stg_itor)->getStgPositionABuyToday(), allocator);
-						create_info_object.AddMember("position_a_sell_yesterday", (*stg_itor)->getStgPositionASellYesterday(), allocator);
-						create_info_object.AddMember("lots", (*stg_itor)->getStgLots(), allocator);
-						create_info_object.AddMember("a_wait_price_tick", (*stg_itor)->getStgAWaitPriceTick(), allocator);
-						create_info_object.AddMember("b_wait_price_tick", (*stg_itor)->getStgBWaitPriceTick(), allocator);
-						//create_info_object.AddMember("StrategyOnoff", (*stg_itor)->getOn_Off(), allocator);
-
-						create_info_array.PushBack(create_info_object, allocator);
-
-						bFind = true;
-					}
+					bFind = true;
 				}
 
 				if (bFind) {
@@ -1934,7 +1889,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				}
 				else {
 					build_doc.AddMember("MsgResult", 0, allocator);
-					build_doc.AddMember("MsgErrorReason", "未找到该策略昨仓信息", allocator);
+					build_doc.AddMember("MsgErrorReason", "未找到该策略昨仓明细", allocator);
 				}
 
 				build_doc.AddMember("Info", create_info_array, allocator);
