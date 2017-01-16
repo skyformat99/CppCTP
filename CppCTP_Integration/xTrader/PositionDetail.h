@@ -70,6 +70,9 @@ public:
 	void setVolumeTradedBatch(int VolumeTradedBatch);
 	int getVolumeTradedBatch();
 
+	void setIsActive(string isActive);
+	string getIsActive();
+
 private:
 	///合约代码
 	string	InstrumentID;
@@ -103,6 +106,8 @@ private:
 	string StrategyID;
 	///一批成交量
 	int VolumeTradedBatch;
+	///是否激活
+	string isActive;
 };
 
 #endif

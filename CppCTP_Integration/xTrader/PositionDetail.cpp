@@ -130,3 +130,10 @@ void PositionDetail::setVolumeTradedBatch(int VolumeTradedBatch){
 int PositionDetail::getVolumeTradedBatch(){
 	return this->VolumeTradedBatch;
 }
+
+void PositionDetail::setIsActive(string isActive) {
+	this->isActive = isActive;
+}
+string PositionDetail::getIsActive() {
+	return this->isActive;
+}

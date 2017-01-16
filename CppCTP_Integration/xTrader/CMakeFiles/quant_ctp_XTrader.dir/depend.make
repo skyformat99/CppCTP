@@ -14,6 +14,7 @@ CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o: Login.h
 CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o: MarketConfig.h
 CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o: MdSpi.h
 CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o: Order.h
+CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o: PositionDetail.h
 CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o: Session.h
 CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o: Strategy.h
 CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o: TdSpi.h
@@ -61,6 +62,7 @@ CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o: Login.h
 CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o: MarketConfig.h
 CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o: MdSpi.h
 CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o: Order.h
+CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o: PositionDetail.h
 CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o: Session.h
 CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o: Strategy.h
 CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o: TdSpi.h
@@ -82,6 +84,7 @@ CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o: Login.h
 CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o: MarketConfig.h
 CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o: MdSpi.h
 CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o: Order.h
+CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o: PositionDetail.h
 CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o: Session.h
 CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o: Strategy.h
 CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o: TdSpi.h
@@ -107,6 +110,7 @@ CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o: MarketConfig.h
 CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o: MdSpi.cpp
 CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o: MdSpi.h
 CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o: Order.h
+CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o: PositionDetail.h
 CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o: Session.h
 CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o: Strategy.h
 CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o: TdSpi.h
@@ -136,6 +140,7 @@ CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: Login.h
 CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: MarketConfig.h
 CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: MdSpi.h
 CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: Order.h
+CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: PositionDetail.h
 CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: Session.h
 CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: Strategy.cpp
 CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: Strategy.h
@@ -157,6 +162,7 @@ CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: Login.h
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: MarketConfig.h
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: MdSpi.h
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: Order.h
+CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: PositionDetail.h
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: Session.h
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: Strategy.h
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: TdSpi.cpp
@@ -179,6 +185,7 @@ CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o: Login.h
 CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o: MarketConfig.h
 CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o: MdSpi.h
 CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o: Order.h
+CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o: PositionDetail.h
 CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o: Session.h
 CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o: Strategy.h
 CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o: TdSpi.h
@@ -200,6 +207,7 @@ CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o: Login.h
 CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o: MarketConfig.h
 CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o: MdSpi.h
 CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o: Order.h
+CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o: PositionDetail.h
 CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o: Session.h
 CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o: Strategy.h
 CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o: TdSpi.h
@@ -226,6 +234,7 @@ CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: Login.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: MarketConfig.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: MdSpi.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: Order.h
+CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: PositionDetail.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: Session.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: Strategy.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: TdSpi.h

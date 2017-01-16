@@ -13,10 +13,12 @@
 #include "MarketConfig.h"
 #include "Algorithm.h"
 #include "Session.h"
+#include "PositionDetail.h"
 
 class Strategy;
 class MarketConfig;
 class Session;
+class PositionDetail;
 
 
 using namespace mongo;
@@ -136,7 +138,22 @@ public:
 	void CreateSession(Session *sid);
 	void DeleteSession(Session *sid);
 	void getAllSession(list<Session *> *l_sessions);
-	
+
+	/************************************************************************/
+	/*    
+	创建持仓明细
+	删除持仓明细
+	更新持仓明细*/
+	/************************************************************************/
+	void CreatePositionDetail(PositionDetail *posd);
+	void DeletePositionDetail(PositionDetail *posd);
+	void UpdatePositionDetail(PositionDetail *posd);
+	void getAllPositionDetail(list<PositionDetail *> *l_posd, string trader_id, string userid);
+
+	void CreatePositionDetailYesterday(PositionDetail *posd);
+	void DeletePositionDetailYesterday(PositionDetail *posd);
+	void UpdatePositionDetailYesterday(PositionDetail *posd);
+	void getAllPositionDetailYesterday(list<PositionDetail *> *l_posd, string trader_id, string userid);
 
 	void setConn(mongo::DBClientConnection *conn);
 	mongo::DBClientConnection *getConn();

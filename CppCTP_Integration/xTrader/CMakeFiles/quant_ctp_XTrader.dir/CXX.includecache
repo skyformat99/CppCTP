@@ -87,6 +87,8 @@ Algorithm.h
 /root/xTrader/Algorithm.h
 Session.h
 /root/xTrader/Session.h
+PositionDetail.h
+/root/xTrader/PositionDetail.h
 
 /root/xTrader/Debug.h
 
@@ -154,6 +156,10 @@ CTP_Manager.h
 
 /root/xTrader/Order.h
 string
+-
+
+/root/xTrader/PositionDetail.h
+iostream
 -
 
 /root/xTrader/Session.h
