@@ -6,6 +6,7 @@
 #include "Debug.h"
 #include "DBManager.h"
 #include "xTradeStruct.h"
+#include "PositionDetail.h"
 
 using std::list;
 class DBManager;
@@ -376,6 +377,8 @@ public:
 	void init_today_position();
 
 	void setL_query_trade(list<CThostFtdcTradeField *> *l_query_trade);
+	void addOrderToListQueryOrder(CThostFtdcOrderField *order);
+	void setL_query_order(list<CThostFtdcOrderField *> *l_query_order);
 
 	void add_position_detail(PositionDetail *posd);
 
@@ -464,6 +467,7 @@ private:
 	list<CThostFtdcTradeField *> *stg_list_position_detail; // 持仓明细
 	list<USER_CThostFtdcOrderField *> *stg_list_position_detail_from_order; // 持仓明细
 	list<CThostFtdcTradeField *> *l_query_trade;
+	list<USER_CThostFtdcOrderField *> *l_query_order;
 
 	long long stg_order_ref_base; // 报单引用计数
 

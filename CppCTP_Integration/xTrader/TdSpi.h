@@ -163,7 +163,11 @@ public:
 	//查询成交单
 	void QryTrade();
 
+	//复制交易回报
 	void CopyTradeInfo(CThostFtdcTradeField *dst, CThostFtdcTradeField *src);
+
+	//复制订单回报
+	void CopyOrderInfo(CThostFtdcOrderField *dst, CThostFtdcOrderField *src);
 
 	//查询成交单响应
 	void OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
@@ -249,6 +253,7 @@ public:
 	string getTradingDay();
 
 	list<CThostFtdcTradeField *> *getL_query_trade();
+	list<CThostFtdcOrderField *> *getL_query_order();
 
 private:
     CThostFtdcTraderApi *tdapi;
@@ -258,6 +263,7 @@ private:
 	bool isFirstTimeLogged;
 	bool isConfirmSettlement;
 	bool isFirstQryTrade;
+	bool isFirstQryOrder;
 	int loginRequestID;
 	string BrokerID;
 	string UserID;
@@ -283,6 +289,7 @@ private:
 	int SessionID;
 	list<Strategy *> *l_strategys;
 	list<CThostFtdcTradeField *> *l_query_trade;
+	list<CThostFtdcOrderField *> *l_query_order;
 	list<CThostFtdcInstrumentField *> *l_instruments_info;
 };
 

@@ -2324,7 +2324,7 @@ bool CTP_Manager::init(bool is_online) {
 	//this->initYesterdayPositionDetail();
 
 	list<CThostFtdcTradeField *> *l_query_trade;
-	/// 初始化今仓
+	/// 初始化今仓(trade)
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
 		(*user_itor)->getUserTradeSPI()->QryTrade();
 		sleep(1);
@@ -2333,6 +2333,28 @@ bool CTP_Manager::init(bool is_online) {
 			(*stg_itor)->setL_query_trade((*user_itor)->getUserTradeSPI()->getL_query_trade());
 		}
 	}
+
+	list<CThostFtdcOrderField *> *l_query_order;
+	list<CThostFtdcOrderField *>::iterator order_itor;
+	/// 初始化今仓(order)
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
+		(*user_itor)->getUserTradeSPI()->QryOrder();
+		sleep(1);
+		l_query_order = (*user_itor)->getUserTradeSPI()->getL_query_order();
+		for (stg_itor = (*user_itor)->getListStrategy()->begin(); stg_itor != (*user_itor)->getListStrategy()->end(); stg_itor++) { // 遍历Strategy
+
+			for (order_itor = l_query_order->begin(); order_itor != l_query_order->end(); order_itor++) {
+
+				string temp((*order_itor)->OrderRef);
+				USER_PRINT(temp);
+				USER_PRINT(temp.substr(temp.length() - 2, 2));
+				if (temp.substr(temp.length() - 2, 2) == (*stg_itor)->getStgStrategyId()) {
+					(*stg_itor)->addOrderToListQueryOrder((*order_itor));
+				}
+			}	
+		}
+	}
+
 
 
 	/// 行情初始化

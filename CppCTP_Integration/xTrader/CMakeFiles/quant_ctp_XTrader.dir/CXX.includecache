@@ -53,6 +53,8 @@ Trader.h
 /root/xTrader/Trader.h
 Session.h
 /root/xTrader/Session.h
+PositionDetail.h
+/root/xTrader/PositionDetail.h
 
 /root/xTrader/DBManager.cpp
 mongo/bson/bson.h
@@ -185,6 +187,8 @@ DBManager.h
 /root/xTrader/DBManager.h
 xTradeStruct.h
 /root/xTrader/xTradeStruct.h
+PositionDetail.h
+/root/xTrader/PositionDetail.h
 
 /root/xTrader/TdSpi.cpp
 iostream
@@ -617,6 +621,8 @@ emmintrin.h
 -
 
 /root/xTrader/xTradeStruct.h
+iostream
+-
 ThostFtdcUserApiDataType.h
 /root/xTrader/ThostFtdcUserApiDataType.h
 

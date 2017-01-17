@@ -10,6 +10,7 @@
 #include "DBManager.h"
 #include "Trader.h"
 #include "Session.h"
+#include "PositionDetail.h"
 
 using std::map;
 class MdSpi;

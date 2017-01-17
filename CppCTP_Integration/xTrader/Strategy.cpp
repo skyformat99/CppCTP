@@ -781,7 +781,7 @@ void Strategy::setL_query_trade(list<CThostFtdcTradeField *> *l_query_trade) {
 	if (l_query_trade->size() > 0) {
 		list<CThostFtdcTradeField *>::iterator Itor;
 		for (Itor = l_query_trade->begin(); Itor != l_query_trade->end(); Itor++) {
-			if (strcmp((*Itor)->InstrumentID, this->stg_instrument_id_A.c_str())) {
+			if (!strcmp((*Itor)->InstrumentID, this->stg_instrument_id_A.c_str())) {
 				if ((*Itor)->OffsetFlag == '0') { // A开仓成交回报
 					if ((*Itor)->Direction == '0') { /*A买开仓*/
 						this->stg_position_a_buy_today += (*Itor)->Volume;
@@ -887,6 +887,21 @@ void Strategy::setL_query_trade(list<CThostFtdcTradeField *> *l_query_trade) {
 
 		}
 	}
+}
+
+void Strategy::addOrderToListQueryOrder(CThostFtdcOrderField *order) {
+	USER_CThostFtdcOrderField *new_order = new USER_CThostFtdcOrderField();
+	memset(new_order, 0, sizeof(USER_CThostFtdcOrderField));
+	this->CopyOrderDataToNew(new_order, order);
+	this->stg_user->add_instrument_id_action_counter(order);
+	this->update_pending_order_list(order);
+	this->add_VolumeTradedBatch(order, new_order);
+	this->update_position_detail(new_order);
+	this->l_query_order->push_back(new_order);
+}
+
+void Strategy::setL_query_order(list<CThostFtdcOrderField *> *l_query_order) {
+
 }
 
 void Strategy::add_position_detail(PositionDetail *posd) {
