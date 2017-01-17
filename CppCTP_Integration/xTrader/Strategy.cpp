@@ -31,6 +31,8 @@ Strategy::Strategy(User *stg_user) {
 
 	this->stg_trade_tasking = false;
 	init_finished = false;
+
+	this->l_query_order = new list<USER_CThostFtdcOrderField *>();
 }
 
 
@@ -1597,7 +1599,7 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 
 	this->update_task_status();
 
-	delete order_new;
+	//delete order_new;
 
 	/// A成交回报,B发送等量的报单
 	if ((!strcmp(pOrder->InstrumentID, this->stg_instrument_id_A.c_str())) && ((pOrder->OrderStatus == '0') || (pOrder->OrderStatus == '1')) && (strlen(pOrder->OrderSysID) != 0)) { //只有全部成交或者部分成交还在队列中
@@ -2219,12 +2221,18 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 		"""
 		# 跳过无成交的order记录                                                                     */
 	/************************************************************************/
+
+	USER_PRINT(pOrder->VolumeTraded);
+	
+
 	if (pOrder->VolumeTraded == 0) {
 		return;
 	}
-
+	USER_PRINT(pOrder->CombOffsetFlag[0]);
 	if (pOrder->CombOffsetFlag[0] == '0') { // 开仓
+		USER_PRINT("pOrder->CombOffsetFlag[0] == 0 come in");
 		this->stg_list_position_detail_from_order->push_back(pOrder);
+		USER_PRINT("pOrder->CombOffsetFlag[0] == 0 away");
 	} else if (pOrder->CombOffsetFlag[0] == '3') { // 平今
 		list<USER_CThostFtdcOrderField *>::iterator itor;
 		for (itor = this->stg_list_position_detail_from_order->begin(); 
@@ -2249,6 +2257,9 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 					delete (*itor);
 					itor = this->stg_list_position_detail_from_order->erase(itor);
 				}
+			}
+			else {
+				itor++;
 			}
 		}
 	}
@@ -2277,6 +2288,9 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 					delete (*itor);
 					itor = this->stg_list_position_detail_from_order->erase(itor);
 				}
+			}
+			else {
+				itor++;
 			}
 		}
 	}
