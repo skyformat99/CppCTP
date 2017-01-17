@@ -1584,6 +1584,9 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	// 添加字段,本次成交量
 	USER_CThostFtdcOrderField *order_new = new USER_CThostFtdcOrderField();
 	memset(order_new, 0x00, sizeof(USER_CThostFtdcOrderField));
+
+	//std::auto_ptr<USER_CThostFtdcOrderField> order_new(new USER_CThostFtdcOrderField);
+
 	this->add_VolumeTradedBatch(pOrder, order_new);
 
 	// 更新持仓明细列表
@@ -1593,6 +1596,8 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	this->update_position(order_new);
 
 	this->update_task_status();
+
+	delete order_new;
 
 	/// A成交回报,B发送等量的报单
 	if ((!strcmp(pOrder->InstrumentID, this->stg_instrument_id_A.c_str())) && ((pOrder->OrderStatus == '0') || (pOrder->OrderStatus == '1')) && (strlen(pOrder->OrderSysID) != 0)) { //只有全部成交或者部分成交还在队列中
