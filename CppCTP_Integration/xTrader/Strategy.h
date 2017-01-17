@@ -306,6 +306,8 @@ public:
 	/// 拷贝结构体CThostFtdcTradeField
 	void CopyTradeData(CThostFtdcTradeField *dst, CThostFtdcTradeField *src);
 
+	
+
 	/// 设置开关
 	int getOn_Off();
 	void setOn_Off(int on_off);
@@ -383,6 +385,8 @@ public:
 	void add_position_detail(PositionDetail *posd);
 
 	void CopyPositionData(PositionDetail *posd, USER_CThostFtdcOrderField *order);
+
+	list<USER_CThostFtdcOrderField *> * getStg_List_Position_Detail_From_Order(); // 持仓明细
 
 private:
 	Trader *trader;

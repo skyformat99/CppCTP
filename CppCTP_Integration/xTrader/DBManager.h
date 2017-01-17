@@ -14,6 +14,7 @@
 #include "Algorithm.h"
 #include "Session.h"
 #include "PositionDetail.h"
+#include "xTradeStruct.h"
 
 class Strategy;
 class MarketConfig;
@@ -146,9 +147,11 @@ public:
 	更新持仓明细*/
 	/************************************************************************/
 	void CreatePositionDetail(PositionDetail *posd);
+	void CreatePositionDetail(USER_CThostFtdcOrderField *posd);
 	void DeletePositionDetail(PositionDetail *posd);
 	void UpdatePositionDetail(PositionDetail *posd);
 	void getAllPositionDetail(list<PositionDetail *> *l_posd, string trader_id = "", string userid = "");
+	void DropPositionDetail();
 
 	void CreatePositionDetailYesterday(PositionDetail *posd);
 	void DeletePositionDetailYesterday(PositionDetail *posd);

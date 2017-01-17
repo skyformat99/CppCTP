@@ -320,15 +320,35 @@ void CTP_Manager::setListStrategy(list<Strategy *> *l_strategys) {
 
 /// 保存strategy_list
 void CTP_Manager::saveStrategy() {
+	/************************************************************************/
+	/* 1:盘后保存工作
+		a:保存策略参数
+		b:保存持仓明细*/
+	/************************************************************************/
 	USER_PRINT("CTP_Manager::saveStrategy");
 	if (!this->isClosingSaved) {
+		// 删除持仓明细所有数据
+		this->dbm->DropPositionDetail();
 		list<Strategy *>::iterator stg_itor;
+		list<USER_CThostFtdcOrderField *>::iterator posd_itor;
 		USER_PRINT("CTP_Manager::saveStrategy");
-		for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
+		for (stg_itor = this->l_strategys->begin(); 
+			stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
 			this->dbm->UpdateStrategy((*stg_itor));
+			// 遍历strategy持仓明细并保存
+			for (posd_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
+				posd_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end();
+				posd_itor++) {
+				this->dbm->CreatePositionDetail((*posd_itor));
+			}
 		}
 		this->isClosingSaved = true;
 	}
+}
+
+/// 保存position_detail
+void CTP_Manager::savePositionDetail() {
+
 }
 
 /// 设置mdspi

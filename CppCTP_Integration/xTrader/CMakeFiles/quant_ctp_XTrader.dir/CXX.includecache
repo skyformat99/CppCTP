@@ -91,6 +91,8 @@ Session.h
 /root/xTrader/Session.h
 PositionDetail.h
 /root/xTrader/PositionDetail.h
+xTradeStruct.h
+/root/xTrader/xTradeStruct.h
 
 /root/xTrader/Debug.h
 

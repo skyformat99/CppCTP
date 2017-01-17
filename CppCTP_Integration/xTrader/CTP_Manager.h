@@ -103,6 +103,9 @@ public:
 	/// ±£¥Êstrategy_list
 	void saveStrategy();
 
+	/// ±£¥Êposition_detail
+	void savePositionDetail();
+
 	/// …Ë÷√mdspi
 	void setMdSpi(MdSpi *mdspi);
 

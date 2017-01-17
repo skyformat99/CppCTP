@@ -1746,6 +1746,47 @@ void DBManager::CreatePositionDetail(PositionDetail *posd) {
 	}
 	USER_PRINT("DBManager::CreatePositionDetail OK");
 }
+
+void DBManager::CreatePositionDetail(USER_CThostFtdcOrderField *posd) {
+	USER_PRINT("DBManager::CreatePositionDetail");
+
+	int posd_count_num = 0;
+
+	if (posd != NULL) {
+		posd_count_num = this->conn->count(DB_POSITIONDETAIL_COLLECTION,
+			BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "is_active" << ISACTIVE));
+		if (posd_count_num != 0) { //session_id存在
+			std::cout << "持仓明细已经存在了!" << std::endl;
+			return;
+		}
+		else { //posd 不存在
+			BSONObjBuilder b;
+
+			b.append("instrumentid", posd->InstrumentID);
+			b.append("orderref", posd->OrderRef);
+			b.append("userid", posd->UserID);
+			b.append("direction", posd->Direction);
+			b.append("comboffsetflag", string(1, posd->CombOffsetFlag[0]));
+			b.append("combhedgeflag", string(1, posd->CombHedgeFlag[0]));
+			b.append("limitprice", posd->LimitPrice);
+			b.append("volumetotaloriginal", posd->VolumeTotalOriginal);
+			b.append("tradingday", posd->TradingDay);
+			b.append("orderstatus", posd->OrderStatus);
+			b.append("volumetraded", posd->VolumeTraded);
+			b.append("volumetotal", posd->VolumeTotal);
+			b.append("insertdate", posd->InsertDate);
+			b.append("inserttime", posd->InsertTime);
+			b.append("strategyid", posd->StrategyID);
+			b.append("volumetradedbatch", posd->VolumeTradedBatch);
+
+			BSONObj p = b.obj();
+			conn->insert(DB_POSITIONDETAIL_COLLECTION, p);
+			USER_PRINT("DBManager::CreatePositionDetail ok");
+		}
+	}
+	USER_PRINT("DBManager::CreatePositionDetail OK");
+}
+
 void DBManager::DeletePositionDetail(PositionDetail *posd) {
 	USER_PRINT("DBManager::DeletePositionDetail");
 	int count_number = 0;
@@ -1866,6 +1907,12 @@ void DBManager::getAllPositionDetail(list<PositionDetail *> *l_posd, string trad
 	}
 
 	USER_PRINT("DBManager::getAllPositionDetail OK");
+}
+
+void DBManager::DropPositionDetail() {
+	USER_PRINT("DBManager::DropPositionDetail");
+	this->conn->dropCollection(DB_POSITIONDETAIL_COLLECTION);
+	USER_PRINT("DBManager::DropPositionDetail ok");
 }
 
 void DBManager::CreatePositionDetailYesterday(PositionDetail *posd) {

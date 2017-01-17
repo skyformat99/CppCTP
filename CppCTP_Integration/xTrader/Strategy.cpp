@@ -932,6 +932,11 @@ void Strategy::CopyPositionData(PositionDetail *posd, USER_CThostFtdcOrderField 
 	order->VolumeTradedBatch = posd->getVolumeTradedBatch();
 }
 
+// 获取持仓明细
+list<USER_CThostFtdcOrderField *> * Strategy::getStg_List_Position_Detail_From_Order() {
+	return this->stg_list_position_detail_from_order;
+}
+
 void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 	
 	// Get Own Instrument
