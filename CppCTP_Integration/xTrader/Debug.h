@@ -6,6 +6,7 @@
 #include <ctime>   // localtime
 #include <sstream> // stringstream
 #include <string>  // string
+#include <cstring>
 
 using namespace std;
 using namespace std::chrono;
@@ -13,7 +14,7 @@ using std::string;
 
 //#define DEBUG
 #ifdef DEBUG
-#define USER_PRINT(x) {time_t tt = system_clock::to_time_t(system_clock::now()); std::cerr << "[DEBUG] - " << std::ctime(&tt) << "" << __FILE__ << ", Line - " << __LINE__ << " - " << " = " << x << std::endl;}
+#define USER_PRINT(x) {time_t tt = system_clock::to_time_t(system_clock::now()); std::string nowt(std::ctime(&tt)); std::cerr << "[DEBUG] - " << nowt.substr(0, nowt.length() - 1) << ", " << __FILE__ << ", Line - " << __LINE__ << "_" << " = " << x << std::endl;}
 #else
 #define USER_PRINT(x)
 #endif

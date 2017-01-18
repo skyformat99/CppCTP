@@ -107,6 +107,8 @@ sstream
 -
 string
 -
+cstring
+-
 
 /root/xTrader/FutureAccount.cpp
 FutureAccount.h
