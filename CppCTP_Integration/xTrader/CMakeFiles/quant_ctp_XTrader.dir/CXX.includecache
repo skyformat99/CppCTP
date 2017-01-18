@@ -95,6 +95,18 @@ xTradeStruct.h
 /root/xTrader/xTradeStruct.h
 
 /root/xTrader/Debug.h
+iostream
+-
+ratio
+-
+chrono
+-
+ctime
+-
+sstream
+-
+string
+-
 
 /root/xTrader/FutureAccount.cpp
 FutureAccount.h
