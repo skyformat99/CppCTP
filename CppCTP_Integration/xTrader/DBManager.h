@@ -93,6 +93,7 @@ public:
 	int UpdateStrategyOnOff(Strategy *stg);
 	int UpdateStrategyOnlyCloseOnOff(Strategy *stg);
 	void getAllStrategy(list<Strategy *> *l_strategys, string traderid = "", string userid = "");
+	void getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<User *> *l_users, string traderid = "");
 
 	/************************************************************************/
 	/* 创建策略(昨仓)
@@ -105,6 +106,7 @@ public:
 	void UpdateStrategyYesterday(Strategy *stg);
 	void getAllStrategyYesterday(list<Strategy *> *l_strategys, string traderid = "", string userid = "");
 	void getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Strategy *> *l_strategys, string traderid = "", string userid = "", string strategyid = "");
+	void getAllStrategyYesterdayByActiveUser(list<Strategy *> *l_strategys, list<User *> *l_users, string traderid = "");
 
 
 	/************************************************************************/

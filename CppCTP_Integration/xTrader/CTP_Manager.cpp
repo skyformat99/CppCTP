@@ -546,7 +546,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				std::cout << "收到期货账户ID = " << s_UserID << std::endl;
 
 				list<Strategy *> l_strategys;
-				static_dbm->getAllStrategy(&l_strategys, s_TraderID, s_UserID);
+				//static_dbm->getAllStrategy(&l_strategys, s_TraderID, s_UserID);
+				static_dbm->getAllStrategyByActiveUser(&l_strategys, ctp_m->getL_User(), s_TraderID);
 
 				/*构建StrategyInfo的Json*/
 				build_doc.SetObject();
@@ -1352,7 +1353,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				std::cout << "收到期货账户ID = " << s_UserID << std::endl;
 
 				list<Strategy *> l_strategys;
-				static_dbm->getAllStrategyYesterday(&l_strategys, s_TraderID, s_UserID);
+				//static_dbm->getAllStrategyYesterday(&l_strategys, s_TraderID, s_UserID);
+				static_dbm->getAllStrategyYesterdayByActiveUser(&l_strategys, ctp_m->getL_User(), s_TraderID);
 
 				/*构建策略昨仓Json*/
 				build_doc.SetObject();
@@ -2218,10 +2220,12 @@ bool CTP_Manager::init(bool is_online) {
 	
 	/// 查询策略
 	//this->dbm->getAllStrategyYesterday(this->l_strategys);
-	this->dbm->getAllStrategy(this->l_strategys);
+	//this->dbm->getAllStrategy(this->l_strategys);
+	this->dbm->getAllStrategyByActiveUser(this->l_strategys, this->l_user);
 
 	/// 查询昨仓策略
-	this->dbm->getAllStrategyYesterday(this->l_strategys_yesterday);
+	//this->dbm->getAllStrategyYesterday(this->l_strategys_yesterday);
+	this->dbm->getAllStrategyYesterdayByActiveUser(this->l_strategys_yesterday, this->l_user);
 
 	/// 查询昨仓持仓明细
 	this->dbm->getAllPositionDetail(this->l_posdetail);
