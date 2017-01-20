@@ -54,7 +54,7 @@ void printContinueEN() {
 
 int main() {
 
-//#define EMU 1
+#define EMU 1
 //#define EMU_EMU 1
 
 #ifdef EMU

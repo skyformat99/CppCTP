@@ -2027,6 +2027,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 	
 }
 
+#if 0
 /// 初始化昨仓
 bool CTP_Manager::initYesterdayPosition() {
 	bool flag = true;
@@ -2045,7 +2046,7 @@ bool CTP_Manager::initYesterdayPosition() {
 
 		if (flag == false) { // 如果时间晚于最新交易日，那么将策略新建到昨仓，并且更新仓位
 
-			this->dbm->UpdateFutureAccountOrderRef((*stg_itor)->getStgUser(), "0");
+			this->dbm->UpdateFutureAccountOrderRef((*stg_itor)->getStgUser(), "1000000001");
 
 			std::cout << "时间晚于最新交易日，策略新建到昨仓，并且更新仓位" << std::endl;
 
@@ -2144,6 +2145,32 @@ bool CTP_Manager::initYesterdayPosition() {
 				flag = false;
 				return flag;
 			}
+		}
+	}
+
+	return flag;
+}
+
+#endif
+
+/// 初始化昨仓
+bool CTP_Manager::initYesterdayPosition() {
+	bool flag = true;
+	list<Strategy *>::iterator stg_itor;
+	list<Strategy *>::iterator stg_itor_yesterday;
+	std::cout << "系统交易日 = " << this->getTradingDay() << std::endl;
+
+	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
+		// 遍历Strategy
+		std::cout << "策略最后更新时间 = " << (*stg_itor)->getStgTradingDay() << std::endl;
+		bool is_equal = Utils::compareTradingDay((*stg_itor)->getStgTradingDay().c_str(), this->getTradingDay().c_str());
+
+		std::cout << "对比结果 = " << flag << std::endl;
+		std::cout << "今仓 userid = " << (*stg_itor)->getStgUserId() << std::endl;
+		std::cout << "今仓 strategy_id = " << (*stg_itor)->getStgStrategyId() << std::endl;
+
+		if (is_equal == false) { // 如果时间晚于最新交易日，那么将策略新建到昨仓，并且更新仓位
+			this->dbm->UpdateFutureAccountOrderRef((*stg_itor)->getStgUser(), "1000000001");
 		}
 	}
 
@@ -2325,25 +2352,25 @@ bool CTP_Manager::init(bool is_online) {
 	}
 
 
-	/// 昨仓初始化
+	/// 如果是新的交易日，更新报单引用
 	if (!(this->initYesterdayPosition())) {
-		USER_PRINT("初始化仓位失败...");
+		USER_PRINT("初始化账户报单引用失败...");
 		init_flag = false;
 		return init_flag;
 	}
 	else {
-		USER_PRINT("初始化仓位成功...");
+		USER_PRINT("初始化账户报单引用成功...");
 	}
 
 	/// 昨仓持仓明细初始化
-	/*if (!(this->initYesterdayPositionDetail())) {
+	if (!(this->initYesterdayPositionDetail())) {
 		USER_PRINT("初始化昨仓明细失败...");
 		init_flag = false;
 		return init_flag;
 	}
 	else {
 		USER_PRINT("初始化昨仓明细成功...");
-	}*/
+	}
 
 	//this->initYesterdayPositionDetail();
 

@@ -561,7 +561,9 @@ void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *
 
 	BSONObj p = b.obj();
 	conn->insert(DB_ONRTNORDER_COLLECTION, p);
+	this->DB_UpdateOrderRef(temp);
 	USER_PRINT("DBManager::DB_OnRtnOrder ok");
+	
 }
 
 void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *pTrade){
