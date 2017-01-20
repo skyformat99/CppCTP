@@ -667,7 +667,9 @@ void Strategy::update_task_status() {
 	{
 		this->stg_trade_tasking = true;
 	}
-	std::cout << "After update this.trade_tasking = " << this->stg_trade_tasking << endl;
+	//std::cout << "After update this.trade_tasking = " << this->stg_trade_tasking << endl;
+	std::cout << "Strategy::update_task_status = " << this->stg_trade_tasking << endl;
+	USER_PRINT(this->stg_trade_tasking);
 }
 
 /// 交易模型
