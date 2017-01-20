@@ -389,7 +389,8 @@ void DBManager::UpdateFutureAccountOrderRef(User *u, string order_ref_base) {
 	{
 		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount_panhou";
 	}
-	this->conn->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (u->getUserID().c_str())), BSON("$set" << BSON("order_ref_base" << order_ref_base.c_str())));
+	USER_PRINT(DB_FUTUREACCOUNT_COLLECTION);
+	this->conn->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (u->getUserID().c_str())), BSON("$set" << BSON("order_ref_base" << order_ref_base)));
 	USER_PRINT("DBManager::UpdateFutureAccountOrderRef ok");
 }
 

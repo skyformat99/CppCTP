@@ -381,7 +381,8 @@ void User::DB_OrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderF
 	b.append("StrategyID", result);
 
 	BSONObj p = b.obj();
-	conn->insert(DB_ORDERINSERT_COLLECTION, p);
+	//conn->insert(DB_ORDERINSERT_COLLECTION, p);
+	this->dbm->getConn()->insert(DB_ORDERINSERT_COLLECTION, p);
 	USER_PRINT("DBManager::DB_OrderInsert ok");
 }
 
@@ -560,7 +561,8 @@ void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *
 	b.append("StrategyID", result);
 
 	BSONObj p = b.obj();
-	conn->insert(DB_ONRTNORDER_COLLECTION, p);
+	//conn->insert(DB_ONRTNORDER_COLLECTION, p);
+	this->dbm->getConn()->insert(DB_ONRTNORDER_COLLECTION, p);
 	this->DB_UpdateOrderRef(temp);
 	USER_PRINT("DBManager::DB_OnRtnOrder ok");
 	
@@ -666,7 +668,9 @@ void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *
 	b.append("StrategyID", result);
 
 	BSONObj p = b.obj();
-	conn->insert(DB_ONRTNTRADE_COLLECTION, p);
+	//conn->insert(DB_ONRTNTRADE_COLLECTION, p);
+	this->dbm->getConn()->insert(DB_ONRTNTRADE_COLLECTION, p);
+	
 	USER_PRINT("DBManager::DB_OnRtnTrade ok");
 }
 

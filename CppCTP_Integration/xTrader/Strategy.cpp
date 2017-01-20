@@ -1714,7 +1714,9 @@ void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketDat
 					}
 				}
 				else if ((*Itor)->Direction == '1') {
+					std::cout << "Strategy::Exec_OnTickComing A挂单方向为卖" << std::endl;
 					if (pDepthMarketData->AskPrice1 < ((*Itor)->LimitPrice - (this->stg_a_wait_price_tick * this->stg_a_price_tick))) {
+						std::cout << "Strategy::Exec_OnTickComing A挂单方向为卖，撤单" << std::endl;
 						/// A合约撤单
 						this->stg_user->getUserTradeSPI()->OrderAction((*Itor)->ExchangeID, (*Itor)->OrderRef, (*Itor)->OrderSysID);
 					}
