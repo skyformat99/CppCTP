@@ -1004,15 +1004,22 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 	int select_num;
 	//如果正在交易,直接返回0
 	if (this->stg_trade_tasking) {
+		USER_PRINT("正在交易,返回");
 		return;
 	}
 	//如果有挂单,返回0
 	if (this->stg_list_order_pending->size() > 0) {
+		USER_PRINT("有挂单,返回");
+		list<CThostFtdcOrderField *>::iterator itor;
+		for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end(); itor++) {
+			USER_PRINT((*itor)->InstrumentID);
+		}
 		return;
 	}
 
 	if (!((this->stg_position_a_sell == this->stg_position_b_buy) && 
 		(this->stg_position_a_buy == this->stg_position_b_sell))) {
+		USER_PRINT("有撇腿,返回");
 		// 有撇腿
 		return;
 	}
@@ -1109,9 +1116,11 @@ void Strategy::Order_Algorithm_One() {
 	USER_PRINT(this->stg_user->getCTP_Manager()->getOn_Off());
 	//为了测试需要打开开关
 	//this->stg_user->getCTP_Manager()->setOn_Off(1);
+	USER_PRINT(this->getStgStrategyId())
 	USER_PRINT(this->stg_user->GetTrader()->getOn_Off());
 	USER_PRINT(this->stg_user->getOn_Off());
 	USER_PRINT(this->getOn_Off());
+
 
 	/// 策略开关，期货账户开关，总开关
 	if (!((this->getOn_Off()) & (this->stg_user->getOn_Off()) & (this->stg_user->GetTrader()->getOn_Off()))) {
@@ -1775,7 +1784,9 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 	/************************************************************************/
 	/* 此处pOrder应该谨慎操作                                                  */
 	/************************************************************************/
-	std::cout << "pending_order_list size = "<< this->stg_list_order_pending->size() << std::endl;
+	//std::cout << "pending_order_list size = "<< this->stg_list_order_pending->size() << std::endl;
+	USER_PRINT(this->stg_list_order_pending->size());
+	USER_PRINT(pOrder->OrderSysID);
 
 	/************************************************************************/
 	/* 
@@ -1788,126 +1799,203 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 		                                                                     */
 	/************************************************************************/
 
-	if (strlen(pOrder->OrderSysID) != 0) {
-		//如果list为空,直接添加到挂单列表里
-		if (this->stg_list_order_pending->size() == 0) {
+	//if (strlen(pOrder->OrderSysID) != 0) {
+	//	//如果list为空,直接添加到挂单列表里
+	//	if (this->stg_list_order_pending->size() == 0) {
+	//		USER_PRINT("this->stg_list_order_pending->size() == 0");
+	//		// 深复制对象
+	//		CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
+	//		memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
+	//		this->CopyOrderData(pOrder_tmp, pOrder);
+
+	//		this->stg_list_order_pending->push_back(pOrder_tmp);
+	//		return;
+	//	} else {
+	//		USER_PRINT("this->stg_list_order_pending->size() > 0");
+	//		/// 挂单列表不为空时
+	//		list<CThostFtdcOrderField *>::iterator Itor;
+	//		for (Itor = this->stg_list_order_pending->begin(); Itor != this->stg_list_order_pending->end();) {
+	//			USER_PRINT((*Itor)->OrderRef);
+	//			USER_PRINT(pOrder->OrderRef);
+	//			if (!strcmp((*Itor)->OrderRef, pOrder->OrderRef)) { // 先前已经有orderref存在挂单编号里
+	//				if (pOrder->OrderStatus == '0') { // 全部成交
+
+	//					USER_PRINT("全部成交");
+	//					delete (*Itor);
+	//					Itor = this->stg_list_order_pending->erase(Itor); //移除
+
+	//				} else if (pOrder->OrderStatus == '1') { // 部分成交还在队列中
+
+	//					USER_PRINT("部分成交还在队列中");
+
+	//					// 深复制对象
+	//					/*CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
+	//					memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
+	//					this->CopyOrderData(pOrder_tmp, pOrder);
+
+	//					*Itor = pOrder_tmp;*/
+	//					this->CopyOrderData(*Itor, pOrder);
+
+
+	//				} else if (pOrder->OrderStatus == '2') { // 部分成交不在队列中
+
+	//					USER_PRINT("部分成交不在队列中");
+
+	//				} else if (pOrder->OrderStatus == '3') { // 未成交还在队列中
+
+	//					USER_PRINT("未成交还在队列中");
+	//					// 深复制对象
+	//					/*CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
+	//					memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
+	//					this->CopyOrderData(pOrder_tmp, pOrder);
+
+	//					*Itor = pOrder_tmp;*/
+
+	//					this->CopyOrderData(*Itor, pOrder);
+
+	//				} else if (pOrder->OrderStatus == '4') { // 未成交不在队列中
+
+	//					USER_PRINT("未成交不在队列中");
+
+
+	//				} else if (pOrder->OrderStatus == '5') { // 撤单
+
+	//					USER_PRINT("撤单");
+	//					delete (*Itor);
+	//					Itor = this->stg_list_order_pending->erase(Itor); //移除
+
+	//				} else if (pOrder->OrderStatus == 'a') { // 未知
+
+	//					USER_PRINT("未知");
+
+	//				} else if (pOrder->OrderStatus == 'b') { // 尚未触发
+
+	//					USER_PRINT("尚未触发");
+
+	//				} else if (pOrder->OrderStatus == 'c') { // 已触发
+
+	//					USER_PRINT("已触发");
+
+	//				}
+
+	//			} else {	// 没有orderref存在挂单编号里,第一次
+	//				if (pOrder->OrderStatus == '0') { // 全部成交
+
+	//				}
+	//				else if (pOrder->OrderStatus == '1') { // 部分成交还在队列中
+	//					USER_PRINT("没有orderref存在挂单列表,部分成交还在队列中");
+	//					// 深复制对象
+	//					CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
+	//					memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
+	//					this->CopyOrderData(pOrder_tmp, pOrder);
+
+	//					this->stg_list_order_pending->push_back(pOrder_tmp);
+	//				}
+	//				else if (pOrder->OrderStatus == '2') { // 部分成交不在队列中
+
+	//				}
+	//				else if (pOrder->OrderStatus == '3') { // 未成交还在队列中
+	//					USER_PRINT("没有orderref存在挂单列表,未成交还在队列中");
+	//					// 深复制对象
+	//					CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
+	//					memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
+	//					this->CopyOrderData(pOrder_tmp, pOrder);
+
+	//					this->stg_list_order_pending->push_back(pOrder_tmp);
+	//				}
+	//				else if (pOrder->OrderStatus == '4') { // 未成交不在队列中
+
+	//				}
+	//				else if (pOrder->OrderStatus == '5') { // 撤单
+
+	//				}
+	//				else if (pOrder->OrderStatus == 'a') { // 未知
+
+	//				}
+	//				else if (pOrder->OrderStatus == 'b') { // 尚未触发
+
+	//				}
+	//				else if (pOrder->OrderStatus == 'c') { // 已触发
+
+	//				}
+	//			}
+	//			Itor++;
+	//		}
+	//	}
+	//}
+
+	USER_PRINT(pOrder->OrderStatus);
+
+	if (pOrder->OrderStatus == '0') {
+		list<CThostFtdcOrderField *>::iterator itor;
+		for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
+			if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
+				delete (*itor);
+				itor = this->stg_list_order_pending->erase(itor); //移除
+			}
+			else {
+				itor++;
+			}
+		}
+	}
+	else if (pOrder->OrderStatus == '1') {
+		
+		list<CThostFtdcOrderField *>::iterator itor;
+		for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
+			if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
+				this->CopyOrderData(*itor, pOrder);
+				break;
+			}
+			else {
+				itor++;
+			}
+		}
+		
+	}
+	else if (pOrder->OrderStatus == '3') {
+		bool isExists = false;
+		// 判断挂单列表是否存在
+		list<CThostFtdcOrderField *>::iterator itor;
+		for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
+			if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
+				// 存在置flag标志位
+				isExists = true;
+				this->CopyOrderData(*itor, pOrder);
+				break;
+			}
+			else {
+				itor++;
+			}
+		}
+		// 如果不存在直接加入
+		if (!isExists) {
+
 			// 深复制对象
 			CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
 			memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
 			this->CopyOrderData(pOrder_tmp, pOrder);
 
 			this->stg_list_order_pending->push_back(pOrder_tmp);
-			return;
-		} else {
-			/// 挂单列表不为空时
-			list<CThostFtdcOrderField *>::iterator Itor;
-			for (Itor = this->stg_list_order_pending->begin(); Itor != this->stg_list_order_pending->end();) {
-				if (!strcmp((*Itor)->OrderRef, pOrder->OrderRef)) { // 先前已经有orderref存在挂单编号里
-					if (pOrder->OrderStatus == '0') { // 全部成交
-
-						USER_PRINT("全部成交");
-						delete (*Itor);
-						Itor = this->stg_list_order_pending->erase(Itor); //移除
-
-					} else if (pOrder->OrderStatus == '1') { // 部分成交还在队列中
-
-						USER_PRINT("部分成交还在队列中");
-
-						// 深复制对象
-						/*CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
-						memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
-						this->CopyOrderData(pOrder_tmp, pOrder);
-
-						*Itor = pOrder_tmp;*/
-						this->CopyOrderData(*Itor, pOrder);
-
-
-					} else if (pOrder->OrderStatus == '2') { // 部分成交不在队列中
-
-						USER_PRINT("部分成交不在队列中");
-
-					} else if (pOrder->OrderStatus == '3') { // 未成交还在队列中
-
-						USER_PRINT("未成交还在队列中");
-						// 深复制对象
-						/*CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
-						memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
-						this->CopyOrderData(pOrder_tmp, pOrder);
-
-						*Itor = pOrder_tmp;*/
-
-						this->CopyOrderData(*Itor, pOrder);
-
-					} else if (pOrder->OrderStatus == '4') { // 未成交不在队列中
-
-						USER_PRINT("未成交不在队列中");
-
-
-					} else if (pOrder->OrderStatus == '5') { // 撤单
-
-						USER_PRINT("撤单");
-						delete (*Itor);
-						Itor = this->stg_list_order_pending->erase(Itor); //移除
-
-					} else if (pOrder->OrderStatus == 'a') { // 未知
-
-						USER_PRINT("未知");
-
-					} else if (pOrder->OrderStatus == 'b') { // 尚未触发
-
-						USER_PRINT("尚未触发");
-
-					} else if (pOrder->OrderStatus == 'c') { // 已触发
-
-						USER_PRINT("已触发");
-
-					}
-
-				} else {	// 没有orderref存在挂单编号里,第一次
-					if (pOrder->OrderStatus == '0') { // 全部成交
-
-					}
-					else if (pOrder->OrderStatus == '1') { // 部分成交还在队列中
-						USER_PRINT("没有orderref存在挂单列表,部分成交还在队列中");
-						// 深复制对象
-						CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
-						memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
-						this->CopyOrderData(pOrder_tmp, pOrder);
-
-						this->stg_list_order_pending->push_back(pOrder_tmp);
-					}
-					else if (pOrder->OrderStatus == '2') { // 部分成交不在队列中
-
-					}
-					else if (pOrder->OrderStatus == '3') { // 未成交还在队列中
-						USER_PRINT("没有orderref存在挂单列表,未成交还在队列中");
-						// 深复制对象
-						CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
-						memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
-						this->CopyOrderData(pOrder_tmp, pOrder);
-
-						this->stg_list_order_pending->push_back(pOrder_tmp);
-					}
-					else if (pOrder->OrderStatus == '4') { // 未成交不在队列中
-
-					}
-					else if (pOrder->OrderStatus == '5') { // 撤单
-
-					}
-					else if (pOrder->OrderStatus == 'a') { // 未知
-
-					}
-					else if (pOrder->OrderStatus == 'b') { // 尚未触发
-
-					}
-					else if (pOrder->OrderStatus == 'c') { // 已触发
-
-					}
-				}
-				Itor++;
+		}
+	}
+	else if (pOrder->OrderStatus == '5') {
+		list<CThostFtdcOrderField *>::iterator itor;
+		for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
+			if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
+				delete (*itor);
+				itor = this->stg_list_order_pending->erase(itor); //移除
+				break;
+			}
+			else {
+				itor++;
 			}
 		}
 	}
+	else if (pOrder->OrderStatus == 'a') {
+		
+	}
+
+
 }
 
 /// 更新持仓量

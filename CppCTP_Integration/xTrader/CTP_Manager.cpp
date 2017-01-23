@@ -2385,6 +2385,7 @@ bool CTP_Manager::init(bool is_online) {
 	//	}
 	//}
 
+	USER_PRINT("初始化持仓明细");
 	list<CThostFtdcOrderField *> *l_query_order;
 	list<CThostFtdcOrderField *>::iterator order_itor;
 	/// 初始化今仓(order)
@@ -2405,8 +2406,6 @@ bool CTP_Manager::init(bool is_online) {
 			}	
 		}
 	}
-
-
 
 	/// 行情初始化
 	MarketConfig *mc = this->dbm->getOneMarketConfig();

@@ -966,7 +966,11 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 			cout << "lots = " << p.getIntField("lots") << ", ";
 			cout << "a_wait_price_tick = " << p.getField("a_wait_price_tick").Double() << ", ";
 			cout << "b_wait_price_tick = " << p.getField("b_wait_price_tick").Double() << ", ";
-			//cout << "strategy_on_off = " << p.getField("strategy_on_off").Int() << endl;
+			cout << "strategy_on_off = " << p.getIntField("strategy_on_off") << endl;
+			cout << "sell_open_on_off = " << p.getIntField("sell_open_on_off") << endl;
+			cout << "buy_close_on_off = " << p.getIntField("buy_close_on_off") << endl;
+			cout << "sell_close_on_off = " << p.getIntField("sell_close_on_off") << endl;
+			cout << "buy_open_on_off = " << p.getIntField("buy_open_on_off") << endl;
 			cout << "trading_day = " << p.getStringField("trading_day") << endl;
 
 			stg->setStgAWaitPriceTick(p.getField("a_wait_price_tick").Double());
