@@ -574,6 +574,7 @@ void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *
 	USER_PRINT("Begin Insert!");
 
 	//this->dbm->getConn()->insert(DB_ONRTNORDER_COLLECTION, p);
+	this->OrderConn->insert(DB_ONRTNORDER_COLLECTION, p);
 
 	/*string temp_order_ref_base = temp.substr(0, 10);
 	USER_PRINT(temp_order_ref_base);
@@ -685,6 +686,7 @@ void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *
 	//conn->insert(DB_ONRTNTRADE_COLLECTION, p);
 
 	//this->dbm->getConn()->insert(DB_ONRTNTRADE_COLLECTION, p);
+	this->TradeConn->insert(DB_ONRTNTRADE_COLLECTION, p);
 	
 	USER_PRINT("DBManager::DB_OnRtnTrade ok");
 }
