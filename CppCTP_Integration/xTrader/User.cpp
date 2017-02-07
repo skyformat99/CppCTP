@@ -382,14 +382,23 @@ void User::DB_OrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderF
 
 	BSONObj p = b.obj();
 	//conn->insert(DB_ORDERINSERT_COLLECTION, p);
+	USER_PRINT("Begin Insert!");
+
 	this->dbm->getConn()->insert(DB_ORDERINSERT_COLLECTION, p);
+
+	/*string temp_order_ref_base = temp.substr(0, 10);
+	USER_PRINT(temp_order_ref_base);
+	this->DB_UpdateOrderRef(temp_order_ref_base);*/
+
 	USER_PRINT("DBManager::DB_OrderInsert ok");
 }
 
 // 更新报单引用
 void User::DB_UpdateOrderRef(string order_ref_base) {
 	USER_PRINT("User::DB_UpdateOrderRef!");
+	int len_order_ref_base = order_ref_base.length();
 	USER_PRINT(order_ref_base);
+	USER_PRINT(len_order_ref_base);
 	this->dbm->UpdateFutureAccountOrderRef(this, order_ref_base);
 }
 
@@ -562,8 +571,13 @@ void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *
 
 	BSONObj p = b.obj();
 	//conn->insert(DB_ONRTNORDER_COLLECTION, p);
-	this->dbm->getConn()->insert(DB_ONRTNORDER_COLLECTION, p);
-	this->DB_UpdateOrderRef(temp);
+	USER_PRINT("Begin Insert!");
+
+	//this->dbm->getConn()->insert(DB_ONRTNORDER_COLLECTION, p);
+
+	/*string temp_order_ref_base = temp.substr(0, 10);
+	USER_PRINT(temp_order_ref_base);
+	this->DB_UpdateOrderRef(temp_order_ref_base);*/
 	USER_PRINT("DBManager::DB_OnRtnOrder ok");
 	
 }
@@ -669,7 +683,8 @@ void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *
 
 	BSONObj p = b.obj();
 	//conn->insert(DB_ONRTNTRADE_COLLECTION, p);
-	this->dbm->getConn()->insert(DB_ONRTNTRADE_COLLECTION, p);
+
+	//this->dbm->getConn()->insert(DB_ONRTNTRADE_COLLECTION, p);
 	
 	USER_PRINT("DBManager::DB_OnRtnTrade ok");
 }

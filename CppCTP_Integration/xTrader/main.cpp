@@ -122,7 +122,6 @@ void *th_fn(void *arg) {
 	out_fd(fd);
 	do_service(fd);
 	close(fd);
-
 	return (void *)0;
 }
 

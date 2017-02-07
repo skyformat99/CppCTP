@@ -1801,11 +1801,15 @@ void TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
 	USER_PRINT(this->current_user);
 	USER_PRINT(user);
 	//this->current_user->DB_OrderInsert(this->current_user->GetOrderConn(), pInputOrder);
-	user->DB_OrderInsert(user->GetOrderConn(), pInputOrder);
+
+	// 存储报单参数
+	//user->DB_OrderInsert(user->GetOrderConn(), pInputOrder);
+
 	string orderref = string(pInputOrder->OrderRef);
 	USER_PRINT(pInputOrder->OrderRef);
 	USER_PRINT(orderref);
-	user->DB_UpdateOrderRef(orderref);
+	// 更新报单引用基准
+	user->DB_UpdateOrderRef(orderref.substr(0, 10));
 	//delete pInputOrder;
 }
 
