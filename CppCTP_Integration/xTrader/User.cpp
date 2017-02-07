@@ -31,6 +31,7 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 	this->TradeConn = DBManager::getDBConnection();
 	this->PositionConn = DBManager::getDBConnection();
 	this->OrderConn = DBManager::getDBConnection();
+	this->OrderRefConn = DBManager::getDBConnection();
 	this->TraderID = TraderID;
 	this->l_strategys = new list<Strategy *>();
 	this->l_sessions = new list<Session *>();
@@ -48,6 +49,7 @@ User::User(string BrokerID, string UserID, int nRequestID, string stg_order_ref_
 	this->TradeConn = DBManager::getDBConnection();
 	this->PositionConn = DBManager::getDBConnection();
 	this->OrderConn = DBManager::getDBConnection();
+	this->OrderRefConn = DBManager::getDBConnection();
 	this->l_strategys = new list<Strategy *>();
 	this->l_sessions = new list<Session *>();
 	this->stg_map_instrument_action_counter = new map<string, int>();
@@ -399,7 +401,7 @@ void User::DB_UpdateOrderRef(string order_ref_base) {
 	int len_order_ref_base = order_ref_base.length();
 	USER_PRINT(order_ref_base);
 	USER_PRINT(len_order_ref_base);
-	this->dbm->UpdateFutureAccountOrderRef(this, order_ref_base);
+	this->dbm->UpdateFutureAccountOrderRef(this->OrderRefConn, this, order_ref_base);
 }
 
 void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *pOrder){

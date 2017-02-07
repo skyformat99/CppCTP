@@ -153,6 +153,7 @@ private:
 	mongo::DBClientConnection * PositionConn;
 	mongo::DBClientConnection * TradeConn;
 	mongo::DBClientConnection * OrderConn;
+	mongo::DBClientConnection * OrderRefConn;
 	DBManager *dbm;
 	long long stg_order_ref_base;
 	CTP_Manager *o_ctp;

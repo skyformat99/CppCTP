@@ -2170,7 +2170,11 @@ bool CTP_Manager::initYesterdayPosition() {
 		std::cout << "今仓 strategy_id = " << (*stg_itor)->getStgStrategyId() << std::endl;
 
 		if (is_equal == false) { // 如果时间晚于最新交易日，那么将策略新建到昨仓，并且更新仓位
-			this->dbm->UpdateFutureAccountOrderRef((*stg_itor)->getStgUser(), "1000000001");
+			// 更新今仓最新交易时间
+			(*stg_itor)->setStgTradingDay(this->getTradingDay());
+			// 更新今仓到数据库
+			this->dbm->UpdateStrategy((*stg_itor));
+			this->dbm->UpdateFutureAccountOrderRef(this->dbm->getConn(), (*stg_itor)->getStgUser(), "1000000001");
 		}
 	}
 

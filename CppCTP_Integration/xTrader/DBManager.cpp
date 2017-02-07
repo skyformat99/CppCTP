@@ -1,5 +1,6 @@
 #include <mongo/bson/bson.h>
 #include <iostream>
+#include <mutex>
 #include "DBManager.h"
 #include "Debug.h"
 
@@ -28,6 +29,8 @@ using std::unique_ptr;
 #define DB_ALGORITHM_COLLECTION					"CTP.algorithm"
 #define ISACTIVE "1"
 #define ISNOTACTIVE "0"
+
+std::mutex mtx; // locks access to counter
 
 DBManager::DBManager() {
 	try
@@ -378,7 +381,7 @@ void DBManager::UpdateFutureAccount(User *u) {
 	USER_PRINT("DBManager::UpdateOperator ok");
 }
 
-void DBManager::UpdateFutureAccountOrderRef(User *u, string order_ref_base) {
+void DBManager::UpdateFutureAccountOrderRef(mongo::DBClientConnection * conn_tmp, User *u, string order_ref_base) {
 	USER_PRINT("order_ref_base");
 	USER_PRINT(order_ref_base);
 	string DB_FUTUREACCOUNT_COLLECTION;
@@ -389,8 +392,14 @@ void DBManager::UpdateFutureAccountOrderRef(User *u, string order_ref_base) {
 	{
 		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount_panhou";
 	}
+	
 	USER_PRINT(DB_FUTUREACCOUNT_COLLECTION);
-	this->conn->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (u->getUserID().c_str())), BSON("$set" << BSON("order_ref_base" << order_ref_base.c_str())));
+	
+	mtx.lock();
+	
+	conn_tmp->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (u->getUserID().c_str())), BSON("$set" << BSON("order_ref_base" << order_ref_base.c_str())));
+
+	mtx.unlock();
 	USER_PRINT("DBManager::UpdateFutureAccountOrderRef ok");
 }
 

@@ -75,7 +75,7 @@ public:
 	void CreateFutureAccount(Trader *op, FutureAccount *fa);
 	void DeleteFutureAccount(FutureAccount *fa);
 	void UpdateFutureAccount(User *u);
-	void UpdateFutureAccountOrderRef(User *u, string order_ref_base);
+	void UpdateFutureAccountOrderRef(mongo::DBClientConnection * conn, User *u, string order_ref_base);
 	void SearchFutrueByUserID(string userid);
 	void SearchFutrueByTraderID(string traderid);
 	void SearchFutrueListByTraderID(string traderid, list<FutureAccount *> *l_futureaccount);
