@@ -292,7 +292,7 @@ int main(int argc, char *argv[]) {
 	});
 
 	tHello.setSingleShot(false);
-	tHello.setInterval(Timer::Interval(1000));
+	tHello.setInterval(Timer::Interval(1000 * 60 * 10));
 	tHello.start(true);
 
 
