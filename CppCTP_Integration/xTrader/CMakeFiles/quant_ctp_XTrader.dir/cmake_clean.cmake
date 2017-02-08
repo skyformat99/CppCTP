@@ -12,6 +12,7 @@ FILE(REMOVE_RECURSE
   "CMakeFiles/quant_ctp_XTrader.dir/Session.cpp.o"
   "CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o"
   "CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o"
+  "CMakeFiles/quant_ctp_XTrader.dir/Timer.cpp.o"
   "CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o"
   "CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o"
   "CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o"

@@ -176,6 +176,9 @@ CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: User.h
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: Utils.h
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: xTradeStruct.h
 
+CMakeFiles/quant_ctp_XTrader.dir/Timer.cpp.o: Timer.cpp
+CMakeFiles/quant_ctp_XTrader.dir/Timer.cpp.o: Timer.h
+
 CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o: Algorithm.h
 CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o: CTP_Manager.h
 CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o: DBManager.h
@@ -242,6 +245,7 @@ CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: ThostFtdcMdApi.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: ThostFtdcTraderApi.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: ThostFtdcUserApiDataType.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: ThostFtdcUserApiStruct.h
+CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: Timer.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: Trader.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: User.h
 CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o: Utils.h

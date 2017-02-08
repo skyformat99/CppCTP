@@ -31,6 +31,7 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 #include "msg.h"
+#include "Timer.h"
 
 using std::cout;
 using std::cin;
@@ -283,6 +284,18 @@ int main(int argc, char *argv[]) {
 		printf("mode: 1:online 0:offline\n");
 		exit(1);
 	}
+
+	// 多线程定时器
+	Timer tHello([]()
+	{
+		cout << "Timer!!!" << endl;
+	});
+
+	tHello.setSingleShot(false);
+	tHello.setInterval(Timer::Interval(1000));
+	tHello.start(true);
+
+
 
 	// 程序入口，初始化资源
 	if (!ctp_m->init(init_flag)) {

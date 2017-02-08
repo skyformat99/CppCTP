@@ -268,6 +268,12 @@ ThostFtdcUserApiStruct.h
 ThostFtdcUserApiDataType.h
 /root/xTrader/ThostFtdcUserApiDataType.h
 
+/root/xTrader/Timer.h
+thread
+-
+chrono
+-
+
 /root/xTrader/Trader.cpp
 Trader.h
 /root/xTrader/Trader.h
@@ -423,6 +429,8 @@ rapidjson/stringbuffer.h
 /root/xTrader/rapidjson/stringbuffer.h
 msg.h
 /root/xTrader/msg.h
+Timer.h
+/root/xTrader/Timer.h
 
 /root/xTrader/msg.h
 sys/types.h
