@@ -534,6 +534,9 @@ void Strategy::CopyNewOrderData(USER_CThostFtdcOrderField *dst, USER_CThostFtdcO
 	///报单引用
 	strcpy(dst->OrderRef, src->OrderRef);
 
+	///策略ID
+	strcpy(dst->StrategyID, src->StrategyID);
+
 	///用户代码
 	strcpy(dst->UserID, src->UserID);
 
@@ -1128,7 +1131,8 @@ void Strategy::CopyPositionData(PositionDetail *posd, USER_CThostFtdcOrderField 
 	order->VolumeTotal = posd->getVolumeTotal();
 	strcpy(order->InsertDate, posd->getInsertDate().c_str());
 	strcpy(order->InsertTime, posd->getInsertTime().c_str());
-	order->StrategyID = posd->getStrategyID();
+	//order->StrategyID = posd->getStrategyID();
+	strcpy(order->StrategyID, posd->getStrategyID().c_str());
 	order->VolumeTradedBatch = posd->getVolumeTradedBatch();
 }
 
@@ -1793,6 +1797,7 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	// 添加字段,本次成交量
 	USER_CThostFtdcOrderField *order_new = new USER_CThostFtdcOrderField();
 	memset(order_new, 0x00, sizeof(USER_CThostFtdcOrderField));
+	USER_PRINT(order_new);
 
 	//std::auto_ptr<USER_CThostFtdcOrderField> order_new(new USER_CThostFtdcOrderField);
 
@@ -1806,7 +1811,7 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 
 	this->update_task_status();
 
-	//delete order_new;
+	delete order_new;
 
 	/// A成交回报,B发送等量的报单
 	if ((!strcmp(pOrder->InstrumentID, this->stg_instrument_id_A.c_str())) && ((pOrder->OrderStatus == '0') || (pOrder->OrderStatus == '1')) && (strlen(pOrder->OrderSysID) != 0)) { //只有全部成交或者部分成交还在队列中
@@ -2574,6 +2579,7 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 		USER_CThostFtdcOrderField *new_order = new USER_CThostFtdcOrderField();
 		memset(new_order, 0, sizeof(USER_CThostFtdcOrderField));
 		this->CopyNewOrderData(new_order, pOrder);
+		USER_PRINT(new_order);
 
 		this->stg_list_position_detail_from_order->push_back(new_order);
 		USER_PRINT("pOrder->CombOffsetFlag[0] == 0 away");
@@ -2603,7 +2609,7 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 				if (pOrder->VolumeTradedBatch == (*itor)->VolumeTradedBatch) { // order_new的VolumeTradedBatch等于持仓列表首个满足条件的order的VolumeTradedBatch
 					USER_PRINT("order_new的VolumeTradedBatch等于持仓列表首个满足条件的order的VolumeTradedBatch");
 					USER_PRINT((*itor));
-					//delete *itor;
+					delete *itor;
 					USER_PRINT("delete itor");
 					itor = this->stg_list_position_detail_from_order->erase(itor);
 					break;
