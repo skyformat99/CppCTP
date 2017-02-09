@@ -377,7 +377,7 @@ void DBManager::UpdateFutureAccount(User *u) {
 	{
 		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount_panhou";
 	}
-	this->conn->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (u->getUserID().c_str())), BSON("$set" << BSON("userid" << u->getUserID() << "brokerid" << u->getBrokerID() << "traderid" << u->getTraderID() << "password" << u->getPassword() << "frontaddress" << u->getFrontAddress() << "isactive" << u->getIsActive() << "on_off" << u->getOn_Off())));
+	this->conn->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (u->getUserID().c_str())), BSON("$set" << BSON("userid" << u->getUserID() << "brokerid" << u->getBrokerID() << "traderid" << u->getTraderID() << "password" << u->getPassword() << "frontaddress" << u->getFrontAddress() << "on_off" << u->getOn_Off())));
 	USER_PRINT("DBManager::UpdateOperator ok");
 }
 
