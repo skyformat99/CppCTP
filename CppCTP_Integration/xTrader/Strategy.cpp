@@ -1301,6 +1301,9 @@ void Strategy::Order_Algorithm_One() {
 	} 
 	else
 	{
+		std::cout << "策略跳过异常行情" << std::endl;
+		std::cout << "UserID" << this->stg_user_id << std::endl;
+		std::cout << "策略ID" << this->stg_strategy_id << std::endl;
 		return;
 	}
 
@@ -1308,12 +1311,12 @@ void Strategy::Order_Algorithm_One() {
 	std::cout << "this->stg_user = " << this->stg_user << std::endl;
 	std::cout << "this->stg_user->getCTP_Manager() = " << this->stg_user->getCTP_Manager() << std::endl;
 	std::cout << "策略开关,期货账户开关,总开关" << std::endl;*/
-	if (this->stg_user) {
+	/*if (this->stg_user) {
 		USER_PRINT(this->stg_user);
-	}
-	else {
+		}
+		else {
 		USER_PRINT("CRASH!!!");
-	}
+		}*/
 	USER_PRINT(this->stg_user->getCTP_Manager()->getOn_Off());
 	//为了测试需要打开开关
 	//this->stg_user->getCTP_Manager()->setOn_Off(1);
@@ -1324,13 +1327,12 @@ void Strategy::Order_Algorithm_One() {
 
 
 	/// 策略开关，期货账户开关，总开关
-	if (!((this->getOn_Off()) & (this->stg_user->getOn_Off()) & (this->stg_user->GetTrader()->getOn_Off()))) {
+	if (!((this->getOn_Off()) && (this->stg_user->getOn_Off()) && (this->stg_user->GetTrader()->getOn_Off()))) {
 		USER_PRINT("请检查开关状态!");
 		/*std::cout << "请检查开关状态!" << std::endl;
-		std::cout << "总开关 = " << this->stg_user->getCTP_Manager()->getOn_Off() << std::endl;
-		std::cout << "账户开关 = " << this->stg_user->getOn_Off() << std::endl;
-		std::cout << "策略开关 = " << this->getOn_Off() << std::endl;*/
-		
+		std::cout << "策略开关 = " << this->getOn_Off() << std::endl;
+		std::cout << "期货账户开关 = " << this->stg_user->getOn_Off() << std::endl;
+		std::cout << "总开关 = " << this->stg_user->GetTrader()->getOn_Off() << std::endl;*/
 		return;
 	}
 
