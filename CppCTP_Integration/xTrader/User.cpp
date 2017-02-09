@@ -32,6 +32,7 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 	this->PositionConn = DBManager::getDBConnection();
 	this->OrderConn = DBManager::getDBConnection();
 	this->OrderRefConn = DBManager::getDBConnection();
+	this->OrderActionConn = DBManager::getDBConnection();
 	this->TraderID = TraderID;
 	this->l_strategys = new list<Strategy *>();
 	this->l_sessions = new list<Session *>();
@@ -50,6 +51,7 @@ User::User(string BrokerID, string UserID, int nRequestID, string stg_order_ref_
 	this->PositionConn = DBManager::getDBConnection();
 	this->OrderConn = DBManager::getDBConnection();
 	this->OrderRefConn = DBManager::getDBConnection();
+	this->OrderActionConn = DBManager::getDBConnection();
 	this->l_strategys = new list<Strategy *>();
 	this->l_sessions = new list<Session *>();
 	this->stg_map_instrument_action_counter = new map<string, int>();
@@ -283,6 +285,9 @@ mongo::DBClientConnection * User::GetTradeConn() {
 }
 mongo::DBClientConnection * User::GetOrderConn() {
 	return this->OrderConn;
+}
+mongo::DBClientConnection * User::GetOrderActionConn() {
+	return this->OrderActionConn;
 }
 
 /************************************************************************/
@@ -734,7 +739,8 @@ void User::DB_OrderAction(mongo::DBClientConnection *conn, CThostFtdcInputOrderA
 	///MacµØÖ·
 	b.append("MacAddress", pOrderAction->MacAddress);
 	BSONObj p = b.obj();
-	conn->insert(DB_ORDERACTION_COLLECTION, p);
+	this->OrderActionConn->insert(DB_ORDERACTION_COLLECTION, p);
+
 	USER_PRINT("DBManager::DB_OrderAction ok");
 }
 
