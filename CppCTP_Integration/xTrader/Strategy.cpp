@@ -1137,10 +1137,14 @@ void Strategy::CopyPositionData(PositionDetail *posd, USER_CThostFtdcOrderField 
 }
 
 void Strategy::printStrategyInfo(string message) {
+	time_t tt = system_clock::to_time_t(system_clock::now()); 
+	std::string nowt(std::ctime(&tt)); 
 	std::cout << "====策略状态信息====" << std::endl;
 	std::cout << "期货账户:" << this->stg_user_id << std::endl;
 	std::cout << "策略编号:" << this->stg_strategy_id << std::endl;
 	std::cout << "调试信息:" << message << std::endl;
+	std::cout << "文件定位:" << __FILE__ << ", 行数:" << __LINE__ << std::endl;
+	std::cout << "时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
 }
 
 // 获取持仓明细
@@ -1396,11 +1400,11 @@ void Strategy::Order_Algorithm_One() {
 	USER_PRINT("&&&&&&&&&&&&&&&&&&&&&&");
 	
 	this->printStrategyInfo("价差卖开参数");
-	std::cout << "this->stg_spread_long = " << this->stg_spread_long << std::endl;
+	/*std::cout << "this->stg_spread_long = " << this->stg_spread_long << std::endl;
 	std::cout << "this->stg_sell_open = " << this->stg_sell_open << std::endl;
 	std::cout << "this->stg_spread_shift = " << this->stg_spread_shift << std::endl;
 	std::cout << "this->stg_a_price_tick = " << this->stg_a_price_tick << std::endl;
-	std::cout << "(this->stg_spread_long >= (this->stg_sell_open + this->stg_spread_shift * this->stg_a_price_tick)) = " << (this->stg_spread_long >= (this->stg_sell_open + this->stg_spread_shift * this->stg_a_price_tick)) << std::endl;
+	std::cout << "(this->stg_spread_long >= (this->stg_sell_open + this->stg_spread_shift * this->stg_a_price_tick)) = " << (this->stg_spread_long >= (this->stg_sell_open + this->stg_spread_shift * this->stg_a_price_tick)) << std::endl;*/
 
 
 	/// 价差卖平(b)
@@ -1942,10 +1946,12 @@ void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketDat
 		std::cout << "pDepthMarketData->InstrumentID = " << pDepthMarketData->InstrumentID << endl;
 		/// A有挂单，判断是否需要撤单
 		if (!strcmp((*Itor)->InstrumentID, this->stg_instrument_id_A.c_str())) {
+			this->printStrategyInfo("A有挂单");
 			/// 通过A最新tick判断A合约是否需要撤单
 			if (!strcmp(pDepthMarketData->InstrumentID, this->stg_instrument_id_A.c_str())) {
 				/// A挂单方向为买
 				if ((*Itor)->Direction == '0') {
+					this->printStrategyInfo("A挂单方向为买，进入撤单判断");
 					/// 挂单价格与盘口买一价比较，如果与盘口价格差距n个最小跳以上，撤单
 					if (pDepthMarketData->BidPrice1 > ((*Itor)->LimitPrice + (this->stg_a_wait_price_tick * this->stg_a_price_tick))) {
 						std::cout << "A合约通过最新tick判断A合约买挂单符合撤单条件" << endl;
@@ -1954,7 +1960,7 @@ void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketDat
 					}
 				}
 				else if ((*Itor)->Direction == '1') {
-					std::cout << "Strategy::Exec_OnTickComing A挂单方向为卖" << std::endl;
+					this->printStrategyInfo("A挂单方向为卖，进入撤单判断");
 					if (pDepthMarketData->AskPrice1 < ((*Itor)->LimitPrice - (this->stg_a_wait_price_tick * this->stg_a_price_tick))) {
 						std::cout << "Strategy::Exec_OnTickComing A挂单方向为卖，撤单" << std::endl;
 						/// A合约撤单
@@ -1967,6 +1973,7 @@ void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketDat
 			else if (!strcmp(pDepthMarketData->InstrumentID, this->stg_instrument_id_B.c_str())) {
 				/// A挂单的买卖方向为买
 				if ((*Itor)->Direction == '0') {
+					this->printStrategyInfo("根据B的行情判断A是否需要撤单，A挂单方向为买，进入撤单判断");
 					/// B最新tick的对手价如果与开仓信号触发时B的tick对手价发生不利变化则A撤单
 					if (pDepthMarketData->BidPrice1 < this->stg_instrument_B_tick_last->BidPrice1) {
 						USER_PRINT("Strategy.trade_task() 通过B最新tick判断A合约买挂单符合撤单条件");
@@ -1975,6 +1982,7 @@ void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketDat
 				}
 				/// A挂单的买卖方向为卖
 				else if ((*Itor)->Direction == '1') {
+					this->printStrategyInfo("根据B的行情判断A是否需要撤单，A挂单的买卖方向为卖，进入撤单判断");
 					/// B最新tick的对手价如果与开仓信号触发时B的tick对手价发生不利变化则A撤单
 					if (pDepthMarketData->AskPrice1 > this->stg_instrument_B_tick_last->AskPrice1) {
 						USER_PRINT("Strategy.trade_task()通过B最新tick判断A合约卖挂单符合撤单条件");
