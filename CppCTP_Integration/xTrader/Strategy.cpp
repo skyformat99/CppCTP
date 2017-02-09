@@ -1535,7 +1535,7 @@ void Strategy::Order_Algorithm_One() {
 		// 合约代码
 		std::strcpy(this->stg_a_order_insert_args->InstrumentID, this->stg_instrument_id_A.c_str());
 		// 限价
-		this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->AskPrice1;
+		this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->AskPrice1 - this->stg_spread_shift * this->stg_a_price_tick;
 		// 数量
 		this->stg_a_order_insert_args->VolumeTotalOriginal = order_volume;
 		// 买卖方向
@@ -1620,7 +1620,7 @@ void Strategy::Order_Algorithm_One() {
 		// 合约代码
 		std::strcpy(this->stg_a_order_insert_args->InstrumentID, this->stg_instrument_id_A.c_str());
 		// 限价
-		this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->BidPrice1;
+		this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->BidPrice1 + this->stg_spread_shift * this->stg_a_price_tick;
 		// 数量
 		this->stg_a_order_insert_args->VolumeTotalOriginal = order_volume;
 		// 买卖方向
