@@ -1391,7 +1391,7 @@ void Strategy::Order_Algorithm_One() {
 		&& (this->stg_position_a_sell == this->stg_position_b_buy)
 		&& (this->stg_position_a_sell > 0)) {
 		/// 市场多头价差大于触发参数， AB持仓量相等且大于0
-		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差多头卖平" << endl;
+		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差卖平" << endl;
 
 		std::cout << "user_id = " << this->stg_user_id << ", "
 			<< "strategy_id = " << this->stg_strategy_id << ", "
@@ -1478,7 +1478,7 @@ void Strategy::Order_Algorithm_One() {
 		(this->stg_position_a_sell > 0) && 
 		(this->stg_spread_short <= (this->stg_buy_close - this->stg_spread_shift * this->stg_a_price_tick))) {
 		/// 市场空头价差小于等于触发参数， AB持仓量相等且大于0
-		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差空头买平" << endl;
+		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买平" << endl;
 
 		std::cout << "user_id = " << this->stg_user_id << ", "
 			<< "strategy_id = " << this->stg_strategy_id << ", "
@@ -1536,6 +1536,12 @@ void Strategy::Order_Algorithm_One() {
 		std::strcpy(this->stg_a_order_insert_args->InstrumentID, this->stg_instrument_id_A.c_str());
 		// 限价
 		this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->AskPrice1 - this->stg_spread_shift * this->stg_a_price_tick;
+		
+		std::cout << "this->stg_instrument_A_tick->AskPrice1 = " << this->stg_instrument_A_tick->AskPrice1 << std::endl;
+		std::cout << "this->stg_spread_shift = " << this->stg_spread_shift << std::endl;
+		std::cout << "this->stg_a_price_tick = " << this->stg_a_price_tick << std::endl;
+		std::cout << "this->stg_a_order_insert_args->LimitPrice = " << this->stg_a_order_insert_args->LimitPrice << std::endl;
+		
 		// 数量
 		this->stg_a_order_insert_args->VolumeTotalOriginal = order_volume;
 		// 买卖方向
@@ -1575,7 +1581,7 @@ void Strategy::Order_Algorithm_One() {
 		/** 市场多头价差大于触发参数
 		A合约买持仓加B合约买小于总仓位**/
 
-		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差多头卖开" << endl;
+		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差卖开" << endl;
 		
 		std::cout << "user_id = " << this->stg_user_id << ", "
 			<< "strategy_id = " << this->stg_strategy_id << ", "
@@ -1621,6 +1627,10 @@ void Strategy::Order_Algorithm_One() {
 		std::strcpy(this->stg_a_order_insert_args->InstrumentID, this->stg_instrument_id_A.c_str());
 		// 限价
 		this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->BidPrice1 + this->stg_spread_shift * this->stg_a_price_tick;
+		std::cout << "this->stg_instrument_A_tick->BidPrice1 = " << this->stg_instrument_A_tick->BidPrice1 << std::endl;
+		std::cout << "this->stg_spread_shift = " << this->stg_spread_shift << std::endl;
+		std::cout << "this->stg_a_price_tick = " << this->stg_a_price_tick << std::endl;
+		std::cout << "this->stg_a_order_insert_args->LimitPrice = " << this->stg_a_order_insert_args->LimitPrice << std::endl;
 		// 数量
 		this->stg_a_order_insert_args->VolumeTotalOriginal = order_volume;
 		// 买卖方向
@@ -1655,7 +1665,7 @@ void Strategy::Order_Algorithm_One() {
 	/// 价差空头买开(b)
 	/*else if ((this->stg_spread_short <= this->stg_buy_open) && (this->stg_position_a_buy + this->stg_position_a_sell < this->stg_lots)) {*/
 	else if ((this->buy_open_on_off) && ((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots)) {
-		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差空头买开" << endl;
+		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买开" << endl;
 
 
 		std::cout << "user_id = " << this->stg_user_id << ", "
@@ -2138,6 +2148,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 	USER_PRINT(pOrder->OrderStatus);
 
 	if (pOrder->OrderStatus == '0') { // 全部成交
+		std::cout << "更新挂单,全部成交" << std::endl;
 		list<CThostFtdcOrderField *>::iterator itor;
 		for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
 			if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
@@ -2151,7 +2162,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 		}
 	}
 	else if (pOrder->OrderStatus == '1') { // 部分成交还在队列中
-		
+		std::cout << "更新挂单,部分成交还在队列中" << std::endl;
 		list<CThostFtdcOrderField *>::iterator itor;
 		for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
 			if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
@@ -2165,6 +2176,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 		
 	}
 	else if (pOrder->OrderStatus == '3') { // 未成交还在队列中
+		std::cout << "更新挂单,未成交还在队列中" << std::endl;
 		bool isExists = false;
 		// 判断挂单列表是否存在
 		list<CThostFtdcOrderField *>::iterator itor;
@@ -2172,6 +2184,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 			if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
 				// 存在置flag标志位
 				isExists = true;
+				std::cout << "更新挂单,又挂单" << std::endl;
 				this->CopyOrderData(*itor, pOrder);
 				break;
 			}
@@ -2181,7 +2194,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 		}
 		// 如果不存在直接加入
 		if (!isExists) {
-
+			std::cout << "更新挂单,无挂单" << std::endl;
 			// 深复制对象
 			CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
 			memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
@@ -2191,6 +2204,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 		}
 	}
 	else if (pOrder->OrderStatus == '5') { // 撤单
+		std::cout << "更新挂单,撤单" << std::endl;
 		list<CThostFtdcOrderField *>::iterator itor;
 		for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
 			if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
