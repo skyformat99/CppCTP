@@ -1338,6 +1338,8 @@ void Strategy::Order_Algorithm_One() {
 	/// 策略开关，期货账户开关，总开关
 	if (!((this->getOn_Off()) && (this->stg_user->getOn_Off()) && (this->stg_user->GetTrader()->getOn_Off()))) {
 		USER_PRINT("请检查开关状态!");
+		std::cout << "UserID" << this->stg_user_id << std::endl;
+		std::cout << "策略ID" << this->stg_strategy_id << std::endl;
 		std::cout << "请检查开关状态!" << std::endl;
 		std::cout << "策略开关 = " << this->getOn_Off() << std::endl;
 		std::cout << "期货账户开关 = " << this->stg_user->getOn_Off() << std::endl;
@@ -2159,7 +2161,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 	USER_PRINT(pOrder->OrderStatus);
 
 	if (pOrder->OrderStatus == '0') { // 全部成交
-		std::cout << "更新挂单,全部成交" << std::endl;
+		//std::cout << "更新挂单,全部成交" << std::endl;
 		list<CThostFtdcOrderField *>::iterator itor;
 		for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
 			if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
@@ -2173,7 +2175,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 		}
 	}
 	else if (pOrder->OrderStatus == '1') { // 部分成交还在队列中
-		std::cout << "更新挂单,部分成交还在队列中" << std::endl;
+		//std::cout << "更新挂单,部分成交还在队列中" << std::endl;
 		list<CThostFtdcOrderField *>::iterator itor;
 		for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
 			if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
@@ -2187,7 +2189,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 		
 	}
 	else if (pOrder->OrderStatus == '3') { // 未成交还在队列中
-		std::cout << "更新挂单,未成交还在队列中" << std::endl;
+		//std::cout << "更新挂单,未成交还在队列中" << std::endl;
 		bool isExists = false;
 		// 判断挂单列表是否存在
 		list<CThostFtdcOrderField *>::iterator itor;
@@ -2205,7 +2207,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 		}
 		// 如果不存在直接加入
 		if (!isExists) {
-			std::cout << "更新挂单,无挂单" << std::endl;
+			//std::cout << "更新挂单,无挂单" << std::endl;
 			// 深复制对象
 			CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
 			memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
@@ -2215,7 +2217,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 		}
 	}
 	else if (pOrder->OrderStatus == '5') { // 撤单
-		std::cout << "更新挂单,撤单" << std::endl;
+		//std::cout << "更新挂单,撤单" << std::endl;
 		list<CThostFtdcOrderField *>::iterator itor;
 		for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
 			if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
