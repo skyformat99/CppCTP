@@ -1399,6 +1399,8 @@ void Strategy::Order_Algorithm_One() {
 	USER_PRINT("&&&&&&&&&&&&&&&&&&&&&&");
 	
 	std::cout << "价差卖开参数" << std::endl;
+	std::cout << "UserID" << this->stg_user_id << std::endl;
+	std::cout << "策略ID" << this->stg_strategy_id << std::endl;
 	std::cout << "this->stg_spread_long = " << this->stg_spread_long << std::endl;
 	std::cout << "this->stg_sell_open = " << this->stg_sell_open << std::endl;
 	std::cout << "this->stg_spread_shift = " << this->stg_spread_shift << std::endl;
