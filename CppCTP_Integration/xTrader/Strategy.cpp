@@ -1359,6 +1359,7 @@ void Strategy::Order_Algorithm_One() {
 	USER_PRINT(this->buy_close_on_off);
 	USER_PRINT((this->stg_position_a_sell == this->stg_position_b_buy));
 	USER_PRINT((this->stg_position_a_sell > 0));
+	USER_PRINT((this->stg_spread_short <= this->stg_buy_close));
 	USER_PRINT("######################");
 
 	USER_PRINT("$$$$$$$$$$$$$$$$$$$$$$");
@@ -1471,8 +1472,10 @@ void Strategy::Order_Algorithm_One() {
 	/// 价差空头买平(f)
 	/*else if ((this->stg_spread_short <= this->stg_buy_close) && (this->stg_position_a_sell == this->stg_position_b_buy) &&
 		(this->stg_position_a_sell > 0)) {*/
-	else if ((this->buy_close_on_off) && (this->stg_position_a_sell == this->stg_position_b_buy) &&
-		(this->stg_position_a_sell > 0)) {
+	else if ((this->buy_close_on_off) && 
+		(this->stg_position_a_sell == this->stg_position_b_buy) &&
+		(this->stg_position_a_sell > 0) && 
+		(this->stg_spread_short <= this->stg_buy_close)) {
 		/// 市场空头价差小于等于触发参数， AB持仓量相等且大于0
 		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差空头买平" << endl;
 
