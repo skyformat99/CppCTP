@@ -1385,8 +1385,15 @@ void Strategy::Order_Algorithm_One() {
 	USER_PRINT(((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots));
 	USER_PRINT("&&&&&&&&&&&&&&&&&&&&&&");
 	
+	std::cout << "价差卖开参数" << std::endl;
+	std::cout << "this->stg_spread_long = " << this->stg_spread_long << std::endl;
+	std::cout << "this->stg_sell_open = " << this->stg_sell_open << std::endl;
+	std::cout << "this->stg_spread_shift = " << this->stg_spread_shift << std::endl;
+	std::cout << "this->stg_a_price_tick = " << this->stg_a_price_tick << std::endl;
+	std::cout << "(this->stg_spread_long >= (this->stg_sell_open + this->stg_spread_shift * this->stg_a_price_tick)) = " << (this->stg_spread_long >= (this->stg_sell_open + this->stg_spread_shift * this->stg_a_price_tick)) << std::endl;
 
-	/// 价差多头卖平(b)
+
+	/// 价差卖平(b)
 	if ((this->sell_close_on_off) && (this->stg_spread_long >= this->stg_sell_close) 
 		&& (this->stg_position_a_sell == this->stg_position_b_buy)
 		&& (this->stg_position_a_sell > 0)) {
@@ -1471,8 +1478,6 @@ void Strategy::Order_Algorithm_One() {
 
 	}
 	/// 价差买平(f)
-	/*else if ((this->stg_spread_short <= this->stg_buy_close) && (this->stg_position_a_sell == this->stg_position_b_buy) &&
-		(this->stg_position_a_sell > 0)) {*/
 	else if ((this->buy_close_on_off) && 
 		(this->stg_position_a_sell == this->stg_position_b_buy) &&
 		(this->stg_position_a_sell > 0) && 
@@ -1574,7 +1579,6 @@ void Strategy::Order_Algorithm_One() {
 	}
 
 	/// 价差卖开(f)
-	//else if ((this->stg_spread_long >= this->stg_sell_open) && (this->stg_position_a_buy + this->stg_position_a_sell < this->stg_lots)) {
 	else if ((this->sell_open_on_off) && 
 		((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots) &&
 		(this->stg_spread_long >= (this->stg_sell_open + this->stg_spread_shift * this->stg_a_price_tick))) {
@@ -1663,7 +1667,6 @@ void Strategy::Order_Algorithm_One() {
 	}
 
 	/// 价差空头买开(b)
-	/*else if ((this->stg_spread_short <= this->stg_buy_open) && (this->stg_position_a_buy + this->stg_position_a_sell < this->stg_lots)) {*/
 	else if ((this->buy_open_on_off) && ((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots)) {
 		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买开" << endl;
 
@@ -1734,9 +1737,6 @@ void Strategy::Order_Algorithm_One() {
 		this->Exec_OrderInsert(this->stg_a_order_insert_args);
 		this->stg_trade_tasking = true;
 	}
-
-
-
 }
 //下单算法2
 void Strategy::Order_Algorithm_Two() {
@@ -1778,7 +1778,7 @@ string Strategy::Generate_Order_Ref() {
 
 // 报单
 void Strategy::Exec_OrderInsert(CThostFtdcInputOrderField *insert_order) {
-	std::cout << "====Strategy::Exec_OrderInsert()====" << std::endl;
+	std::cout << "====报单参数====" << std::endl;
 	std::cout << "OrderRef = " << insert_order->OrderRef << std::endl;
 	std::cout << "InstrumentID = " << insert_order->InstrumentID << std::endl;
 	std::cout << "LimitPrice = " << insert_order->LimitPrice << std::endl;
