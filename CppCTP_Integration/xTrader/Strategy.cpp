@@ -1210,6 +1210,7 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 	//如果有挂单,返回0
 	if (this->stg_list_order_pending->size() > 0) {
 		USER_PRINT("有挂单,返回");
+		USER_PRINT(this->stg_list_order_pending->size());
 		list<CThostFtdcOrderField *>::iterator itor;
 		for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end(); itor++) {
 			USER_PRINT((*itor)->InstrumentID);
@@ -1469,13 +1470,13 @@ void Strategy::Order_Algorithm_One() {
 		this->stg_trade_tasking = true;
 
 	}
-	/// 价差空头买平(f)
+	/// 价差买平(f)
 	/*else if ((this->stg_spread_short <= this->stg_buy_close) && (this->stg_position_a_sell == this->stg_position_b_buy) &&
 		(this->stg_position_a_sell > 0)) {*/
 	else if ((this->buy_close_on_off) && 
 		(this->stg_position_a_sell == this->stg_position_b_buy) &&
 		(this->stg_position_a_sell > 0) && 
-		(this->stg_spread_short <= this->stg_buy_close)) {
+		(this->stg_spread_short <= (this->stg_buy_close - this->stg_spread_shift * this->stg_a_price_tick))) {
 		/// 市场空头价差小于等于触发参数， AB持仓量相等且大于0
 		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差空头买平" << endl;
 
@@ -1566,9 +1567,11 @@ void Strategy::Order_Algorithm_One() {
 		this->stg_trade_tasking = true;
 	}
 
-	/// 价差多头卖开(f)
+	/// 价差卖开(f)
 	//else if ((this->stg_spread_long >= this->stg_sell_open) && (this->stg_position_a_buy + this->stg_position_a_sell < this->stg_lots)) {
-	else if ((this->sell_open_on_off) && ((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots)) {
+	else if ((this->sell_open_on_off) && 
+		((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots) &&
+		(this->stg_spread_long >= (this->stg_sell_open + this->stg_spread_shift * this->stg_a_price_tick))) {
 		/** 市场多头价差大于触发参数
 		A合约买持仓加B合约买小于总仓位**/
 
@@ -1911,8 +1914,12 @@ void Strategy::Exec_OnErrRtnOrderAction() {
 // 行情回调,执行交易任务
 void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 	USER_PRINT("Exec_OnTickComing()");
+	std::cout << "行情回调" << std::endl;
 	list<CThostFtdcOrderField *>::iterator Itor;
 	for (Itor = this->stg_list_order_pending->begin(); Itor != this->stg_list_order_pending->end(); Itor++) {
+		std::cout << "(*Itor)->InstrumentID = " << (*Itor)->InstrumentID << endl;
+		std::cout << "this->stg_instrument_id_A = " << this->stg_instrument_id_A << endl;
+		std::cout << "pDepthMarketData->InstrumentID = " << pDepthMarketData->InstrumentID << endl;
 		/// A有挂单，判断是否需要撤单
 		if (!strcmp((*Itor)->InstrumentID, this->stg_instrument_id_A.c_str())) {
 			/// 通过A最新tick判断A合约是否需要撤单
@@ -1920,7 +1927,7 @@ void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketDat
 				/// A挂单方向为买
 				if ((*Itor)->Direction == '0') {
 					/// 挂单价格与盘口买一价比较，如果与盘口价格差距n个最小跳以上，撤单
-					if (pDepthMarketData->BidPrice1 > (*Itor)->LimitPrice + (this->stg_a_wait_price_tick * this->stg_a_price_tick)) {
+					if (pDepthMarketData->BidPrice1 > ((*Itor)->LimitPrice + (this->stg_a_wait_price_tick * this->stg_a_price_tick))) {
 						std::cout << "A合约通过最新tick判断A合约买挂单符合撤单条件" << endl;
 						/// A合约撤单
 						this->stg_user->getUserTradeSPI()->OrderAction((*Itor)->ExchangeID, (*Itor)->OrderRef, (*Itor)->OrderSysID);
@@ -2130,19 +2137,20 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 
 	USER_PRINT(pOrder->OrderStatus);
 
-	if (pOrder->OrderStatus == '0') {
+	if (pOrder->OrderStatus == '0') { // 全部成交
 		list<CThostFtdcOrderField *>::iterator itor;
 		for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
 			if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
 				delete (*itor);
 				itor = this->stg_list_order_pending->erase(itor); //移除
+				break;
 			}
 			else {
 				itor++;
 			}
 		}
 	}
-	else if (pOrder->OrderStatus == '1') {
+	else if (pOrder->OrderStatus == '1') { // 部分成交还在队列中
 		
 		list<CThostFtdcOrderField *>::iterator itor;
 		for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
@@ -2156,7 +2164,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 		}
 		
 	}
-	else if (pOrder->OrderStatus == '3') {
+	else if (pOrder->OrderStatus == '3') { // 未成交还在队列中
 		bool isExists = false;
 		// 判断挂单列表是否存在
 		list<CThostFtdcOrderField *>::iterator itor;
@@ -2182,7 +2190,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 			this->stg_list_order_pending->push_back(pOrder_tmp);
 		}
 	}
-	else if (pOrder->OrderStatus == '5') {
+	else if (pOrder->OrderStatus == '5') { // 撤单
 		list<CThostFtdcOrderField *>::iterator itor;
 		for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
 			if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
@@ -2195,7 +2203,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 			}
 		}
 	}
-	else if (pOrder->OrderStatus == 'a') {
+	else if (pOrder->OrderStatus == 'a') { // 未知
 		
 	}
 

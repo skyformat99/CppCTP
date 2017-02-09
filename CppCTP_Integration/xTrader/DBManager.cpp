@@ -397,7 +397,7 @@ void DBManager::UpdateFutureAccountOrderRef(mongo::DBClientConnection * conn_tmp
 	
 	mtx.lock();
 	
-	conn_tmp->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (u->getUserID().c_str())), BSON("$set" << BSON("order_ref_base" << order_ref_base.c_str())));
+	conn_tmp->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (u->getUserID().c_str())), BSON("$set" << BSON("order_ref_base" << order_ref_base)));
 
 	mtx.unlock();
 	USER_PRINT("DBManager::UpdateFutureAccountOrderRef ok");
