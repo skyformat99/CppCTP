@@ -1914,7 +1914,7 @@ void Strategy::Exec_OnErrRtnOrderAction() {
 // 行情回调,执行交易任务
 void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 	USER_PRINT("Exec_OnTickComing()");
-	std::cout << "行情回调" << std::endl;
+	//std::cout << "行情回调" << std::endl;
 	list<CThostFtdcOrderField *>::iterator Itor;
 	for (Itor = this->stg_list_order_pending->begin(); Itor != this->stg_list_order_pending->end(); Itor++) {
 		std::cout << "(*Itor)->InstrumentID = " << (*Itor)->InstrumentID << endl;
