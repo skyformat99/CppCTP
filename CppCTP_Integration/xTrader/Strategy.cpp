@@ -1205,6 +1205,9 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 	//如果正在交易,直接返回0
 	if (this->stg_trade_tasking) {
 		USER_PRINT("正在交易,返回");
+		std::cout << "UserID" << this->stg_user_id << std::endl;
+		std::cout << "策略ID" << this->stg_strategy_id << std::endl;
+		std::cout << "正在交易,返回" << std::endl;
 		return;
 	}
 	//如果有挂单,返回0
@@ -1215,12 +1218,18 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 		for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end(); itor++) {
 			USER_PRINT((*itor)->InstrumentID);
 		}
+		std::cout << "UserID" << this->stg_user_id << std::endl;
+		std::cout << "策略ID" << this->stg_strategy_id << std::endl;
+		std::cout << "有挂单,返回" << std::endl;
 		return;
 	}
 
 	if (!((this->stg_position_a_sell == this->stg_position_b_buy) && 
 		(this->stg_position_a_buy == this->stg_position_b_sell))) {
 		USER_PRINT("有撇腿,返回");
+		std::cout << "UserID" << this->stg_user_id << std::endl;
+		std::cout << "策略ID" << this->stg_strategy_id << std::endl;
+		std::cout << "有撇腿,返回" << std::endl;
 		// 有撇腿
 		return;
 	}
@@ -1329,10 +1338,10 @@ void Strategy::Order_Algorithm_One() {
 	/// 策略开关，期货账户开关，总开关
 	if (!((this->getOn_Off()) && (this->stg_user->getOn_Off()) && (this->stg_user->GetTrader()->getOn_Off()))) {
 		USER_PRINT("请检查开关状态!");
-		/*std::cout << "请检查开关状态!" << std::endl;
+		std::cout << "请检查开关状态!" << std::endl;
 		std::cout << "策略开关 = " << this->getOn_Off() << std::endl;
 		std::cout << "期货账户开关 = " << this->stg_user->getOn_Off() << std::endl;
-		std::cout << "总开关 = " << this->stg_user->GetTrader()->getOn_Off() << std::endl;*/
+		std::cout << "总开关 = " << this->stg_user->GetTrader()->getOn_Off() << std::endl;
 		return;
 	}
 
