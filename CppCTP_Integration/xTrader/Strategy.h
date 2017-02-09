@@ -391,6 +391,8 @@ public:
 
 	list<USER_CThostFtdcOrderField *> * getStg_List_Position_Detail_From_Order(); // ³Ö²ÖÃ÷Ï¸
 
+	void printStrategyInfo(string message);
+
 private:
 	Trader *trader;
 	User *user;

@@ -1136,6 +1136,13 @@ void Strategy::CopyPositionData(PositionDetail *posd, USER_CThostFtdcOrderField 
 	order->VolumeTradedBatch = posd->getVolumeTradedBatch();
 }
 
+void Strategy::printStrategyInfo(string message) {
+	std::cout << "====策略状态信息====" << std::endl;
+	std::cout << "期货账户:" << this->stg_user_id << std::endl;
+	std::cout << "策略编号:" << this->stg_strategy_id << std::endl;
+	std::cout << "调试信息:" << message << std::endl;
+}
+
 // 获取持仓明细
 list<USER_CThostFtdcOrderField *> * Strategy::getStg_List_Position_Detail_From_Order() {
 	return this->stg_list_position_detail_from_order;
@@ -1205,9 +1212,7 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 	//如果正在交易,直接返回0
 	if (this->stg_trade_tasking) {
 		USER_PRINT("正在交易,返回");
-		std::cout << "UserID" << this->stg_user_id << std::endl;
-		std::cout << "策略ID" << this->stg_strategy_id << std::endl;
-		std::cout << "正在交易,返回" << std::endl;
+		this->printStrategyInfo("正在交易,返回");
 		return;
 	}
 	//如果有挂单,返回0
@@ -1218,18 +1223,14 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 		for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end(); itor++) {
 			USER_PRINT((*itor)->InstrumentID);
 		}
-		std::cout << "UserID" << this->stg_user_id << std::endl;
-		std::cout << "策略ID" << this->stg_strategy_id << std::endl;
-		std::cout << "有挂单,返回" << std::endl;
+		this->printStrategyInfo("有挂单,返回");
 		return;
 	}
 
 	if (!((this->stg_position_a_sell == this->stg_position_b_buy) && 
 		(this->stg_position_a_buy == this->stg_position_b_sell))) {
 		USER_PRINT("有撇腿,返回");
-		std::cout << "UserID" << this->stg_user_id << std::endl;
-		std::cout << "策略ID" << this->stg_strategy_id << std::endl;
-		std::cout << "有撇腿,返回" << std::endl;
+		this->printStrategyInfo("有撇腿,返回");
 		// 有撇腿
 		return;
 	}
@@ -1310,9 +1311,7 @@ void Strategy::Order_Algorithm_One() {
 	} 
 	else
 	{
-		std::cout << "策略跳过异常行情" << std::endl;
-		std::cout << "UserID" << this->stg_user_id << std::endl;
-		std::cout << "策略ID" << this->stg_strategy_id << std::endl;
+		this->printStrategyInfo("策略跳过异常行情");
 		return;
 	}
 
@@ -1338,9 +1337,7 @@ void Strategy::Order_Algorithm_One() {
 	/// 策略开关，期货账户开关，总开关
 	if (!((this->getOn_Off()) && (this->stg_user->getOn_Off()) && (this->stg_user->GetTrader()->getOn_Off()))) {
 		USER_PRINT("请检查开关状态!");
-		std::cout << "UserID" << this->stg_user_id << std::endl;
-		std::cout << "策略ID" << this->stg_strategy_id << std::endl;
-		std::cout << "请检查开关状态!" << std::endl;
+		this->printStrategyInfo("请检查开关状态!");
 		std::cout << "策略开关 = " << this->getOn_Off() << std::endl;
 		std::cout << "期货账户开关 = " << this->stg_user->getOn_Off() << std::endl;
 		std::cout << "总开关 = " << this->stg_user->GetTrader()->getOn_Off() << std::endl;
@@ -1398,9 +1395,7 @@ void Strategy::Order_Algorithm_One() {
 	USER_PRINT(((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots));
 	USER_PRINT("&&&&&&&&&&&&&&&&&&&&&&");
 	
-	std::cout << "价差卖开参数" << std::endl;
-	std::cout << "UserID" << this->stg_user_id << std::endl;
-	std::cout << "策略ID" << this->stg_strategy_id << std::endl;
+	this->printStrategyInfo("价差卖开参数");
 	std::cout << "this->stg_spread_long = " << this->stg_spread_long << std::endl;
 	std::cout << "this->stg_sell_open = " << this->stg_sell_open << std::endl;
 	std::cout << "this->stg_spread_shift = " << this->stg_spread_shift << std::endl;
