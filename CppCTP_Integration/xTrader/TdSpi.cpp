@@ -87,7 +87,7 @@ void TdSpi::Connect(User *user) {
 	USER_PRINT("TdSpi::Connect");
 	USER_PRINT(const_cast<char *>(user->getFrontAddress().c_str()));
 	this->tdapi = user->getUserTradeAPI();
-	cout << "this.tdapi = " << this->tdapi;
+	cout << "TdSpi::Connect This.Tdapi = " << this->tdapi << std::endl;
 	this->tdapi->RegisterFront(const_cast<char *>(user->getFrontAddress().c_str()));
 	//注册事件处理对象
 	this->tdapi->RegisterSpi(user->getUserTradeSPI());
