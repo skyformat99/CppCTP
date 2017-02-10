@@ -391,7 +391,8 @@ public:
 
 	list<USER_CThostFtdcOrderField *> * getStg_List_Position_Detail_From_Order(); // 持仓明细
 
-	void printStrategyInfo(string message);
+	void printStrategyInfo(string message); //调试输出
+	void printStrategyInfoPosition();
 
 private:
 	Trader *trader;

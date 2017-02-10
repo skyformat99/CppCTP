@@ -860,8 +860,11 @@ void Strategy::update_task_status() {
 	if ((this->stg_position_a_buy_today == this->stg_position_b_sell_today)
 		&& (this->stg_position_a_buy_yesterday == this->stg_position_b_sell_yesterday)
 		&& (this->stg_position_a_sell_today == this->stg_position_b_buy_today)
-		&& (this->stg_position_a_sell_yesterday == this->stg_position_b_buy_yesterday)) {
-			this->stg_trade_tasking = false;
+		&& (this->stg_position_a_sell_yesterday == this->stg_position_b_buy_yesterday)
+		&& (this->stg_list_order_pending->size() == 0)) {
+		this->printStrategyInfo("更新交易状态");
+		this->printStrategyInfoPosition();
+		this->stg_trade_tasking = false;
 	}
 	else
 	{
@@ -1146,6 +1149,22 @@ void Strategy::printStrategyInfo(string message) {
 	std::cout << "调试信息:" << message << std::endl;
 }
 
+void Strategy::printStrategyInfoPosition() {
+	std::cout << "A合约今买 = " << this->stg_position_a_buy_today << ", "
+		<< "A合约昨买 = " << this->stg_position_a_buy_yesterday << ", "
+		<< "A合约总买 = " << this->stg_position_a_buy << ", "
+		<< "A合约今卖 = " << this->stg_position_a_sell_today << ", "
+		<< "A合约昨卖 = " << this->stg_position_a_buy_yesterday << ", "
+		<< "A合约总卖 = " << this->stg_position_a_sell << std::endl;
+
+	std::cout << "B合约今买 = " << this->stg_position_b_buy_today << ", "
+		<< "B合约昨买 = " << this->stg_position_b_buy_yesterday << ", "
+		<< "B合约总买 = " << this->stg_position_b_buy << ", "
+		<< "B合约今卖 = " << this->stg_position_b_sell_today << ", "
+		<< "B合约昨卖 = " << this->stg_position_b_buy_yesterday << ", "
+		<< "B合约总卖 = " << this->stg_position_b_sell << std::endl;
+}
+
 // 获取持仓明细
 list<USER_CThostFtdcOrderField *> * Strategy::getStg_List_Position_Detail_From_Order() {
 	return this->stg_list_position_detail_from_order;
@@ -1190,11 +1209,11 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		USER_PRINT(stg_instrument_B_tick->BidPrice1);
 	}
 	USER_PRINT(this->stg_trade_tasking);
-	/// 如果正在交易,继续更新tick进行交易
+	/// 如果有交易任务,进入交易任务执行
 	if (this->stg_trade_tasking) {
 		this->Exec_OnTickComing(pDepthMarketData);
 	}
-	else { /// 如果未在交易，那么选择下单算法
+	else { /// 如果没有交易任务，那么选择开始新的交易任务
 		this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
 	}
 	USER_PRINT("Strategy::OnRtnDepthMarketData OUT");
