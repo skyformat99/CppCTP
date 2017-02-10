@@ -2009,7 +2009,7 @@ void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketDat
 					std::cout << "B_Tick 撤单判断:this->stg_instrument_B_tick_last->BidPrice1" << this->stg_instrument_B_tick_last->BidPrice1 << std::endl;
 					std::cout << "B_Tick 撤单判断:pDepthMarketData->BidPrice1 < this->stg_instrument_B_tick_last->BidPrice1 = " << (pDepthMarketData->BidPrice1 < this->stg_instrument_B_tick_last->BidPrice1) << std::endl;*/
 					/// B最新tick的对手价如果与开仓信号触发时B的tick对手价发生不利变化则A撤单
-					if (pDepthMarketData->BidPrice1 < (this->stg_instrument_B_tick_last->BidPrice1 + (this->stg_b_wait_price_tick * this->stg_b_price_tick))) {
+					if (pDepthMarketData->BidPrice1 < (this->stg_instrument_B_tick_last->BidPrice1 - (this->stg_b_wait_price_tick * this->stg_b_price_tick))) {
 						USER_PRINT("Strategy.trade_task() 通过B最新tick判断A合约买挂单符合撤单条件");
 						this->printStrategyInfo("Strategy.trade_task() 通过B最新tick判断A合约买挂单符合撤单条件");
 						std::cout << "B_Tick 符合撤单:pDepthMarketData->BidPrice1 = " << pDepthMarketData->BidPrice1 << std::endl;
@@ -2026,7 +2026,7 @@ void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketDat
 					std::cout << "B_Tick 撤单判断:this->stg_instrument_B_tick_last->AskPrice1" << this->stg_instrument_B_tick_last->AskPrice1 << std::endl;
 					std::cout << "B_Tick 撤单判断:pDepthMarketData->AskPrice1 > this->stg_instrument_B_tick_last->AskPrice1 = " << (pDepthMarketData->AskPrice1 > this->stg_instrument_B_tick_last->AskPrice1) << std::endl;*/
 					/// B最新tick的对手价如果与开仓信号触发时B的tick对手价发生不利变化则A撤单
-					if (pDepthMarketData->AskPrice1 > (this->stg_instrument_B_tick_last->AskPrice1 - (this->stg_b_wait_price_tick * this->stg_b_price_tick))) {
+					if (pDepthMarketData->AskPrice1 > (this->stg_instrument_B_tick_last->AskPrice1 + (this->stg_b_wait_price_tick * this->stg_b_price_tick))) {
 						USER_PRINT("Strategy.trade_task()通过B最新tick判断A合约卖挂单符合撤单条件");
 						this->printStrategyInfo("Strategy.trade_task()通过B最新tick判断A合约卖挂单符合撤单条件");
 						std::cout << "B_Tick 符合撤单:pDepthMarketData->AskPrice1 = " << pDepthMarketData->AskPrice1 << std::endl;
