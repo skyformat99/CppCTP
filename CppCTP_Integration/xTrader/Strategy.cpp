@@ -1430,7 +1430,7 @@ void Strategy::Order_Algorithm_One() {
 	/// 价差卖平(b)
 	if ((this->sell_close_on_off) &&
 		(this->stg_position_a_sell == this->stg_position_b_buy) &&
-		(this->stg_position_a_sell > 0) &&
+		(this->stg_position_a_buy > 0) &&
 		(this->stg_spread_long >= (this->stg_sell_close + this->stg_spread_shift * this->stg_a_price_tick))) {
 		/// 市场多头价差大于触发参数， AB持仓量相等且大于0
 		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差卖平" << endl;
