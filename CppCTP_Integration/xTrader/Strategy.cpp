@@ -1479,7 +1479,11 @@ void Strategy::Order_Algorithm_One() {
 		// 合约代码
 		std::strcpy(this->stg_a_order_insert_args->InstrumentID, this->stg_instrument_id_A.c_str());
 		// 限价
-		this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->AskPrice1;
+		this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->BidPrice1 - this->stg_a_limit_price_shift * this->stg_a_price_tick;
+		std::cout << "this->stg_a_order_insert_args->LimitPrice = " << this->stg_a_order_insert_args->LimitPrice << std::endl;
+		std::cout << "this->stg_instrument_A_tick->BidPrice1 = " << this->stg_instrument_A_tick->BidPrice1 << std::endl;
+		std::cout << "this->stg_a_limit_price_shift = " << this->stg_a_limit_price_shift << std::endl;
+		std::cout << "this->stg_a_price_tick = " << this->stg_a_price_tick << std::endl;
 		// 数量
 		this->stg_a_order_insert_args->VolumeTotalOriginal = order_volume;
 		// 买卖方向
@@ -1496,7 +1500,11 @@ void Strategy::Order_Algorithm_One() {
 		// 合约代码
 		std::strcpy(this->stg_b_order_insert_args->InstrumentID, this->stg_instrument_id_B.c_str());
 		// 限价
-		this->stg_b_order_insert_args->LimitPrice = this->stg_instrument_B_tick->BidPrice1;
+		this->stg_b_order_insert_args->LimitPrice = this->stg_instrument_B_tick->AskPrice1 + this->stg_b_limit_price_shift * this->stg_b_price_tick;
+		std::cout << "this->stg_b_order_insert_args->LimitPrice = " << this->stg_b_order_insert_args->LimitPrice << std::endl;
+		std::cout << "this->stg_instrument_B_tick->AskPrice1 = " << this->stg_instrument_B_tick->AskPrice1 << std::endl;
+		std::cout << "this->stg_b_limit_price_shift = " << this->stg_b_limit_price_shift << std::endl;
+		std::cout << "this->stg_b_price_tick = " << this->stg_b_price_tick << std::endl;
 		// 数量
 		//this->stg_b_order_insert_args->VolumeTotalOriginal = order_volume;
 		// 买卖方向
@@ -1702,7 +1710,7 @@ void Strategy::Order_Algorithm_One() {
 		this->stg_trade_tasking = true;
 	}
 
-	/// 价差空头买开(b)
+	/// 价差买开
 	else if ((this->buy_open_on_off) && ((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots)) {
 		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买开" << endl;
 
@@ -1742,7 +1750,12 @@ void Strategy::Order_Algorithm_One() {
 		// 合约代码
 		std::strcpy(this->stg_a_order_insert_args->InstrumentID, this->stg_instrument_id_A.c_str());
 		// 限价
-		this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->BidPrice1;
+		this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->AskPrice1 + this->stg_a_limit_price_shift * this->stg_a_price_tick;
+		std::cout << "this->stg_a_order_insert_args->LimitPrice = " << this->stg_a_order_insert_args->LimitPrice << std::endl;
+		std::cout << "this->stg_instrument_A_tick->AskPrice1 = " << this->stg_instrument_A_tick->AskPrice1 << std::endl;
+		std::cout << "this->stg_a_limit_price_shift = " << this->stg_a_limit_price_shift << std::endl;
+		std::cout << "this->stg_a_price_tick = " << this->stg_a_price_tick << std::endl;
+
 		// 数量
 		this->stg_a_order_insert_args->VolumeTotalOriginal = order_volume;
 		// 买卖方向
@@ -1759,7 +1772,11 @@ void Strategy::Order_Algorithm_One() {
 		// 合约代码
 		std::strcpy(this->stg_b_order_insert_args->InstrumentID, this->stg_instrument_id_B.c_str());
 		// 限价
-		this->stg_b_order_insert_args->LimitPrice = this->stg_instrument_B_tick->AskPrice1;
+		this->stg_b_order_insert_args->LimitPrice = this->stg_instrument_B_tick->BidPrice1 - this->stg_b_limit_price_shift * this->stg_b_price_tick;
+		std::cout << "this->stg_b_order_insert_args->LimitPrice = " << this->stg_b_order_insert_args->LimitPrice << std::endl;
+		std::cout << "this->stg_instrument_B_tick->BidPrice1 = " << this->stg_instrument_B_tick->BidPrice1 << std::endl;
+		std::cout << "this->stg_b_limit_price_shift = " << this->stg_b_limit_price_shift << std::endl;
+		std::cout << "this->stg_b_price_tick = " << this->stg_b_price_tick << std::endl;
 		// 数量
 		//this->stg_b_order_insert_args->VolumeTotalOriginal = order_volume;
 		// 买卖方向
