@@ -862,8 +862,8 @@ void Strategy::update_task_status() {
 		&& (this->stg_position_a_sell_today == this->stg_position_b_buy_today)
 		&& (this->stg_position_a_sell_yesterday == this->stg_position_b_buy_yesterday)
 		&& (this->stg_list_order_pending->size() == 0)) {
-		this->printStrategyInfo("更新交易状态");
-		this->printStrategyInfoPosition();
+		/*this->printStrategyInfo("更新交易状态");
+		this->printStrategyInfoPosition();*/
 		this->stg_trade_tasking = false;
 	}
 	else
@@ -1973,11 +1973,11 @@ void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketDat
 				/// A挂单方向为买
 				if ((*Itor)->Direction == '0') {
 					this->printStrategyInfo("A挂单方向为买，进入撤单判断");
-					std::cout << "撤单判断:pDepthMarketData->BidPrice1 = " << pDepthMarketData->BidPrice1 << std::endl;
-					std::cout << "撤单判断:(*Itor)->LimitPrice = " << (*Itor)->LimitPrice << std::endl;
-					std::cout << "撤单判断:this->stg_a_wait_price_tick = " << this->stg_a_wait_price_tick << std::endl;
-					std::cout << "撤单判断:this->stg_a_price_tick = " << this->stg_a_price_tick << std::endl;
-					std::cout << "撤单判断:pDepthMarketData->BidPrice1 > ((*Itor)->LimitPrice + (this->stg_a_wait_price_tick * this->stg_a_price_tick)) = " << (pDepthMarketData->BidPrice1 > ((*Itor)->LimitPrice + (this->stg_a_wait_price_tick * this->stg_a_price_tick))) << std::endl;
+					std::cout << "A_Tick 撤单判断:pDepthMarketData->BidPrice1 = " << pDepthMarketData->BidPrice1 << std::endl;
+					std::cout << "A_Tick 撤单判断:(*Itor)->LimitPrice = " << (*Itor)->LimitPrice << std::endl;
+					std::cout << "A_Tick 撤单判断:this->stg_a_wait_price_tick = " << this->stg_a_wait_price_tick << std::endl;
+					std::cout << "A_Tick 撤单判断:this->stg_a_price_tick = " << this->stg_a_price_tick << std::endl;
+					std::cout << "A_Tick 撤单判断:pDepthMarketData->BidPrice1 > ((*Itor)->LimitPrice + (this->stg_a_wait_price_tick * this->stg_a_price_tick)) = " << (pDepthMarketData->BidPrice1 > ((*Itor)->LimitPrice + (this->stg_a_wait_price_tick * this->stg_a_price_tick))) << std::endl;
 					/// 挂单价格与盘口买一价比较，如果与盘口价格差距n个最小跳以上，撤单
 					if (pDepthMarketData->BidPrice1 > ((*Itor)->LimitPrice + (this->stg_a_wait_price_tick * this->stg_a_price_tick))) {
 						std::cout << "A合约通过最新tick判断A合约买挂单符合撤单条件" << endl;
@@ -1987,11 +1987,11 @@ void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketDat
 				}
 				else if ((*Itor)->Direction == '1') {
 					this->printStrategyInfo("A挂单方向为卖，进入撤单判断");
-					std::cout << "撤单判断:pDepthMarketData->AskPrice1 = " << pDepthMarketData->AskPrice1 << std::endl;
-					std::cout << "撤单判断:(*Itor)->LimitPrice = " << (*Itor)->LimitPrice << std::endl;
-					std::cout << "撤单判断:this->stg_a_wait_price_tick = " << this->stg_a_wait_price_tick << std::endl;
-					std::cout << "撤单判断:this->stg_a_price_tick = " << this->stg_a_price_tick << std::endl;
-					std::cout << "撤单判断:pDepthMarketData->AskPrice1 < ((*Itor)->LimitPrice - (this->stg_a_wait_price_tick * this->stg_a_price_tick)) = " << (pDepthMarketData->AskPrice1 < ((*Itor)->LimitPrice - (this->stg_a_wait_price_tick * this->stg_a_price_tick))) << std::endl;
+					std::cout << "A_Tick 撤单判断:pDepthMarketData->AskPrice1 = " << pDepthMarketData->AskPrice1 << std::endl;
+					std::cout << "A_Tick 撤单判断:(*Itor)->LimitPrice = " << (*Itor)->LimitPrice << std::endl;
+					std::cout << "A_Tick 撤单判断:this->stg_a_wait_price_tick = " << this->stg_a_wait_price_tick << std::endl;
+					std::cout << "A_Tick 撤单判断:this->stg_a_price_tick = " << this->stg_a_price_tick << std::endl;
+					std::cout << "A_Tick 撤单判断:pDepthMarketData->AskPrice1 < ((*Itor)->LimitPrice - (this->stg_a_wait_price_tick * this->stg_a_price_tick)) = " << (pDepthMarketData->AskPrice1 < ((*Itor)->LimitPrice - (this->stg_a_wait_price_tick * this->stg_a_price_tick))) << std::endl;
 					if (pDepthMarketData->AskPrice1 < ((*Itor)->LimitPrice - (this->stg_a_wait_price_tick * this->stg_a_price_tick))) {
 						std::cout << "Strategy::Exec_OnTickComing A挂单方向为卖，撤单" << std::endl;
 						/// A合约撤单
@@ -2005,6 +2005,9 @@ void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketDat
 				/// A挂单的买卖方向为买
 				if ((*Itor)->Direction == '0') {
 					this->printStrategyInfo("根据B的行情判断A是否需要撤单，A挂单方向为买，进入撤单判断");
+					std::cout << "B_Tick 撤单判断:pDepthMarketData->BidPrice1" << pDepthMarketData->BidPrice1 << std::endl;
+					std::cout << "B_Tick 撤单判断:this->stg_instrument_B_tick_last->BidPrice1" << this->stg_instrument_B_tick_last->BidPrice1 << std::endl;
+					std::cout << "B_Tick 撤单判断:pDepthMarketData->BidPrice1 < this->stg_instrument_B_tick_last->BidPrice1" << (pDepthMarketData->BidPrice1 < this->stg_instrument_B_tick_last->BidPrice1) << std::endl;
 					/// B最新tick的对手价如果与开仓信号触发时B的tick对手价发生不利变化则A撤单
 					if (pDepthMarketData->BidPrice1 < this->stg_instrument_B_tick_last->BidPrice1) {
 						USER_PRINT("Strategy.trade_task() 通过B最新tick判断A合约买挂单符合撤单条件");
@@ -2014,6 +2017,9 @@ void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketDat
 				/// A挂单的买卖方向为卖
 				else if ((*Itor)->Direction == '1') {
 					this->printStrategyInfo("根据B的行情判断A是否需要撤单，A挂单的方向为卖，进入撤单判断");
+					std::cout << "B_Tick 撤单判断:pDepthMarketData->AskPrice1" << pDepthMarketData->AskPrice1 << std::endl;
+					std::cout << "B_Tick 撤单判断:this->stg_instrument_B_tick_last->AskPrice1" << this->stg_instrument_B_tick_last->AskPrice1 << std::endl;
+					std::cout << "B_Tick 撤单判断:pDepthMarketData->AskPrice1 > this->stg_instrument_B_tick_last->AskPrice1" << (pDepthMarketData->AskPrice1 > this->stg_instrument_B_tick_last->AskPrice1) << std::endl;
 					/// B最新tick的对手价如果与开仓信号触发时B的tick对手价发生不利变化则A撤单
 					if (pDepthMarketData->AskPrice1 > this->stg_instrument_B_tick_last->AskPrice1) {
 						USER_PRINT("Strategy.trade_task()通过B最新tick判断A合约卖挂单符合撤单条件");
