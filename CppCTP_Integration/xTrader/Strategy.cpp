@@ -1986,7 +1986,7 @@ void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketDat
 				}
 				/// A挂单的买卖方向为卖
 				else if ((*Itor)->Direction == '1') {
-					this->printStrategyInfo("根据B的行情判断A是否需要撤单，A挂单的买卖方向为卖，进入撤单判断");
+					this->printStrategyInfo("根据B的行情判断A是否需要撤单，A挂单的方向为卖，进入撤单判断");
 					/// B最新tick的对手价如果与开仓信号触发时B的tick对手价发生不利变化则A撤单
 					if (pDepthMarketData->AskPrice1 > this->stg_instrument_B_tick_last->AskPrice1) {
 						USER_PRINT("Strategy.trade_task()通过B最新tick判断A合约卖挂单符合撤单条件");
