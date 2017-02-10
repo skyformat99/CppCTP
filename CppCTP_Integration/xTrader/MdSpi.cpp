@@ -269,7 +269,7 @@ void MdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstr
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (pSpecificInstrument) {
 			cout << "订阅行情应答" << endl;
-			cout << "合约代码:" << pSpecificInstrument->InstrumentID << endl;
+			cout << "订阅行情合约代码:" << pSpecificInstrument->InstrumentID << endl;
 		}
 	}
 }
