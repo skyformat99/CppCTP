@@ -525,7 +525,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
 
 			}
-			else if (msgtype == 3) { // 创建StrategyInfo
+			else if (msgtype == 3) { // 请求查询策略信息
 				std::cout << "请求查询策略信息..." << std::endl;
 
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
@@ -610,6 +610,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					info_object.AddMember("trade_volume", (*stg_itor)->getStgTradeVolume(), allocator);
 					info_object.AddMember("amount", (*stg_itor)->getStgAmount(), allocator);
 					info_object.AddMember("average_shift", (*stg_itor)->getStgAverageShift(), allocator);
+					info_object.AddMember("a_limit_price_shift", (*stg_itor)->getStgALimitPriceShift(), allocator);
+					info_object.AddMember("b_limit_price_shift", (*stg_itor)->getStgBLimitPriceShift(), allocator);
 
 
 					rapidjson::Value instrument_array(rapidjson::kArrayType);
@@ -762,6 +764,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								(*stg_itor)->setStgLotsBatch(object["lots_batch"].GetInt());
 								(*stg_itor)->setStgStopLoss(object["stop_loss"].GetDouble());
 								(*stg_itor)->setStgSpreadShift(object["spread_shift"].GetDouble());
+								(*stg_itor)->setStgALimitPriceShift(object["a_limit_price_shift"].GetInt());
+								(*stg_itor)->setStgBLimitPriceShift(object["b_limit_price_shift"].GetInt());
 								(*stg_itor)->setStgAWaitPriceTick(object["a_wait_price_tick"].GetDouble());
 								(*stg_itor)->setStgBWaitPriceTick(object["b_wait_price_tick"].GetDouble());
 								(*stg_itor)->setStgAOrderActionTiresLimit(object["a_order_action_limit"].GetInt());
@@ -823,6 +827,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								//create_info_object.AddMember("position_a_sell_today", (*stg_itor)->getStgPositionASellToday(), allocator);
 								//create_info_object.AddMember("position_b_sell", (*stg_itor)->getStgPositionBSell(), allocator);
 								create_info_object.AddMember("spread_shift", (*stg_itor)->getStgSpreadShift(), allocator);
+								create_info_object.AddMember("a_limit_price_shift", (*stg_itor)->getStgALimitPriceShift(), allocator);
+								create_info_object.AddMember("b_limit_price_shift", (*stg_itor)->getStgBLimitPriceShift(), allocator);
 								//create_info_object.AddMember("position_b_sell_today", (*stg_itor)->getStgPositionBSellToday(), allocator);
 								//create_info_object.AddMember("position_b_buy_today", (*stg_itor)->getStgPositionBBuyToday(), allocator);
 								//create_info_object.AddMember("position_a_sell", (*stg_itor)->getStgPositionASell(), allocator);
@@ -968,6 +974,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							new_stg->setStgPositionASellToday(object["position_a_sell_today"].GetInt());
 							new_stg->setStgPositionBSell(object["position_b_sell"].GetInt());
 							new_stg->setStgSpreadShift(object["spread_shift"].GetDouble());
+							new_stg->setStgALimitPriceShift(object["a_limit_price_shift"].GetInt());
+							new_stg->setStgBLimitPriceShift(object["b_limit_price_shift"].GetInt());
 							new_stg->setStgPositionBSellToday(object["position_b_sell_today"].GetInt());
 							new_stg->setStgPositionBBuyToday(object["position_b_buy_today"].GetInt());
 							new_stg->setStgPositionASell(object["position_a_sell"].GetInt());
@@ -1064,6 +1072,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							create_info_object.AddMember("position_a_sell_today", new_stg->getStgPositionASellToday(), allocator);
 							create_info_object.AddMember("position_b_sell", new_stg->getStgPositionBSell(), allocator);
 							create_info_object.AddMember("spread_shift", new_stg->getStgSpreadShift(), allocator);
+							create_info_object.AddMember("a_limit_price_shift", new_stg->getStgALimitPriceShift(), allocator);
+							create_info_object.AddMember("b_limit_price_shift", new_stg->getStgBLimitPriceShift(), allocator);
 							create_info_object.AddMember("position_b_sell_today", new_stg->getStgPositionBSellToday(), allocator);
 							create_info_object.AddMember("position_b_buy_today", new_stg->getStgPositionBBuyToday(), allocator);
 							create_info_object.AddMember("position_a_sell", new_stg->getStgPositionASell(), allocator);
@@ -1379,6 +1389,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						create_info_object.AddMember("position_a_sell_today", (*stg_itor)->getStgPositionASellToday(), allocator);
 						create_info_object.AddMember("position_b_sell", (*stg_itor)->getStgPositionBSell(), allocator);
 						create_info_object.AddMember("spread_shift", (*stg_itor)->getStgSpreadShift(), allocator);
+						create_info_object.AddMember("a_limit_price_shift", (*stg_itor)->getStgALimitPriceShift(), allocator);
+						create_info_object.AddMember("b_limit_price_shift", (*stg_itor)->getStgBLimitPriceShift(), allocator);
 						create_info_object.AddMember("position_b_sell_today", (*stg_itor)->getStgPositionBSellToday(), allocator);
 						create_info_object.AddMember("position_b_buy_today", (*stg_itor)->getStgPositionBBuyToday(), allocator);
 						create_info_object.AddMember("position_a_sell", (*stg_itor)->getStgPositionASell(), allocator);

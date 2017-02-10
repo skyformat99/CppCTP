@@ -123,6 +123,12 @@ public:
 	int getStgBOrderActionCount();
 	void setStgBOrderActionCount(int stg_b_order_action_count);
 
+	int getStgALimitPriceShift(); // A合约报单偏移
+	void setStgALimitPriceShift(int stg_a_limit_price_shift);
+	
+	int getStgBLimitPriceShift(); // B合约报单偏移
+	void setStgBLimitPriceShift(int stg_b_limit_price_shift);
+
 
 	string getStgOrderRefA();
 	void setStgOrderRefA(string stgOrderRefA);
@@ -469,6 +475,8 @@ private:
 	string stg_order_ref_b;		// B合约报单引用
 	double stg_a_price_tick;	// A合约最小跳价
 	double stg_b_price_tick;	// B合约最小跳价
+	int stg_a_limit_price_shift; // A合约报单偏移
+	int stg_b_limit_price_shift; // B合约报单偏移
 
 	bool stg_trade_tasking;		// 交易任务进行中
 	CThostFtdcInputOrderField *stg_a_order_insert_args;		// a合约报单参数

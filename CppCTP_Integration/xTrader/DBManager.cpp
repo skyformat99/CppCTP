@@ -594,6 +594,8 @@ int DBManager::CreateStrategy(Strategy *stg) {
 		b.append("trade_volume", stg->getStgTradeVolume());
 		b.append("amount", stg->getStgAmount());
 		b.append("average_shift", stg->getStgAverageShift());
+		b.append("a_limit_price_shift", stg->getStgALimitPriceShift());
+		b.append("b_limit_price_shift", stg->getStgBLimitPriceShift());
 
 
 		// 创建一个数组对象
@@ -726,7 +728,7 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 			<< "buy_close_on_off" << stg->getStgBuyCloseOnOff()
 			<< "sell_close_on_off" << stg->getStgSellCloseOnOff()
 			<< "buy_open_on_off" << stg->getStgBuyOpenOnOff()
-			
+
 			<< "trade_model" << stg->getStgTradeModel()
 			<< "hold_profit" << stg->getStgHoldProfit()
 			<< "close_profit" << stg->getStgCloseProfit()
@@ -737,6 +739,9 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 			<< "trade_volume" << stg->getStgTradeVolume()
 			<< "amount" << stg->getStgAmount()
 			<< "average_shift" << stg->getStgAverageShift()
+
+			<< "a_limit_price_shift" << stg->getStgALimitPriceShift()
+			<< "b_limit_price_shift" << stg->getStgBLimitPriceShift()
 
 			<< "position_a_buy_yesterday" << stg->getStgPositionABuyYesterday()
 			<< "user_id" << stg->getStgUserId()
@@ -820,6 +825,9 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 		cout << "amount" << p.getField("amount").Double() << ", ";
 		cout << "average_shift" << p.getField("average_shift").Double() << ", ";
 
+		cout << "a_limit_price_shift" << p.getIntField("a_limit_price_shift") << ", ";
+		cout << "b_limit_price_shift" << p.getIntField("b_limit_price_shift") << ", ";
+
 		cout << "position_a_buy_yesterday = " << p.getIntField("position_a_buy_yesterday") << ", ";
 		cout << "user_id = " << p.getStringField("user_id") << ", "; // string type
 		cout << "position_a_buy_today = " << p.getIntField("position_a_buy_today") << ", ";
@@ -858,6 +866,9 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 		stg->setStgAmount(p.getField("amount").Double());
 		stg->setStgAverageShift(p.getField("average_shift").Double());
 		stg->setStgTradingDay(p.getStringField("trading_day"));
+
+		stg->setStgALimitPriceShift(p.getIntField("a_limit_price_shift"));
+		stg->setStgBLimitPriceShift(p.getIntField("b_limit_price_shift"));
 
 		std::cout << "after stg->setStgTradingDay = " << stg->getStgTradingDay() << std::endl;
 		std::cout << "address stg = " << stg << std::endl;
@@ -968,6 +979,9 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 			cout << "amount" << p.getField("amount").Double() << ", ";
 			cout << "average_shift" << p.getField("average_shift").Double() << ", ";
 
+			cout << "a_limit_price_shift" << p.getIntField("a_limit_price_shift") << ", ";
+			cout << "b_limit_price_shift" << p.getIntField("b_limit_price_shift") << ", ";
+
 			cout << "position_a_buy_yesterday = " << p.getIntField("position_a_buy_yesterday") << ", ";
 			cout << "user_id = " << p.getStringField("user_id") << ", "; // string type
 			cout << "position_a_buy_today = " << p.getIntField("position_a_buy_today") << ", ";
@@ -1009,6 +1023,8 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 			stg->setStgTradeVolume(p.getIntField("trade_volume"));
 			stg->setStgAmount(p.getField("amount").Double());
 			stg->setStgAverageShift(p.getField("average_shift").Double());
+			stg->setStgALimitPriceShift(p.getIntField("a_limit_price_shift"));
+			stg->setStgBLimitPriceShift(p.getIntField("b_limit_price_shift"));
 			stg->setStgTradingDay(p.getStringField("trading_day"));
 
 			std::cout << "after stg->setStgTradingDay = " << stg->getStgTradingDay() << std::endl;
@@ -1114,6 +1130,8 @@ int DBManager::CreateStrategyYesterday(Strategy *stg) {
 		b.append("trade_volume", stg->getStgTradeVolume());
 		b.append("amount", stg->getStgAmount());
 		b.append("average_shift", stg->getStgAverageShift());
+		b.append("a_limit_price_shift", stg->getStgALimitPriceShift());
+		b.append("b_limit_price_shift", stg->getStgBLimitPriceShift());
 
 
 		// 创建一个数组对象
@@ -1206,6 +1224,8 @@ void DBManager::UpdateStrategyYesterday(Strategy *stg) {
 			<< "trade_volume" << stg->getStgTradeVolume()
 			<< "amount" << stg->getStgAmount()
 			<< "average_shift" << stg->getStgAverageShift()
+			<< "a_limit_price_shift" << stg->getStgALimitPriceShift()
+			<< "b_limit_price_shift" << stg->getStgBLimitPriceShift()
 
 			<< "position_a_buy_yesterday" << stg->getStgPositionABuyYesterday()
 			<< "user_id" << stg->getStgUserId()
@@ -1290,6 +1310,8 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 		cout << "trade_volume" << p.getIntField("trade_volume") << ", ";
 		cout << "amount" << p.getField("amount").Double() << ", ";
 		cout << "average_shift" << p.getField("average_shift").Double() << ", ";
+		cout << "a_limit_price_shift" << p.getIntField("a_limit_price_shift") << ", ";
+		cout << "b_limit_price_shift" << p.getIntField("b_limit_price_shift") << ", ";
 
 		cout << "position_a_buy_yesterday = " << p.getIntField("position_a_buy_yesterday") << ", ";
 		cout << "user_id = " << p.getStringField("user_id") << ", "; // string type
@@ -1349,6 +1371,10 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 		stg->setStgSellClose(p.getField("sell_close").Double());
 		stg->setStgSellOpen(p.getField("sell_open").Double());
 		stg->setStgSpreadShift(p.getField("spread_shift").Double());
+
+		stg->setStgALimitPriceShift(p.getIntField("a_limit_price_shift"));
+		stg->setStgBLimitPriceShift(p.getIntField("b_limit_price_shift"));
+
 		stg->setStgStopLoss(p.getField("stop_loss").Double());
 		stg->setStgStrategyId(p.getStringField("strategy_id"));
 		stg->setStgTraderId(p.getStringField("trader_id"));
@@ -1447,6 +1473,9 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 		cout << "trade_volume" << p.getIntField("trade_volume") << ", ";
 		cout << "amount" << p.getField("amount").Double() << ", ";
 		cout << "average_shift" << p.getField("average_shift").Double() << ", ";
+
+		cout << "a_limit_price_shift" << p.getIntField("a_limit_price_shift") << ", ";
+		cout << "b_limit_price_shift" << p.getIntField("b_limit_price_shift") << ", ";
 		cout << "trading_day" << p.getStringField("trading_day") << ", ";
 
 
@@ -1502,6 +1531,8 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 		stg->setStgSellClose(p.getField("sell_close").Double());
 		stg->setStgSellOpen(p.getField("sell_open").Double());
 		stg->setStgSpreadShift(p.getField("spread_shift").Double());
+		stg->setStgALimitPriceShift(p.getIntField("a_limit_price_shift"));
+		stg->setStgBLimitPriceShift(p.getIntField("b_limit_price_shift"));
 		stg->setStgStopLoss(p.getField("stop_loss").Double());
 		stg->setStgStrategyId(p.getStringField("strategy_id"));
 		stg->setStgTraderId(p.getStringField("trader_id"));
@@ -1591,6 +1622,8 @@ void DBManager::getAllStrategyYesterdayByActiveUser(list<Strategy *> *l_strategy
 			cout << "trade_volume" << p.getIntField("trade_volume") << ", ";
 			cout << "amount" << p.getField("amount").Double() << ", ";
 			cout << "average_shift" << p.getField("average_shift").Double() << ", ";
+			cout << "a_limit_price_shift" << p.getIntField("a_limit_price_shift") << ", ";
+			cout << "b_limit_price_shift" << p.getIntField("b_limit_price_shift") << ", ";
 
 			cout << "position_a_buy_yesterday = " << p.getIntField("position_a_buy_yesterday") << ", ";
 			cout << "user_id = " << p.getStringField("user_id") << ", "; // string type
@@ -1629,6 +1662,8 @@ void DBManager::getAllStrategyYesterdayByActiveUser(list<Strategy *> *l_strategy
 			stg->setStgTradeVolume(p.getIntField("trade_volume"));
 			stg->setStgAmount(p.getField("amount").Double());
 			stg->setStgAverageShift(p.getField("average_shift").Double());
+			stg->setStgALimitPriceShift(p.getIntField("a_limit_price_shift"));
+			stg->setStgBLimitPriceShift(p.getIntField("b_limit_price_shift"));
 			stg->setStgTradingDay(p.getStringField("trading_day"));
 
 			std::cout << "after stg->setStgTradingDay = " << stg->getStgTradingDay() << std::endl;

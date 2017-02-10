@@ -2900,6 +2900,8 @@ void Strategy::setStgBPriceTick(double stgBPriceTick) {
 	stg_b_price_tick = stgBPriceTick;
 }
 
+
+
 double Strategy::getStgBWaitPriceTick() {
 	return stg_b_wait_price_tick;
 }
@@ -3050,6 +3052,22 @@ int Strategy::getStgBOrderActionCount() {
 }
 void Strategy::setStgBOrderActionCount(int stg_b_order_action_count) {
 	this->stg_b_order_action_count = stg_b_order_action_count;
+}
+
+int Strategy::getStgALimitPriceShift() {
+	return this->stg_a_limit_price_shift;
+}
+
+void Strategy::setStgALimitPriceShift(int stg_a_limit_price_shift) {
+	this->stg_a_limit_price_shift = stg_a_limit_price_shift;
+}
+
+int Strategy::getStgBLimitPriceShift() {
+	return this->stg_b_limit_price_shift;
+}
+
+void Strategy::setStgBLimitPriceShift(int stg_b_limit_price_shift) {
+	this->stg_b_limit_price_shift = stg_b_limit_price_shift;
 }
 
 string Strategy::getStgOrderRefA() {
