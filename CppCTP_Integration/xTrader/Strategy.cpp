@@ -1428,9 +1428,10 @@ void Strategy::Order_Algorithm_One() {
 
 
 	/// 价差卖平(b)
-	if ((this->sell_close_on_off) && (this->stg_spread_long >= this->stg_sell_close) 
-		&& (this->stg_position_a_sell == this->stg_position_b_buy)
-		&& (this->stg_position_a_sell > 0)) {
+	if ((this->sell_close_on_off) &&
+		(this->stg_position_a_sell == this->stg_position_b_buy) &&
+		(this->stg_position_a_sell > 0) &&
+		(this->stg_spread_long >= (this->stg_sell_close + this->stg_spread_shift * this->stg_a_price_tick))) {
 		/// 市场多头价差大于触发参数， AB持仓量相等且大于0
 		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差卖平" << endl;
 
@@ -1715,7 +1716,9 @@ void Strategy::Order_Algorithm_One() {
 	}
 
 	/// 价差买开
-	else if ((this->buy_open_on_off) && ((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots)) {
+	else if ((this->buy_open_on_off) &&
+		((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots) &&
+		((this->stg_spread_short <= (this->stg_buy_open - this->stg_spread_shift * this->stg_a_price_tick)))) {
 		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买开" << endl;
 
 
@@ -2276,7 +2279,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 			if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
 				// 存在置flag标志位
 				isExists = true;
-				std::cout << "更新挂单,又挂单" << std::endl;
+				std::cout << "更新挂单,有挂单" << std::endl;
 				this->CopyOrderData(*itor, pOrder);
 				break;
 			}
