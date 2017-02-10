@@ -1675,7 +1675,7 @@ void Strategy::Order_Algorithm_One() {
 		this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->BidPrice1 - this->stg_a_limit_price_shift * this->stg_a_price_tick;
 		
 		std::cout << "this->stg_instrument_A_tick->BidPrice1 = " << this->stg_instrument_A_tick->BidPrice1 << std::endl;
-		std::cout << "this->stg_spread_shift = " << this->stg_spread_shift << std::endl;
+		std::cout << "this->stg_a_limit_price_shift = " << this->stg_a_limit_price_shift << std::endl;
 		std::cout << "this->stg_a_price_tick = " << this->stg_a_price_tick << std::endl;
 		std::cout << "this->stg_a_order_insert_args->LimitPrice = " << this->stg_a_order_insert_args->LimitPrice << std::endl;
 
@@ -1696,6 +1696,10 @@ void Strategy::Order_Algorithm_One() {
 		std::strcpy(this->stg_b_order_insert_args->InstrumentID, this->stg_instrument_id_B.c_str());
 		// 限价
 		this->stg_b_order_insert_args->LimitPrice = this->stg_instrument_B_tick->AskPrice1 + this->stg_b_limit_price_shift * this->stg_b_price_tick;
+		std::cout << "this->stg_instrument_B_tick->AskPrice1 = " << this->stg_instrument_B_tick->AskPrice1 << std::endl;
+		std::cout << "this->stg_b_limit_price_shift = " << this->stg_b_limit_price_shift << std::endl;
+		std::cout << "this->stg_b_price_tick = " << this->stg_b_price_tick << std::endl;
+		std::cout << "this->stg_b_order_insert_args->LimitPrice = " << this->stg_b_order_insert_args->LimitPrice << std::endl;
 		// 数量
 		//this->stg_b_order_insert_args->VolumeTotalOriginal = order_volume;
 		// 买卖方向
@@ -2067,16 +2071,18 @@ void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketDat
 				/// B挂单的买卖方向为买
 				if ((*Itor)->Direction == '0') {
 					/// 挂单价格与盘口买一价比较，如果与盘口价格差距n个最小跳以上，撤单
-					if (pDepthMarketData->BidPrice1 >= (*Itor)->LimitPrice + this->stg_b_wait_price_tick * this->stg_b_price_tick) {
+					if (pDepthMarketData->BidPrice1 >= ((*Itor)->LimitPrice + this->stg_b_wait_price_tick * this->stg_b_price_tick)) {
 						USER_PRINT("通过B最新tick判断B合约买挂单符合撤单条件");
+						this->printStrategyInfo("通过B最新tick判断B合约买挂单符合撤单条件");
 						this->stg_user->getUserTradeSPI()->OrderAction((*Itor)->ExchangeID, (*Itor)->OrderRef, (*Itor)->OrderSysID);
 					}
 				}
 				/// B挂单的买卖方向为卖
 				else if ((*Itor)->Direction == '1') {
 					/// 挂单价格与盘口卖一价比较，如果与盘口价格差距n个最小跳以上，撤单
-					if (pDepthMarketData->AskPrice1 <= (*Itor)->LimitPrice - this->stg_b_wait_price_tick * this->stg_b_price_tick) {
+					if (pDepthMarketData->AskPrice1 <= ((*Itor)->LimitPrice - this->stg_b_wait_price_tick * this->stg_b_price_tick)) {
 						USER_PRINT("通过B最新tick判断B合约卖挂单符合撤单条件");
+						this->printStrategyInfo("通过B最新tick判断B合约卖挂单符合撤单条件");
 						this->stg_user->getUserTradeSPI()->OrderAction((*Itor)->ExchangeID, (*Itor)->OrderRef, (*Itor)->OrderSysID);
 					}
 				}
