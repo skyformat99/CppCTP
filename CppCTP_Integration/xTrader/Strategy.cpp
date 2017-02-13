@@ -1477,16 +1477,16 @@ void Strategy::Order_Algorithm_One() {
 
 		/// 优先平昨仓
 		/// 报单手数：盘口挂单量、每份发单手数、持仓量
-		if (this->stg_position_a_sell_yesterday > 0) {
+		if (this->stg_position_a_buy_yesterday > 0) {
 			
-			std::cout << "this->stg_spread_short_volume = " << this->stg_spread_short_volume << std::endl;
-			std::cout << "this->stg_position_a_sell_yesterday = " << this->stg_position_a_sell_yesterday << std::endl;
-			order_volume = this->getMinNum(this->stg_spread_short_volume, this->stg_lots_batch, this->stg_position_a_sell_yesterday);
+			std::cout << "this->stg_spread_long_volume = " << this->stg_spread_long_volume << std::endl;
+			std::cout << "this->stg_position_a_buy_yesterday = " << this->stg_position_a_buy_yesterday << std::endl;
+			order_volume = this->getMinNum(this->stg_spread_long_volume, this->stg_lots_batch, this->stg_position_a_buy_yesterday);
 			std::cout << "order_volume = " << order_volume << std::endl;
 			this->stg_a_order_insert_args->CombOffsetFlag[0] = '4'; /// 平昨
 			this->stg_b_order_insert_args->CombOffsetFlag[0] = '4'; /// 平昨
 		}
-		else if ((this->stg_position_a_sell_yesterday == 0) && (this->stg_position_a_buy_today > 0)) {
+		else if ((this->stg_position_a_buy_yesterday == 0) && (this->stg_position_a_buy_today > 0)) {
 			std::cout << "this->stg_spread_short_volume = " << this->stg_spread_short_volume << std::endl;
 			std::cout << "this->stg_lots_batch = " << this->stg_lots_batch << std::endl;
 			std::cout << "this->stg_position_a_buy_today = " << this->stg_position_a_buy_today << std::endl;
@@ -1522,7 +1522,7 @@ void Strategy::Order_Algorithm_One() {
 		// 数量
 		this->stg_a_order_insert_args->VolumeTotalOriginal = order_volume;
 		// 买卖方向
-		this->stg_a_order_insert_args->Direction = '0'; // 0买 1卖
+		this->stg_a_order_insert_args->Direction = '1'; // 0买 1卖
 		// 组合开平标志
 		/// this->stg_a_order_insert_args->CombOffsetFlag[0] = '0';
 		// 组合投机套保标志
@@ -1543,7 +1543,7 @@ void Strategy::Order_Algorithm_One() {
 		// 数量
 		//this->stg_b_order_insert_args->VolumeTotalOriginal = order_volume;
 		// 买卖方向
-		this->stg_b_order_insert_args->Direction = '1'; // 0买 1卖
+		this->stg_b_order_insert_args->Direction = '0'; // 0买 1卖
 		// 组合开平标志
 		/// this->stg_b_order_insert_args->CombOffsetFlag[0] = '0'; //组合开平标志0开仓 上期所3平今、4平昨，其他交易所1平仓
 		// 组合投机套保标志
