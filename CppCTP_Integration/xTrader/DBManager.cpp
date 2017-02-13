@@ -709,7 +709,7 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 			<< "stop_loss" << stg->getStgStopLoss()
 			<< "position_b_buy_yesterday" << stg->getStgPositionBBuyYesterday()
 			<< "is_active" << stg->isStgIsActive()
-			<< "position_b_sell_yesterday" << stg->getStgPositionBSell()
+			<< "position_b_sell_yesterday" << stg->getStgPositionBSellYesterday()
 			<< "strategy_id" << stg->getStgStrategyId()
 			<< "position_b_buy" << stg->getStgPositionBBuy()
 			<< "lots_batch" << stg->getStgLotsBatch()
