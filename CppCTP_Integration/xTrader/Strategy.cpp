@@ -1188,7 +1188,7 @@ list<USER_CThostFtdcOrderField *> * Strategy::getStg_List_Position_Detail_From_O
 
 void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 	
-	//tick_mtx.lock();
+	tick_mtx.lock();
 
 	// Get Own Instrument
 	USER_PRINT(this);
@@ -1230,15 +1230,15 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 	/// 如果有交易任务,进入交易任务执行
 	if (this->stg_trade_tasking) {
 		this->printStrategyInfo("Strategy::OnRtnDepthMarketData() 有交易任务,进入交易任务执行");
-		std::cout << "挂单列表长度 = " << this->stg_list_order_pending->size() << std::endl;
 		std::cout << "stg_position_a_buy_today = " << stg_position_a_buy_today << std::endl;
-		std::cout << "stg_position_a_buy_yesterday = " << stg_position_a_buy_yesterday << std::endl;
-		std::cout << "stg_position_a_sell_today = " << stg_position_a_sell_today << std::endl;
-		std::cout << "stg_position_a_sell_yesterday = " << stg_position_a_sell_yesterday << std::endl;
-		std::cout << "stg_position_b_buy_today = " << stg_position_b_buy_today << std::endl;
-		std::cout << "stg_position_b_buy_yesterday = " << stg_position_b_buy_yesterday << std::endl;
 		std::cout << "stg_position_b_sell_today = " << stg_position_b_sell_today << std::endl;
+		std::cout << "stg_position_a_buy_yesterday = " << stg_position_a_buy_yesterday << std::endl;
 		std::cout << "stg_position_b_sell_yesterday = " << stg_position_b_sell_yesterday << std::endl;
+		std::cout << "stg_position_a_sell_today = " << stg_position_a_sell_today << std::endl;
+		std::cout << "stg_position_b_buy_today = " << stg_position_b_buy_today << std::endl;
+		std::cout << "stg_position_a_sell_yesterday = " << stg_position_a_sell_yesterday << std::endl;
+		std::cout << "stg_position_b_buy_yesterday = " << stg_position_b_buy_yesterday << std::endl;
+		std::cout << "挂单列表长度 = " << this->stg_list_order_pending->size() << std::endl;
 
 		this->Exec_OnTickComing(pDepthMarketData);
 	}
@@ -1246,7 +1246,7 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
 	}
 	USER_PRINT("Strategy::OnRtnDepthMarketData OUT");
-	//tick_mtx.unlock();
+	tick_mtx.unlock();
 }
 
 //选择下单算法
@@ -1471,7 +1471,10 @@ void Strategy::Order_Algorithm_One() {
 		(this->stg_position_a_sell == this->stg_position_b_buy) &&
 		(this->stg_position_a_buy > 0) &&
 		(this->stg_spread_long >= (this->stg_sell_close + this->stg_spread_shift * this->stg_a_price_tick))) {
-		this->stg_trade_tasking = true;
+		
+		//this->stg_trade_tasking = true;
+		this->update_task_status();
+
 		/// 市场多头价差大于触发参数， AB持仓量相等且大于0
 		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差卖平" << endl;
 
@@ -1578,7 +1581,9 @@ void Strategy::Order_Algorithm_One() {
 		(this->stg_position_a_sell > 0) && 
 		(this->stg_spread_short <= (this->stg_buy_close - this->stg_spread_shift * this->stg_a_price_tick))) {
 		
-		this->stg_trade_tasking = true;
+		//this->stg_trade_tasking = true;
+		this->update_task_status();
+
 		/// 市场空头价差小于等于触发参数， AB持仓量相等且大于0
 		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买平" << endl;
 
@@ -1687,7 +1692,10 @@ void Strategy::Order_Algorithm_One() {
 	else if ((this->sell_open_on_off) && 
 		((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots) &&
 		(this->stg_spread_long >= (this->stg_sell_open + this->stg_spread_shift * this->stg_a_price_tick))) {
-		this->stg_trade_tasking = true;
+		
+		//this->stg_trade_tasking = true;
+		this->update_task_status();
+
 		/** 市场多头价差大于触发参数
 		A合约买持仓加B合约买小于总仓位**/
 
@@ -1792,7 +1800,10 @@ void Strategy::Order_Algorithm_One() {
 	else if ((this->buy_open_on_off) &&
 		((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots) &&
 		((this->stg_spread_short <= (this->stg_buy_open - this->stg_spread_shift * this->stg_a_price_tick)))) {
-		this->stg_trade_tasking = true; 
+
+		//this->stg_trade_tasking = true;
+		this->update_task_status();
+
 		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买开" << endl;
 
 		std::cout << "user_id = " << this->stg_user_id << ", "
@@ -2479,6 +2490,9 @@ void Strategy::update_position(USER_CThostFtdcOrderField *pOrder) {
 	USER_PRINT(this->stg_instrument_id_A);
 	USER_PRINT(this->stg_instrument_id_B);
 
+	this->printStrategyInfo("Strategy::update_position() 输出VolumeTradedBatch");
+	std::cout << "VolumeTradedBatch = " << pOrder->VolumeTradedBatch << std::endl;
+
 	// A成交
 	if (!strcmp(pOrder->InstrumentID, this->stg_instrument_id_A.c_str())) {
 		USER_PRINT(pOrder->CombOffsetFlag[0]);
@@ -2555,20 +2569,22 @@ void Strategy::update_position(USER_CThostFtdcOrderField *pOrder) {
 		this->stg_position_b_sell = this->stg_position_b_sell_today + this->stg_position_b_sell_yesterday;
 	}
 
+	this->printStrategyInfo("Strategy::update_position() 更新持仓变量");
 
-	std::cout << "A合约今买 = " << this->stg_position_a_buy_today << ", "
-		<< "A合约昨买 = " << this->stg_position_a_buy_yesterday << ", "
-		<< "A合约总买 = " << this->stg_position_a_buy << ", "
-		<< "A合约今卖 = " << this->stg_position_a_sell_today << ", "
-		<< "A合约昨卖 = " << this->stg_position_a_buy_yesterday << ", "
-		<< "A合约总卖 = " << this->stg_position_a_sell << std::endl;
+	std::cout << "A合约总买 = " << this->stg_position_a_buy << std::endl;
+	std::cout << "A合约今买 = " << this->stg_position_a_buy_today << std::endl;
+	std::cout << "A合约昨买 = " << this->stg_position_a_buy_yesterday << std::endl;
+	std::cout << "A合约总卖 = " << this->stg_position_a_sell << std::endl;
+	std::cout << "A合约今卖 = " << this->stg_position_a_sell_today << std::endl;
+	std::cout << "A合约昨卖 = " << this->stg_position_a_buy_yesterday << std::endl;
 
-	std::cout << "B合约今买 = " << this->stg_position_b_buy_today << ", "
-		<< "B合约昨买 = " << this->stg_position_b_buy_yesterday << ", "
-		<< "B合约总买 = " << this->stg_position_b_buy << ", "
-		<< "B合约今卖 = " << this->stg_position_b_sell_today << ", "
-		<< "B合约昨卖 = " << this->stg_position_b_buy_yesterday << ", "
-		<< "B合约总卖 = " << this->stg_position_b_sell << std::endl;
+	std::cout << "B合约总卖 = " << this->stg_position_b_sell << std::endl;
+	std::cout << "B合约今卖 = " << this->stg_position_b_sell_today << std::endl;
+	std::cout << "B合约昨卖 = " << this->stg_position_b_sell_yesterday << std::endl;
+	std::cout << "B合约总买 = " << this->stg_position_b_buy << std::endl;
+	std::cout << "B合约今买 = " << this->stg_position_b_buy_today << std::endl;
+	std::cout << "B合约昨买 = " << this->stg_position_b_buy_yesterday << std::endl;
+
 
 	USER_PRINT("A合约今买");
 	USER_PRINT(this->stg_position_a_buy_today);
