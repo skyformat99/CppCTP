@@ -1048,6 +1048,7 @@ void Strategy::setL_query_trade(list<CThostFtdcTradeField *> *l_query_trade) {
 				else if ((*Itor)->OffsetFlag == '4') { // B平昨成交回报
 					if ((*Itor)->Direction == '0') { /*B买平昨*/
 						this->stg_position_b_sell_yesterday -= (*Itor)->Volume;
+						std::cout << "Strategy::setL_query_trade 1051 stg_position_b_sell_yesterday = " << this->stg_position_b_sell_yesterday << std::endl;
 					}
 					else if ((*Itor)->Direction == '1') { /*B卖平昨*/
 						this->stg_position_b_buy_yesterday -= (*Itor)->Volume;
@@ -2427,6 +2428,7 @@ void Strategy::update_position(CThostFtdcOrderField *pOrder) {
 		else if (pOrder->CombOffsetFlag[0] == '4') { // B平昨成交回报
 			if (pOrder->Direction == '0') { // B买平昨成交回报
 				this->stg_position_b_sell_yesterday -= pOrder->VolumeTraded;
+				std::cout << "Strategy::update_position 2431 stg_position_b_sell_yesterday = " << this->stg_position_b_sell_yesterday << std::endl;
 			}
 			else if (pOrder->Direction == '1') { // B卖平昨成交回报
 				this->stg_position_b_buy_yesterday -= pOrder->VolumeTraded;
@@ -2510,6 +2512,7 @@ void Strategy::update_position(USER_CThostFtdcOrderField *pOrder) {
 			if (pOrder->Direction == '0') // B买平昨成交回报
 			{
 				this->stg_position_b_sell_yesterday -= pOrder->VolumeTradedBatch;
+				std::cout << "Strategy::update_position 2515 stg_position_b_sell_yesterday = " << stg_position_b_sell_yesterday << std::endl;
 			}
 			else if (pOrder->Direction == '1') { // B卖平昨成交回报
 				this->stg_position_b_buy_yesterday -= pOrder->VolumeTradedBatch;
@@ -2616,6 +2619,7 @@ void Strategy::update_position(CThostFtdcTradeField *pTrade) {
 		else if (pTrade->OffsetFlag == '4') { // A平昨
 			if (pTrade->Direction == '0') { // A买平昨
 				this->stg_position_b_sell_yesterday -= pTrade->Volume;
+				std::cout << "Strategy::update_position 2622 stg_position_b_sell_yesterday = " << this->stg_position_b_sell_yesterday << std::endl;
 			}
 			else if (pTrade->Direction == '1') { // A卖平昨
 				this->stg_position_b_buy_yesterday -= pTrade->Volume;
