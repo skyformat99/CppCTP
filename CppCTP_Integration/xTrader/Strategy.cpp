@@ -1455,6 +1455,7 @@ void Strategy::Order_Algorithm_One() {
 		(this->stg_position_a_sell == this->stg_position_b_buy) &&
 		(this->stg_position_a_buy > 0) &&
 		(this->stg_spread_long >= (this->stg_sell_close + this->stg_spread_shift * this->stg_a_price_tick))) {
+		this->stg_trade_tasking = true;
 		/// 市场多头价差大于触发参数， AB持仓量相等且大于0
 		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差卖平" << endl;
 
@@ -1497,6 +1498,7 @@ void Strategy::Order_Algorithm_One() {
 		}
 		if ((order_volume <= 0)) {
 			std::cout << "发单手数错误值 = " << order_volume << endl;
+			this->stg_trade_tasking = false;
 			return;
 		} else {
 			std::cout << "发单手数 = " << order_volume << endl;
@@ -1551,7 +1553,7 @@ void Strategy::Order_Algorithm_One() {
 
 		/// 执行下单任务
 		this->Exec_OrderInsert(this->stg_a_order_insert_args);
-		this->stg_trade_tasking = true;
+		
 
 	}
 	/// 价差买平(f)
@@ -1559,6 +1561,8 @@ void Strategy::Order_Algorithm_One() {
 		(this->stg_position_a_sell == this->stg_position_b_buy) &&
 		(this->stg_position_a_sell > 0) && 
 		(this->stg_spread_short <= (this->stg_buy_close - this->stg_spread_shift * this->stg_a_price_tick))) {
+		
+		this->stg_trade_tasking = true;
 		/// 市场空头价差小于等于触发参数， AB持仓量相等且大于0
 		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买平" << endl;
 
@@ -1607,6 +1611,7 @@ void Strategy::Order_Algorithm_One() {
 		}
 		if ((order_volume <= 0)) {
 			std::cout << "发单手数错误值 = " << order_volume << endl;
+			this->stg_trade_tasking = false;
 			return;
 		} else {
 			std::cout << "发单手数 = " << order_volume << endl;
@@ -1659,13 +1664,14 @@ void Strategy::Order_Algorithm_One() {
 
 		/// 执行下单任务
 		this->Exec_OrderInsert(this->stg_a_order_insert_args);
-		this->stg_trade_tasking = true;
+		
 	}
 
 	/// 价差卖开(f)
 	else if ((this->sell_open_on_off) && 
 		((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots) &&
 		(this->stg_spread_long >= (this->stg_sell_open + this->stg_spread_shift * this->stg_a_price_tick))) {
+		this->stg_trade_tasking = true;
 		/** 市场多头价差大于触发参数
 		A合约买持仓加B合约买小于总仓位**/
 
@@ -1704,6 +1710,7 @@ void Strategy::Order_Algorithm_One() {
 
 		if (order_volume <= 0) {
 			std::cout << "发单手数错误值 = " << order_volume << endl;
+			this->stg_trade_tasking = false;
 			return;
 		} else {
 			std::cout << "发单手数 = " << order_volume << endl;
@@ -1760,15 +1767,15 @@ void Strategy::Order_Algorithm_One() {
 
 		/// 执行下单任务
 		this->Exec_OrderInsert(this->stg_a_order_insert_args);
-		this->stg_trade_tasking = true;
+		
 	}
 
 	/// 价差买开
 	else if ((this->buy_open_on_off) &&
 		((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots) &&
 		((this->stg_spread_short <= (this->stg_buy_open - this->stg_spread_shift * this->stg_a_price_tick)))) {
+		this->stg_trade_tasking = true; 
 		std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买开" << endl;
-
 
 		std::cout << "user_id = " << this->stg_user_id << ", "
 			<< "strategy_id = " << this->stg_strategy_id << ", "
@@ -1797,6 +1804,7 @@ void Strategy::Order_Algorithm_One() {
 
 		if (order_volume <= 0) {
 			std::cout << "发单手数错误值 = " << order_volume << endl;
+			this->stg_trade_tasking = false;
 			return;
 		} else {
 			std::cout << "发单手数 = " << order_volume << endl;
@@ -1852,7 +1860,7 @@ void Strategy::Order_Algorithm_One() {
 
 		/// 执行下单任务
 		this->Exec_OrderInsert(this->stg_a_order_insert_args);
-		this->stg_trade_tasking = true;
+		
 	}
 }
 //下单算法2
