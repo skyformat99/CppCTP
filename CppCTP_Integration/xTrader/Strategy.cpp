@@ -1692,6 +1692,8 @@ void Strategy::Order_Algorithm_One() {
 			<< "spread short = " << this->stg_spread_short << ", "
 			<< "spread short volume = " << this->stg_spread_short_volume << ", "
 			<< "stg_lots_batch = " << this->stg_lots_batch << ", "
+			<< "stg_position_a_buy = " << this->stg_position_a_buy << ", "
+			<< "stg_position_a_sell = " << this->stg_position_a_sell << ", "
 			<< "stg_lots = " << this->stg_lots << endl;
 
 		/// 满足交易任务之前的tick
@@ -1801,6 +1803,7 @@ void Strategy::Order_Algorithm_One() {
 		std::cout << "this->stg_lots_batch = " << this->stg_lots_batch << std::endl;
 		std::cout << "this->stg_lots = " << this->stg_lots << std::endl;
 		std::cout << "this->stg_position_a_buy = " << this->stg_position_a_buy << std::endl;
+		std::cout << "this->stg_position_a_sell = " << this->stg_position_a_sell << std::endl;
 		std::cout << "this->stg_position_b_buy = " << this->stg_position_b_buy << std::endl;
 
 		/// 报单手数：盘口挂单量,每份发单手数,剩余可开仓手数中取最小值

@@ -781,10 +781,6 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								(*stg_itor)->setStgBuyCloseOnOff(object["buy_close_on_off"].GetInt());
 								(*stg_itor)->setStgSellCloseOnOff(object["sell_close_on_off"].GetInt());
 								(*stg_itor)->setStgBuyOpenOnOff(object["buy_open_on_off"].GetInt());
-
-
-
-
 								
 								//(*stg_itor)->setStgOnlyClose(object["only_close"].GetInt());
 								//(*stg_itor)->setStgHoldProfit(object["hold_profit"].GetDouble());
@@ -857,9 +853,6 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								create_info_object.AddMember("buy_open_on_off", (*stg_itor)->getStgBuyOpenOnOff(), allocator);
 
 
-
-
-
 								/*新增字段*/
 								create_info_object.AddMember("trade_model", rapidjson::StringRef((*stg_itor)->getStgTradeModel().c_str()), allocator);
 								create_info_object.AddMember("hold_profit", (*stg_itor)->getStgHoldProfit(), allocator);
@@ -871,7 +864,6 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								create_info_object.AddMember("trade_volume", (*stg_itor)->getStgTradeVolume(), allocator);
 								create_info_object.AddMember("amount", (*stg_itor)->getStgAmount(), allocator);
 								create_info_object.AddMember("average_shift", (*stg_itor)->getStgAverageShift(), allocator);
-
 
 								rapidjson::Value instrument_array(rapidjson::kArrayType);
 								for (int j = 0; j < 2; j++) {
