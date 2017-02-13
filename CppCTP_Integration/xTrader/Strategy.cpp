@@ -1451,6 +1451,7 @@ void Strategy::Order_Algorithm_One() {
 		int order_volume = 0;
 
 		this->printStrategyInfo("计算发单手数");
+
 		/// 优先平昨仓
 		/// 报单手数：盘口挂单量、每份发单手数、持仓量
 		if (this->stg_position_a_sell_yesterday > 0) {
@@ -1462,11 +1463,11 @@ void Strategy::Order_Algorithm_One() {
 			this->stg_a_order_insert_args->CombOffsetFlag[0] = '4'; /// 平昨
 			this->stg_b_order_insert_args->CombOffsetFlag[0] = '4'; /// 平昨
 		}
-		else if ((this->stg_position_a_sell_yesterday == 0) && (this->stg_position_a_sell_today > 0)) {
+		else if ((this->stg_position_a_sell_yesterday == 0) && (this->stg_position_a_buy_today > 0)) {
 			std::cout << "this->stg_spread_short_volume = " << this->stg_spread_short_volume << std::endl;
 			std::cout << "this->stg_lots_batch = " << this->stg_lots_batch << std::endl;
-			std::cout << "this->stg_position_a_sell_today = " << this->stg_position_a_sell_today << std::endl;
-			order_volume = this->getMinNum(this->stg_spread_short_volume, this->stg_lots_batch, this->stg_position_a_sell_today);
+			std::cout << "this->stg_position_a_buy_today = " << this->stg_position_a_buy_today << std::endl;
+			order_volume = this->getMinNum(this->stg_spread_short_volume, this->stg_lots_batch, this->stg_position_a_buy_today);
 			std::cout << "order_volume = " << order_volume << std::endl;
 			this->stg_a_order_insert_args->CombOffsetFlag[0] = '3'; /// 平今
 			this->stg_b_order_insert_args->CombOffsetFlag[0] = '3'; /// 平今
