@@ -1230,6 +1230,16 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 	/// 如果有交易任务,进入交易任务执行
 	if (this->stg_trade_tasking) {
 		this->printStrategyInfo("Strategy::OnRtnDepthMarketData() 有交易任务,进入交易任务执行");
+		std::cout << "挂单列表长度 = " << this->stg_list_order_pending->size() << std::endl;
+		std::cout << "stg_position_a_buy_today = " << stg_position_a_buy_today << std::endl;
+		std::cout << "stg_position_a_buy_yesterday = " << stg_position_a_buy_yesterday << std::endl;
+		std::cout << "stg_position_a_sell_today = " << stg_position_a_sell_today << std::endl;
+		std::cout << "stg_position_a_sell_yesterday = " << stg_position_a_sell_yesterday << std::endl;
+		std::cout << "stg_position_b_buy_today = " << stg_position_b_buy_today << std::endl;
+		std::cout << "stg_position_b_buy_yesterday = " << stg_position_b_buy_yesterday << std::endl;
+		std::cout << "stg_position_b_sell_today = " << stg_position_b_sell_today << std::endl;
+		std::cout << "stg_position_b_sell_yesterday = " << stg_position_b_sell_yesterday << std::endl;
+
 		this->Exec_OnTickComing(pDepthMarketData);
 	}
 	else { /// 如果没有交易任务，那么选择开始新的交易任务
