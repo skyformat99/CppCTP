@@ -1940,18 +1940,23 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	USER_PRINT("Exec_OnRtnOrder");
 	USER_PRINT(pOrder->InstrumentID);
 	USER_PRINT(pOrder->VolumeTraded);
-	
-	// 更新挂单列表，持仓信息
-	this->update_pending_order_list(pOrder);
 
 	// 添加字段,本次成交量
 	USER_CThostFtdcOrderField *order_new = new USER_CThostFtdcOrderField();
 	memset(order_new, 0x00, sizeof(USER_CThostFtdcOrderField));
 	USER_PRINT(order_new);
 
+	// 添加本次成交字段VolumeTradedBatch
+	this->add_VolumeTradedBatch(pOrder, order_new);
+	
+	// 更新挂单列表，持仓信息
+	this->update_pending_order_list(pOrder);
+
+	
+
 	//std::auto_ptr<USER_CThostFtdcOrderField> order_new(new USER_CThostFtdcOrderField);
 
-	this->add_VolumeTradedBatch(pOrder, order_new);
+	
 
 	// 更新持仓明细列表
 	this->update_position_detail(order_new);
@@ -2869,28 +2874,60 @@ void Strategy::add_VolumeTradedBatch(CThostFtdcOrderField *pOrder, USER_CThostFt
 	this->CopyOrderDataToNew(new_Order, pOrder);
 	USER_PRINT(new_Order->OrderStatus);
 
-	if (new_Order->OrderStatus == '1' || new_Order->OrderStatus == '0') { // 全部成交或者部分成交还在队列中
-		USER_PRINT(new_Order->VolumeTotalOriginal);
-		if (new_Order->VolumeTotalOriginal == 1) {
-			new_Order->VolumeTradedBatch = 1;
-		}
-		else {
-			/// 遍历挂单列表
-			list<CThostFtdcOrderField *>::iterator Itor;
-			for (Itor = this->stg_list_order_pending->begin(); Itor != this->stg_list_order_pending->end(); Itor++) {
-				USER_PRINT((*Itor)->OrderRef);
-				USER_PRINT(new_Order->OrderRef);
-				if (!strcmp((*Itor)->OrderRef, new_Order->OrderRef)) {
-					new_Order->VolumeTradedBatch = new_Order->VolumeTraded - (*Itor)->VolumeTraded;
-					break;
-				}
+	//if (new_Order->OrderStatus == '1' || new_Order->OrderStatus == '0') { // 全部成交或者部分成交还在队列中
+	//	USER_PRINT(new_Order->VolumeTotalOriginal);
+	//	if (new_Order->VolumeTotalOriginal == 1) {
+	//		new_Order->VolumeTradedBatch = 1;
+	//	}
+	//	else {
+	//		/// 遍历挂单列表
+	//		list<CThostFtdcOrderField *>::iterator Itor;
+	//		for (Itor = this->stg_list_order_pending->begin(); Itor != this->stg_list_order_pending->end(); Itor++) {
+	//			USER_PRINT((*Itor)->OrderRef);
+	//			USER_PRINT(new_Order->OrderRef);
+	//			if (!strcmp((*Itor)->OrderRef, new_Order->OrderRef)) {
+	//				new_Order->VolumeTradedBatch = new_Order->VolumeTraded - (*Itor)->VolumeTraded;
+	//				break;
+	//			}
+	//		}
+	//	}
+	//}
+	//else
+	//{
+	//	new_Order->VolumeTradedBatch = 0;
+	//}
+
+
+	if (new_Order->OrderStatus == '0') { // 全部成交
+		new_Order->VolumeTradedBatch = new_Order->VolumeTotalOriginal;
+		
+	}
+	else if (new_Order->OrderStatus == '1') // 部分成交还在队列中
+	{
+		bool is_exists = false;
+		/// 遍历挂单列表
+		list<CThostFtdcOrderField *>::iterator Itor;
+		for (Itor = this->stg_list_order_pending->begin(); Itor != this->stg_list_order_pending->end(); Itor++) {
+			USER_PRINT((*Itor)->OrderRef);
+			USER_PRINT(new_Order->OrderRef);
+			if (!strcmp((*Itor)->OrderRef, new_Order->OrderRef)) {
+				is_exists = true;
+				new_Order->VolumeTradedBatch = new_Order->VolumeTraded - (*Itor)->VolumeTraded;
+				break;
 			}
 		}
+
+		if (!is_exists) {
+			new_Order->VolumeTradedBatch = new_Order->VolumeTraded;
+		}
+		
 	}
 	else
 	{
 		new_Order->VolumeTradedBatch = 0;
 	}
+
+
 	USER_PRINT(new_Order->VolumeTradedBatch);
 }
 
