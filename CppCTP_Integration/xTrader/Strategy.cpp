@@ -1667,7 +1667,7 @@ void Strategy::Order_Algorithm_One() {
 		//USER_PRINT("stg_instrument_B_tick_last");
 		//USER_PRINT(stg_instrument_B_tick_last);
 
-
+		this->printStrategyInfo("计算发单手数");
 		std::cout << "this->stg_spread_long_volume = " << this->stg_spread_long_volume << std::endl;
 		std::cout << "this->stg_lots_batch = " << this->stg_lots_batch << std::endl;
 		std::cout << "this->stg_lots = " << this->stg_lots << std::endl;
@@ -1675,7 +1675,7 @@ void Strategy::Order_Algorithm_One() {
 		std::cout << "this->stg_position_b_buy = " << this->stg_position_b_buy << std::endl;
 		/// 报单手数：盘口挂单量,每份发单手数,剩余可开仓手数中取最小值
 		int order_volume = this->getMinNum(this->stg_spread_long_volume, this->stg_lots_batch, this->stg_lots - (this->stg_position_a_buy + this->stg_position_b_buy));
-		std::cout << "this->order_volume = " << order_volume << std::endl;
+		std::cout << "order_volume = " << order_volume << std::endl;
 
 
 		if (order_volume <= 0) {
@@ -1759,7 +1759,7 @@ void Strategy::Order_Algorithm_One() {
 		this->CopyTickData(stg_instrument_A_tick_last, stg_instrument_A_tick);
 		this->CopyTickData(stg_instrument_B_tick_last, stg_instrument_B_tick);
 
-
+		this->printStrategyInfo("计算发单手数");
 		std::cout << "this->stg_spread_long_volume = " << this->stg_spread_long_volume << std::endl;
 		std::cout << "this->stg_lots_batch = " << this->stg_lots_batch << std::endl;
 		std::cout << "this->stg_lots = " << this->stg_lots << std::endl;
