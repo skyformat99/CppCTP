@@ -563,7 +563,7 @@ int DBManager::CreateStrategy(Strategy *stg) {
 		b.append("stop_loss", stg->getStgStopLoss());
 		b.append("position_b_buy_yesterday", stg->getStgPositionBBuyYesterday());
 		b.append("is_active", stg->isStgIsActive());
-		b.append("position_b_sell_yesterday", stg->getStgPositionBSell());
+		b.append("position_b_sell_yesterday", stg->getStgPositionBSellYesterday());
 		b.append("strategy_id", stg->getStgStrategyId());
 		b.append("position_b_buy", stg->getStgPositionBBuy());
 		b.append("lots_batch", stg->getStgLotsBatch());
@@ -1105,7 +1105,7 @@ int DBManager::CreateStrategyYesterday(Strategy *stg) {
 		b.append("stop_loss", stg->getStgStopLoss());
 		b.append("position_b_buy_yesterday", stg->getStgPositionBBuyYesterday());
 		b.append("is_active", stg->isStgIsActive());
-		b.append("position_b_sell_yesterday", stg->getStgPositionBSell());
+		b.append("position_b_sell_yesterday", stg->getStgPositionBSellYesterday());
 		b.append("strategy_id", stg->getStgStrategyId());
 		b.append("position_b_buy", stg->getStgPositionBBuy());
 		b.append("lots_batch", stg->getStgLotsBatch());
@@ -1200,7 +1200,7 @@ void DBManager::UpdateStrategyYesterday(Strategy *stg) {
 			<< "stop_loss" << stg->getStgStopLoss()
 			<< "position_b_buy_yesterday" << stg->getStgPositionBBuyYesterday()
 			<< "is_active" << stg->isStgIsActive()
-			<< "position_b_sell_yesterday" << stg->getStgPositionBSell()
+			<< "position_b_sell_yesterday" << stg->getStgPositionBSellYesterday()
 			<< "strategy_id" << stg->getStgStrategyId()
 			<< "position_b_buy" << stg->getStgPositionBBuy()
 			<< "lots_batch" << stg->getStgLotsBatch()
