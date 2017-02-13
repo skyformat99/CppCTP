@@ -189,6 +189,8 @@ iostream
 /root/xTrader/Strategy.cpp
 sstream
 -
+mutex
+-
 Strategy.h
 /root/xTrader/Strategy.h
 

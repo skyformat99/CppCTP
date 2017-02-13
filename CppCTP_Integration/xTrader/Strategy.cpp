@@ -1,6 +1,9 @@
 ﻿#include <algorithm>
 #include <sstream>
+#include <mutex>
 #include "Strategy.h"
+
+std::mutex tick_mtx; // locks access to counter
 
 Strategy::Strategy(User *stg_user) {
 
@@ -1185,6 +1188,8 @@ list<USER_CThostFtdcOrderField *> * Strategy::getStg_List_Position_Detail_From_O
 
 void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 	
+	tick_mtx.lock();
+
 	// Get Own Instrument
 	USER_PRINT(this);
 	USER_PRINT("Strategy::OnRtnDepthMarketData IN");
@@ -1231,6 +1236,7 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
 	}
 	USER_PRINT("Strategy::OnRtnDepthMarketData OUT");
+	tick_mtx.unlock();
 }
 
 //选择下单算法
