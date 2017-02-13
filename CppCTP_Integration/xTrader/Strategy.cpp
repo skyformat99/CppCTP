@@ -1427,6 +1427,17 @@ void Strategy::Order_Algorithm_One() {
 	std::cout << "(this->stg_spread_long >= (this->stg_sell_open + this->stg_spread_shift * this->stg_a_price_tick)) = " << (this->stg_spread_long >= (this->stg_sell_open + this->stg_spread_shift * this->stg_a_price_tick)) << std::endl;*/
 
 
+	this->printStrategyInfo("价差卖平参数");
+	std::cout << "this->sell_close_on_off = " << this->sell_close_on_off << std::endl;
+	std::cout << "this->stg_position_a_sell = " << this->stg_position_a_sell << std::endl;
+	std::cout << "this->stg_position_b_buy = " << this->stg_position_b_buy << std::endl;
+	std::cout << "this->stg_position_a_buy = " << this->stg_position_a_buy << std::endl;
+	std::cout << "this->stg_spread_long = " << this->stg_spread_long << std::endl;
+	std::cout << "this->stg_sell_close = " << this->stg_sell_close << std::endl;
+	std::cout << "this->stg_spread_shift = " << this->stg_spread_shift << std::endl;
+	std::cout << "this->stg_a_price_tick = " << this->stg_a_price_tick << std::endl;
+	std::cout << "(this->stg_spread_long >= (this->stg_sell_close + this->stg_spread_shift * this->stg_a_price_tick)) = " << (this->stg_spread_long >= (this->stg_sell_close + this->stg_spread_shift * this->stg_a_price_tick)) << std::endl;
+
 	/// 价差卖平(b)
 	if ((this->sell_close_on_off) &&
 		(this->stg_position_a_sell == this->stg_position_b_buy) &&
