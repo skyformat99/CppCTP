@@ -873,7 +873,7 @@ void Strategy::update_task_status() {
 	}
 	else
 	{
-		this->printStrategyInfo("更新交易状态");
+		this->printStrategyInfo("Strategy::update_task_status() 更新交易状态");
 		std::cout << "stg_position_a_buy_today = " << stg_position_a_buy_today << std::endl;
 		std::cout << "stg_position_b_sell_today = " << stg_position_b_sell_today << std::endl;
 		std::cout << "stg_position_a_buy_yesterday = " << stg_position_a_buy_yesterday << std::endl;
@@ -886,7 +886,7 @@ void Strategy::update_task_status() {
 		this->stg_trade_tasking = true;
 	}
 	//std::cout << "After update this.trade_tasking = " << this->stg_trade_tasking << endl;
-	std::cout << "Strategy::update_task_status = " << this->stg_trade_tasking << endl;
+	std::cout << "Strategy::update_task_status() this->stg_trade_tasking = " << this->stg_trade_tasking << endl;
 	USER_PRINT(this->stg_trade_tasking);
 }
 
@@ -1188,7 +1188,7 @@ list<USER_CThostFtdcOrderField *> * Strategy::getStg_List_Position_Detail_From_O
 
 void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 	
-	tick_mtx.lock();
+	//tick_mtx.lock();
 
 	// Get Own Instrument
 	USER_PRINT(this);
@@ -1229,14 +1229,14 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 	USER_PRINT(this->stg_trade_tasking);
 	/// 如果有交易任务,进入交易任务执行
 	if (this->stg_trade_tasking) {
-		this->printStrategyInfo("有交易任务,进入交易任务执行");
+		this->printStrategyInfo("Strategy::OnRtnDepthMarketData() 有交易任务,进入交易任务执行");
 		this->Exec_OnTickComing(pDepthMarketData);
 	}
 	else { /// 如果没有交易任务，那么选择开始新的交易任务
 		this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
 	}
 	USER_PRINT("Strategy::OnRtnDepthMarketData OUT");
-	tick_mtx.unlock();
+	//tick_mtx.unlock();
 }
 
 //选择下单算法
