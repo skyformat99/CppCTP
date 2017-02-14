@@ -861,7 +861,7 @@ int Strategy::getStgSellCloseOnOff() {
 
 /// 更新交易状态
 void Strategy::update_task_status() {
-	update_status_mtx.lock();
+	//update_status_mtx.lock();
 	USER_PRINT("Strategy::update_task_status");
 	USER_PRINT(this->stg_trade_tasking);
 	if ((this->stg_position_a_buy_today == this->stg_position_b_sell_today)
@@ -889,7 +889,7 @@ void Strategy::update_task_status() {
 	}
 	//std::cout << "After update this.trade_tasking = " << this->stg_trade_tasking << endl;
 	std::cout << "Strategy::update_task_status() this->stg_trade_tasking = " << this->stg_trade_tasking << endl;
-	update_status_mtx.unlock();
+	//update_status_mtx.unlock();
 	USER_PRINT(this->stg_trade_tasking);
 }
 
