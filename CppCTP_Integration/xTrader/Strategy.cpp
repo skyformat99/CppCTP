@@ -2493,7 +2493,7 @@ void Strategy::update_position(USER_CThostFtdcOrderField *pOrder) {
 	USER_PRINT(this->stg_instrument_id_B);
 
 	this->printStrategyInfo("Strategy::update_position() 输出VolumeTradedBatch");
-	std::cout << "VolumeTradedBatch = " << pOrder->VolumeTradedBatch << std::endl;
+	std::cout << "Strategy::update_position() VolumeTradedBatch = " << pOrder->VolumeTradedBatch << std::endl;
 
 	// A成交
 	if (!strcmp(pOrder->InstrumentID, this->stg_instrument_id_A.c_str())) {
@@ -2587,10 +2587,11 @@ void Strategy::update_position(USER_CThostFtdcOrderField *pOrder) {
 	//std::cout << "B合约今买 = " << this->stg_position_b_buy_today << std::endl;
 	//std::cout << "B合约昨买 = " << this->stg_position_b_buy_yesterday << std::endl;
 
-	std::cout << "Strategy::update_position() A买(" << this->stg_position_a_buy << ", " << this->stg_position_a_buy_yesterday << ")" << std::endl;
-	std::cout << "Strategy::update_position() B卖(" << this->stg_position_b_sell << ", " << this->stg_position_b_sell_yesterday << ")" << std::endl;
 	std::cout << "Strategy::update_position() A卖(" << this->stg_position_a_sell << ", " << this->stg_position_a_sell_yesterday << ")" << std::endl;
 	std::cout << "Strategy::update_position() B买(" << this->stg_position_b_buy << ", " << this->stg_position_b_buy_yesterday << ")" << std::endl;
+	std::cout << "Strategy::update_position() A买(" << this->stg_position_a_buy << ", " << this->stg_position_a_buy_yesterday << ")" << std::endl;
+	std::cout << "Strategy::update_position() B卖(" << this->stg_position_b_sell << ", " << this->stg_position_b_sell_yesterday << ")" << std::endl;
+	
 	std::cout << "Strategy::update_position() 挂单列表长度 = " << this->stg_list_order_pending->size() << std::endl;
 	std::cout << "Strategy::update_position() 任务执行状态 = " << this->stg_trade_tasking << std::endl;
 
@@ -2956,6 +2957,7 @@ void Strategy::add_VolumeTradedBatch(CThostFtdcOrderField *pOrder, USER_CThostFt
 		if (!is_exists) {
 			new_Order->VolumeTradedBatch = new_Order->VolumeTraded;
 		}
+
 		
 	}
 	else
@@ -2963,7 +2965,7 @@ void Strategy::add_VolumeTradedBatch(CThostFtdcOrderField *pOrder, USER_CThostFt
 		new_Order->VolumeTradedBatch = 0;
 	}
 
-
+	std::cout << "Strategy::add_VolumeTradedBatch() 合约 = " << new_Order->InstrumentID << ", 买卖 = " << new_Order->Direction << ", 开平 = " << new_Order->CombOffsetFlag[0] << ", 本次成交量 = " << new_Order->VolumeTradedBatch << std::endl;
 	USER_PRINT(new_Order->VolumeTradedBatch);
 }
 
