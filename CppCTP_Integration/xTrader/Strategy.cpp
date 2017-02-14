@@ -2078,7 +2078,7 @@ void Strategy::ExEc_OnRtnTrade(CThostFtdcTradeField *pTrade) {
 	/************************************************************************/
 	//this->update_position_detail(pTrade); 
 	//this->update_position(pTrade);
-	this->update_task_status();
+	//this->update_task_status();
 }
 
 // 报单录入错误回报
