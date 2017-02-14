@@ -739,6 +739,7 @@ void TdSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentSt
 		string localtime = this->getTradingDay() + "15:00:00";
 		if (Utils::compareTradingDaySeconds(real_status_time.c_str(), localtime.c_str())) { // 时间相等进行收盘工作
 			USER_PRINT("收盘了...策略进行保存");
+			std::cout << "TdSpi::OnRtnInstrumentStatus() 收盘了开始策略保存" << std::endl;
 			this->current_user->getCTP_Manager()->saveStrategy();
 		}
 		///进入本状态原因

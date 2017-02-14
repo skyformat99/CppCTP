@@ -2193,7 +2193,7 @@ bool CTP_Manager::initYesterdayPositionDetail() {
 	bool flag = false;
 	list<PositionDetail *>::iterator posd_itor;
 	list<Strategy *>::iterator stg_itor;
-	std::cout << "系统交易日 = " << this->getTradingDay() << std::endl;
+	std::cout << "CTP_Manager::initYesterdayPositionDetail() 系统交易日 = " << this->getTradingDay() << std::endl;
 
 	/// 遍历策略，遍历昨仓明细，进行绑定
 	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++)
@@ -2202,6 +2202,7 @@ bool CTP_Manager::initYesterdayPositionDetail() {
 
 			if (((*stg_itor)->getStgUserId() == (*posd_itor)->getUserID()) && ((*stg_itor)->getStgStrategyId() == (*posd_itor)->getStrategyID())) {
 				USER_PRINT("昨仓明细找到");
+				(*stg_itor)->printStrategyInfo("CTP_Manager::initYesterdayPositionDetail() 添加昨仓明细到各自策略持仓明细列表");
 				(*stg_itor)->add_position_detail((*posd_itor));
 				flag = true;
 			}
@@ -2344,7 +2345,7 @@ bool CTP_Manager::init(bool is_online) {
 	this->setTradingDay(this->l_user->front()->getUserTradeSPI()->getTradingDay());
 
 	/// session维护，如果不是本交易日的session，就要删除
-	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) {
+	/*for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) {
 		USER_PRINT((*user_itor)->getUserID());
 		for (sid_itor = (*user_itor)->getL_Sessions()->begin(); sid_itor != (*user_itor)->getL_Sessions()->end();) {
 			USER_PRINT((*sid_itor)->getTradingDay());
@@ -2360,7 +2361,7 @@ bool CTP_Manager::init(bool is_online) {
 				sid_itor++;
 			}
 		}
-	}
+	}*/
 
 
 	/// 如果是新的交易日，更新报单引用
