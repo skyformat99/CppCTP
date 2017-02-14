@@ -1978,10 +1978,13 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	// 更新持仓明细列表
 	this->update_position_detail(order_new);
 
+	// 更新标志位
+	this->update_task_status();
+
 	// 更新持仓变量
 	this->update_position(order_new);
 
-	this->update_task_status();
+	
 
 	delete order_new;
 
