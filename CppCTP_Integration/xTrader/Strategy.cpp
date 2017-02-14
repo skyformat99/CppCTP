@@ -861,7 +861,7 @@ int Strategy::getStgSellCloseOnOff() {
 
 /// 更新交易状态
 void Strategy::update_task_status() {
-	//update_status_mtx.lock();
+	update_status_mtx.lock();
 	USER_PRINT("Strategy::update_task_status");
 	USER_PRINT(this->stg_trade_tasking);
 	if ((this->stg_position_a_buy_today == this->stg_position_b_sell_today)
@@ -889,7 +889,7 @@ void Strategy::update_task_status() {
 	}
 	//std::cout << "After update this.trade_tasking = " << this->stg_trade_tasking << endl;
 	std::cout << "Strategy::update_task_status() this->stg_trade_tasking = " << this->stg_trade_tasking << endl;
-	//update_status_mtx.unlock();
+	update_status_mtx.unlock();
 	USER_PRINT(this->stg_trade_tasking);
 }
 
@@ -2165,7 +2165,7 @@ void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketDat
 					std::cout << "B_Tick 撤单判断:pDepthMarketData->AskPrice1 > this->stg_instrument_B_tick_last->AskPrice1 = " << (pDepthMarketData->AskPrice1 > this->stg_instrument_B_tick_last->AskPrice1) << std::endl;*/
 					/// B最新tick的对手价如果与开仓信号触发时B的tick对手价发生不利变化则A撤单
 					if (pDepthMarketData->AskPrice1 > (this->stg_instrument_B_tick_last->AskPrice1 + (this->stg_b_wait_price_tick * this->stg_b_price_tick))) {
-						USER_PRINT("Strategy.trade_task()通过B最新tick判断A合约卖挂单符合撤单条件");
+						USER_PRINT("Strategy.trade_task() 通过B最新tick判断A合约卖挂单符合撤单条件");
 						/*this->printStrategyInfo("Strategy.trade_task()通过B最新tick判断A合约卖挂单符合撤单条件");
 						std::cout << "B_Tick 符合撤单:pDepthMarketData->AskPrice1 = " << pDepthMarketData->AskPrice1 << std::endl;
 						std::cout << "B_Tick 符合撤单:this->stg_instrument_B_tick_last->AskPrice1 = " << this->stg_instrument_B_tick_last->AskPrice1 << std::endl;

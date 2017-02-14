@@ -1617,6 +1617,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 								
 								static_dbm->UpdateStrategy((*stg_itor));
+
+								(*stg_itor)->update_task_status();
+
 								std::cout << "Strategy修改持仓完成!" << std::endl;
 
 								/*构造内容json*/
