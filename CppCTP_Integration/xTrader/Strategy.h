@@ -163,6 +163,10 @@ public:
 	int getStgPositionBBuyToday();
 	void setStgPositionBBuyToday(int stgPositionBBuyToday);
 
+	
+	int getStgPendingAOpen();
+	void setStgPendingAOpen(int stg_pending_a_open);
+
 	int getStgPositionBBuyYesterday();
 	void setStgPositionBBuyYesterday(int stgPositionBBuyYesterday);
 
@@ -459,6 +463,9 @@ private:
 	int stg_position_b_sell_today;		// B合约卖持仓今仓
 	int stg_position_b_sell_yesterday;	// B合约卖持仓昨仓
 	int stg_position_b_sell;			// B合约卖持仓总仓位
+	int stg_pending_a_open;			// A合约挂单买开仓量
+
+
 
 	CThostFtdcDepthMarketDataField *stg_instrument_A_tick;	// A合约tick（第一腿）
 	CThostFtdcDepthMarketDataField *stg_instrument_B_tick;	// B合约tick（第二腿）

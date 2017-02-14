@@ -1693,7 +1693,7 @@ void Strategy::Order_Algorithm_One() {
 
 	/// 价差卖开(f)
 	else if ((this->sell_open_on_off) && 
-		((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots) &&
+		((this->stg_position_a_buy + this->stg_position_a_sell + this->stg_pending_a_open) < this->stg_lots) &&
 		(this->stg_spread_long >= (this->stg_sell_open + this->stg_spread_shift * this->stg_a_price_tick))) {
 		
 		//this->stg_trade_tasking = true;
@@ -1801,7 +1801,7 @@ void Strategy::Order_Algorithm_One() {
 
 	/// 价差买开
 	else if ((this->buy_open_on_off) &&
-		((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots) &&
+		((this->stg_position_a_buy + this->stg_position_a_sell + this->stg_pending_a_open) < this->stg_lots) &&
 		((this->stg_spread_short <= (this->stg_buy_open - this->stg_spread_shift * this->stg_a_price_tick)))) {
 
 		//this->stg_trade_tasking = true;
@@ -2421,6 +2421,25 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 	else if (pOrder->OrderStatus == 'a') { // 未知
 		
 	}
+
+	// 遍历挂单列表，找出A合约开仓未成交的量
+	list<CThostFtdcOrderField *>::iterator cal_itor;
+	for (cal_itor = this->stg_list_order_pending->begin(); cal_itor != this->stg_list_order_pending->end();) {
+		// 对比InstrumentID
+		if (!strcmp((*cal_itor)->InstrumentID, this->stg_instrument_id_A.c_str()) && ((*cal_itor)->CombOffsetFlag[0] == '0')) { // 查找A合约开仓
+			this->stg_pending_a_open += (*cal_itor)->VolumeTotalOriginal - (*cal_itor)->VolumeTraded;
+		}
+
+		if (!strcmp((*cal_itor)->OrderRef, pOrder->OrderRef)) {
+			delete (*cal_itor);
+			cal_itor = this->stg_list_order_pending->erase(cal_itor); //移除
+			break;
+		}
+		else {
+			cal_itor++;
+		}
+	}
+
 
 }
 
@@ -3342,6 +3361,13 @@ int Strategy::getStgPositionBBuyToday() {
 
 void Strategy::setStgPositionBBuyToday(int stgPositionBBuyToday) {
 	stg_position_b_buy_today = stgPositionBBuyToday;
+}
+
+int Strategy::getStgPendingAOpen() {
+	return this->stg_pending_a_open;
+}
+void Strategy::setStgPendingAOpen(int stg_pending_a_open) {
+	this->stg_pending_a_open = stg_pending_a_open;
 }
 
 int Strategy::getStgPositionBBuyYesterday() {
