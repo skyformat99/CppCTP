@@ -1968,10 +1968,15 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	// 添加字段,本次成交量
 	USER_CThostFtdcOrderField *order_new = new USER_CThostFtdcOrderField();
 	memset(order_new, 0x00, sizeof(USER_CThostFtdcOrderField));
+	// 添加字段,本次成交量
+	USER_CThostFtdcOrderField *order_new_tmp = new USER_CThostFtdcOrderField();
+	memset(order_new_tmp, 0x00, sizeof(USER_CThostFtdcOrderField));
 	USER_PRINT(order_new);
 
 	// 添加本次成交字段VolumeTradedBatch
 	this->add_VolumeTradedBatch(pOrder, order_new);
+
+	this->CopyNewOrderData(order_new_tmp, order_new);
 	
 	// 更新挂单列表，持仓信息
 	this->update_pending_order_list(pOrder);
@@ -1979,7 +1984,7 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	//std::auto_ptr<USER_CThostFtdcOrderField> order_new(new USER_CThostFtdcOrderField);
 
 	// 更新持仓明细列表
-	this->update_position_detail(order_new);
+	this->update_position_detail(order_new_tmp);
 
 	// 更新标志位
 	this->update_task_status();
@@ -1987,9 +1992,8 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	// 更新持仓变量
 	this->update_position(order_new);
 
-	
-
 	delete order_new;
+	delete order_new_tmp;
 
 	/// A成交回报,B发送等量的报单
 	if ((!strcmp(pOrder->InstrumentID, this->stg_instrument_id_A.c_str())) && ((pOrder->OrderStatus == '0') || (pOrder->OrderStatus == '1')) && (strlen(pOrder->OrderSysID) != 0)) { //只有全部成交或者部分成交还在队列中
@@ -2493,7 +2497,7 @@ void Strategy::update_position(USER_CThostFtdcOrderField *pOrder) {
 	USER_PRINT(this->stg_instrument_id_B);
 
 	this->printStrategyInfo("Strategy::update_position() 输出VolumeTradedBatch");
-	std::cout << "Strategy::update_position() VolumeTradedBatch = " << pOrder->VolumeTradedBatch << std::endl;
+	std::cout << "Strategy::update_position() 本次成交量 = " << pOrder->VolumeTradedBatch << ", 报单引用 = " << pOrder->OrderRef << std::endl;
 
 	// A成交
 	if (!strcmp(pOrder->InstrumentID, this->stg_instrument_id_A.c_str())) {
@@ -2965,7 +2969,7 @@ void Strategy::add_VolumeTradedBatch(CThostFtdcOrderField *pOrder, USER_CThostFt
 		new_Order->VolumeTradedBatch = 0;
 	}
 
-	std::cout << "Strategy::add_VolumeTradedBatch() 合约 = " << new_Order->InstrumentID << ", 买卖 = " << new_Order->Direction << ", 开平 = " << new_Order->CombOffsetFlag[0] << ", 本次成交量 = " << new_Order->VolumeTradedBatch << std::endl;
+	std::cout << "Strategy::add_VolumeTradedBatch() 合约 = " << new_Order->InstrumentID << ", 买卖 = " << new_Order->Direction << ", 开平 = " << new_Order->CombOffsetFlag[0] << ", 本次成交量 = " << new_Order->VolumeTradedBatch << ", 报单引用 = " << new_Order->OrderRef << std::endl;
 	USER_PRINT(new_Order->VolumeTradedBatch);
 }
 
