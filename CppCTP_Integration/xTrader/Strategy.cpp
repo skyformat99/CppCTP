@@ -2486,8 +2486,8 @@ void Strategy::update_position(USER_CThostFtdcOrderField *pOrder) {
 	USER_PRINT(this->stg_instrument_id_A);
 	USER_PRINT(this->stg_instrument_id_B);
 
-	/*this->printStrategyInfo("Strategy::update_position() 输出VolumeTradedBatch");
-	std::cout << "VolumeTradedBatch = " << pOrder->VolumeTradedBatch << std::endl;*/
+	this->printStrategyInfo("Strategy::update_position() 输出VolumeTradedBatch");
+	std::cout << "VolumeTradedBatch = " << pOrder->VolumeTradedBatch << std::endl;
 
 	// A成交
 	if (!strcmp(pOrder->InstrumentID, this->stg_instrument_id_A.c_str())) {
@@ -2581,12 +2581,12 @@ void Strategy::update_position(USER_CThostFtdcOrderField *pOrder) {
 	//std::cout << "B合约今买 = " << this->stg_position_b_buy_today << std::endl;
 	//std::cout << "B合约昨买 = " << this->stg_position_b_buy_yesterday << std::endl;
 
-	/*std::cout << "A买(" << this->stg_position_a_buy << ", " << this->stg_position_a_buy_yesterday << ")" << std::endl;
+	std::cout << "A买(" << this->stg_position_a_buy << ", " << this->stg_position_a_buy_yesterday << ")" << std::endl;
 	std::cout << "B卖(" << this->stg_position_b_sell << ", " << this->stg_position_b_sell_yesterday << ")" << std::endl;
 	std::cout << "A卖(" << this->stg_position_a_sell << ", " << this->stg_position_a_sell_yesterday << ")" << std::endl;
 	std::cout << "B买(" << this->stg_position_b_buy << ", " << this->stg_position_b_buy_yesterday << ")" << std::endl;
 	std::cout << "挂单列表长度 = " << this->stg_list_order_pending->size() << std::endl;
-	std::cout << "任务执行状态 = " << this->stg_trade_tasking << std::endl;*/
+	std::cout << "任务执行状态 = " << this->stg_trade_tasking << std::endl;
 
 
 
