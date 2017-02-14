@@ -2428,19 +2428,10 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 
 	// 遍历挂单列表，找出A合约开仓未成交的量
 	list<CThostFtdcOrderField *>::iterator cal_itor;
-	for (cal_itor = this->stg_list_order_pending->begin(); cal_itor != this->stg_list_order_pending->end();) {
+	for (cal_itor = this->stg_list_order_pending->begin(); cal_itor != this->stg_list_order_pending->end(); cal_itor++) {
 		// 对比InstrumentID
 		if (!strcmp((*cal_itor)->InstrumentID, this->stg_instrument_id_A.c_str()) && ((*cal_itor)->CombOffsetFlag[0] == '0')) { // 查找A合约开仓
 			this->stg_pending_a_open += (*cal_itor)->VolumeTotalOriginal - (*cal_itor)->VolumeTraded;
-		}
-
-		if (!strcmp((*cal_itor)->OrderRef, pOrder->OrderRef)) {
-			delete (*cal_itor);
-			cal_itor = this->stg_list_order_pending->erase(cal_itor); //移除
-			break;
-		}
-		else {
-			cal_itor++;
 		}
 	}
 

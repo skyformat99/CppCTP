@@ -2278,7 +2278,7 @@ bool CTP_Manager::init(bool is_online) {
 	list<Session *>::iterator sid_itor;
 
 	/// 绑定sessionid到每个期货账户名下
-	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) {
+	/*for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) {
 		USER_PRINT((*user_itor)->getUserID());
 		for (sid_itor = this->l_sessions->begin(); sid_itor != this->l_sessions->end(); sid_itor++) {
 			USER_PRINT((*sid_itor)->getUserID());
@@ -2287,7 +2287,7 @@ bool CTP_Manager::init(bool is_online) {
 				(*user_itor)->getL_Sessions()->push_back((*sid_itor));
 			}
 		}
-	}
+	}*/
 
 	/// 绑定交易员和期货账户
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) {
@@ -2339,6 +2339,8 @@ bool CTP_Manager::init(bool is_online) {
 	}
 	else {
 		std::cout << "策略最小跳价格获取失败!!!" << std::endl;
+		init_flag = false;
+		return init_flag;
 	}
 
 	/// 设置时间
