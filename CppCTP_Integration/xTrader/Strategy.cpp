@@ -864,6 +864,24 @@ void Strategy::update_task_status() {
 	update_status_mtx.lock();
 	USER_PRINT("Strategy::update_task_status");
 	USER_PRINT(this->stg_trade_tasking);
+
+	/*std::cout << "Strategy::update_task_status() A今买 = " << stg_position_a_buy_today << std::endl;
+	std::cout << "Strategy::update_task_status() B今卖 = " << stg_position_b_sell_today << std::endl;
+	std::cout << "Strategy::update_task_status() A昨买 = " << stg_position_a_buy_yesterday << std::endl;
+	std::cout << "Strategy::update_task_status() B昨卖 = " << stg_position_b_sell_yesterday << std::endl;
+	std::cout << "Strategy::update_task_status() A今卖 = " << stg_position_a_sell_today << std::endl;
+	std::cout << "Strategy::update_task_status() B今买 = " << stg_position_b_buy_today << std::endl;
+	std::cout << "Strategy::update_task_status() A昨卖 = " << stg_position_a_sell_yesterday << std::endl;
+	std::cout << "Strategy::update_task_status() B昨买 = " << stg_position_b_buy_yesterday << std::endl;*/
+
+	std::cout << "Strategy::update_task_status() A卖(" << this->stg_position_a_sell << ", " << this->stg_position_a_sell_yesterday << ")" << std::endl;
+	std::cout << "Strategy::update_task_status() B买(" << this->stg_position_b_buy << ", " << this->stg_position_b_buy_yesterday << ")" << std::endl;
+	std::cout << "Strategy::update_task_status() A买(" << this->stg_position_a_buy << ", " << this->stg_position_a_buy_yesterday << ")" << std::endl;
+	std::cout << "Strategy::update_task_status() B卖(" << this->stg_position_b_sell << ", " << this->stg_position_b_sell_yesterday << ")" << std::endl;
+
+	std::cout << "Strategy::update_task_status() 挂单列表长度 = " << this->stg_list_order_pending->size() << std::endl;
+	std::cout << "Strategy::update_task_status() 执行任务状态 = " << this->stg_trade_tasking << std::endl;
+
 	if ((this->stg_position_a_buy_today == this->stg_position_b_sell_today)
 		&& (this->stg_position_a_buy_yesterday == this->stg_position_b_sell_yesterday)
 		&& (this->stg_position_a_sell_today == this->stg_position_b_buy_today)
@@ -885,6 +903,7 @@ void Strategy::update_task_status() {
 		std::cout << "stg_position_a_sell_yesterday = " << stg_position_a_sell_yesterday << std::endl;
 		std::cout << "stg_position_b_buy_yesterday = " << stg_position_b_buy_yesterday << std::endl;
 		std::cout << "this->stg_list_order_pending->size() = " << this->stg_list_order_pending->size() << std::endl;*/
+
 		this->stg_trade_tasking = true;
 	}
 	//std::cout << "After update this.trade_tasking = " << this->stg_trade_tasking << endl;
@@ -1477,7 +1496,7 @@ void Strategy::Order_Algorithm_One() {
 		
 		//this->stg_trade_tasking = true;
 		this->printStrategyInfo("价差卖平");
-		this->update_task_status();
+		//this->update_task_status();
 
 		/// 市场多头价差大于触发参数， AB持仓量相等且大于0
 		//std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差卖平" << endl;
@@ -1587,7 +1606,7 @@ void Strategy::Order_Algorithm_One() {
 		
 		//this->stg_trade_tasking = true;
 		this->printStrategyInfo("价差买平");
-		this->update_task_status();
+		//this->update_task_status();
 
 		/// 市场空头价差小于等于触发参数， AB持仓量相等且大于0
 		//std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买平" << endl;
@@ -1700,7 +1719,7 @@ void Strategy::Order_Algorithm_One() {
 		
 		//this->stg_trade_tasking = true;
 		this->printStrategyInfo("价差卖开");
-		this->update_task_status();
+		//this->update_task_status();
 
 		/** 市场多头价差大于触发参数
 		A合约买持仓加B合约买小于总仓位**/
@@ -1809,7 +1828,7 @@ void Strategy::Order_Algorithm_One() {
 
 		//this->stg_trade_tasking = true;
 		this->printStrategyInfo("价差买开");
-		this->update_task_status();
+		//this->update_task_status();
 
 		//std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买开" << endl;
 
