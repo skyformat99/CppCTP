@@ -2218,7 +2218,7 @@ bool TdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 	if (bResult) {
 		codeDst[90] = { 0 };
 		Utils::Gb2312ToUtf8(codeDst, 90, pRspInfo->ErrorMsg, strlen(pRspInfo->ErrorMsg)); // Gb2312ToUtf8
-		cerr << "--->>> ErrorID=" << pRspInfo->ErrorID << ", ErrorMsg=" << codeDst << endl;
+		cerr << "TdSpi::IsErrorRspInfo() ErrorID = " << pRspInfo->ErrorID << ", ErrorMsg=" << codeDst << endl;
 	}
 	return bResult;
 }
