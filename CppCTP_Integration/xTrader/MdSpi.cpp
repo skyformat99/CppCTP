@@ -362,7 +362,7 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
     
 	/*std::cout << "MdSpi::OnRtnDepthMarketData()" << std::endl;
 	std::cout << "\t this->l_strategys->size() = " << this->l_strategys->size() << std::endl;*/
-	int count = 0;
+	//int count = 0;
 	list<Strategy *>::iterator itor;
 	for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 		USER_PRINT(((*itor)));

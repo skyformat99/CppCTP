@@ -696,7 +696,8 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
 		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
 
-	std::cout << "count_number = " << count_number << std::endl;
+	std::cout << "DBManager::UpdateStrategy()" << std::endl;
+	std::cout << "\tcount_number = " << count_number << std::endl;
 
 	if (count_number > 0) {
 		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true), BSON("$set" << BSON("position_a_sell_today" << stg->getStgPositionASellToday()
@@ -1186,8 +1187,8 @@ void DBManager::UpdateStrategyYesterday(Strategy *stg) {
 
 	count_number = this->conn->count(DB_STRATEGY_YESTERDAY_COLLECTION,
 		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
-
-	std::cout << "count_number = " << count_number << std::endl;
+	std::cout << "DBManager::UpdateStrategyYesterday()" << std::endl;
+	std::cout << "\tcount_number = " << count_number << std::endl;
 
 	if (count_number > 0) {
 		this->conn->update(DB_STRATEGY_YESTERDAY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str())), BSON("$set" << BSON("position_a_sell_today" << stg->getStgPositionASellToday()
