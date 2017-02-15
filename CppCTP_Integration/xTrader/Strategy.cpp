@@ -874,13 +874,13 @@ void Strategy::update_task_status() {
 	std::cout << "Strategy::update_task_status() A昨卖 = " << stg_position_a_sell_yesterday << std::endl;
 	std::cout << "Strategy::update_task_status() B昨买 = " << stg_position_b_buy_yesterday << std::endl;*/
 
-	std::cout << "Strategy::update_task_status() A卖(" << this->stg_position_a_sell << ", " << this->stg_position_a_sell_yesterday << ")" << std::endl;
-	std::cout << "Strategy::update_task_status() B买(" << this->stg_position_b_buy << ", " << this->stg_position_b_buy_yesterday << ")" << std::endl;
-	std::cout << "Strategy::update_task_status() A买(" << this->stg_position_a_buy << ", " << this->stg_position_a_buy_yesterday << ")" << std::endl;
-	std::cout << "Strategy::update_task_status() B卖(" << this->stg_position_b_sell << ", " << this->stg_position_b_sell_yesterday << ")" << std::endl;
-
-	std::cout << "Strategy::update_task_status() 挂单列表长度 = " << this->stg_list_order_pending->size() << std::endl;
-	std::cout << "Strategy::update_task_status() 执行任务状态 = " << this->stg_trade_tasking << std::endl;
+	std::cout << "Strategy::update_position():" << std::endl;
+	std::cout << "\tA买(" << this->stg_position_a_sell << ", " << this->stg_position_a_sell_yesterday << ")" << std::endl;
+	std::cout << "\tB买(" << this->stg_position_b_buy << ", " << this->stg_position_b_buy_yesterday << ")" << std::endl;
+	std::cout << "\tA买(" << this->stg_position_a_buy << ", " << this->stg_position_a_buy_yesterday << ")" << std::endl;
+	std::cout << "\tB卖(" << this->stg_position_b_sell << ", " << this->stg_position_b_sell_yesterday << ")" << std::endl;
+	std::cout << "\t挂单列表长度 = " << this->stg_list_order_pending->size() << std::endl;
+	std::cout << "\t任务执行状态 = " << this->stg_trade_tasking << std::endl;
 
 	if ((this->stg_position_a_buy_today == this->stg_position_b_sell_today)
 		&& (this->stg_position_a_buy_yesterday == this->stg_position_b_sell_yesterday)
