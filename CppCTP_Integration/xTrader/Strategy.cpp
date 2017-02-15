@@ -875,12 +875,12 @@ void Strategy::update_task_status() {
 	std::cout << "Strategy::update_task_status() B昨买 = " << stg_position_b_buy_yesterday << std::endl;*/
 
 	std::cout << "Strategy::update_task_status():" << std::endl;
-	std::cout << "\tA买(" << this->stg_position_a_sell << ", " << this->stg_position_a_sell_yesterday << ")" << std::endl;
-	std::cout << "\tB买(" << this->stg_position_b_buy << ", " << this->stg_position_b_buy_yesterday << ")" << std::endl;
-	std::cout << "\tA买(" << this->stg_position_a_buy << ", " << this->stg_position_a_buy_yesterday << ")" << std::endl;
-	std::cout << "\tB卖(" << this->stg_position_b_sell << ", " << this->stg_position_b_sell_yesterday << ")" << std::endl;
-	std::cout << "\t挂单列表长度 = " << this->stg_list_order_pending->size() << std::endl;
-	std::cout << "\t任务执行状态 = " << this->stg_trade_tasking << std::endl;
+	std::cout << "\t(this->stg_position_a_buy_today == this->stg_position_b_sell_today)(" << this->stg_position_a_buy_today << ", " << this->stg_position_b_sell_today << ")" << std::endl;
+	std::cout << "\tthis->stg_position_a_buy_yesterday == this->stg_position_b_sell_yesterday(" << this->stg_position_a_buy_yesterday << ", " << this->stg_position_b_sell_yesterday << ")" << std::endl;
+	std::cout << "\tthis->stg_position_a_sell_today == this->stg_position_b_buy_today(" << this->stg_position_a_sell_today << ", " << this->stg_position_b_buy_today << ")" << std::endl;
+	std::cout << "\tthis->stg_position_a_sell_yesterday == this->stg_position_b_buy_yesterday(" << this->stg_position_a_sell_yesterday << ", " << this->stg_position_b_buy_yesterday << ")" << std::endl;
+	std::cout << "\tthis->stg_list_order_pending->size() == 0(" << this->stg_list_order_pending->size() << ", " << 0 << ")" << std::endl;
+	
 
 	if ((this->stg_position_a_buy_today == this->stg_position_b_sell_today)
 		&& (this->stg_position_a_buy_yesterday == this->stg_position_b_sell_yesterday)
@@ -907,7 +907,8 @@ void Strategy::update_task_status() {
 		this->stg_trade_tasking = true;
 	}
 	//std::cout << "After update this.trade_tasking = " << this->stg_trade_tasking << endl;
-	std::cout << "Strategy::update_task_status() this->stg_trade_tasking = " << this->stg_trade_tasking << endl;
+	std::cout << "\t挂单列表长度 = " << this->stg_list_order_pending->size() << std::endl;
+	std::cout << "\t任务执行状态 = " << this->stg_trade_tasking << std::endl;
 	update_status_mtx.unlock();
 	USER_PRINT(this->stg_trade_tasking);
 }
@@ -2530,7 +2531,7 @@ void Strategy::update_position(USER_CThostFtdcOrderField *pOrder) {
 	USER_PRINT(this->stg_instrument_id_B);
 
 	this->printStrategyInfo("Strategy::update_position() 输出VolumeTradedBatch");
-	std::cout << "Strategy::update_position() 本次成交量 = " << pOrder->VolumeTradedBatch << ", 报单引用 = " << pOrder->OrderRef << std::endl;
+	
 
 	// A成交
 	if (!strcmp(pOrder->InstrumentID, this->stg_instrument_id_A.c_str())) {
@@ -2631,6 +2632,7 @@ void Strategy::update_position(USER_CThostFtdcOrderField *pOrder) {
 	std::cout << "\tB卖(" << this->stg_position_b_sell << ", " << this->stg_position_b_sell_yesterday << ")" << std::endl;
 	std::cout << "\t挂单列表长度 = " << this->stg_list_order_pending->size() << std::endl;
 	std::cout << "\t任务执行状态 = " << this->stg_trade_tasking << std::endl;
+	std::cout << "\t本次成交量 = " << pOrder->VolumeTradedBatch << ", 报单引用 = " << pOrder->OrderRef << std::endl;
 
 
 
