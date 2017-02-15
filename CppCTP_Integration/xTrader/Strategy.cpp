@@ -1752,7 +1752,6 @@ void Strategy::Order_Algorithm_One() {
 			<< "stg_position_a_sell = " << this->stg_position_a_sell << ", "
 			<< "stg_lots = " << this->stg_lots << endl;*/
 
-		std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
 		cout << "\t交易日:" << stg_instrument_A_tick->TradingDay 
 			<< ", 合约代码:" << stg_instrument_A_tick->InstrumentID 
 			<< ", 最新价:" << stg_instrument_A_tick->LastPrice 
