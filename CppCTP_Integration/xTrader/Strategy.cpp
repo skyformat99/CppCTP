@@ -1286,7 +1286,6 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 	USER_PRINT(this->stg_position_a_buy);
 	USER_PRINT(this->stg_position_b_sell);
 
-	int select_num;
 	////如果正在交易,直接返回0
 	//if (this->stg_trade_tasking) {
 	//	USER_PRINT("正在交易,返回");
