@@ -360,13 +360,13 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
  //   //<< "本次结算价格:" << pDepthMarketData->SettlementPrice << endl
  //   //<< "成交金额:" << pDepthMarketData->Turnover << endl
     
-	std::cout << "MdSpi::OnRtnDepthMarketData()" << std::endl;
-	std::cout << "\t this->l_strategys->size() = " << this->l_strategys->size() << std::endl;
+	/*std::cout << "MdSpi::OnRtnDepthMarketData()" << std::endl;
+	std::cout << "\t this->l_strategys->size() = " << this->l_strategys->size() << std::endl;*/
 	int count = 0;
 	list<Strategy *>::iterator itor;
 	for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 		USER_PRINT(((*itor)));
-		std::cout << "\tcount = " << count++ << std::endl;
+		//std::cout << "\tcount = " << count++ << std::endl;
 		(*itor)->OnRtnDepthMarketData(pDepthMarketData);
 	}
 	//cout << "===========================================" << endl;
