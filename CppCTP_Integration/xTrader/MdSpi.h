@@ -63,6 +63,7 @@ public:
 
     ///深度行情通知
     void OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData);
+	void CopyTickData(CThostFtdcDepthMarketDataField *dst, CThostFtdcDepthMarketDataField *src);
 
 	//通信断开
 	void OnFrontDisconnected(int nReason);
@@ -116,5 +117,6 @@ private:
 	sem_t unsubmarket_sem;
 	list<Strategy *> *l_strategys;
 	CTP_Manager *ctp_m;
+	CThostFtdcDepthMarketDataField *last_tick_data;
 };
 #endif //QUANT_CTP_MDSPI_H

@@ -15,6 +15,7 @@ struct timespec outtime = {3, 0};
 
 //初始化构造函数
 MdSpi::MdSpi(CThostFtdcMdApi *mdapi) {
+	CThostFtdcDepthMarketDataField *last_tick_data = new CThostFtdcDepthMarketDataField();
 	sem_init(&connect_sem, 0, 0);
 	sem_init(&login_sem, 0, 0);
 	sem_init(&logout_sem, 0, 0);
@@ -339,6 +340,9 @@ void MdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificIns
 	}
 }
 
+
+
+
 //深度行情接收
 void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 	USER_PRINT("MdSpi::OnRtnDepthMarketData IN");
@@ -363,6 +367,34 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
 	/*std::cout << "MdSpi::OnRtnDepthMarketData()" << std::endl;
 	std::cout << "\t this->l_strategys->size() = " << this->l_strategys->size() << std::endl;*/
 	//int count = 0;
+
+	if (!strcmp(this->last_tick_data->InstrumentID, pDepthMarketData->InstrumentID) &&
+		!strcmp(this->last_tick_data->UpdateTime, pDepthMarketData->UpdateTime) &&
+		(this->last_tick_data->UpdateMillisec == pDepthMarketData->UpdateMillisec)) {
+		std::cout << "MdSpi::OnRtnDepthMarketData()" << std::endl;
+		cout << "\t交易日:" << pDepthMarketData->TradingDay
+			<< ", 合约代码:" << pDepthMarketData->InstrumentID
+			<< ", 最新价:" << pDepthMarketData->LastPrice
+			<< ", 持仓量:" << pDepthMarketData->OpenInterest
+			//<< ", 上次结算价:" << pDepthMarketData->PreSettlementPrice 
+			//<< ", 昨收盘:" << pDepthMarketData->PreClosePrice 
+			<< ", 数量:" << pDepthMarketData->Volume
+			//<< ", 昨持仓量:" << pDepthMarketData->PreOpenInterest
+			<< ", 最后修改时间:" << pDepthMarketData->UpdateTime
+			<< ", 最后修改毫秒:" << pDepthMarketData->UpdateMillisec
+			<< ", 申买价一：" << pDepthMarketData->BidPrice1
+			<< ", 申买量一:" << pDepthMarketData->BidVolume1
+			<< ", 申卖价一:" << pDepthMarketData->AskPrice1
+			<< ", 申卖量一:" << pDepthMarketData->AskVolume1
+			//<< ", 今收盘价:" << pDepthMarketData->ClosePrice
+			//<< ", 当日均价:" << pDepthMarketData->AveragePrice
+			//<< ", 本次结算价格:" << pDepthMarketData->SettlementPrice
+			<< ", 成交金额:" << pDepthMarketData->Turnover << endl;
+	}
+	else {
+		this->CopyTickData(this->last_tick_data, pDepthMarketData);
+	}
+
 	list<Strategy *>::iterator itor;
 	for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 		USER_PRINT(((*itor)));
@@ -371,6 +403,97 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
 	}
 	//cout << "===========================================" << endl;
 	USER_PRINT("MdSpi::OnRtnDepthMarketData OUT");
+}
+
+void MdSpi::CopyTickData(CThostFtdcDepthMarketDataField *dst, CThostFtdcDepthMarketDataField *src) {
+	///交易日
+	strcpy(dst->TradingDay, src->TradingDay);
+	///合约代码
+	strcpy(dst->InstrumentID, src->InstrumentID);
+	///交易所代码
+	strcpy(dst->ExchangeID, src->ExchangeID);
+	///合约在交易所的代码
+	strcpy(dst->ExchangeInstID, src->ExchangeInstID);
+	///最新价
+	dst->LastPrice = src->LastPrice;
+	///上次结算价
+	dst->PreSettlementPrice = src->PreSettlementPrice;
+	///昨收盘
+	dst->PreClosePrice = src->PreClosePrice;
+	///昨持仓量
+	dst->PreOpenInterest = src->PreOpenInterest;
+	///今开盘
+	dst->OpenPrice = src->OpenPrice;
+	///最高价
+	dst->HighestPrice = src->HighestPrice;
+	///最低价
+	dst->LowestPrice = src->LowestPrice;
+	///数量
+	dst->Volume = src->Volume;
+	///成交金额
+	dst->Turnover = src->Turnover;
+	///持仓量
+	dst->OpenInterest = src->OpenInterest;
+	///今收盘
+	dst->ClosePrice = src->ClosePrice;
+	///本次结算价
+	dst->SettlementPrice = src->SettlementPrice;
+	///涨停板价
+	dst->UpperLimitPrice = src->UpperLimitPrice;
+	///跌停板价
+	dst->LowerLimitPrice = src->LowerLimitPrice;
+	///昨虚实度
+	dst->PreDelta = src->PreDelta;
+	///今虚实度
+	dst->CurrDelta = src->CurrDelta;
+	///最后修改时间
+	strcpy(dst->UpdateTime, src->UpdateTime);
+	///最后修改毫秒
+	dst->UpdateMillisec = src->UpdateMillisec;
+	///申买价一
+	dst->BidPrice1 = src->BidPrice1;
+	///申买量一
+	dst->BidVolume1 = src->BidVolume1;
+	///申卖价一
+	dst->AskPrice1 = src->AskPrice1;
+	///申卖量一
+	dst->AskVolume1 = src->AskVolume1;
+	///申买价二
+	dst->BidPrice2 = src->BidPrice2;
+	///申买量二
+	dst->BidVolume2 = src->BidVolume2;
+	///申卖价二
+	dst->AskPrice2 = src->AskPrice2;
+	///申卖量二
+	dst->AskVolume2 = src->AskVolume2;
+	///申买价三
+	dst->BidPrice3 = src->BidPrice3;
+	///申买量三
+	dst->BidVolume3 = src->BidVolume3;
+	///申卖价三
+	dst->AskPrice3 = src->AskPrice3;
+	///申卖量三
+	dst->AskVolume3 = src->AskVolume3;
+	///申买价四
+	dst->BidPrice4 = src->BidPrice4;
+	///申买量四
+	dst->BidVolume4 = src->BidVolume4;
+	///申卖价四
+	dst->AskPrice4 = src->AskPrice4;
+	///申卖量四
+	dst->AskVolume4 = src->AskVolume4;
+	///申买价五
+	dst->BidPrice5 = src->BidPrice5;
+	///申买量五
+	dst->BidVolume5 = src->BidVolume5;
+	///申卖价五
+	dst->AskPrice5 = src->AskPrice5;
+	///申卖量五
+	dst->AskVolume5 = src->AskVolume5;
+	///当日均价
+	dst->AveragePrice = src->AveragePrice;
+	///业务日期
+	strcpy(dst->ActionDay, src->ActionDay);
 }
 
 //通信断开
