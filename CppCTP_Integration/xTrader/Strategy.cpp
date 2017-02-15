@@ -1496,7 +1496,7 @@ void Strategy::Order_Algorithm_One() {
 		
 		//this->stg_trade_tasking = true;
 		this->printStrategyInfo("价差卖平");
-		this->update_task_status();
+		//this->update_task_status();
 
 		/// 市场多头价差大于触发参数， AB持仓量相等且大于0
 		//std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差卖平" << endl;
@@ -1606,7 +1606,7 @@ void Strategy::Order_Algorithm_One() {
 		
 		//this->stg_trade_tasking = true;
 		this->printStrategyInfo("价差买平");
-		this->update_task_status();
+		//this->update_task_status();
 
 		/// 市场空头价差小于等于触发参数， AB持仓量相等且大于0
 		//std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买平" << endl;
@@ -1719,7 +1719,7 @@ void Strategy::Order_Algorithm_One() {
 		
 		//this->stg_trade_tasking = true;
 		this->printStrategyInfo("价差卖开");
-		this->update_task_status();
+		//this->update_task_status();
 
 		/** 市场多头价差大于触发参数
 		A合约买持仓加B合约买小于总仓位**/
@@ -1828,7 +1828,7 @@ void Strategy::Order_Algorithm_One() {
 
 		//this->stg_trade_tasking = true;
 		this->printStrategyInfo("价差买开");
-		this->update_task_status();
+		//this->update_task_status();
 
 		//std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买开" << endl;
 
