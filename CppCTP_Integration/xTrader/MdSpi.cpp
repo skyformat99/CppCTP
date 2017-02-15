@@ -371,7 +371,7 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
 	if (!strcmp(this->last_tick_data->InstrumentID, pDepthMarketData->InstrumentID) &&
 		!strcmp(this->last_tick_data->UpdateTime, pDepthMarketData->UpdateTime) &&
 		(this->last_tick_data->UpdateMillisec == pDepthMarketData->UpdateMillisec)) {
-		std::cout << "MdSpi::OnRtnDepthMarketData()" << std::endl;
+		std::cout << "MdSpi::OnRtnDepthMarketData() 重复tick推送" << std::endl;
 		cout << "\t交易日:" << pDepthMarketData->TradingDay
 			<< ", 合约代码:" << pDepthMarketData->InstrumentID
 			<< ", 最新价:" << pDepthMarketData->LastPrice
@@ -390,6 +390,7 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
 			//<< ", 当日均价:" << pDepthMarketData->AveragePrice
 			//<< ", 本次结算价格:" << pDepthMarketData->SettlementPrice
 			<< ", 成交金额:" << pDepthMarketData->Turnover << endl;
+		return;
 	}
 	else {
 		this->CopyTickData(this->last_tick_data, pDepthMarketData);
