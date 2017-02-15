@@ -2017,15 +2017,18 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 
 		string temp(pOrder->OrderRef);
 		string result = temp.substr(0, 1);
-		if (temp.length() == 12 && result == "1") { // 通过本交易系统发出去的order长度12,首位字符为1
-			this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pOrder);
-			//delete[] codeDst;
+		if (strlen(pOrder->OrderSysID) != 0) { // 如果报单编号不为空，为交易所返回
+			if (temp.length() == 12 && result == "1") { // 通过本交易系统发出去的order长度12,首位字符为1
+				this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pOrder);
+				//delete[] codeDst;
 
-			list<Strategy *>::iterator itor;
-			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
-				(*itor)->OnRtnOrder(pOrder);
+				list<Strategy *>::iterator itor;
+				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+					(*itor)->OnRtnOrder(pOrder);
+				}
 			}
 		}
+		
 
 	} else {
 		USER_PRINT("OnRtnOrder no pOrder");

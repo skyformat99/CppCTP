@@ -2405,6 +2405,9 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 
 	USER_PRINT(pOrder->OrderStatus);
 
+	std::cout << "Strategy::update_pending_order_list()" << std::endl;
+	std::cout << "\tthis->stg_pending_a_open = " << this->stg_pending_a_open << std::endl;
+
 	if (pOrder->OrderStatus == '0') { // 全部成交
 		//std::cout << "更新挂单,全部成交" << std::endl;
 		list<CThostFtdcOrderField *>::iterator itor;
@@ -2488,7 +2491,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 		}
 	}
 	
-	std::cout << "Strategy::update_pending_order_list()" << std::endl;
+	//std::cout << "Strategy::update_pending_order_list()" << std::endl;
 	std::cout << "\tthis->stg_pending_a_open = " << this->stg_pending_a_open << std::endl;
 
 
