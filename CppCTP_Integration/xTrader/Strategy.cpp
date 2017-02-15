@@ -1752,6 +1752,26 @@ void Strategy::Order_Algorithm_One() {
 			<< "stg_position_a_sell = " << this->stg_position_a_sell << ", "
 			<< "stg_lots = " << this->stg_lots << endl;*/
 
+		std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
+		cout << "\t交易日:" << stg_instrument_A_tick->TradingDay 
+			<< ", 合约代码:" << stg_instrument_A_tick->InstrumentID 
+			<< ", 最新价:" << stg_instrument_A_tick->LastPrice 
+			<< ", 持仓量:" << stg_instrument_A_tick->OpenInterest 
+			//<< ", 上次结算价:" << stg_instrument_A_tick->PreSettlementPrice 
+			//<< ", 昨收盘:" << stg_instrument_A_tick->PreClosePrice 
+			<< ", 数量:" << stg_instrument_A_tick->Volume 
+			//<< ", 昨持仓量:" << stg_instrument_A_tick->PreOpenInterest
+			<< ", 最后修改时间:" << stg_instrument_A_tick->UpdateTime
+			<< ", 最后修改毫秒:" << stg_instrument_A_tick->UpdateMillisec
+			<< ", 申买价一：" << stg_instrument_A_tick->BidPrice1 
+			<< ", 申买量一:" << stg_instrument_A_tick->BidVolume1 
+			<< ", 申卖价一:" << stg_instrument_A_tick->AskPrice1 
+			<< ", 申卖量一:" << stg_instrument_A_tick->AskVolume1 
+			//<< ", 今收盘价:" << stg_instrument_A_tick->ClosePrice
+			//<< ", 当日均价:" << stg_instrument_A_tick->AveragePrice
+			//<< ", 本次结算价格:" << stg_instrument_A_tick->SettlementPrice
+			<< ", 成交金额:" << stg_instrument_A_tick->Turnover << endl;
+
 		/// 满足交易任务之前的tick
 		this->CopyTickData(stg_instrument_A_tick_last, stg_instrument_A_tick);
 		this->CopyTickData(stg_instrument_B_tick_last, stg_instrument_B_tick);
@@ -2468,6 +2488,9 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 			this->stg_pending_a_open += (*cal_itor)->VolumeTotalOriginal - (*cal_itor)->VolumeTraded;
 		}
 	}
+	
+	std::cout << "Strategy::update_pending_order_list()" << std::endl;
+	std::cout << "\tthis->stg_pending_a_open = " << this->stg_pending_a_open << std::endl;
 
 
 }
