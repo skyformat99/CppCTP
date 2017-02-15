@@ -15,7 +15,7 @@ struct timespec outtime = {3, 0};
 
 //初始化构造函数
 MdSpi::MdSpi(CThostFtdcMdApi *mdapi) {
-	CThostFtdcDepthMarketDataField *last_tick_data = new CThostFtdcDepthMarketDataField();
+	this->last_tick_data = new CThostFtdcDepthMarketDataField();
 	sem_init(&connect_sem, 0, 0);
 	sem_init(&login_sem, 0, 0);
 	sem_init(&logout_sem, 0, 0);
