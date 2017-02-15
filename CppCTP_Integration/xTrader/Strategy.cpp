@@ -18,6 +18,7 @@ Strategy::Strategy(User *stg_user) {
 	this->stg_b_limit_price_shift = 0;
 	this->stg_is_active = true;				//默认策略均为激活状态
 	this->stg_trading_day = "";
+	this->stg_pending_a_open = 0;			//A开仓挂单
 
 	this->stg_user = stg_user;					// 默认用户为空
 
