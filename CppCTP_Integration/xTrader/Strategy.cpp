@@ -876,10 +876,10 @@ void Strategy::update_task_status() {
 
 	std::cout << "Strategy::update_task_status():" << std::endl;
 	std::cout << "\t(this->stg_position_a_buy_today == this->stg_position_b_sell_today)(" << this->stg_position_a_buy_today << ", " << this->stg_position_b_sell_today << ")" << std::endl;
-	std::cout << "\tthis->stg_position_a_buy_yesterday == this->stg_position_b_sell_yesterday(" << this->stg_position_a_buy_yesterday << ", " << this->stg_position_b_sell_yesterday << ")" << std::endl;
-	std::cout << "\tthis->stg_position_a_sell_today == this->stg_position_b_buy_today(" << this->stg_position_a_sell_today << ", " << this->stg_position_b_buy_today << ")" << std::endl;
-	std::cout << "\tthis->stg_position_a_sell_yesterday == this->stg_position_b_buy_yesterday(" << this->stg_position_a_sell_yesterday << ", " << this->stg_position_b_buy_yesterday << ")" << std::endl;
-	std::cout << "\tthis->stg_list_order_pending->size() == 0(" << this->stg_list_order_pending->size() << ", " << 0 << ")" << std::endl;
+	std::cout << "\t(this->stg_position_a_buy_yesterday == this->stg_position_b_sell_yesterday)(" << this->stg_position_a_buy_yesterday << ", " << this->stg_position_b_sell_yesterday << ")" << std::endl;
+	std::cout << "\t(this->stg_position_a_sell_today == this->stg_position_b_buy_today)(" << this->stg_position_a_sell_today << ", " << this->stg_position_b_buy_today << ")" << std::endl;
+	std::cout << "\t(this->stg_position_a_sell_yesterday == this->stg_position_b_buy_yesterday)(" << this->stg_position_a_sell_yesterday << ", " << this->stg_position_b_buy_yesterday << ")" << std::endl;
+	std::cout << "\t(this->stg_list_order_pending->size() == 0)(" << this->stg_list_order_pending->size() << ", " << 0 << ")" << std::endl;
 	
 
 	if ((this->stg_position_a_buy_today == this->stg_position_b_sell_today)
@@ -2010,11 +2010,11 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	// 更新持仓明细列表
 	this->update_position_detail(order_new_tmp);
 
-	// 更新标志位
-	this->update_task_status();
-
 	// 更新持仓变量
 	this->update_position(order_new);
+
+	// 更新标志位
+	this->update_task_status();
 
 	delete order_new;
 	delete order_new_tmp;
