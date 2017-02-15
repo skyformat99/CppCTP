@@ -861,7 +861,7 @@ int Strategy::getStgSellCloseOnOff() {
 
 /// 更新交易状态
 void Strategy::update_task_status() {
-	update_status_mtx.lock();
+	//update_status_mtx.lock();
 	USER_PRINT("Strategy::update_task_status");
 	USER_PRINT(this->stg_trade_tasking);
 
@@ -909,7 +909,7 @@ void Strategy::update_task_status() {
 	//std::cout << "After update this.trade_tasking = " << this->stg_trade_tasking << endl;
 	std::cout << "\t挂单列表长度 = " << this->stg_list_order_pending->size() << std::endl;
 	std::cout << "\t任务执行状态 = " << this->stg_trade_tasking << std::endl;
-	update_status_mtx.unlock();
+	//update_status_mtx.unlock();
 	USER_PRINT(this->stg_trade_tasking);
 }
 
@@ -1211,7 +1211,7 @@ list<USER_CThostFtdcOrderField *> * Strategy::getStg_List_Position_Detail_From_O
 
 void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 	
-	tick_mtx.lock();
+	//tick_mtx.lock();
 
 	// Get Own Instrument
 	USER_PRINT(this);
@@ -1262,14 +1262,16 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		std::cout << "stg_position_a_sell_yesterday = " << stg_position_a_sell_yesterday << std::endl;
 		std::cout << "stg_position_b_buy_yesterday = " << stg_position_b_buy_yesterday << std::endl;
 		std::cout << "挂单列表长度 = " << this->stg_list_order_pending->size() << std::endl;*/
-
+		std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
+		std::cout << "\t(有交易任务,进入交易任务执行)" << std::endl;
+		std::cout << "\t(stg_trade_tasking):(" << this->stg_trade_tasking << ")" << std::endl;
 		this->Exec_OnTickComing(pDepthMarketData);
 	}
 	else { /// 如果没有交易任务，那么选择开始新的交易任务
 		this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
 	}
 	USER_PRINT("Strategy::OnRtnDepthMarketData OUT");
-	tick_mtx.unlock();
+	//tick_mtx.unlock();
 }
 
 //选择下单算法
@@ -1284,12 +1286,12 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 	USER_PRINT(this->stg_position_b_sell);
 
 	int select_num;
-	//如果正在交易,直接返回0
-	if (this->stg_trade_tasking) {
-		USER_PRINT("正在交易,返回");
-		//this->printStrategyInfo("正在交易,返回");
-		return;
-	}
+	////如果正在交易,直接返回0
+	//if (this->stg_trade_tasking) {
+	//	USER_PRINT("正在交易,返回");
+	//	//this->printStrategyInfo("正在交易,返回");
+	//	return;
+	//}
 	//如果有挂单,返回0
 	if (this->stg_list_order_pending->size() > 0) {
 		USER_PRINT("有挂单,返回");
@@ -1299,6 +1301,8 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 			USER_PRINT((*itor)->InstrumentID);
 		}
 		//this->printStrategyInfo("有挂单,返回");
+		std::cout << "Strategy::Select_Order_Algorithm():" << std::endl;
+		std::cout << "\t(有挂单,返回)" << std::endl;
 		return;
 	}
 
@@ -1307,6 +1311,8 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 		USER_PRINT("有撇腿,返回");
 		//this->printStrategyInfo("有撇腿,返回");
 		// 有撇腿
+		std::cout << "Strategy::Select_Order_Algorithm():" << std::endl;
+		std::cout << "\t(有撇腿)" << std::endl;
 		return;
 	}
 
@@ -1500,7 +1506,8 @@ void Strategy::Order_Algorithm_One() {
 		//this->update_task_status();
 
 		/// 市场多头价差大于触发参数， AB持仓量相等且大于0
-		//std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差卖平" << endl;
+		std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
+		std::cout << "\t策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差卖平" << endl;
 
 		/*std::cout << "user_id = " << this->stg_user_id << ", "
 			<< "strategy_id = " << this->stg_strategy_id << ", "
@@ -1611,6 +1618,8 @@ void Strategy::Order_Algorithm_One() {
 
 		/// 市场空头价差小于等于触发参数， AB持仓量相等且大于0
 		//std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买平" << endl;
+		std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
+		std::cout << "\t策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买平" << endl;
 
 		/*std::cout << "user_id = " << this->stg_user_id << ", "
 			<< "strategy_id = " << this->stg_strategy_id << ", "
@@ -1726,6 +1735,8 @@ void Strategy::Order_Algorithm_One() {
 		A合约买持仓加B合约买小于总仓位**/
 
 		//std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差卖开" << endl;
+		std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
+		std::cout << "\t策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差卖开" << endl;
 		
 		/*std::cout << "user_id = " << this->stg_user_id << ", "
 			<< "strategy_id = " << this->stg_strategy_id << ", "
@@ -1832,6 +1843,8 @@ void Strategy::Order_Algorithm_One() {
 		//this->update_task_status();
 
 		//std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买开" << endl;
+		std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
+		std::cout << "\t策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买开" << endl;
 
 		/*std::cout << "user_id = " << this->stg_user_id << ", "
 			<< "strategy_id = " << this->stg_strategy_id << ", "
