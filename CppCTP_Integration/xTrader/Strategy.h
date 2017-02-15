@@ -464,6 +464,7 @@ private:
 	int stg_position_b_sell_yesterday;	// B合约卖持仓昨仓
 	int stg_position_b_sell;			// B合约卖持仓总仓位
 	int stg_pending_a_open;				// A合约挂单买开仓量
+	bool stg_select_order_algorithm_flag;	// 下单算法锁标志位
 
 
 

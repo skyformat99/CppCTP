@@ -5,6 +5,7 @@
 
 std::mutex tick_mtx; // locks access to counter
 std::mutex update_status_mtx; // locks access to counter
+std::mutex select_order_algorithm_mtx; // locks access to counter
 
 Strategy::Strategy(User *stg_user) {
 
@@ -19,6 +20,7 @@ Strategy::Strategy(User *stg_user) {
 	this->stg_is_active = true;				//默认策略均为激活状态
 	this->stg_trading_day = "";
 	this->stg_pending_a_open = 0;			//A开仓挂单
+	this->stg_select_order_algorithm_flag = false; //默认允许选择下单算法锁为false，可以选择
 
 	this->stg_user = stg_user;					// 默认用户为空
 
@@ -1269,7 +1271,13 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		this->Exec_OnTickComing(pDepthMarketData);
 	}
 	else { /// 如果没有交易任务，那么选择开始新的交易任务
+		//if (!stg_select_order_algorithm_flag) {
+		//	stg_select_order_algorithm_flag = true; // 选择算法加锁
+		//	
+		//}
+		select_order_algorithm_mtx.lock();
 		this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
+		select_order_algorithm_mtx.unlock();
 	}
 	USER_PRINT("Strategy::OnRtnDepthMarketData OUT");
 	//tick_mtx.unlock();
@@ -2480,7 +2488,32 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 			}
 		}
 		else if (pOrder->OrderStatus == 'a') { // 未知
+			//std::cout << "更新挂单,未成交还在队列中" << std::endl;
+			bool isExists = false;
+			// 判断挂单列表是否存在
+			list<CThostFtdcOrderField *>::iterator itor;
+			for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
+				if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
+					// 存在置flag标志位
+					isExists = true;
+					//std::cout << "更新挂单,有挂单" << std::endl;
+					this->CopyOrderData(*itor, pOrder);
+					break;
+				}
+				else {
+					itor++;
+				}
+			}
+			// 如果不存在直接加入
+			if (!isExists) {
+				//std::cout << "更新挂单,无挂单" << std::endl;
+				// 深复制对象
+				CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
+				memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
+				this->CopyOrderData(pOrder_tmp, pOrder);
 
+				this->stg_list_order_pending->push_back(pOrder_tmp);
+			}
 		}
 
 		// 遍历挂单列表，找出A合约开仓未成交的量
