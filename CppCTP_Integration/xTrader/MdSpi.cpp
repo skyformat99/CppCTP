@@ -173,7 +173,7 @@ bool MdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo) {
 	// 如果ErrorID != 0, 说明收到了错误的响应
 	bool bResult = ((pRspInfo) && (pRspInfo->ErrorID != 0));
 	if (bResult)
-		cerr << "--->>> ErrorID=" << pRspInfo->ErrorID << ", ErrorMsg=" << pRspInfo->ErrorMsg << endl;
+		cerr << "MdSpi::IsErrorRspInfo() ErrorID=" << pRspInfo->ErrorID << ", ErrorMsg=" << pRspInfo->ErrorMsg << endl;
 	return bResult;
 }
 
@@ -269,8 +269,9 @@ void MdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstr
 	USER_PRINT("OnRspSubMarketData");
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (pSpecificInstrument) {
-			cout << "订阅行情应答" << endl;
-			cout << "订阅行情合约代码:" << pSpecificInstrument->InstrumentID << endl;
+			std::cout << "MdSpi::OnRspSubMarketData()" << std::endl;
+			std::cout << "\t订阅行情应答" << std::endl;
+			std::cout << "\t订阅行情合约代码:" << pSpecificInstrument->InstrumentID << std::endl;
 		}
 	}
 }
@@ -394,13 +395,12 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
 	}
 	else {
 		this->CopyTickData(this->last_tick_data, pDepthMarketData);
-	}
-
-	list<Strategy *>::iterator itor;
-	for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
-		USER_PRINT(((*itor)));
-		//std::cout << "\tcount = " << count++ << std::endl;
-		(*itor)->OnRtnDepthMarketData(pDepthMarketData);
+		list<Strategy *>::iterator itor;
+		for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+			USER_PRINT(((*itor)));
+			//std::cout << "\tcount = " << count++ << std::endl;
+			(*itor)->OnRtnDepthMarketData(pDepthMarketData);
+		}
 	}
 	//cout << "===========================================" << endl;
 	USER_PRINT("MdSpi::OnRtnDepthMarketData OUT");
