@@ -1868,6 +1868,12 @@ void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcR
 			std::cout << "互换单标志:" << pInputOrder->IsSwapOrder << endl;
 			std::cout << "=================================================================================" << endl;
 			this->current_user->DB_OnRspOrderInsert(this->current_user->GetOrderConn(), pInputOrder);
+
+			list<Strategy *>::iterator itor;
+			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+				(*itor)->OnRspOrderInsert(pInputOrder);
+			}
+
 		}
 	}
 }

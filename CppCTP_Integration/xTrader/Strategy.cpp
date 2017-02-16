@@ -21,6 +21,7 @@ Strategy::Strategy(User *stg_user) {
 	this->stg_trading_day = "";
 	this->stg_pending_a_open = 0;			//A开仓挂单
 	this->stg_select_order_algorithm_flag = false; //默认允许选择下单算法锁为false，可以选择
+	this->stg_lock_order_ref = "";
 
 	this->stg_user = stg_user;					// 默认用户为空
 
@@ -916,6 +917,47 @@ void Strategy::update_task_status() {
 	USER_PRINT(this->stg_trade_tasking);
 }
 
+/// 更新tick锁
+void Strategy::update_tick_lock_status(USER_CThostFtdcOrderField *pOrder) {
+	std::cout << "Strategy::update_tick_lock_status():" << std::endl;
+
+	bool flag = false; // 默认关闭tick锁
+
+	if (pOrder->OrderStatus == '0') { // 全部成交
+	}
+	else if (pOrder->OrderStatus == '1') { // 部分成交还在队列中
+
+	}
+	else if (pOrder->OrderStatus == '2') { // 部分成交不在队列中
+
+	}
+	else if (pOrder->OrderStatus == '3') { // 未成交还在队列中
+	
+	}
+	else if (pOrder->OrderStatus == '4') { // 未成交不在队列中
+
+	}
+	else if (pOrder->OrderStatus == '5') { // 撤单
+	
+	}
+	else if (pOrder->OrderStatus == 'a') { // 未知
+	
+	}
+	else if (pOrder->OrderStatus == 'b') { // 尚未触发
+
+	}
+	else if (pOrder->OrderStatus == 'c') { // 已触发
+
+	}
+	else {
+		// 当报单状态不在以上之中,依然打开锁
+		flag = true;
+	}
+
+
+	this->setStgSelectOrderAlgorithmFlag(flag); // tick锁
+}
+
 /// 交易模型
 void Strategy::setStgTradeModel(string stg_trade_model) {
 	this->stg_trade_model = stg_trade_model;
@@ -1271,13 +1313,12 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		this->Exec_OnTickComing(pDepthMarketData);
 	}
 	else { /// 如果没有交易任务，那么选择开始新的交易任务
-		//if (!stg_select_order_algorithm_flag) {
-		//	stg_select_order_algorithm_flag = true; // 选择算法加锁
-		//	
-		//}
-		select_order_algorithm_mtx.lock();
-		this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
-		select_order_algorithm_mtx.unlock();
+		if (!stg_select_order_algorithm_flag) {
+			this->setStgSelectOrderAlgorithmFlag(true); // 开启下单锁
+			this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
+		}
+
+		
 	}
 	USER_PRINT("Strategy::OnRtnDepthMarketData OUT");
 	//tick_mtx.unlock();
@@ -1311,6 +1352,7 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 		//this->printStrategyInfo("有挂单,返回");
 		std::cout << "Strategy::Select_Order_Algorithm():" << std::endl;
 		std::cout << "\t(有挂单,返回)" << std::endl;
+		this->setStgSelectOrderAlgorithmFlag(false); // 关闭下单锁
 		return;
 	}
 
@@ -1321,6 +1363,7 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 		// 有撇腿
 		std::cout << "Strategy::Select_Order_Algorithm():" << std::endl;
 		std::cout << "\t(有撇腿)" << std::endl;
+		this->setStgSelectOrderAlgorithmFlag(false); // 关闭下单锁
 		return;
 	}
 
@@ -1401,6 +1444,7 @@ void Strategy::Order_Algorithm_One() {
 	else
 	{
 		//this->printStrategyInfo("策略跳过异常行情");
+		this->setStgSelectOrderAlgorithmFlag(false);
 		return;
 	}
 
@@ -1430,6 +1474,7 @@ void Strategy::Order_Algorithm_One() {
 		/*std::cout << "策略开关 = " << this->getOn_Off() << std::endl;
 		std::cout << "期货账户开关 = " << this->stg_user->getOn_Off() << std::endl;
 		std::cout << "总开关 = " << this->stg_user->GetTrader()->getOn_Off() << std::endl;*/
+		this->setStgSelectOrderAlgorithmFlag(false);
 		return;
 	}
 
@@ -1516,6 +1561,7 @@ void Strategy::Order_Algorithm_One() {
 		/// 市场多头价差大于触发参数， AB持仓量相等且大于0
 		std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
 		std::cout << "\t策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差卖平" << endl;
+		
 
 		/*std::cout << "user_id = " << this->stg_user_id << ", "
 			<< "strategy_id = " << this->stg_strategy_id << ", "
@@ -1564,6 +1610,7 @@ void Strategy::Order_Algorithm_One() {
 
 		this->stg_order_ref_a = this->Generate_Order_Ref();
 		this->stg_order_ref_last = this->stg_order_ref_a;
+		this->stg_lock_order_ref = this->stg_order_ref_a;
 
 		USER_PRINT("OrderRef");
 		USER_PRINT(this->stg_order_ref_a);
@@ -1619,7 +1666,7 @@ void Strategy::Order_Algorithm_One() {
 		(this->stg_position_a_sell == this->stg_position_b_buy) &&
 		(this->stg_position_a_sell > 0) && 
 		(this->stg_spread_short <= (this->stg_buy_close - this->stg_spread_shift * this->stg_a_price_tick))) {
-		
+
 		//this->stg_trade_tasking = true;
 		this->printStrategyInfo("价差买平");
 		//this->update_task_status();
@@ -1682,6 +1729,7 @@ void Strategy::Order_Algorithm_One() {
 
 		this->stg_order_ref_a = this->Generate_Order_Ref();
 		this->stg_order_ref_last = this->stg_order_ref_a;
+		this->stg_lock_order_ref = this->stg_order_ref_a;
 
 		//USER_PRINT("OrderRef");
 		USER_PRINT(this->stg_order_ref_a);
@@ -1808,6 +1856,7 @@ void Strategy::Order_Algorithm_One() {
 
 		this->stg_order_ref_a = this->Generate_Order_Ref();
 		this->stg_order_ref_last = this->stg_order_ref_a;
+		this->stg_lock_order_ref = this->stg_order_ref_a;
 
 		USER_PRINT("OrderRef");
 		USER_PRINT(this->stg_order_ref_a);
@@ -1909,6 +1958,7 @@ void Strategy::Order_Algorithm_One() {
 
 		this->stg_order_ref_a = this->Generate_Order_Ref();
 		this->stg_order_ref_last = this->stg_order_ref_a;
+		this->stg_lock_order_ref = this->stg_order_ref_a;
 
 		USER_PRINT("OrderRef");
 		USER_PRINT(this->stg_order_ref_a);
@@ -2016,6 +2066,7 @@ void Strategy::Exec_OrderInsert(CThostFtdcInputOrderField *insert_order) {
 // 报单录入请求
 void Strategy::Exec_OnRspOrderInsert() {
 	USER_PRINT("Exec_OnRspOrderInsert()");
+
 }
 
 // 报单操作请求响应
@@ -2055,6 +2106,9 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 
 	// 更新标志位
 	this->update_task_status();
+
+	// 更新tick锁
+	this->update_tick_lock_status(order_new);
 
 	delete order_new;
 	delete order_new_tmp;
@@ -2488,32 +2542,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 			}
 		}
 		else if (pOrder->OrderStatus == 'a') { // 未知
-			//std::cout << "更新挂单,未成交还在队列中" << std::endl;
-			bool isExists = false;
-			// 判断挂单列表是否存在
-			list<CThostFtdcOrderField *>::iterator itor;
-			for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
-				if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
-					// 存在置flag标志位
-					isExists = true;
-					//std::cout << "更新挂单,有挂单" << std::endl;
-					this->CopyOrderData(*itor, pOrder);
-					break;
-				}
-				else {
-					itor++;
-				}
-			}
-			// 如果不存在直接加入
-			if (!isExists) {
-				//std::cout << "更新挂单,无挂单" << std::endl;
-				// 深复制对象
-				CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
-				memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
-				this->CopyOrderData(pOrder_tmp, pOrder);
-
-				this->stg_list_order_pending->push_back(pOrder_tmp);
-			}
+			
 		}
 
 		// 遍历挂单列表，找出A合约开仓未成交的量
@@ -2705,34 +2734,6 @@ void Strategy::update_position(USER_CThostFtdcOrderField *pOrder) {
 	std::cout << "\t挂单列表长度 = " << this->stg_list_order_pending->size() << std::endl;
 	std::cout << "\t任务执行状态 = " << this->stg_trade_tasking << std::endl;
 	std::cout << "\t本次成交量 = " << pOrder->VolumeTradedBatch << ", 报单引用 = " << pOrder->OrderRef << std::endl;
-
-
-
-	USER_PRINT("A合约今买");
-	USER_PRINT(this->stg_position_a_buy_today);
-	USER_PRINT("A合约昨买");
-	USER_PRINT(this->stg_position_a_buy_yesterday);
-	USER_PRINT("A合约总买");
-	USER_PRINT(this->stg_position_a_buy);
-	USER_PRINT("A合约今卖");
-	USER_PRINT(this->stg_position_a_sell_today);
-	USER_PRINT("A合约昨卖");
-	USER_PRINT(this->stg_position_a_sell_yesterday);
-	USER_PRINT("A合约总卖");
-	USER_PRINT(this->stg_position_a_sell);
-
-	USER_PRINT("B合约今买");
-	USER_PRINT(this->stg_position_b_buy_today);
-	USER_PRINT("B合约昨买");
-	USER_PRINT(this->stg_position_b_buy_yesterday);
-	USER_PRINT("B合约总买");
-	USER_PRINT(this->stg_position_b_buy);
-	USER_PRINT("B合约今卖");
-	USER_PRINT(this->stg_position_b_sell_today);
-	USER_PRINT("B合约昨卖");
-	USER_PRINT(this->stg_position_b_sell_yesterday);
-	USER_PRINT("B合约总卖");
-	USER_PRINT(this->stg_position_b_sell);
 
 }
 
@@ -3616,6 +3617,21 @@ void Strategy::setStgTradingDay(string stg_trading_day) {
 
 string Strategy::getStgTradingDay() {
 	return this->stg_trading_day;
+}
+
+void Strategy::setStgSelectOrderAlgorithmFlag(bool stg_select_order_algorithm_flag) {
+	this->stg_select_order_algorithm_flag = stg_select_order_algorithm_flag;
+}
+
+bool Strategy::getStgSelectOrderAlgorithmFlag() {
+	return this->stg_select_order_algorithm_flag;
+}
+
+void Strategy::setStgLockOrderRef(string stg_lock_order_ref) {
+	this->stg_lock_order_ref = stg_lock_order_ref;
+}
+string Strategy::getStgLockOrderRef() {
+	return this->stg_lock_order_ref;
 }
 
 /************************************************************************/

@@ -227,6 +227,13 @@ public:
 	void setStgTradingDay(string stg_trading_day);
 	string getStgTradingDay();
 
+	void setStgSelectOrderAlgorithmFlag(bool stg_select_order_algorithm_flag);
+	bool getStgSelectOrderAlgorithmFlag();
+
+	void setStgLockOrderRef(string stg_lock_order_ref);
+	string getStgLockOrderRef();
+
+
 	/************************************************************************/
 	/* 交易相关的回报函数                                                      */
 	/************************************************************************/
@@ -256,6 +263,8 @@ public:
 
 	//选择下单算法
 	void Select_Order_Algorithm(string stg_order_algorithm);
+
+	
 
 	//下单算法1
 	void Order_Algorithm_One();
@@ -295,8 +304,16 @@ public:
 	/// 更新持仓明细(Order)
 	void update_position_detail(USER_CThostFtdcOrderField *pOrder);
 
+	/// 更新交易状态
+	void update_task_status();
+
+	/// 更新tick锁
+	void update_tick_lock_status(USER_CThostFtdcOrderField *order);
+
 	/// 添加字段本次成交量至order构体中
 	void add_VolumeTradedBatch(CThostFtdcOrderField *pOrder, USER_CThostFtdcOrderField *new_Order);
+
+	
 
 
 	/// 得到三个数最小值
@@ -337,8 +354,7 @@ public:
 	void setStgSellCloseOnOff(int sell_close_on_off);			//卖平-开关
 	int getStgSellCloseOnOff();
 
-	/// 更新交易状态
-	void update_task_status();
+	
 
 	/// 交易模型
 	void setStgTradeModel(string stg_trade_model);
@@ -465,7 +481,7 @@ private:
 	int stg_position_b_sell;			// B合约卖持仓总仓位
 	int stg_pending_a_open;				// A合约挂单买开仓量
 	bool stg_select_order_algorithm_flag;	// 下单算法锁标志位
-
+	string stg_lock_order_ref;			// 选择下单算法过程中产生的order_ref
 
 
 	CThostFtdcDepthMarketDataField *stg_instrument_A_tick;	// A合约tick（第一腿）
