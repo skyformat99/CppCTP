@@ -1868,6 +1868,8 @@ void Strategy::Order_Algorithm_One() {
 		//	<< ", 成交金额:" << stg_instrument_A_tick->Turnover << endl;
 
 		if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) || this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick)) {
+			std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
+			std::cout << "\t CompareTickData相同!" << std::endl;
 			return;
 		}
 
@@ -1977,6 +1979,8 @@ void Strategy::Order_Algorithm_One() {
 			<< "spread short volume = " << this->stg_spread_short_volume << endl;*/
 
 		if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) || this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick)) {
+			std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
+			std::cout << "\t CompareTickData相同!" << std::endl;
 			return;
 		}
 
