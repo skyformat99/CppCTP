@@ -1344,20 +1344,20 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		this->Exec_OnTickComing(pDepthMarketData);
 	}
 	else { /// 如果没有交易任务，那么选择开始新的交易任务
-		if (!stg_select_order_algorithm_flag) {
-			this->setStgSelectOrderAlgorithmFlag("Strategy::OnRtnDepthMarketData()", true); // 开启下单锁
-			this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
-			/*std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
-			std::cout << "\t(开启tick锁 stg_select_order_algorithm_flag):(" << this->stg_select_order_algorithm_flag << ")" << std::endl;*/
-		}
-		else
-		{
-			/*std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
-			std::cout << "\t(tick锁已开 stg_select_order_algorithm_flag):(" << this->stg_select_order_algorithm_flag << ")" << std::endl;*/
-		}
+		//if (!stg_select_order_algorithm_flag) {
+		//	this->setStgSelectOrderAlgorithmFlag("Strategy::OnRtnDepthMarketData()", true); // 开启下单锁
+		//	this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
+		//	/*std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
+		//	std::cout << "\t(开启tick锁 stg_select_order_algorithm_flag):(" << this->stg_select_order_algorithm_flag << ")" << std::endl;*/
+		//}
+		//else
+		//{
+		//	/*std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
+		//	std::cout << "\t(tick锁已开 stg_select_order_algorithm_flag):(" << this->stg_select_order_algorithm_flag << ")" << std::endl;*/
+		//}
 
 		//一把锁测试
-		//this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
+		this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
 
 		
 	}
@@ -1867,9 +1867,9 @@ void Strategy::Order_Algorithm_One() {
 		//	//<< ", 本次结算价格:" << stg_instrument_A_tick->SettlementPrice
 		//	<< ", 成交金额:" << stg_instrument_A_tick->Turnover << endl;
 
-		/*if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick)) {
+		if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) || this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick)) {
 			return;
-		}*/
+		}
 
 		/// 满足交易任务之前的tick
 		this->CopyTickData(stg_instrument_A_tick_last, stg_instrument_A_tick);
@@ -1976,9 +1976,9 @@ void Strategy::Order_Algorithm_One() {
 			<< "spread short = " << this->stg_spread_short << ", "
 			<< "spread short volume = " << this->stg_spread_short_volume << endl;*/
 
-		/*if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick)) {
+		if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) || this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick)) {
 			return;
-		}*/
+		}
 
 		/// 满足交易任务之前的tick
 		this->CopyTickData(stg_instrument_A_tick_last, stg_instrument_A_tick);
