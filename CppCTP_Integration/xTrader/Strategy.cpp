@@ -1352,8 +1352,8 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		}
 		else
 		{
-			/*std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
-			std::cout << "\t(tick锁已开 stg_select_order_algorithm_flag):(" << this->stg_select_order_algorithm_flag << ")" << std::endl;*/
+			std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
+			std::cout << "\t(tick锁已开 stg_select_order_algorithm_flag):(" << this->stg_select_order_algorithm_flag << ")" << std::endl;
 		}
 
 		//一把锁测试
