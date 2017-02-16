@@ -1613,6 +1613,12 @@ void Strategy::Order_Algorithm_One() {
 			<< "spread short = " << this->stg_spread_short << ", "
 			<< "spread short volume = " << this->stg_spread_short_volume << endl;*/
 
+		if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) || this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick)) {
+			std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
+			std::cout << "\t CompareTickData相同!" << std::endl;
+			return;
+		}
+
 		/// 满足交易任务之前的一个tick
 		this->CopyTickData(stg_instrument_A_tick_last, stg_instrument_A_tick);
 		this->CopyTickData(stg_instrument_B_tick_last, stg_instrument_B_tick);
@@ -1727,6 +1733,12 @@ void Strategy::Order_Algorithm_One() {
 			<< "spread short volume = " << this->stg_spread_short_volume << ", "
 			<< "stg_lots_batch = " << this->stg_lots_batch << ", "
 			<< "stg_position_a_sell_yesterday = " << this->stg_position_a_sell_yesterday << endl;*/
+
+		if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) || this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick)) {
+			std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
+			std::cout << "\t CompareTickData相同!" << std::endl;
+			return;
+		}
 
 		/// 满足交易任务之前的一个tick
 		this->CopyTickData(stg_instrument_A_tick_last, stg_instrument_A_tick);
@@ -2521,7 +2533,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 	USER_PRINT(pOrder->OrderStatus);
 
 	std::cout << "Strategy::update_pending_order_list()" << std::endl;
-	std::cout << "\tthis->stg_pending_a_open = " << this->stg_pending_a_open << std::endl;
+	std::cout << "\t Begin:this->stg_pending_a_open = " << this->stg_pending_a_open << std::endl;
 
 
 	if (strlen(pOrder->OrderSysID) != 0) { // 如果报单编号不为空，为交易所返回
@@ -2601,6 +2613,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 
 		// 遍历挂单列表，找出A合约开仓未成交的量
 		list<CThostFtdcOrderField *>::iterator cal_itor;
+		this->stg_pending_a_open = 0;
 		for (cal_itor = this->stg_list_order_pending->begin(); cal_itor != this->stg_list_order_pending->end(); cal_itor++) {
 			// 对比InstrumentID
 			if (!strcmp((*cal_itor)->InstrumentID, this->stg_instrument_id_A.c_str()) && ((*cal_itor)->CombOffsetFlag[0] == '0')) { // 查找A合约开仓
@@ -2609,7 +2622,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 		}
 
 		//std::cout << "Strategy::update_pending_order_list()" << std::endl;
-		std::cout << "\tthis->stg_pending_a_open = " << this->stg_pending_a_open << std::endl;
+		std::cout << "\tEnd:this->stg_pending_a_open = " << this->stg_pending_a_open << std::endl;
 	}
 }
 
