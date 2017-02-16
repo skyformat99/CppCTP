@@ -2126,10 +2126,11 @@ void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFt
 	if ((this->IsErrorRspInfo(pRspInfo))) {
 		if (pInputOrder) {
 			this->current_user->DB_OnErrRtnOrderInsert(this->current_user->GetOrderConn(), pInputOrder);
-			list<Strategy *>::iterator itor;
-			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
-				(*itor)->OnErrRtnOrderInsert(pInputOrder);
-			}
+			
+		}
+		list<Strategy *>::iterator itor;
+		for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+			(*itor)->OnErrRtnOrderInsert(pInputOrder);
 		}
 	}
 }
