@@ -1554,13 +1554,13 @@ void Strategy::Order_Algorithm_One() {
 		else {
 		USER_PRINT("CRASH!!!");
 		}*/
-	USER_PRINT(this->stg_user->getCTP_Manager()->getOn_Off());
-	//为了测试需要打开开关
-	//this->stg_user->getCTP_Manager()->setOn_Off(1);
-	USER_PRINT(this->getStgStrategyId())
-	USER_PRINT(this->stg_user->GetTrader()->getOn_Off());
-	USER_PRINT(this->stg_user->getOn_Off());
-	USER_PRINT(this->getOn_Off());
+	//USER_PRINT(this->stg_user->getCTP_Manager()->getOn_Off());
+	////为了测试需要打开开关
+	////this->stg_user->getCTP_Manager()->setOn_Off(1);
+	//USER_PRINT(this->getStgStrategyId())
+	//USER_PRINT(this->stg_user->GetTrader()->getOn_Off());
+	//USER_PRINT(this->stg_user->getOn_Off());
+	//USER_PRINT(this->getOn_Off());
 
 
 	/// 策略开关，期货账户开关，总开关
@@ -1575,7 +1575,7 @@ void Strategy::Order_Algorithm_One() {
 	}
 
 	//std::cout << "策略开关,期货账户开关,总开关22222" << std::endl;
-	USER_PRINT("**********************");
+	/*USER_PRINT("**********************");
 	USER_PRINT("价差多头卖平");
 	USER_PRINT(this->sell_close_on_off);
 	USER_PRINT(this->stg_spread_long);
@@ -1623,7 +1623,7 @@ void Strategy::Order_Algorithm_One() {
 	USER_PRINT("&满足条件：");
 	USER_PRINT(this->buy_open_on_off);
 	USER_PRINT(((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots));
-	USER_PRINT("&&&&&&&&&&&&&&&&&&&&&&");
+	USER_PRINT("&&&&&&&&&&&&&&&&&&&&&&");*/
 	
 	/*this->printStrategyInfo("价差卖开参数");
 	std::cout << "this->stg_spread_long = " << this->stg_spread_long << std::endl;

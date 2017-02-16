@@ -2123,7 +2123,7 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 //下单错误响应
 void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo) {
 	USER_PRINT("TdSpi::OnErrRtnOrderInsert");
-	if (!(this->IsErrorRspInfo(pRspInfo))) {
+	if ((this->IsErrorRspInfo(pRspInfo))) {
 		if (pInputOrder) {
 			this->current_user->DB_OnErrRtnOrderInsert(this->current_user->GetOrderConn(), pInputOrder);
 			list<Strategy *>::iterator itor;
