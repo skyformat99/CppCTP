@@ -2036,6 +2036,8 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 
 		string temp(pOrder->OrderRef);
 		string result = temp.substr(0, 1);
+		int len_order_ref = temp.length();
+		string strategyid = temp.substr(len_order_ref - 2, 2);
 		
 		if (temp.length() == 12 && result == "1") { // 通过本交易系统发出去的order长度12,首位字符为1
 			this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pOrder);
@@ -2043,8 +2045,14 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 
 			list<Strategy *>::iterator itor;
 			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
-				(*itor)->OnRtnOrder(pOrder);
+				if ((*itor)->getStgStrategyId() == strategyid) {
+					(*itor)->OnRtnOrder(pOrder);
+					break;
+				}
 			}
+
+			
+
 		}
 		
 

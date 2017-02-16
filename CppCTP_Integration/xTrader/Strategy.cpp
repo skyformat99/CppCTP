@@ -1571,7 +1571,7 @@ void Strategy::Order_Algorithm_One() {
 		/*std::cout << "策略开关 = " << this->getOn_Off() << std::endl;
 		std::cout << "期货账户开关 = " << this->stg_user->getOn_Off() << std::endl;
 		std::cout << "总开关 = " << this->stg_user->GetTrader()->getOn_Off() << std::endl;*/
-		this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One()_2", false);
+		//this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One()_2", false);
 		return;
 	}
 
