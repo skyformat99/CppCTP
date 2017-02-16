@@ -955,7 +955,7 @@ void Strategy::update_tick_lock_status(USER_CThostFtdcOrderField *pOrder) {
 	}
 
 	std::cout << "\t tick flag = " << flag << std::endl;
-	this->setStgSelectOrderAlgorithmFlag(flag); // tick锁
+	this->setStgSelectOrderAlgorithmFlag("Strategy::update_tick_lock_status()", flag); // tick锁
 }
 
 /// 交易模型
@@ -1314,7 +1314,7 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 	}
 	else { /// 如果没有交易任务，那么选择开始新的交易任务
 		if (!stg_select_order_algorithm_flag) {
-			this->setStgSelectOrderAlgorithmFlag(true); // 开启下单锁
+			this->setStgSelectOrderAlgorithmFlag("Strategy::OnRtnDepthMarketData()", true); // 开启下单锁
 			this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
 			/*std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
 			std::cout << "\t(开启tick锁 stg_select_order_algorithm_flag):(" << this->stg_select_order_algorithm_flag << ")" << std::endl;*/
@@ -1359,7 +1359,7 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 		//this->printStrategyInfo("有挂单,返回");
 		std::cout << "Strategy::Select_Order_Algorithm():" << std::endl;
 		std::cout << "\t(有挂单,返回)" << std::endl;
-		this->setStgSelectOrderAlgorithmFlag(false); // 关闭下单锁
+		this->setStgSelectOrderAlgorithmFlag("Strategy::OnRtnDepthMarketData()_1", false); // 关闭下单锁
 		return;
 	}
 
@@ -1370,7 +1370,7 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 		// 有撇腿
 		std::cout << "Strategy::Select_Order_Algorithm():" << std::endl;
 		std::cout << "\t(有撇腿)" << std::endl;
-		this->setStgSelectOrderAlgorithmFlag(false); // 关闭下单锁
+		this->setStgSelectOrderAlgorithmFlag("Strategy::OnRtnDepthMarketData()_2", false); // 关闭下单锁
 		return;
 	}
 
@@ -1451,7 +1451,7 @@ void Strategy::Order_Algorithm_One() {
 	else
 	{
 		//this->printStrategyInfo("策略跳过异常行情");
-		this->setStgSelectOrderAlgorithmFlag(false);
+		this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One()_1", false);
 		return;
 	}
 
@@ -1481,7 +1481,7 @@ void Strategy::Order_Algorithm_One() {
 		/*std::cout << "策略开关 = " << this->getOn_Off() << std::endl;
 		std::cout << "期货账户开关 = " << this->stg_user->getOn_Off() << std::endl;
 		std::cout << "总开关 = " << this->stg_user->GetTrader()->getOn_Off() << std::endl;*/
-		this->setStgSelectOrderAlgorithmFlag(false);
+		this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One()_2", false);
 		return;
 	}
 
@@ -2073,7 +2073,7 @@ void Strategy::Exec_OrderInsert(CThostFtdcInputOrderField *insert_order) {
 // 报单录入请求
 void Strategy::Exec_OnRspOrderInsert() {
 	USER_PRINT("Exec_OnRspOrderInsert()");
-	this->setStgSelectOrderAlgorithmFlag(false);
+	this->setStgSelectOrderAlgorithmFlag("Strategy::Exec_OnRspOrderInsert()", false);
 }
 
 // 报单操作请求响应
@@ -2205,7 +2205,7 @@ void Strategy::ExEc_OnRtnTrade(CThostFtdcTradeField *pTrade) {
 // 报单录入错误回报
 void Strategy::Exec_OnErrRtnOrderInsert() {
 	USER_PRINT("Exec_OnErrRtnOrderInsert()");
-	this->setStgSelectOrderAlgorithmFlag(false);
+	this->setStgSelectOrderAlgorithmFlag("Strategy::Exec_OnErrRtnOrderInsert()", false);
 }
 
 // 报单操作错误回报
@@ -3627,9 +3627,10 @@ string Strategy::getStgTradingDay() {
 	return this->stg_trading_day;
 }
 
-void Strategy::setStgSelectOrderAlgorithmFlag(bool stg_select_order_algorithm_flag) {
+void Strategy::setStgSelectOrderAlgorithmFlag(string msg, bool stg_select_order_algorithm_flag) {
 	std::cout << "Strategy::setStgSelectOrderAlgorithmFlag():" << std::endl;
-	std::cout << "\t(stg_select_order_algorithm_flag):(" << stg_select_order_algorithm_flag << ")" << std::endl;
+	std::cout << "\tmsg = " << msg << std::endl;
+	std::cout << "\tstg_select_order_algorithm_flag = " << stg_select_order_algorithm_flag << std::endl;
 	this->stg_select_order_algorithm_flag = stg_select_order_algorithm_flag;
 }
 

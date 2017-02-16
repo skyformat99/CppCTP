@@ -227,7 +227,7 @@ public:
 	void setStgTradingDay(string stg_trading_day);
 	string getStgTradingDay();
 
-	void setStgSelectOrderAlgorithmFlag(bool stg_select_order_algorithm_flag);
+	void setStgSelectOrderAlgorithmFlag(string msg, bool stg_select_order_algorithm_flag);
 	bool getStgSelectOrderAlgorithmFlag();
 
 	void setStgLockOrderRef(string stg_lock_order_ref);
