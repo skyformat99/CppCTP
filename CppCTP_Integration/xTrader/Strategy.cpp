@@ -2,6 +2,7 @@
 #include <sstream>
 #include <mutex>
 #include "Strategy.h"
+#include "Utils.h"
 
 std::mutex tick_mtx; // locks access to counter
 std::mutex update_status_mtx; // locks access to counter
@@ -1293,6 +1294,7 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 
 	time_t tt = system_clock::to_time_t(system_clock::now());
 	std::string nowt(std::ctime(&tt));
+	string new_time = Utils::getNowTimeMs();
 
 	// Get Own Instrument
 	USER_PRINT(this);
@@ -1360,8 +1362,8 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 			
 			std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
 			std::cout << "\ttick锁已上锁 stg_select_order_algorithm_flag = " << this->stg_select_order_algorithm_flag << ")" << std::endl;
-			std::cout << "\t上一个tick系统时间 = " << this->stg_tick_systime_record.substr(0, nowt.length() - 1) << std::endl;
-			std::cout << "\t新tick系统时间 = " << nowt.substr(0, nowt.length() - 1) << std::endl;
+			std::cout << "\t上一个tick系统时间 = " << this->stg_tick_systime_record << std::endl;
+			std::cout << "\t新tick系统时间 = " << new_time << std::endl;
 			if (!CompareTickData(this->stg_instrument_Last_tick, pDepthMarketData)) {
 				std::cout << "\t上一个tick信息 = 交易日:" << stg_instrument_Last_tick->TradingDay
 					<< ", 合约代码:" << stg_instrument_Last_tick->InstrumentID
@@ -1414,7 +1416,7 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		
 	}
 	this->CopyTickData(this->stg_instrument_Last_tick, pDepthMarketData);
-	this->stg_tick_systime_record = nowt;
+	this->stg_tick_systime_record = new_time;
 	USER_PRINT("Strategy::OnRtnDepthMarketData OUT");
 	//tick_mtx.unlock();
 }

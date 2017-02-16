@@ -193,6 +193,8 @@ mutex
 -
 Strategy.h
 /root/xTrader/Strategy.h
+Utils.h
+/root/xTrader/Utils.h
 
 /root/xTrader/Strategy.h
 list

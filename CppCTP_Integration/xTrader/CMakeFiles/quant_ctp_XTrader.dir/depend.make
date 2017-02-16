@@ -151,6 +151,7 @@ CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: ThostFtdcUserApiDataType.h
 CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: ThostFtdcUserApiStruct.h
 CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: Trader.h
 CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: User.h
+CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: Utils.h
 CMakeFiles/quant_ctp_XTrader.dir/Strategy.cpp.o: xTradeStruct.h
 
 CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o: Algorithm.h
