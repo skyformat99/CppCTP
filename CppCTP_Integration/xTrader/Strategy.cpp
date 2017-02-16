@@ -1316,13 +1316,13 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		if (!stg_select_order_algorithm_flag) {
 			this->setStgSelectOrderAlgorithmFlag(true); // 开启下单锁
 			this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
-			std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
-			std::cout << "\t(开启tick锁 stg_select_order_algorithm_flag):(" << this->stg_select_order_algorithm_flag << ")" << std::endl;
+			/*std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
+			std::cout << "\t(开启tick锁 stg_select_order_algorithm_flag):(" << this->stg_select_order_algorithm_flag << ")" << std::endl;*/
 		}
 		else
 		{
-			std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
-			std::cout << "\t(tick锁已开 stg_select_order_algorithm_flag):(" << this->stg_select_order_algorithm_flag << ")" << std::endl;
+			/*std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
+			std::cout << "\t(tick锁已开 stg_select_order_algorithm_flag):(" << this->stg_select_order_algorithm_flag << ")" << std::endl;*/
 		}
 
 		
@@ -3628,6 +3628,8 @@ string Strategy::getStgTradingDay() {
 }
 
 void Strategy::setStgSelectOrderAlgorithmFlag(bool stg_select_order_algorithm_flag) {
+	std::cout << "Strategy::setStgSelectOrderAlgorithmFlag():" << std::endl;
+	std::cout << "\t(stg_select_order_algorithm_flag):(" << stg_select_order_algorithm_flag << ")" << std::endl;
 	this->stg_select_order_algorithm_flag = stg_select_order_algorithm_flag;
 }
 
