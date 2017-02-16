@@ -1817,7 +1817,7 @@ void TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
 ///报单录入请求响应
 void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspOrderInsert");
-	if (!(this->IsErrorRspInfo(pRspInfo))) {
+	if ((this->IsErrorRspInfo(pRspInfo))) {
 		if (pInputOrder) {
 			std::cout << "=================================================================================" << endl;
 			///经纪公司代码
@@ -1869,11 +1869,12 @@ void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcR
 			std::cout << "=================================================================================" << endl;
 			this->current_user->DB_OnRspOrderInsert(this->current_user->GetOrderConn(), pInputOrder);
 
-			list<Strategy *>::iterator itor;
-			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
-				(*itor)->OnRspOrderInsert(pInputOrder);
-			}
+			
 
+		}
+		list<Strategy *>::iterator itor;
+		for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+			(*itor)->OnRspOrderInsert(pInputOrder);
 		}
 	}
 }
