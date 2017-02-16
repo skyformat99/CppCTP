@@ -2066,7 +2066,7 @@ void Strategy::Exec_OrderInsert(CThostFtdcInputOrderField *insert_order) {
 // 报单录入请求
 void Strategy::Exec_OnRspOrderInsert() {
 	USER_PRINT("Exec_OnRspOrderInsert()");
-
+	this->setStgSelectOrderAlgorithmFlag(false);
 }
 
 // 报单操作请求响应
@@ -2198,6 +2198,7 @@ void Strategy::ExEc_OnRtnTrade(CThostFtdcTradeField *pTrade) {
 // 报单录入错误回报
 void Strategy::Exec_OnErrRtnOrderInsert() {
 	USER_PRINT("Exec_OnErrRtnOrderInsert()");
+	this->setStgSelectOrderAlgorithmFlag(false);
 }
 
 // 报单操作错误回报
@@ -3659,6 +3660,7 @@ void Strategy::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 //下单错误响应
 void Strategy::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder) {
 	USER_PRINT("Strategy::OnErrRtnOrderInsert");
+	this->Exec_OnErrRtnOrderInsert();
 }
 
 ///报单录入请求响应
