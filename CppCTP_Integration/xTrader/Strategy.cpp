@@ -1254,6 +1254,37 @@ list<USER_CThostFtdcOrderField *> * Strategy::getStg_List_Position_Detail_From_O
 	return this->stg_list_position_detail_from_order;
 }
 
+bool Strategy::CompareTickData(CThostFtdcDepthMarketDataField *last_tick_data, CThostFtdcDepthMarketDataField *pDepthMarketData) {
+	if (!strcmp(last_tick_data->InstrumentID, pDepthMarketData->InstrumentID) &&
+		!strcmp(last_tick_data->UpdateTime, pDepthMarketData->UpdateTime) &&
+		(last_tick_data->UpdateMillisec == pDepthMarketData->UpdateMillisec)) {
+		std::cout << "Strategy::CompareTickData() 重复tick" << std::endl;
+		std::cout << "\t交易日:" << pDepthMarketData->TradingDay
+			<< ", 合约代码:" << pDepthMarketData->InstrumentID
+			<< ", 最新价:" << pDepthMarketData->LastPrice
+			<< ", 持仓量:" << pDepthMarketData->OpenInterest
+			//<< ", 上次结算价:" << pDepthMarketData->PreSettlementPrice 
+			//<< ", 昨收盘:" << pDepthMarketData->PreClosePrice 
+			<< ", 数量:" << pDepthMarketData->Volume
+			//<< ", 昨持仓量:" << pDepthMarketData->PreOpenInterest
+			<< ", 最后修改时间:" << pDepthMarketData->UpdateTime
+			<< ", 最后修改毫秒:" << pDepthMarketData->UpdateMillisec
+			<< ", 申买价一：" << pDepthMarketData->BidPrice1
+			<< ", 申买量一:" << pDepthMarketData->BidVolume1
+			<< ", 申卖价一:" << pDepthMarketData->AskPrice1
+			<< ", 申卖量一:" << pDepthMarketData->AskVolume1
+			//<< ", 今收盘价:" << pDepthMarketData->ClosePrice
+			//<< ", 当日均价:" << pDepthMarketData->AveragePrice
+			//<< ", 本次结算价格:" << pDepthMarketData->SettlementPrice
+			<< ", 成交金额:" << pDepthMarketData->Turnover << std::endl;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 	
 	//tick_mtx.lock();
@@ -1313,17 +1344,20 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		this->Exec_OnTickComing(pDepthMarketData);
 	}
 	else { /// 如果没有交易任务，那么选择开始新的交易任务
-		if (!stg_select_order_algorithm_flag) {
-			this->setStgSelectOrderAlgorithmFlag("Strategy::OnRtnDepthMarketData()", true); // 开启下单锁
-			this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
-			/*std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
-			std::cout << "\t(开启tick锁 stg_select_order_algorithm_flag):(" << this->stg_select_order_algorithm_flag << ")" << std::endl;*/
-		}
-		else
-		{
-			/*std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
-			std::cout << "\t(tick锁已开 stg_select_order_algorithm_flag):(" << this->stg_select_order_algorithm_flag << ")" << std::endl;*/
-		}
+		//if (!stg_select_order_algorithm_flag) {
+		//	this->setStgSelectOrderAlgorithmFlag("Strategy::OnRtnDepthMarketData()", true); // 开启下单锁
+		//	this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
+		//	/*std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
+		//	std::cout << "\t(开启tick锁 stg_select_order_algorithm_flag):(" << this->stg_select_order_algorithm_flag << ")" << std::endl;*/
+		//}
+		//else
+		//{
+		//	/*std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
+		//	std::cout << "\t(tick锁已开 stg_select_order_algorithm_flag):(" << this->stg_select_order_algorithm_flag << ")" << std::endl;*/
+		//}
+
+		//一把锁测试
+		this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
 
 		
 	}
@@ -1814,24 +1848,28 @@ void Strategy::Order_Algorithm_One() {
 			<< "stg_position_a_sell = " << this->stg_position_a_sell << ", "
 			<< "stg_lots = " << this->stg_lots << endl;*/
 
-		cout << "\t交易日:" << stg_instrument_A_tick->TradingDay 
-			<< ", 合约代码:" << stg_instrument_A_tick->InstrumentID 
-			<< ", 最新价:" << stg_instrument_A_tick->LastPrice 
-			<< ", 持仓量:" << stg_instrument_A_tick->OpenInterest 
-			//<< ", 上次结算价:" << stg_instrument_A_tick->PreSettlementPrice 
-			//<< ", 昨收盘:" << stg_instrument_A_tick->PreClosePrice 
-			<< ", 数量:" << stg_instrument_A_tick->Volume 
-			//<< ", 昨持仓量:" << stg_instrument_A_tick->PreOpenInterest
-			<< ", 最后修改时间:" << stg_instrument_A_tick->UpdateTime
-			<< ", 最后修改毫秒:" << stg_instrument_A_tick->UpdateMillisec
-			<< ", 申买价一：" << stg_instrument_A_tick->BidPrice1 
-			<< ", 申买量一:" << stg_instrument_A_tick->BidVolume1 
-			<< ", 申卖价一:" << stg_instrument_A_tick->AskPrice1 
-			<< ", 申卖量一:" << stg_instrument_A_tick->AskVolume1 
-			//<< ", 今收盘价:" << stg_instrument_A_tick->ClosePrice
-			//<< ", 当日均价:" << stg_instrument_A_tick->AveragePrice
-			//<< ", 本次结算价格:" << stg_instrument_A_tick->SettlementPrice
-			<< ", 成交金额:" << stg_instrument_A_tick->Turnover << endl;
+		//cout << "\t交易日:" << stg_instrument_A_tick->TradingDay 
+		//	<< ", 合约代码:" << stg_instrument_A_tick->InstrumentID 
+		//	<< ", 最新价:" << stg_instrument_A_tick->LastPrice 
+		//	<< ", 持仓量:" << stg_instrument_A_tick->OpenInterest 
+		//	//<< ", 上次结算价:" << stg_instrument_A_tick->PreSettlementPrice 
+		//	//<< ", 昨收盘:" << stg_instrument_A_tick->PreClosePrice 
+		//	<< ", 数量:" << stg_instrument_A_tick->Volume 
+		//	//<< ", 昨持仓量:" << stg_instrument_A_tick->PreOpenInterest
+		//	<< ", 最后修改时间:" << stg_instrument_A_tick->UpdateTime
+		//	<< ", 最后修改毫秒:" << stg_instrument_A_tick->UpdateMillisec
+		//	<< ", 申买价一：" << stg_instrument_A_tick->BidPrice1 
+		//	<< ", 申买量一:" << stg_instrument_A_tick->BidVolume1 
+		//	<< ", 申卖价一:" << stg_instrument_A_tick->AskPrice1 
+		//	<< ", 申卖量一:" << stg_instrument_A_tick->AskVolume1 
+		//	//<< ", 今收盘价:" << stg_instrument_A_tick->ClosePrice
+		//	//<< ", 当日均价:" << stg_instrument_A_tick->AveragePrice
+		//	//<< ", 本次结算价格:" << stg_instrument_A_tick->SettlementPrice
+		//	<< ", 成交金额:" << stg_instrument_A_tick->Turnover << endl;
+
+		if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick)) {
+			return;
+		}
 
 		/// 满足交易任务之前的tick
 		this->CopyTickData(stg_instrument_A_tick_last, stg_instrument_A_tick);
@@ -1937,6 +1975,10 @@ void Strategy::Order_Algorithm_One() {
 			<< "spread long volume = " << this->stg_spread_long_volume << ", "
 			<< "spread short = " << this->stg_spread_short << ", "
 			<< "spread short volume = " << this->stg_spread_short_volume << endl;*/
+
+		if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick)) {
+			return;
+		}
 
 		/// 满足交易任务之前的tick
 		this->CopyTickData(stg_instrument_A_tick_last, stg_instrument_A_tick);

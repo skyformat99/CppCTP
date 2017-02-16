@@ -24,6 +24,8 @@ public:
 
 	void OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData);
 
+	bool CompareTickData(CThostFtdcDepthMarketDataField *last_tick_data, CThostFtdcDepthMarketDataField *pDepthMarketData);
+
 	void setTrader(Trader *trader);
 	Trader *getTrader();
 
