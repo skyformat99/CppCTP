@@ -1615,7 +1615,9 @@ void Strategy::Order_Algorithm_One() {
 
 		if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) || this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick)) {
 			std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
-			std::cout << "\t CompareTickData相同!" << std::endl;
+			std::cout << "\tCompareTickData相同!" << std::endl;
+			std::cout << "\tthis->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) = " << this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) << std::endl;
+			std::cout << "\tthis->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick) = " << this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick) << std::endl;
 			return;
 		}
 
@@ -1737,6 +1739,8 @@ void Strategy::Order_Algorithm_One() {
 		if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) || this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick)) {
 			std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
 			std::cout << "\t CompareTickData相同!" << std::endl;
+			std::cout << "\tthis->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) = " << this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) << std::endl;
+			std::cout << "\tthis->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick) = " << this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick) << std::endl;
 			return;
 		}
 
@@ -1882,6 +1886,8 @@ void Strategy::Order_Algorithm_One() {
 		if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) || this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick)) {
 			std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
 			std::cout << "\t CompareTickData相同!" << std::endl;
+			std::cout << "\tthis->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) = " << this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) << std::endl;
+			std::cout << "\tthis->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick) = " << this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick) << std::endl;
 			return;
 		}
 
@@ -1993,6 +1999,8 @@ void Strategy::Order_Algorithm_One() {
 		if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) || this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick)) {
 			std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
 			std::cout << "\t CompareTickData相同!" << std::endl;
+			std::cout << "\tthis->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) = " << this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) << std::endl;
+			std::cout << "\tthis->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick) = " << this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick) << std::endl;
 			return;
 		}
 
