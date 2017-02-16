@@ -484,8 +484,9 @@ private:
 	int stg_pending_a_open;				// A合约挂单买开仓量
 	bool stg_select_order_algorithm_flag;	// 下单算法锁标志位
 	string stg_lock_order_ref;			// 选择下单算法过程中产生的order_ref
+	string stg_tick_systime_record;		// 收到tick的系统时间
 
-
+	CThostFtdcDepthMarketDataField *stg_instrument_Last_tick;	// A合约tick（第一腿）
 	CThostFtdcDepthMarketDataField *stg_instrument_A_tick;	// A合约tick（第一腿）
 	CThostFtdcDepthMarketDataField *stg_instrument_B_tick;	// B合约tick（第二腿）
 	CThostFtdcDepthMarketDataField *stg_instrument_A_tick_last;	// A合约tick（第一腿）交易前最后一次
