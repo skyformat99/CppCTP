@@ -1619,6 +1619,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								static_dbm->UpdateStrategy((*stg_itor));
 
 								(*stg_itor)->update_task_status();
+								(*stg_itor)->setStgSelectOrderAlgorithmFlag("CTP_Manager::HandleMessage() msgtype == 12", false);
 
 								std::cout << "Strategy修改持仓完成!" << std::endl;
 

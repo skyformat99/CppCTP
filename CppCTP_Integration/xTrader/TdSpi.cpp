@@ -1819,6 +1819,8 @@ void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcR
 	USER_PRINT("TdSpi::OnRspOrderInsert");
 	if ((this->IsErrorRspInfo(pRspInfo))) {
 		if (pInputOrder) {
+
+			std::cout << "TdSpi::OnRspOrderInsert()" << endl;
 			std::cout << "=================================================================================" << endl;
 			///经纪公司代码
 			std::cout << "经纪公司代码:" << pInputOrder->BrokerID << ", ";
@@ -1869,12 +1871,21 @@ void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcR
 			std::cout << "=================================================================================" << endl;
 			this->current_user->DB_OnRspOrderInsert(this->current_user->GetOrderConn(), pInputOrder);
 
-			
+			string temp(pInputOrder->OrderRef);
+			string result = temp.substr(0, 1);
+			int len_order_ref = temp.length();
+			string strategyid = temp.substr(len_order_ref - 2, 2);
+			if (temp.length() == 12 && result == "1") {
 
-		}
-		list<Strategy *>::iterator itor;
-		for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
-			(*itor)->OnRspOrderInsert(pInputOrder);
+				list<Strategy *>::iterator itor;
+				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+					if ((*itor)->getStgStrategyId() == strategyid) {
+						(*itor)->OnRspOrderInsert(pInputOrder);
+						break;
+					}
+				}
+
+			}
 		}
 	}
 }
@@ -2125,12 +2136,23 @@ void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFt
 	USER_PRINT("TdSpi::OnErrRtnOrderInsert");
 	if ((this->IsErrorRspInfo(pRspInfo))) {
 		if (pInputOrder) {
+			std::cout << "TdSpi::OnErrRtnOrderInsert()" << endl;
 			this->current_user->DB_OnErrRtnOrderInsert(this->current_user->GetOrderConn(), pInputOrder);
-			
-		}
-		list<Strategy *>::iterator itor;
-		for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
-			(*itor)->OnErrRtnOrderInsert(pInputOrder);
+			string temp(pInputOrder->OrderRef);
+			string result = temp.substr(0, 1);
+			int len_order_ref = temp.length();
+			string strategyid = temp.substr(len_order_ref - 2, 2);
+			if (temp.length() == 12 && result == "1") {
+
+				list<Strategy *>::iterator itor;
+				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+					if ((*itor)->getStgStrategyId() == strategyid) {
+						(*itor)->OnRspOrderInsert(pInputOrder);
+						break;
+					}
+				}
+
+			}
 		}
 	}
 }
