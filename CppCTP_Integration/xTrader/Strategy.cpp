@@ -1345,9 +1345,9 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		std::cout << "stg_position_a_sell_yesterday = " << stg_position_a_sell_yesterday << std::endl;
 		std::cout << "stg_position_b_buy_yesterday = " << stg_position_b_buy_yesterday << std::endl;
 		std::cout << "挂单列表长度 = " << this->stg_list_order_pending->size() << std::endl;*/
-		std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
+		/*std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
 		std::cout << "\t(有交易任务,进入交易任务执行)" << std::endl;
-		std::cout << "\t(stg_trade_tasking):(" << this->stg_trade_tasking << ")" << std::endl;
+		std::cout << "\t(stg_trade_tasking):(" << this->stg_trade_tasking << ")" << std::endl;*/
 		this->Exec_OnTickComing(pDepthMarketData);
 	}
 	else { /// 如果没有交易任务，那么选择开始新的交易任务
