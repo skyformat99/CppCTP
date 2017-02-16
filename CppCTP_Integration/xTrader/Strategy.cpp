@@ -1344,17 +1344,17 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		this->Exec_OnTickComing(pDepthMarketData);
 	}
 	else { /// 如果没有交易任务，那么选择开始新的交易任务
-		//if (!stg_select_order_algorithm_flag) {
-		//	this->setStgSelectOrderAlgorithmFlag("Strategy::OnRtnDepthMarketData()", true); // 开启下单锁
-		//	this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
-		//	/*std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
-		//	std::cout << "\t(开启tick锁 stg_select_order_algorithm_flag):(" << this->stg_select_order_algorithm_flag << ")" << std::endl;*/
-		//}
-		//else
-		//{
-		//	/*std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
-		//	std::cout << "\t(tick锁已开 stg_select_order_algorithm_flag):(" << this->stg_select_order_algorithm_flag << ")" << std::endl;*/
-		//}
+		if (!stg_select_order_algorithm_flag) {
+			//this->setStgSelectOrderAlgorithmFlag("Strategy::OnRtnDepthMarketData()", true); // 开启下单锁
+			this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
+			/*std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
+			std::cout << "\t(开启tick锁 stg_select_order_algorithm_flag):(" << this->stg_select_order_algorithm_flag << ")" << std::endl;*/
+		}
+		else
+		{
+			/*std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
+			std::cout << "\t(tick锁已开 stg_select_order_algorithm_flag):(" << this->stg_select_order_algorithm_flag << ")" << std::endl;*/
+		}
 
 		//一把锁测试
 		this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
@@ -1593,8 +1593,11 @@ void Strategy::Order_Algorithm_One() {
 	if ((this->sell_close_on_off) &&
 		(this->stg_position_a_sell == this->stg_position_b_buy) &&
 		(this->stg_position_a_buy > 0) &&
-		(this->stg_spread_long >= (this->stg_sell_close + this->stg_spread_shift * this->stg_a_price_tick))) {
+		(this->stg_spread_long >= (this->stg_sell_close + this->stg_spread_shift * this->stg_a_price_tick)) &&
+		(!this->stg_select_order_algorithm_flag)) {
 		
+		this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One() 价差卖平", true); // 开启下单锁
+
 		//this->stg_trade_tasking = true;
 		this->printStrategyInfo("价差卖平");
 		//this->update_task_status();
@@ -1613,13 +1616,13 @@ void Strategy::Order_Algorithm_One() {
 			<< "spread short = " << this->stg_spread_short << ", "
 			<< "spread short volume = " << this->stg_spread_short_volume << endl;*/
 
-		if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) || this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick)) {
+		/*if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) || this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick)) {
 			std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
 			std::cout << "\tCompareTickData相同!" << std::endl;
 			std::cout << "\tthis->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) = " << this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) << std::endl;
 			std::cout << "\tthis->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick) = " << this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick) << std::endl;
 			return;
-		}
+		}*/
 
 		/// 满足交易任务之前的一个tick
 		this->CopyTickData(stg_instrument_A_tick_last, stg_instrument_A_tick);
@@ -1714,7 +1717,10 @@ void Strategy::Order_Algorithm_One() {
 	else if ((this->buy_close_on_off) && 
 		(this->stg_position_a_sell == this->stg_position_b_buy) &&
 		(this->stg_position_a_sell > 0) && 
-		(this->stg_spread_short <= (this->stg_buy_close - this->stg_spread_shift * this->stg_a_price_tick))) {
+		(this->stg_spread_short <= (this->stg_buy_close - this->stg_spread_shift * this->stg_a_price_tick)) &&
+		(!this->stg_select_order_algorithm_flag)) {
+
+		this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One() 价差买平", true); // 开启下单锁
 
 		//this->stg_trade_tasking = true;
 		this->printStrategyInfo("价差买平");
@@ -1736,13 +1742,13 @@ void Strategy::Order_Algorithm_One() {
 			<< "stg_lots_batch = " << this->stg_lots_batch << ", "
 			<< "stg_position_a_sell_yesterday = " << this->stg_position_a_sell_yesterday << endl;*/
 
-		if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) || this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick)) {
+		/*if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) || this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick)) {
 			std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
 			std::cout << "\t CompareTickData相同!" << std::endl;
 			std::cout << "\tthis->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) = " << this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) << std::endl;
 			std::cout << "\tthis->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick) = " << this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick) << std::endl;
 			return;
-		}
+			}*/
 
 		/// 满足交易任务之前的一个tick
 		this->CopyTickData(stg_instrument_A_tick_last, stg_instrument_A_tick);
@@ -1838,7 +1844,10 @@ void Strategy::Order_Algorithm_One() {
 	/// 价差卖开(f)
 	else if ((this->sell_open_on_off) && 
 		((this->stg_position_a_buy + this->stg_position_a_sell + this->stg_pending_a_open) < this->stg_lots) &&
-		(this->stg_spread_long >= (this->stg_sell_open + this->stg_spread_shift * this->stg_a_price_tick))) {
+		(this->stg_spread_long >= (this->stg_sell_open + this->stg_spread_shift * this->stg_a_price_tick)) &&
+		(!this->stg_select_order_algorithm_flag)) {
+
+		this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One() 价差卖开", true); // 开启下单锁
 		
 		//this->stg_trade_tasking = true;
 		this->printStrategyInfo("价差卖开");
@@ -1883,13 +1892,13 @@ void Strategy::Order_Algorithm_One() {
 		//	//<< ", 本次结算价格:" << stg_instrument_A_tick->SettlementPrice
 		//	<< ", 成交金额:" << stg_instrument_A_tick->Turnover << endl;
 
-		if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) || this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick)) {
+		/*if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) || this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick)) {
 			std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
 			std::cout << "\t CompareTickData相同!" << std::endl;
 			std::cout << "\tthis->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) = " << this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) << std::endl;
 			std::cout << "\tthis->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick) = " << this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick) << std::endl;
 			return;
-		}
+			}*/
 
 		/// 满足交易任务之前的tick
 		this->CopyTickData(stg_instrument_A_tick_last, stg_instrument_A_tick);
@@ -1977,7 +1986,10 @@ void Strategy::Order_Algorithm_One() {
 	/// 价差买开
 	else if ((this->buy_open_on_off) &&
 		((this->stg_position_a_buy + this->stg_position_a_sell + this->stg_pending_a_open) < this->stg_lots) &&
-		((this->stg_spread_short <= (this->stg_buy_open - this->stg_spread_shift * this->stg_a_price_tick)))) {
+		((this->stg_spread_short <= (this->stg_buy_open - this->stg_spread_shift * this->stg_a_price_tick))) &&
+		(!this->stg_select_order_algorithm_flag)) {
+
+		this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One() 价差买开", true); // 开启下单锁
 
 		//this->stg_trade_tasking = true;
 		this->printStrategyInfo("价差买开");
@@ -1996,13 +2008,13 @@ void Strategy::Order_Algorithm_One() {
 			<< "spread short = " << this->stg_spread_short << ", "
 			<< "spread short volume = " << this->stg_spread_short_volume << endl;*/
 
-		if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) || this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick)) {
+		/*if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) || this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick)) {
 			std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
 			std::cout << "\t CompareTickData相同!" << std::endl;
 			std::cout << "\tthis->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) = " << this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) << std::endl;
 			std::cout << "\tthis->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick) = " << this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick) << std::endl;
 			return;
-		}
+		}*/
 
 		/// 满足交易任务之前的tick
 		this->CopyTickData(stg_instrument_A_tick_last, stg_instrument_A_tick);
