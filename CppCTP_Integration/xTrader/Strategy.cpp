@@ -954,7 +954,7 @@ void Strategy::update_tick_lock_status(USER_CThostFtdcOrderField *pOrder) {
 		flag = true;
 	}
 
-
+	std::cout << "\t tick flag = " << flag << std::endl;
 	this->setStgSelectOrderAlgorithmFlag(flag); // tick锁
 }
 
