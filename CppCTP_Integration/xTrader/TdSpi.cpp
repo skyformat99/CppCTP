@@ -2183,7 +2183,7 @@ void TdSpi::OrderAction(char *ExchangeID, char *OrderRef, char *OrderSysID) {
 //撤单错误响应
 void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspOrderAction");
-	if (!(this->IsErrorRspInfo(pRspInfo))) {
+	if ((this->IsErrorRspInfo(pRspInfo))) {
 		if (pInputOrderAction) {
 			this->current_user->DB_OnRspOrderAction(this->current_user->GetOrderConn(), pInputOrderAction);
 			list<Strategy *>::iterator itor;
@@ -2197,7 +2197,7 @@ void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction,
 //撤单错误
 void TdSpi::OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction, CThostFtdcRspInfoField *pRspInfo) {
 	USER_PRINT("TdSpi::OnErrRtnOrderAction");
-	if (!(this->IsErrorRspInfo(pRspInfo))) {
+	if ((this->IsErrorRspInfo(pRspInfo))) {
 		if (pOrderAction) {
 			this->current_user->DB_OnErrRtnOrderAction(this->current_user->GetOrderConn(), pOrderAction);
 			list<Strategy *>::iterator itor;

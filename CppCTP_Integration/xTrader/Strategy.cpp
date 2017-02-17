@@ -1379,6 +1379,8 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		{
 			
 			std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
+			std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
+			std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
 			std::cout << "\ttick锁已上锁 stg_select_order_algorithm_flag = " << this->stg_select_order_algorithm_flag << ")" << std::endl;
 			std::cout << "\t上一个tick系统时间 = " << this->stg_tick_systime_record << std::endl;
 			std::cout << "\t新tick系统时间 = " << new_time << std::endl;
