@@ -2320,7 +2320,7 @@ bool CTP_Manager::init(bool is_online) {
 			}
 		}
 		/// 遍历设值后进行TD初始化
-		this->CreateAccount((*user_itor), this->l_strategys);
+		this->CreateAccount((*user_itor), (*user_itor)->getListStrategy());
 		std::cout << "账户 : " << (*user_itor)->getUserID() << " 初始化完成!" << std::endl;
 		sleep(3);
 	}
