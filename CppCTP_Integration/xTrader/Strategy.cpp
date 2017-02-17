@@ -882,11 +882,14 @@ void Strategy::update_task_status() {
 	std::cout << "Strategy::update_task_status() B昨买 = " << stg_position_b_buy_yesterday << std::endl;*/
 
 	std::cout << "Strategy::update_task_status():" << std::endl;
+	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
+	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
 	std::cout << "\t(this->stg_position_a_buy_today == this->stg_position_b_sell_today)(" << this->stg_position_a_buy_today << ", " << this->stg_position_b_sell_today << ")" << std::endl;
 	std::cout << "\t(this->stg_position_a_buy_yesterday == this->stg_position_b_sell_yesterday)(" << this->stg_position_a_buy_yesterday << ", " << this->stg_position_b_sell_yesterday << ")" << std::endl;
 	std::cout << "\t(this->stg_position_a_sell_today == this->stg_position_b_buy_today)(" << this->stg_position_a_sell_today << ", " << this->stg_position_b_buy_today << ")" << std::endl;
 	std::cout << "\t(this->stg_position_a_sell_yesterday == this->stg_position_b_buy_yesterday)(" << this->stg_position_a_sell_yesterday << ", " << this->stg_position_b_buy_yesterday << ")" << std::endl;
 	std::cout << "\t(this->stg_list_order_pending->size() == 0)(" << this->stg_list_order_pending->size() << ", " << 0 << ")" << std::endl;
+	
 	
 
 	if ((this->stg_position_a_buy_today == this->stg_position_b_sell_today)
@@ -918,47 +921,62 @@ void Strategy::update_task_status() {
 	std::cout << "\t任务执行状态 = " << this->stg_trade_tasking << std::endl;
 	//update_status_mtx.unlock();
 	USER_PRINT(this->stg_trade_tasking);
+
+	/************************************************************************/
+	/* 任务执行中的时候，tick可以解锁                                                                     */
+	/************************************************************************/
+	if (this->stg_trade_tasking) {
+		this->setStgSelectOrderAlgorithmFlag("Strategy::update_task_status()", false);
+	}
+
 }
 
 /// 更新tick锁
 void Strategy::update_tick_lock_status(USER_CThostFtdcOrderField *pOrder) {
 	std::cout << "Strategy::update_tick_lock_status():" << std::endl;
+	bool flag; // tick锁标志位
+	if (strlen(pOrder->OrderSysID) != 0) { //收到交易所回报
+		
 
-	bool flag = false; // 默认关闭tick锁
+		if (pOrder->OrderStatus == '0') { // 全部成交
+			flag = false; // 释放锁
+		}
+		else if (pOrder->OrderStatus == '1') { // 部分成交还在队列中
+			flag = false; // 释放锁
+		}
+		else if (pOrder->OrderStatus == '2') { // 部分成交不在队列中
+			flag = false; // 释放锁
+		}
+		else if (pOrder->OrderStatus == '3') { // 未成交还在队列中
+			flag = false; // 释放锁
+		}
+		else if (pOrder->OrderStatus == '4') { // 未成交不在队列中
+			flag = false; // 释放锁
+		}
+		else if (pOrder->OrderStatus == '5') { // 撤单
+			flag = false; // 释放锁
+		}
+		else if (pOrder->OrderStatus == 'a') { // 未知
+			//flag = true;
+			flag = false; // 释放锁
+		}
+		else if (pOrder->OrderStatus == 'b') { // 尚未触发
+			flag = false; // 释放锁
+		}
+		else if (pOrder->OrderStatus == 'c') { // 已触发
+			flag = false; // 释放锁
+		}
+		else {
+			// 当报单状态不在以上之中,依然打开锁
+			flag = true;
+		}
 
-	if (pOrder->OrderStatus == '0') { // 全部成交
-	}
-	else if (pOrder->OrderStatus == '1') { // 部分成交还在队列中
-
-	}
-	else if (pOrder->OrderStatus == '2') { // 部分成交不在队列中
-
-	}
-	else if (pOrder->OrderStatus == '3') { // 未成交还在队列中
-	
-	}
-	else if (pOrder->OrderStatus == '4') { // 未成交不在队列中
-
-	}
-	else if (pOrder->OrderStatus == '5') { // 撤单
-	
-	}
-	else if (pOrder->OrderStatus == 'a') { // 未知
-	
-	}
-	else if (pOrder->OrderStatus == 'b') { // 尚未触发
-
-	}
-	else if (pOrder->OrderStatus == 'c') { // 已触发
-
+		std::cout << "\t tick flag = " << flag << std::endl;
+		this->setStgSelectOrderAlgorithmFlag("Strategy::update_tick_lock_status()", flag); // tick锁
 	}
 	else {
-		// 当报单状态不在以上之中,依然打开锁
-		flag = true;
-	}
 
-	std::cout << "\t tick flag = " << flag << std::endl;
-	this->setStgSelectOrderAlgorithmFlag("Strategy::update_tick_lock_status()", flag); // tick锁
+	}
 }
 
 /// 交易模型
@@ -1902,21 +1920,23 @@ void Strategy::Order_Algorithm_One() {
 		((this->stg_position_a_buy + this->stg_position_a_sell + this->stg_pending_a_open) < this->stg_lots) &&
 		(this->stg_spread_long >= (this->stg_sell_open + this->stg_spread_shift * this->stg_a_price_tick)) &&
 		(!this->stg_select_order_algorithm_flag)) {
+		std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
+		std::cout << "\tthis->stg_select_order_algorithm_flag before set = " << this->stg_select_order_algorithm_flag << std::endl;
 
 		this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One() 价差卖开", true); // 开启下单锁
 		
 		//this->stg_trade_tasking = true;
-		this->printStrategyInfo("价差卖开");
+		//this->printStrategyInfo("价差卖开");
 		//this->update_task_status();
 
 		/** 市场多头价差大于触发参数
 		A合约买持仓加B合约买小于总仓位**/
 
 		//std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差卖开" << endl;
-		std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
-		std::cout << "\t策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差卖开" << endl;
 		
-		/*std::cout << "user_id = " << this->stg_user_id << ", "
+		//std::cout << "\t策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差卖开" << endl;
+		
+		std::cout << "user_id = " << this->stg_user_id << ", "
 			<< "strategy_id = " << this->stg_strategy_id << ", "
 			<< "instrument_A = " << this->stg_instrument_id_A << ", "
 			<< "instrument_B = " << this->stg_instrument_id_B << ", "
@@ -1927,7 +1947,7 @@ void Strategy::Order_Algorithm_One() {
 			<< "stg_lots_batch = " << this->stg_lots_batch << ", "
 			<< "stg_position_a_buy = " << this->stg_position_a_buy << ", "
 			<< "stg_position_a_sell = " << this->stg_position_a_sell << ", "
-			<< "stg_lots = " << this->stg_lots << endl;*/
+			<< "stg_lots = " << this->stg_lots << endl;
 
 		//cout << "\t交易日:" << stg_instrument_A_tick->TradingDay 
 		//	<< ", 合约代码:" << stg_instrument_A_tick->InstrumentID 
@@ -2249,7 +2269,7 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	this->update_task_status();
 
 	// 更新tick锁
-	this->update_tick_lock_status(order_new);
+	//this->update_tick_lock_status(order_new);
 
 	delete order_new;
 	delete order_new_tmp;
@@ -2470,146 +2490,11 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 	USER_PRINT(this->stg_list_order_pending->size());
 	USER_PRINT(pOrder->OrderSysID);
 
-	/************************************************************************/
-	/* 
-		order中的字段OrderStatus
-		 0 全部成交
-		 1 部分成交，订单还在交易所撮合队列中
-		 3 未成交，订单还在交易所撮合队列中
-		 5 已撤销
-		 a 未知 - 订单已提交交易所，未从交易所收到确认信息
-		                                                                     */
-	/************************************************************************/
-
-	//if (strlen(pOrder->OrderSysID) != 0) {
-	//	//如果list为空,直接添加到挂单列表里
-	//	if (this->stg_list_order_pending->size() == 0) {
-	//		USER_PRINT("this->stg_list_order_pending->size() == 0");
-	//		// 深复制对象
-	//		CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
-	//		memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
-	//		this->CopyOrderData(pOrder_tmp, pOrder);
-
-	//		this->stg_list_order_pending->push_back(pOrder_tmp);
-	//		return;
-	//	} else {
-	//		USER_PRINT("this->stg_list_order_pending->size() > 0");
-	//		/// 挂单列表不为空时
-	//		list<CThostFtdcOrderField *>::iterator Itor;
-	//		for (Itor = this->stg_list_order_pending->begin(); Itor != this->stg_list_order_pending->end();) {
-	//			USER_PRINT((*Itor)->OrderRef);
-	//			USER_PRINT(pOrder->OrderRef);
-	//			if (!strcmp((*Itor)->OrderRef, pOrder->OrderRef)) { // 先前已经有orderref存在挂单编号里
-	//				if (pOrder->OrderStatus == '0') { // 全部成交
-
-	//					USER_PRINT("全部成交");
-	//					delete (*Itor);
-	//					Itor = this->stg_list_order_pending->erase(Itor); //移除
-
-	//				} else if (pOrder->OrderStatus == '1') { // 部分成交还在队列中
-
-	//					USER_PRINT("部分成交还在队列中");
-
-	//					// 深复制对象
-	//					/*CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
-	//					memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
-	//					this->CopyOrderData(pOrder_tmp, pOrder);
-
-	//					*Itor = pOrder_tmp;*/
-	//					this->CopyOrderData(*Itor, pOrder);
-
-
-	//				} else if (pOrder->OrderStatus == '2') { // 部分成交不在队列中
-
-	//					USER_PRINT("部分成交不在队列中");
-
-	//				} else if (pOrder->OrderStatus == '3') { // 未成交还在队列中
-
-	//					USER_PRINT("未成交还在队列中");
-	//					// 深复制对象
-	//					/*CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
-	//					memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
-	//					this->CopyOrderData(pOrder_tmp, pOrder);
-
-	//					*Itor = pOrder_tmp;*/
-
-	//					this->CopyOrderData(*Itor, pOrder);
-
-	//				} else if (pOrder->OrderStatus == '4') { // 未成交不在队列中
-
-	//					USER_PRINT("未成交不在队列中");
-
-
-	//				} else if (pOrder->OrderStatus == '5') { // 撤单
-
-	//					USER_PRINT("撤单");
-	//					delete (*Itor);
-	//					Itor = this->stg_list_order_pending->erase(Itor); //移除
-
-	//				} else if (pOrder->OrderStatus == 'a') { // 未知
-
-	//					USER_PRINT("未知");
-
-	//				} else if (pOrder->OrderStatus == 'b') { // 尚未触发
-
-	//					USER_PRINT("尚未触发");
-
-	//				} else if (pOrder->OrderStatus == 'c') { // 已触发
-
-	//					USER_PRINT("已触发");
-
-	//				}
-
-	//			} else {	// 没有orderref存在挂单编号里,第一次
-	//				if (pOrder->OrderStatus == '0') { // 全部成交
-
-	//				}
-	//				else if (pOrder->OrderStatus == '1') { // 部分成交还在队列中
-	//					USER_PRINT("没有orderref存在挂单列表,部分成交还在队列中");
-	//					// 深复制对象
-	//					CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
-	//					memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
-	//					this->CopyOrderData(pOrder_tmp, pOrder);
-
-	//					this->stg_list_order_pending->push_back(pOrder_tmp);
-	//				}
-	//				else if (pOrder->OrderStatus == '2') { // 部分成交不在队列中
-
-	//				}
-	//				else if (pOrder->OrderStatus == '3') { // 未成交还在队列中
-	//					USER_PRINT("没有orderref存在挂单列表,未成交还在队列中");
-	//					// 深复制对象
-	//					CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
-	//					memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
-	//					this->CopyOrderData(pOrder_tmp, pOrder);
-
-	//					this->stg_list_order_pending->push_back(pOrder_tmp);
-	//				}
-	//				else if (pOrder->OrderStatus == '4') { // 未成交不在队列中
-
-	//				}
-	//				else if (pOrder->OrderStatus == '5') { // 撤单
-
-	//				}
-	//				else if (pOrder->OrderStatus == 'a') { // 未知
-
-	//				}
-	//				else if (pOrder->OrderStatus == 'b') { // 尚未触发
-
-	//				}
-	//				else if (pOrder->OrderStatus == 'c') { // 已触发
-
-	//				}
-	//			}
-	//			Itor++;
-	//		}
-	//	}
-	//}
-
 	USER_PRINT(pOrder->OrderStatus);
 
 	std::cout << "Strategy::update_pending_order_list()" << std::endl;
 	std::cout << "\t Begin:this->stg_pending_a_open = " << this->stg_pending_a_open << std::endl;
+
 
 
 	if (strlen(pOrder->OrderSysID) != 0) { // 如果报单编号不为空，为交易所返回
@@ -2699,6 +2584,16 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 
 		//std::cout << "Strategy::update_pending_order_list()" << std::endl;
 		std::cout << "\tEnd:this->stg_pending_a_open = " << this->stg_pending_a_open << std::endl;
+	}
+	else { // 报单编号长度为0, CTP 直接返回的错误或者还未发到交易所
+		/************************************************************************/
+		/* 1：错误发单情况已处理tick解锁
+			详细参考：Strategy::Exec_OnRspOrderInsert()， Strategy::Exec_OnErrRtnOrderInsert()
+		*/
+		/************************************************************************/
+		/************************************************************************/
+		/* 2：报单发往交易所未收到回报                                                                     */
+		/************************************************************************/
 	}
 }
 
@@ -2870,7 +2765,7 @@ void Strategy::update_position(USER_CThostFtdcOrderField *pOrder) {
 	//std::cout << "B合约昨买 = " << this->stg_position_b_buy_yesterday << std::endl;
 
 	std::cout << "Strategy::update_position():" << std::endl;
-	std::cout << "\tA买(" << this->stg_position_a_sell << ", " << this->stg_position_a_sell_yesterday << ")" << std::endl;
+	std::cout << "\tA卖(" << this->stg_position_a_sell << ", " << this->stg_position_a_sell_yesterday << ")" << std::endl;
 	std::cout << "\tB买(" << this->stg_position_b_buy << ", " << this->stg_position_b_buy_yesterday << ")" << std::endl;
 	std::cout << "\tA买(" << this->stg_position_a_buy << ", " << this->stg_position_a_buy_yesterday << ")" << std::endl;
 	std::cout << "\tB卖(" << this->stg_position_b_sell << ", " << this->stg_position_b_sell_yesterday << ")" << std::endl;
