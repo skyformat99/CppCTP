@@ -2319,7 +2319,7 @@ bool CTP_Manager::init(bool is_online) {
 				//(*stg_itor)->setStgTradingDay((*user_itor)->getTradingDay()); // 更新时间
 			}
 		}
-		/// 遍历设值后进行TD初始化
+		/// 遍历设值后进行TD初始化，初始化绑定对应的策略列表
 		this->CreateAccount((*user_itor), (*user_itor)->getListStrategy());
 		std::cout << "账户 : " << (*user_itor)->getUserID() << " 初始化完成!" << std::endl;
 		sleep(3);
