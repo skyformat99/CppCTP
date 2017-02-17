@@ -2765,6 +2765,8 @@ void Strategy::update_position(USER_CThostFtdcOrderField *pOrder) {
 	//std::cout << "B合约昨买 = " << this->stg_position_b_buy_yesterday << std::endl;
 
 	std::cout << "Strategy::update_position():" << std::endl;
+	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
+	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
 	std::cout << "\tA卖(" << this->stg_position_a_sell << ", " << this->stg_position_a_sell_yesterday << ")" << std::endl;
 	std::cout << "\tB买(" << this->stg_position_b_buy << ", " << this->stg_position_b_buy_yesterday << ")" << std::endl;
 	std::cout << "\tA买(" << this->stg_position_a_buy << ", " << this->stg_position_a_buy_yesterday << ")" << std::endl;
