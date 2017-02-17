@@ -472,7 +472,7 @@ void DBManager::SearchFutrueListByTraderID(string traderid, list<FutureAccount *
 	}
 
 	unique_ptr<DBClientCursor> cursor =
-		this->conn->query(DB_FUTUREACCOUNT_COLLECTION, MONGO_QUERY("traderid" << traderid));
+		this->conn->query(DB_FUTUREACCOUNT_COLLECTION, MONGO_QUERY("traderid" << traderid << "isactive" << ISACTIVE));
 	while (cursor->more()) {
 		BSONObj p = cursor->next();
 		FutureAccount *fa = new FutureAccount();
