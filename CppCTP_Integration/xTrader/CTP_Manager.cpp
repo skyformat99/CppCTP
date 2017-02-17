@@ -80,7 +80,10 @@ User * CTP_Manager::CreateAccount(User *user, list<Strategy *> *l_strategys) {
 		}
 
 		sleep(1);
-		std::cout << "CTP_Manager.cpp user address" << user << endl;
+		std::cout << "CTP_Manager::CreateAccount()" << std::endl;
+		std::cout << "\t期货账户 = " << user->getUserID() << endl;
+		std::cout << "\tBrokerID = " << user->getBrokerID() << endl;
+		std::cout << "\t期货密码 = " << user->getPassword() << endl;
 		user->getUserTradeSPI()->Connect(user); // 连接
 		sleep(1);
 		user->getUserTradeSPI()->Login(user); // 登陆

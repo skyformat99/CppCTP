@@ -288,7 +288,8 @@ int main(int argc, char *argv[]) {
 	// 多线程定时器
 	Timer tHello([]()
 	{
-		cout << "Timer!!!" << endl;
+		std::cout << "main()" << std::endl;
+		std::cout << "\t系统定时器tick" << std::endl;
 	});
 
 	tHello.setSingleShot(false);

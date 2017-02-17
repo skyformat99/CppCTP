@@ -1919,7 +1919,7 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 		///报单价格条件
 		std::cout << "\t||报单价格条件:" << pOrder->OrderPriceType << ", ";
 		///买卖方向
-		std::cout << "\t买卖方向:" << pOrder->Direction << ", ";
+		std::cout << "\t\t\t买卖方向:" << pOrder->Direction << ", ";
 		///组合开平标志
 		std::cout << "\t组合开平标志:" << pOrder->CombOffsetFlag << ", ";
 		///组合投机套保标志
@@ -1967,11 +1967,11 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 		///报单提示序号
 		//std::cout << "\t报单提示序号:" << pOrder->NotifySequence << endl;
 		///交易日
-		std::cout << "\t||交易日:" << pOrder->TradingDay << ", ";
+		std::cout << "\t\t\t交易日:" << pOrder->TradingDay << ", ";
 		///结算编号
 		//std::cout << "\t结算编号:" << pOrder->SettlementID << ", ";
 		///报单编号
-		std::cout << "\t报单编号:" << pOrder->OrderSysID << ", ";
+		std::cout << "\t\t报单编号:" << pOrder->OrderSysID << ", ";
 		/////报单来源
 		//std::cout << "\t报单来源:" << pOrder->OrderSource << ", ";
 		/////报单状态
@@ -2186,9 +2186,23 @@ void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction,
 	if ((this->IsErrorRspInfo(pRspInfo))) {
 		if (pInputOrderAction) {
 			this->current_user->DB_OnRspOrderAction(this->current_user->GetOrderConn(), pInputOrderAction);
-			list<Strategy *>::iterator itor;
-			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
-				(*itor)->OnRspOrderAction(pInputOrderAction);
+
+			string temp(pInputOrderAction->OrderRef);
+			string result = temp.substr(0, 1);
+			int len_order_ref = temp.length();
+			string strategyid = temp.substr(len_order_ref - 2, 2);
+
+			if (temp.length() == 12 && result == "1") { // 通过本交易系统发出去的order长度12,首位字符为1
+				//this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pInputOrderAction);
+				//delete[] codeDst;
+
+				list<Strategy *>::iterator itor;
+				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+					if ((*itor)->getStgStrategyId() == strategyid) {
+						(*itor)->OnRspOrderAction(pInputOrderAction);
+						//break;
+					}
+				}
 			}
 		}
 	}
@@ -2200,9 +2214,24 @@ void TdSpi::OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction, CThost
 	if ((this->IsErrorRspInfo(pRspInfo))) {
 		if (pOrderAction) {
 			this->current_user->DB_OnErrRtnOrderAction(this->current_user->GetOrderConn(), pOrderAction);
-			list<Strategy *>::iterator itor;
-			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
-				(*itor)->OnErrRtnOrderAction(pOrderAction);
+
+
+			string temp(pOrderAction->OrderRef);
+			string result = temp.substr(0, 1);
+			int len_order_ref = temp.length();
+			string strategyid = temp.substr(len_order_ref - 2, 2);
+
+			if (temp.length() == 12 && result == "1") { // 通过本交易系统发出去的order长度12,首位字符为1
+				//this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pInputOrderAction);
+				//delete[] codeDst;
+
+				list<Strategy *>::iterator itor;
+				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+					if ((*itor)->getStgStrategyId() == strategyid) {
+						(*itor)->OnErrRtnOrderAction(pOrderAction);
+						//break;
+					}
+				}
 			}
 		}
 	}

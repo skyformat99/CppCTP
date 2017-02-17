@@ -2495,7 +2495,9 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 	USER_PRINT(pOrder->OrderStatus);
 
 	std::cout << "Strategy::update_pending_order_list()" << std::endl;
-	std::cout << "\t Begin:this->stg_pending_a_open = " << this->stg_pending_a_open << std::endl;
+	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
+	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
+	std::cout << "\tBegin:this->stg_pending_a_open = " << this->stg_pending_a_open << std::endl;
 
 
 
@@ -3065,30 +3067,6 @@ void Strategy::add_VolumeTradedBatch(CThostFtdcOrderField *pOrder, USER_CThostFt
 	this->CopyOrderDataToNew(new_Order, pOrder);
 	USER_PRINT(new_Order->OrderStatus);
 
-	//if (new_Order->OrderStatus == '1' || new_Order->OrderStatus == '0') { // 全部成交或者部分成交还在队列中
-	//	USER_PRINT(new_Order->VolumeTotalOriginal);
-	//	if (new_Order->VolumeTotalOriginal == 1) {
-	//		new_Order->VolumeTradedBatch = 1;
-	//	}
-	//	else {
-	//		/// 遍历挂单列表
-	//		list<CThostFtdcOrderField *>::iterator Itor;
-	//		for (Itor = this->stg_list_order_pending->begin(); Itor != this->stg_list_order_pending->end(); Itor++) {
-	//			USER_PRINT((*Itor)->OrderRef);
-	//			USER_PRINT(new_Order->OrderRef);
-	//			if (!strcmp((*Itor)->OrderRef, new_Order->OrderRef)) {
-	//				new_Order->VolumeTradedBatch = new_Order->VolumeTraded - (*Itor)->VolumeTraded;
-	//				break;
-	//			}
-	//		}
-	//	}
-	//}
-	//else
-	//{
-	//	new_Order->VolumeTradedBatch = 0;
-	//}
-
-
 	if (new_Order->OrderStatus == '0') { // 全部成交
 		new_Order->VolumeTradedBatch = new_Order->VolumeTotalOriginal;
 		
@@ -3118,8 +3096,10 @@ void Strategy::add_VolumeTradedBatch(CThostFtdcOrderField *pOrder, USER_CThostFt
 	{
 		new_Order->VolumeTradedBatch = 0;
 	}
-
-	std::cout << "Strategy::add_VolumeTradedBatch() 合约 = " << new_Order->InstrumentID << ", 买卖 = " << new_Order->Direction << ", 开平 = " << new_Order->CombOffsetFlag[0] << ", 本次成交量 = " << new_Order->VolumeTradedBatch << ", 报单引用 = " << new_Order->OrderRef << std::endl;
+	std::cout << "Strategy::add_VolumeTradedBatch()" << std::endl;
+	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
+	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
+	std::cout << "\t合约 = " << new_Order->InstrumentID << ", 买卖 = " << new_Order->Direction << ", 开平 = " << new_Order->CombOffsetFlag[0] << ", 本次成交量 = " << new_Order->VolumeTradedBatch << ", 报单引用 = " << new_Order->OrderRef << std::endl;
 	USER_PRINT(new_Order->VolumeTradedBatch);
 }
 
@@ -3665,7 +3645,7 @@ void Strategy::setStgSelectOrderAlgorithmFlag(string msg, bool stg_select_order_
 	time_t tt = system_clock::to_time_t(system_clock::now());
 	std::string nowt(std::ctime(&tt));
 	std::cout << "Strategy::setStgSelectOrderAlgorithmFlag():" << std::endl;
-	std::cout << "\tmsg = " << msg << std::endl;
+	std::cout << "\t调用者 = " << msg << std::endl;
 	//std::cout << "====策略状态信息====" << std::endl;
 	std::cout << "\t时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
 	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
