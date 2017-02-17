@@ -2,5 +2,6 @@ push.bat
 push.sh
 FutureTools/Pycharm/Gather/.idea/*
 FutureTools/Pycharm/Gather/gui/.idea/*
-CppCTP_Integration/xTrader/conn/*
+CppCTP_Integration/xTrader/conn/md/*
+CppCTP_Integration/xTrader/conn/td/*
 CppCTP_Integration/xTrader/CMakeFiles/*
