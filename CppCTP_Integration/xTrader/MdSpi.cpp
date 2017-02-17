@@ -369,39 +369,47 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
 	std::cout << "\t this->l_strategys->size() = " << this->l_strategys->size() << std::endl;*/
 	//int count = 0;
 
-	if (!strcmp(this->last_tick_data->InstrumentID, pDepthMarketData->InstrumentID) &&
-		!strcmp(this->last_tick_data->UpdateTime, pDepthMarketData->UpdateTime) &&
-		(this->last_tick_data->UpdateMillisec == pDepthMarketData->UpdateMillisec)) {
-		std::cout << "MdSpi::OnRtnDepthMarketData() 重复tick推送" << std::endl;
-		cout << "\t交易日:" << pDepthMarketData->TradingDay
-			<< ", 合约代码:" << pDepthMarketData->InstrumentID
-			<< ", 最新价:" << pDepthMarketData->LastPrice
-			<< ", 持仓量:" << pDepthMarketData->OpenInterest
-			//<< ", 上次结算价:" << pDepthMarketData->PreSettlementPrice 
-			//<< ", 昨收盘:" << pDepthMarketData->PreClosePrice 
-			<< ", 数量:" << pDepthMarketData->Volume
-			//<< ", 昨持仓量:" << pDepthMarketData->PreOpenInterest
-			<< ", 最后修改时间:" << pDepthMarketData->UpdateTime
-			<< ", 最后修改毫秒:" << pDepthMarketData->UpdateMillisec
-			<< ", 申买价一：" << pDepthMarketData->BidPrice1
-			<< ", 申买量一:" << pDepthMarketData->BidVolume1
-			<< ", 申卖价一:" << pDepthMarketData->AskPrice1
-			<< ", 申卖量一:" << pDepthMarketData->AskVolume1
-			//<< ", 今收盘价:" << pDepthMarketData->ClosePrice
-			//<< ", 当日均价:" << pDepthMarketData->AveragePrice
-			//<< ", 本次结算价格:" << pDepthMarketData->SettlementPrice
-			<< ", 成交金额:" << pDepthMarketData->Turnover << endl;
-		return;
+	//if (!strcmp(this->last_tick_data->InstrumentID, pDepthMarketData->InstrumentID) &&
+	//	!strcmp(this->last_tick_data->UpdateTime, pDepthMarketData->UpdateTime) &&
+	//	(this->last_tick_data->UpdateMillisec == pDepthMarketData->UpdateMillisec)) {
+	//	std::cout << "MdSpi::OnRtnDepthMarketData() 重复tick推送" << std::endl;
+	//	cout << "\t交易日:" << pDepthMarketData->TradingDay
+	//		<< ", 合约代码:" << pDepthMarketData->InstrumentID
+	//		<< ", 最新价:" << pDepthMarketData->LastPrice
+	//		<< ", 持仓量:" << pDepthMarketData->OpenInterest
+	//		//<< ", 上次结算价:" << pDepthMarketData->PreSettlementPrice 
+	//		//<< ", 昨收盘:" << pDepthMarketData->PreClosePrice 
+	//		<< ", 数量:" << pDepthMarketData->Volume
+	//		//<< ", 昨持仓量:" << pDepthMarketData->PreOpenInterest
+	//		<< ", 最后修改时间:" << pDepthMarketData->UpdateTime
+	//		<< ", 最后修改毫秒:" << pDepthMarketData->UpdateMillisec
+	//		<< ", 申买价一：" << pDepthMarketData->BidPrice1
+	//		<< ", 申买量一:" << pDepthMarketData->BidVolume1
+	//		<< ", 申卖价一:" << pDepthMarketData->AskPrice1
+	//		<< ", 申卖量一:" << pDepthMarketData->AskVolume1
+	//		//<< ", 今收盘价:" << pDepthMarketData->ClosePrice
+	//		//<< ", 当日均价:" << pDepthMarketData->AveragePrice
+	//		//<< ", 本次结算价格:" << pDepthMarketData->SettlementPrice
+	//		<< ", 成交金额:" << pDepthMarketData->Turnover << endl;
+	//	return;
+	//}
+	//else {
+	//	this->CopyTickData(this->last_tick_data, pDepthMarketData);
+	//	list<Strategy *>::iterator itor;
+	//	for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+	//		USER_PRINT(((*itor)));
+	//		//std::cout << "\tcount = " << count++ << std::endl;
+	//		(*itor)->OnRtnDepthMarketData(pDepthMarketData);
+	//	}
+	//}
+
+	list<Strategy *>::iterator itor;
+	for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+		USER_PRINT(((*itor)));
+		//std::cout << "\tcount = " << count++ << std::endl;
+		(*itor)->OnRtnDepthMarketData(pDepthMarketData);
 	}
-	else {
-		this->CopyTickData(this->last_tick_data, pDepthMarketData);
-		list<Strategy *>::iterator itor;
-		for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
-			USER_PRINT(((*itor)));
-			//std::cout << "\tcount = " << count++ << std::endl;
-			(*itor)->OnRtnDepthMarketData(pDepthMarketData);
-		}
-	}
+
 	//cout << "===========================================" << endl;
 	USER_PRINT("MdSpi::OnRtnDepthMarketData OUT");
 }
