@@ -1,12 +1,19 @@
 ﻿#include <algorithm>
 #include <sstream>
+#include <mongo/bson/bson.h>
 #include <mutex>
 #include "Strategy.h"
 #include "Utils.h"
+using mongo::BSONArray;
+using mongo::BSONArrayBuilder;
+using mongo::BSONObj;
+using mongo::BSONObjBuilder;
+using mongo::BSONElement;
+using mongo::ConnectException;
 
-std::mutex tick_mtx; // locks access to counter
-std::mutex update_status_mtx; // locks access to counter
-std::mutex select_order_algorithm_mtx; // locks access to counter
+//std::mutex tick_mtx; // locks access to counter
+//std::mutex update_status_mtx; // locks access to counter
+//std::mutex select_order_algorithm_mtx; // locks access to counter
 
 Strategy::Strategy(User *stg_user) {
 
@@ -24,6 +31,7 @@ Strategy::Strategy(User *stg_user) {
 	this->stg_select_order_algorithm_flag = false; //默认允许选择下单算法锁为false，可以选择
 	this->stg_lock_order_ref = "";
 	this->stg_tick_systime_record = "";		// 系统接收tick的时间
+	this->stg_save_strategy_conn = DBManager::getDBConnection();
 
 	this->stg_user = stg_user;					// 默认用户为空
 
@@ -823,6 +831,127 @@ void Strategy::CopyTradeData(CThostFtdcTradeField *dst, CThostFtdcTradeField *sr
 
 	///成交来源
 	dst->TradeSource = src->TradeSource;
+}
+
+/// 收盘保存数据
+void Strategy::DropPositionDetail() {
+	this->stg_save_strategy_conn->dropCollection("CTP.positiondetail");
+}
+
+/// 更新策略
+void Strategy::UpdateStrategy(Strategy *stg) {
+	int count_number = 0;
+
+	std::cout << "Strategy::UpdateStrategy()" << std::endl;
+
+
+	count_number = this->stg_save_strategy_conn->count("CTP.strategy",
+		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
+
+	std::cout << "\t查找到 " << count_number << " 条记录" << std::endl;
+
+	if (count_number > 0) {
+		this->stg_save_strategy_conn->update("CTP.strategy", BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true), BSON("$set" << BSON("position_a_sell_today" << stg->getStgPositionASellToday()
+			<< "position_b_sell" << stg->getStgPositionBSell()
+			<< "spread_shift" << stg->getStgSpreadShift()
+			<< "position_b_sell_today" << stg->getStgPositionBSellToday()
+			<< "position_b_buy_today" << stg->getStgPositionBBuyToday()
+			<< "position_a_sell" << stg->getStgPositionASell()
+			<< "buy_close" << stg->getStgBuyClose()
+			<< "stop_loss" << stg->getStgStopLoss()
+			<< "position_b_buy_yesterday" << stg->getStgPositionBBuyYesterday()
+			<< "is_active" << stg->isStgIsActive()
+			<< "position_b_sell_yesterday" << stg->getStgPositionBSellYesterday()
+			<< "strategy_id" << stg->getStgStrategyId()
+			<< "position_b_buy" << stg->getStgPositionBBuy()
+			<< "lots_batch" << stg->getStgLotsBatch()
+			<< "position_a_buy" << stg->getStgPositionABuy()
+			<< "sell_open" << stg->getStgSellOpen()
+			<< "order_algorithm" << stg->getStgOrderAlgorithm()
+			<< "trader_id" << stg->getStgTraderId()
+			<< "a_order_action_limit" << stg->getStgAOrderActionTiresLimit()
+			<< "b_order_action_limit" << stg->getStgBOrderActionTiresLimit()
+			<< "sell_close" << stg->getStgSellClose()
+			<< "buy_open" << stg->getStgBuyOpen()
+
+			<< "only_close" << stg->isStgOnlyClose()
+			<< "strategy_on_off" << stg->getOn_Off()
+			<< "sell_open_on_off" << stg->getStgSellOpenOnOff()
+			<< "buy_close_on_off" << stg->getStgBuyCloseOnOff()
+			<< "sell_close_on_off" << stg->getStgSellCloseOnOff()
+			<< "buy_open_on_off" << stg->getStgBuyOpenOnOff()
+
+			<< "trade_model" << stg->getStgTradeModel()
+			<< "hold_profit" << stg->getStgHoldProfit()
+			<< "close_profit" << stg->getStgCloseProfit()
+			<< "commission" << stg->getStgCommission()
+			<< "position" << stg->getStgPosition()
+			<< "position_buy" << stg->getStgPositionBuy()
+			<< "position_sell" << stg->getStgPositionSell()
+			<< "trade_volume" << stg->getStgTradeVolume()
+			<< "amount" << stg->getStgAmount()
+			<< "average_shift" << stg->getStgAverageShift()
+
+			<< "a_limit_price_shift" << stg->getStgALimitPriceShift()
+			<< "b_limit_price_shift" << stg->getStgBLimitPriceShift()
+
+			<< "position_a_buy_yesterday" << stg->getStgPositionABuyYesterday()
+			<< "user_id" << stg->getStgUserId()
+			<< "position_a_buy_today" << stg->getStgPositionABuyToday()
+			<< "position_a_sell_yesterday" << stg->getStgPositionASellYesterday()
+			<< "lots" << stg->getStgLots()
+			<< "a_wait_price_tick" << stg->getStgAWaitPriceTick()
+			<< "b_wait_price_tick" << stg->getStgBWaitPriceTick()
+			<< "trading_day" << stg->getStgTradingDay()
+			<< "list_instrument_id" << BSON_ARRAY(stg->getStgInstrumentIdA() << stg->getStgInstrumentIdB()))));
+
+		USER_PRINT("DBManager::UpdateStrategy ok");
+	}
+	else
+	{
+		USER_PRINT("Strategy ID Not Exists!");
+	}
+}
+
+/// 创建持仓明细
+void Strategy::CreatePositionDetail(USER_CThostFtdcOrderField *posd) {
+	USER_PRINT("Strategy::CreatePositionDetail");
+
+	int posd_count_num = 0;
+
+	if (posd != NULL) {
+		posd_count_num = this->stg_save_strategy_conn->count("CTP.positiondetail",
+			BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "is_active" << ISACTIVE));
+		if (posd_count_num != 0) { //session_id存在
+			std::cout << "持仓明细已经存在了!" << std::endl;
+			return;
+		}
+		else { //posd 不存在
+			BSONObjBuilder b;
+
+			b.append("instrumentid", posd->InstrumentID);
+			b.append("orderref", posd->OrderRef);
+			b.append("userid", posd->UserID);
+			b.append("direction", posd->Direction);
+			b.append("comboffsetflag", string(1, posd->CombOffsetFlag[0]));
+			b.append("combhedgeflag", string(1, posd->CombHedgeFlag[0]));
+			b.append("limitprice", posd->LimitPrice);
+			b.append("volumetotaloriginal", posd->VolumeTotalOriginal);
+			b.append("tradingday", posd->TradingDay);
+			b.append("orderstatus", posd->OrderStatus);
+			b.append("volumetraded", posd->VolumeTraded);
+			b.append("volumetotal", posd->VolumeTotal);
+			b.append("insertdate", posd->InsertDate);
+			b.append("inserttime", posd->InsertTime);
+			b.append("strategyid", posd->StrategyID);
+			b.append("volumetradedbatch", posd->VolumeTradedBatch);
+
+			BSONObj p = b.obj();
+			this->stg_save_strategy_conn->insert("CTP.positiondetail", p);
+			USER_PRINT("DBManager::CreatePositionDetail ok");
+		}
+	}
+	USER_PRINT("Strategy::CreatePositionDetail OK");
 }
 
 /// 设置开关
@@ -3663,6 +3792,13 @@ void Strategy::setStgLockOrderRef(string stg_lock_order_ref) {
 }
 string Strategy::getStgLockOrderRef() {
 	return this->stg_lock_order_ref;
+}
+
+void Strategy::setStgSaveStrategyConn(mongo::DBClientConnection *stg_save_strategy_conn) {
+	this->stg_save_strategy_conn = stg_save_strategy_conn;
+}
+mongo::DBClientConnection * Strategy::getStgSaveStrategyConn() {
+	return this->stg_save_strategy_conn;
 }
 
 /************************************************************************/

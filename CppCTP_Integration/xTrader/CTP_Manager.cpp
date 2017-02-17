@@ -321,28 +321,58 @@ void CTP_Manager::setListStrategy(list<Strategy *> *l_strategys) {
 	this->l_strategys = l_strategys;
 }
 
-/// 保存strategy_list
+/// 收盘时保存strategy_list
 void CTP_Manager::saveStrategy() {
 	/************************************************************************/
 	/* 1:盘后保存工作
+		a:将持仓明细表全部清空(把内存里最新的持仓明细存储进去)
 		a:保存策略参数
 		b:保存持仓明细*/
 	/************************************************************************/
 	USER_PRINT("CTP_Manager::saveStrategy");
 	if (!this->isClosingSaved) {
+
 		// 删除持仓明细所有数据
 		this->dbm->DropPositionDetail();
+
 		list<Strategy *>::iterator stg_itor;
 		list<USER_CThostFtdcOrderField *>::iterator posd_itor;
 		USER_PRINT("CTP_Manager::saveStrategy");
+		std::cout << "CTP_Manager::saveStrategy()" << std::endl;
 		for (stg_itor = this->l_strategys->begin(); 
 			stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
-			this->dbm->UpdateStrategy((*stg_itor));
+			
+			
+			std::cout << "\t保存期货账户 = " << (*stg_itor)->getStgUserId() << std::endl;
+			std::cout << "\t保存策略ID = " << (*stg_itor)->getStgStrategyId() << std::endl;
+
+			//this->dbm->UpdateStrategy((*stg_itor));
+			(*stg_itor)->UpdateStrategy((*stg_itor));
+
 			// 遍历strategy持仓明细并保存
 			for (posd_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
 				posd_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end();
 				posd_itor++) {
-				this->dbm->CreatePositionDetail((*posd_itor));
+				//this->dbm->CreatePositionDetail((*posd_itor));
+				std::cout << "\t================持仓明细输出BEGIN===================" << std::endl;
+				std::cout << "\tinstrumentid = " << (*posd_itor)->InstrumentID << std::endl;
+				std::cout << "\torderref = " << (*posd_itor)->OrderRef << std::endl;
+				std::cout << "\tuserid = " << (*posd_itor)->UserID << std::endl;
+				std::cout << "\tdirection = " << (*posd_itor)->Direction << std::endl;
+				std::cout << "\tcomboffsetflag = " << string(1, (*posd_itor)->CombOffsetFlag[0]) << std::endl;
+				std::cout << "\tcombhedgeflag = " << string(1, (*posd_itor)->CombHedgeFlag[0]) << std::endl;
+				std::cout << "\tlimitprice = " << (*posd_itor)->LimitPrice << std::endl;
+				std::cout << "\tvolumetotaloriginal = " << (*posd_itor)->VolumeTotalOriginal << std::endl;
+				std::cout << "\ttradingday = " << (*posd_itor)->TradingDay << std::endl;
+				std::cout << "\torderstatus = " << (*posd_itor)->OrderStatus << std::endl;
+				std::cout << "\tvolumetraded = " << (*posd_itor)->VolumeTraded << std::endl;
+				std::cout << "\tvolumetotal = " << (*posd_itor)->VolumeTotal << std::endl;
+				std::cout << "\tinsertdate = " << (*posd_itor)->InsertDate << std::endl;
+				std::cout << "\tinserttime = " << (*posd_itor)->InsertTime << std::endl;
+				std::cout << "\tstrategyid = " << (*posd_itor)->StrategyID << std::endl;
+				std::cout << "\tvolumetradedbatch = " << (*posd_itor)->VolumeTradedBatch << std::endl;
+				std::cout << "\t================持仓明细输出 END ===================" << std::endl;
+				(*stg_itor)->CreatePositionDetail((*posd_itor));
 			}
 		}
 		this->isClosingSaved = true;

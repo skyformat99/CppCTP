@@ -235,6 +235,9 @@ public:
 	void setStgLockOrderRef(string stg_lock_order_ref);
 	string getStgLockOrderRef();
 
+	void setStgSaveStrategyConn(mongo::DBClientConnection *stg_save_strategy_conn);
+	mongo::DBClientConnection *getStgSaveStrategyConn();
+
 
 	/************************************************************************/
 	/* 交易相关的回报函数                                                      */
@@ -266,7 +269,6 @@ public:
 	//选择下单算法
 	void Select_Order_Algorithm(string stg_order_algorithm);
 
-	
 
 	//下单算法1
 	void Order_Algorithm_One();
@@ -338,7 +340,14 @@ public:
 	/// 拷贝结构体CThostFtdcTradeField
 	void CopyTradeData(CThostFtdcTradeField *dst, CThostFtdcTradeField *src);
 
-	
+	/// 收盘保存数据
+	void DropPositionDetail();
+
+	/// 更新策略
+	void UpdateStrategy(Strategy *stg);
+
+	/// 创建持仓明细
+	void CreatePositionDetail(USER_CThostFtdcOrderField *posd);
 
 	/// 设置开关
 	int getOn_Off();
@@ -432,6 +441,7 @@ private:
 	list<string> *l_instruments;
 
 	DBManager *stg_DBM;			// 数据库连接实例
+	mongo::DBClientConnection *stg_save_strategy_conn; //收盘用于保存策略的数据库连接
 	User *stg_user;				// user实例
 	string stg_trader_id;		// 交易员账户id
 	string stg_user_id;			// user_id

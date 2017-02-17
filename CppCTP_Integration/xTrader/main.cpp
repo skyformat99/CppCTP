@@ -48,6 +48,9 @@ CTP_Manager *ctp_m = NULL;
 void sig_handler(int signo) {
 	if (signo == SIGINT) {
 		printf("服务端已关闭!!!\n");
+
+
+
 		close(sockfd);
 		exit(1);
 	}
@@ -256,7 +259,7 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 
-	if (signal(SIGINT, sig_handler) == SIG_ERR) {
+	if (signal(SIGINT, sig_handler) == SIG_ERR) { // 按下crtl+c键后的处理
 		perror("signal sigint error");
 		exit(1);
 	}

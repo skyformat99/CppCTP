@@ -1911,23 +1911,23 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 		///投资者代码
 		std::cout << "\t投资者代码:" << pOrder->InvestorID << ", ";
 		///合约代码
-		std::cout << "\t合约代码:" << pOrder->InstrumentID << ", ";
+		std::cout << "\t合约代码:" << pOrder->InstrumentID << ",       ";
 		///报单引用
 		std::cout << "\t报单引用:" << pOrder->OrderRef << ", ";
 		///用户代码
 		std::cout << "\t用户代码:" << pOrder->UserID << endl;
 		///报单价格条件
-		std::cout << "\t||报单价格条件:" << pOrder->OrderPriceType << ", ";
+		std::cout << "\t||报单价格条件:" << pOrder->OrderPriceType << ",    ";
 		///买卖方向
-		std::cout << "\t\t\t买卖方向:" << pOrder->Direction << ", ";
+		std::cout << "\t\t\t买卖方向:" << pOrder->Direction << ",        ";
 		///组合开平标志
-		std::cout << "\t组合开平标志:" << pOrder->CombOffsetFlag << ", ";
+		std::cout << "\t组合开平标志:" << pOrder->CombOffsetFlag << ",        ";
 		///组合投机套保标志
-		std::cout << "\t组合投机套保标志:" << pOrder->CombHedgeFlag << ", ";
+		std::cout << "\t组合投机套保标志:" << pOrder->CombHedgeFlag << ",    ";
 		///价格
 		std::cout << "\t价格:" << pOrder->LimitPrice << endl;
 		///数量
-		std::cout << "\t||数量:" << pOrder->VolumeTotalOriginal << ", ";
+		std::cout << "\t||数量:" << pOrder->VolumeTotalOriginal << ",            ";
 		///有效期类型
 		//std::cout << "\t有效期类型:" << pOrder->TimeCondition << ", ";
 		///GTD日期
@@ -1967,7 +1967,7 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 		///报单提示序号
 		//std::cout << "\t报单提示序号:" << pOrder->NotifySequence << endl;
 		///交易日
-		std::cout << "\t\t\t交易日:" << pOrder->TradingDay << ", ";
+		std::cout << "\t\t\t交易日:" << pOrder->TradingDay << ",   ";
 		///结算编号
 		//std::cout << "\t结算编号:" << pOrder->SettlementID << ", ";
 		///报单编号
