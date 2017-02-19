@@ -12,6 +12,7 @@
 #include "Session.h"
 #include "PositionDetail.h"
 #include "xTradeStruct.h"
+#include "Timer.h"
 
 using std::map;
 class MdSpi;
@@ -74,6 +75,18 @@ public:
 	/// 获取trader是否在l_trader里
 	bool checkInLTrader(string trader);
 
+	bool getTenMinFlag();
+	void setTenMinFlag(bool ten_min_flag);
+
+	bool getOneMinFlag();
+	void setOneMinFlag(bool one_min_flag);
+
+	bool getOneSecondFlag();
+	void setOneSecondFlag(bool one_second_flag);
+
+
+
+
 	/// 得到l_trader
 	list<string> *getL_Trader();
 
@@ -100,6 +113,12 @@ public:
 
 	/// 设置strategy_list
 	void setListStrategy(list<Strategy *> *l_strategys);
+
+	/// 设置定时器
+	void setCalTimer(Timer *cal_timer);
+
+	/// 获取定时器
+	Timer *getCalTimer();
 
 	/// 保存strategy_list
 	void saveStrategy();
@@ -155,5 +174,11 @@ private:
 	bool isClosingSaved;
 	list<Session *> *l_sessions;
 	list<USER_CThostFtdcOrderField *> *l_posdetail;
+	Timer *cal_timer;
+
+	bool ten_min_flag;
+	bool one_min_flag;
+	bool one_second_flag;
+
 };
 #endif

@@ -16,6 +16,7 @@ public:
 	static int timeval_subtract(struct timeval* result, struct timeval* x, struct timeval* y);
 	static string getNowTimeNs();
 	static string getNowTimeMs();
+	static string getNowTime();
 	static bool compareTradingDay(const char *compare_day, const char *today);
 	static bool compareTradingDaySeconds(const char *compare_day, const char *today);
 	static long long strtolonglong(string str);

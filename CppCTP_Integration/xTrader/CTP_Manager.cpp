@@ -31,6 +31,9 @@ CTP_Manager::CTP_Manager() {
 	this->l_unsubinstrument = new list<string>();
 	this->l_sessions = new list<Session *>();
 	isClosingSaved = false;
+	this->ten_min_flag = false;
+	this->one_min_flag = false;
+	this->one_second_flag = false;
 }
 
 bool CTP_Manager::CheckIn(Login *login) {
@@ -257,6 +260,30 @@ bool CTP_Manager::checkInLTrader(string trader) {
 	return flag;
 }
 
+bool CTP_Manager::getTenMinFlag() {
+	return this->ten_min_flag;
+}
+
+void CTP_Manager::setTenMinFlag(bool ten_min_flag) {
+	this->ten_min_flag = ten_min_flag;
+}
+
+bool CTP_Manager::getOneMinFlag() {
+	return this->one_min_flag;
+}
+
+void CTP_Manager::setOneMinFlag(bool one_min_flag) {
+	this->one_min_flag = one_min_flag;
+}
+
+bool CTP_Manager::getOneSecondFlag() {
+	return this->one_second_flag;
+}
+
+void CTP_Manager::setOneSecondFlag(bool one_second_flag) {
+	this->one_second_flag = one_second_flag;
+}
+
 /// 得到l_trader
 list<string> *CTP_Manager::getL_Trader() {
 	return this->l_trader;
@@ -319,6 +346,16 @@ list<Strategy *> * CTP_Manager::getListStrategyYesterday() {
 /// 设置strategy_list
 void CTP_Manager::setListStrategy(list<Strategy *> *l_strategys) {
 	this->l_strategys = l_strategys;
+}
+
+/// 设置定时器
+void CTP_Manager::setCalTimer(Timer *cal_timer) {
+	this->cal_timer = cal_timer;
+}
+
+/// 获取定时器
+Timer * CTP_Manager::getCalTimer() {
+	return this->cal_timer;
 }
 
 /// 收盘时保存strategy_list

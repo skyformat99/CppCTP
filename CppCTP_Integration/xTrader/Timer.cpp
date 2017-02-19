@@ -33,7 +33,7 @@ void Timer::start(bool multiThread)
 void Timer::stop()
 {
     _running = false;
-    _thread.join();
+    //_thread.join();
 }
 
 bool Timer::running() const

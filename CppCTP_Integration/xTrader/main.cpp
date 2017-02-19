@@ -44,6 +44,11 @@ using namespace rapidjson;
 int sockfd;
 CTP_Manager *ctp_m = NULL;
 
+string one_min_time = "14:50:00";
+string one_sec_time = "14:59:00";
+string stop_trading_time = "14:59:55";
+string close_time = "15:00:00";
+
 /*信号处理*/
 void sig_handler(int signo) {
 	if (signo == SIGINT) {
@@ -84,6 +89,7 @@ void do_service(int fd) {
 	while (1)
 	{
 		memset(buff, 0, sizeof(buff));
+
 
 		size_t size;
 		//printf("sizeof buff is %d = \n", sizeof(buff));
@@ -259,6 +265,86 @@ void printFutureAccountOperateMenu() {
 	cout << "|==============================|" << endl;
 }
 
+void timer_handler() {
+
+	time_t tt = system_clock::to_time_t(system_clock::now()); 
+	std::string nowt(std::ctime(&tt));
+	std::cout << "main.cpp timer_handler()" << std::endl;
+	std::cout << "\t定时器输出" << std::endl;
+	std::cout << "\t现在时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
+
+
+	/************************************************************************/
+	/*	string one_min_time = "14：50：00";
+		string one_sec_time = "14：59：00";
+		string stop_trading_time = "14：59：55";
+		string close_time = "15：00：00";
+		时间在14:49:00之前，按照10分钟一次计时
+		一旦时间超过14：50：00，我就按照一分钟计时一次；
+		一旦时间超过14：59：00，我就按照1秒计时一次；
+		一旦时间超过14：59：55，不开始新的交易任务。
+		*/
+	/************************************************************************/
+
+	if (ctp_m->getCalTimer()->running()) {
+
+		string nowtime = Utils::getNowTime();
+		std::cout << "\t开始比较，现在时间 = " << nowtime << std::endl;
+		
+		if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + one_min_time).c_str())) { // 时间大于14：50：00
+
+			if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + one_sec_time).c_str())) { // 时间大于14:59:00
+				
+				if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + stop_trading_time).c_str())) { // 时间大于14:59:55
+					//关闭任务开关,防止刷单
+
+					if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + close_time).c_str())) { // 时间大于15:00:00
+						// 保存策略参数
+
+					}
+
+				} 
+				else { // 时间大于14:59:00小于时间大于14:59:55，按照一秒一次计时
+
+					if (!ctp_m->getOneSecondFlag()) {
+						std::cout << "\t开始进行1秒计时" << std::endl;
+						ctp_m->getCalTimer()->stop();
+						ctp_m->getCalTimer()->setSingleShot(false);
+						ctp_m->getCalTimer()->setInterval(Timer::Interval(1000));
+						ctp_m->getCalTimer()->start();
+						ctp_m->setOneSecondFlag(true);
+					}
+				}
+
+			}
+			else { // 时间小于14:59:00,按照1分钟进行一次计时
+				if (!ctp_m->getOneMinFlag())
+				{
+					std::cout << "\t开始进行1分钟计时" << std::endl;
+					ctp_m->getCalTimer()->stop();
+					ctp_m->getCalTimer()->setSingleShot(false);
+					ctp_m->getCalTimer()->setInterval(Timer::Interval(1000 * 60));
+					ctp_m->getCalTimer()->start();
+					ctp_m->setOneMinFlag(true);
+				}
+			}
+		}
+		else { // 时间小于14:50:00,按照10分钟进行一次计时
+			if (!ctp_m->getTenMinFlag()) {
+				std::cout << "\t开始进行10分钟计时" << std::endl;
+				ctp_m->getCalTimer()->stop();
+				ctp_m->getCalTimer()->setSingleShot(false);
+				ctp_m->getCalTimer()->setInterval(Timer::Interval(1000 * 60 * 10));
+				ctp_m->getCalTimer()->start();
+				ctp_m->setTenMinFlag(true);
+			}
+		}
+	}
+	
+}
+
+
+
 int main(int argc, char *argv[]) {
 
 	if (argc < 3) {
@@ -298,23 +384,28 @@ int main(int argc, char *argv[]) {
 	}
 
 	// 多线程定时器
-	Timer tHello([]()
+	/*Timer tHello([]()
 	{
 		std::cout << "main()" << std::endl;
 		std::cout << "\t系统定时器tick" << std::endl;
-	});
+	});*/
 
-	tHello.setSingleShot(false);
-	tHello.setInterval(Timer::Interval(1000 * 60 * 10));
-	tHello.start(true);
+	Timer tHello(timer_handler);
 
-
+	//CTPManager设置定时器
+	ctp_m->setCalTimer(&tHello);
 
 	// 程序入口，初始化资源
 	if (!ctp_m->init(init_flag)) {
 		std::cout << "系统初始化失败!" << std::endl;
 		exit(1);
 	}
+
+	//开启定时器
+	tHello.setSingleShot(false);
+	//tHello.setInterval(Timer::Interval(1000 * 60 * 10));
+	tHello.setInterval(Timer::Interval(1000));
+	tHello.start(true);
 
 	/*算法单元测试
 	Algorithm *alg = new Algorithm();

@@ -159,6 +159,23 @@ string Utils::getNowTimeMs() {
 	return (s + date_time + s + std::to_string(us.tv_usec));
 }
 
+string Utils::getNowTime() {
+	printf("---------------------------时间输出----------------------------------------\n");
+	printf("[time(NULL)]     :     %ld\n", time(NULL));
+	struct timespec ts;
+	clock_gettime(CLOCK_REALTIME, &ts);
+	printf("clock_gettime : tv_sec=%ld, tv_nsec=%ld\n", ts.tv_sec, ts.tv_nsec);
+
+	struct tm t;
+	char date_time[64];
+	//strftime(date_time, sizeof(date_time), "%Y%m%d %H:%M:%S", localtime_r(&ts.tv_sec, &t));
+	strftime(date_time, sizeof(date_time), "%Y%m%d%X", localtime_r(&ts.tv_sec, &t));
+	/*printf("clock_gettime : date_time=%s, tv_nsec=%ld, tv_usec=%ld, compare_str=%s\n", date_time, ts.tv_nsec, ts.tv_nsec / 1000, (":"
+		+ std::to_string(ts.tv_nsec)).c_str());*/
+	
+	return date_time;
+}
+
 bool Utils::compareTradingDay(const char *compare_day, const char *today) {
 	
 	struct tm tm_time = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -187,6 +204,10 @@ bool Utils::compareTradingDaySeconds(const char *compare_day, const char *today)
 	struct tm tm_time = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	struct tm tm_time2 = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
+	std::cout << "Utils::compareTradingDaySeconds()" << std::endl;
+	std::cout << "\t现在时间 = " << compare_day << std::endl;
+	std::cout << "\t对比时间 = " << today << std::endl;
+
 	//strptime(compare_day, "%Y%m%d%H%M%S", &tm_time); //时间格式：20161216 13:30:00
 	strptime(compare_day, "%Y%m%d%X", &tm_time);//时间格式：20161216 13:30:00
 	time_t l_time1 = mktime(&tm_time);
@@ -195,12 +216,14 @@ bool Utils::compareTradingDaySeconds(const char *compare_day, const char *today)
 	time_t l_time2 = mktime(&tm_time2);
 
 
-	if (l_time1 == l_time2) {
+	if (l_time1 >= l_time2) {
 		USER_PRINT("日期相等");
+		std::cout << "\t对比结果 = " << true << std::endl;
 		return true; // 等于当前日期
 	}
 	else {
 		USER_PRINT("日期偏小了");
+		std::cout << "\t对比结果 = " << false << std::endl;
 		return false; // 小于当前日期
 	}
 }
