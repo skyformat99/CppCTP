@@ -2,6 +2,9 @@
 #include <cstring>
 #include <chrono>
 #include <thread>
+#include <mutex>              // std::mutex, std::unique_lock
+#include <condition_variable> // std::condition_variable, std::cv_status
+
 
 #include "TdSpi.h"
 #include "Utils.h"
@@ -11,6 +14,7 @@
 
 //转码数组
 char codeDst[90] = { 0 };
+std::condition_variable cv;
 
 
 //协程控制
@@ -761,6 +765,15 @@ void TdSpi::QryOrder() {
 	int error_no = this->tdapi->ReqQryOrder(pQryOrder, this->getRequestID());
 	//std::cout << "error_no = " << error_no << endl;
 	delete pQryOrder;
+
+	std::mutex mtx;
+	std::unique_lock<std::mutex> lck(mtx);
+	while (cv.wait_for(lck, std::chrono::seconds(10)) == std::cv_status::timeout) {
+		std::cout << "TdSpi::QryOrder()" << std::endl;
+		std::cout << "\t等待超时" << std::endl;
+		return;
+	}
+
 }
 
 //响应查询报单;
@@ -922,6 +935,7 @@ void TdSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *
 			std::cout << "\t当前账户 = " << this->current_user->getUserID() << std::endl;
 			std::cout << "\t报单回报为空!" << std::endl;
 			std::cout << "\t是否最后一条 = " << bIsLast << std::endl;
+			cv.notify_one();
 		}
 		
 	}
