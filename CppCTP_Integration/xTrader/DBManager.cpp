@@ -1975,6 +1975,7 @@ void DBManager::getAllAlgorithm(list<Algorithm *> *l_alg) {
 	}
 }
 
+#if 0
 /************************************************************************/
 /* 创建sessionid
 删除sessionid
@@ -2015,6 +2016,7 @@ void DBManager::DeleteSession(Session *sid) {
 	this->conn->remove(DB_SESSIONS_COLLECTION, BSON("sessionid" << sid->getSessionID() << "frontid" << sid->getFrontID()));
 	USER_PRINT("DBManager::DeleteSessionID ok");
 }
+
 
 void DBManager::getAllSession(list<Session *> *l_sessions) {
 	/// 初始化的时候，必须保证list为空
@@ -2185,12 +2187,13 @@ void DBManager::UpdatePositionDetail(PositionDetail *posd) {
 
 	USER_PRINT("DBManager::UpdatePositionDetail OK");
 }
-void DBManager::getAllPositionDetail(list<PositionDetail *> *l_posd, string traderid, string userid) {
+
+void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, string traderid, string userid) {
 	USER_PRINT("DBManager::getAllPositionDetail");
 	
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
-		list<PositionDetail *>::iterator itor;
+		list<USER_CThostFtdcOrderField *>::iterator itor;
 		for (itor = l_posd->begin(); itor != l_posd->end();) {
 			delete (*itor);
 			itor = l_posd->erase(itor);
@@ -2205,7 +2208,7 @@ void DBManager::getAllPositionDetail(list<PositionDetail *> *l_posd, string trad
 			cursor = this->conn->query(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid << "is_active" << ISACTIVE));
 		}
 		else {
-			cursor = this->conn->query(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("trader_id" << traderid << "is_active" << ISNOTACTIVE));
+			cursor = this->conn->query(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("trader_id" << traderid << "is_active" << ISACTIVE));
 		}
 	}
 	else {
@@ -2215,7 +2218,7 @@ void DBManager::getAllPositionDetail(list<PositionDetail *> *l_posd, string trad
 	while (cursor->more()) {
 		BSONObj p = cursor->next();
 
-		PositionDetail *new_pos = new PositionDetail();
+		USER_CThostFtdcOrderField *new_pos = new USER_CThostFtdcOrderField();
 
 		cout << "instrumentid = " << p.getStringField("instrumentid") << ", ";
 		cout << "orderref = " << p.getStringField("orderref") << ", ";
@@ -2234,22 +2237,22 @@ void DBManager::getAllPositionDetail(list<PositionDetail *> *l_posd, string trad
 		cout << "strategyid = " << p.getStringField("strategyid") << ", ";
 		cout << "volumetradedbatch = " << p.getIntField("volumetradedbatch") << ", ";
 
-		new_pos->setInstrumentID(p.getStringField("instrumentid"));
-		new_pos->setOrderRef(p.getStringField("orderref"));
-		new_pos->setUserID(p.getStringField("userid"));
-		new_pos->setDirection(p.getIntField("direction"));
-		new_pos->setCombOffsetFlag(p.getStringField("comboffsetflag"));
-		new_pos->setCombHedgeFlag(p.getStringField("combhedgeflag"));
-		new_pos->setLimitPrice(p.getField("limitprice").Double());
-		new_pos->setVolumeTotalOriginal(p.getIntField("volumetotaloriginal"));
-		new_pos->setTradingDay(p.getStringField("tradingday"));
-		new_pos->setOrderStatus(p.getIntField("orderstatus"));
-		new_pos->setVolumeTraded(p.getIntField("volumetraded"));
-		new_pos->setVolumeTotal(p.getIntField("volumetotal"));
-		new_pos->setInsertDate(p.getStringField("insertdate"));
-		new_pos->setInsertTime(p.getStringField("inserttime"));
-		new_pos->setStrategyID(p.getStringField("strategyid"));
-		new_pos->setVolumeTradedBatch(p.getIntField("volumetradedbatch"));
+		strcpy(new_pos->InstrumentID, p.getStringField("instrumentid"));
+		strcpy(new_pos->OrderRef, p.getStringField("orderref"));
+		strcpy(new_pos->UserID, p.getStringField("userid"));
+		new_pos->Direction = p.getIntField("direction");
+		strcpy(new_pos->CombOffsetFlag, p.getStringField("comboffsetflag"));
+		strcpy(new_pos->CombHedgeFlag, p.getStringField("combhedgeflag"));
+		new_pos->LimitPrice = p.getField("limitprice").Double();
+		new_pos->VolumeTotalOriginal = p.getIntField("volumetotaloriginal");
+		strcpy(new_pos->TradingDay, p.getStringField("tradingday"));
+		new_pos->OrderStatus = p.getIntField("orderstatus");
+		new_pos->VolumeTraded = p.getIntField("volumetraded");
+		new_pos->VolumeTotal = p.getIntField("volumetotal");
+		strcpy(new_pos->InsertDate, p.getStringField("insertdate"));
+		strcpy(new_pos->InsertTime, p.getStringField("inserttime"));
+		strcpy(new_pos->StrategyID, p.getStringField("strategyid"));
+		new_pos->VolumeTradedBatch = p.getIntField("volumetradedbatch");
 
 		l_posd->push_back(new_pos);
 	}
@@ -2350,7 +2353,7 @@ void DBManager::UpdatePositionDetailYesterday(PositionDetail *posd) {
 	}
 	USER_PRINT("DBManager::UpdatePositionDetailYesterday OK");
 }
-void DBManager::getAllPositionDetailYesterday(list<PositionDetail *> *l_posd, 
+void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> *l_posd,
 	string traderid, string userid) {
 	USER_PRINT("DBManager::getAllPositionDetailYesterday");
 	
@@ -2422,6 +2425,7 @@ void DBManager::getAllPositionDetailYesterday(list<PositionDetail *> *l_posd,
 
 	USER_PRINT("DBManager::getAllPositionDetailYesterday OK");
 }
+#endif
 
 
 void DBManager::setConn(mongo::DBClientConnection *conn) {

@@ -13,7 +13,7 @@
 #include "MarketConfig.h"
 #include "Algorithm.h"
 #include "Session.h"
-#include "PositionDetail.h"
+
 #include "xTradeStruct.h"
 
 class Strategy;
@@ -138,9 +138,9 @@ public:
 	   删除sessionid
 	   获取sessionid*/
 	/************************************************************************/
-	void CreateSession(Session *sid);
-	void DeleteSession(Session *sid);
-	void getAllSession(list<Session *> *l_sessions);
+	//void CreateSession(Session *sid);
+	//void DeleteSession(Session *sid);
+	//void getAllSession(list<Session *> *l_sessions);
 
 	/************************************************************************/
 	/*    
@@ -148,17 +148,17 @@ public:
 	删除持仓明细
 	更新持仓明细*/
 	/************************************************************************/
-	void CreatePositionDetail(PositionDetail *posd);
-	void CreatePositionDetail(USER_CThostFtdcOrderField *posd);
-	void DeletePositionDetail(PositionDetail *posd);
-	void UpdatePositionDetail(PositionDetail *posd);
-	void getAllPositionDetail(list<PositionDetail *> *l_posd, string trader_id = "", string userid = "");
-	void DropPositionDetail();
+	//void CreatePositionDetail(PositionDetail *posd);
+	//void CreatePositionDetail(USER_CThostFtdcOrderField *posd);
+	//void DeletePositionDetail(PositionDetail *posd);
+	//void UpdatePositionDetail(PositionDetail *posd);
+	//void getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, string trader_id = "", string userid = "");
+	//void DropPositionDetail();
 
-	void CreatePositionDetailYesterday(PositionDetail *posd);
-	void DeletePositionDetailYesterday(PositionDetail *posd);
-	void UpdatePositionDetailYesterday(PositionDetail *posd);
-	void getAllPositionDetailYesterday(list<PositionDetail *> *l_posd, string trader_id, string userid);
+	//void CreatePositionDetailYesterday(PositionDetail *posd);
+	//void DeletePositionDetailYesterday(PositionDetail *posd);
+	//void UpdatePositionDetailYesterday(PositionDetail *posd);
+	//void getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> *l_posd, string trader_id, string userid);
 
 	void setConn(mongo::DBClientConnection *conn);
 	mongo::DBClientConnection *getConn();

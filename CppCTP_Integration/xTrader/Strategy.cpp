@@ -15,6 +15,12 @@ using mongo::ConnectException;
 //std::mutex update_status_mtx; // locks access to counter
 //std::mutex select_order_algorithm_mtx; // locks access to counter
 
+#define ISACTIVE "1"
+#define ISNOTACTIVE "0"
+#define DB_STRATEGY_COLLECTION					"CTP.strategy"
+#define DB_POSITIONDETAIL_COLLECTION			"CTP.positiondetail"
+#define DB_POSITIONDETAIL_YESTERDAY_COLLECTION	"CTP.positiondetail_yesterday"
+
 Strategy::Strategy(User *stg_user) {
 
 	this->on_off = 0;						//开关					
@@ -349,6 +355,12 @@ void Strategy::CopyOrderData(CThostFtdcOrderField *dst, CThostFtdcOrderField *sr
 }
 
 void Strategy::CopyOrderDataToNew(USER_CThostFtdcOrderField *dst, CThostFtdcOrderField *src) {
+
+	string temp(src->OrderRef);
+	int len_order_ref = temp.length();
+	string strategyid = temp.substr(len_order_ref - 2, 2);
+	///策略id
+	strcpy(dst->StrategyID, strategyid.c_str());
 
 	///经纪公司代码
 	strcpy(dst->BrokerID, src->BrokerID);
@@ -845,13 +857,13 @@ void Strategy::UpdateStrategy(Strategy *stg) {
 	std::cout << "Strategy::UpdateStrategy()" << std::endl;
 
 
-	count_number = this->stg_save_strategy_conn->count("CTP.strategy",
+	count_number = this->stg_save_strategy_conn->count(DB_STRATEGY_COLLECTION,
 		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
 
 	std::cout << "\t查找到 " << count_number << " 条记录" << std::endl;
 
 	if (count_number > 0) {
-		this->stg_save_strategy_conn->update("CTP.strategy", BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true), BSON("$set" << BSON("position_a_sell_today" << stg->getStgPositionASellToday()
+		this->stg_save_strategy_conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true), BSON("$set" << BSON("position_a_sell_today" << stg->getStgPositionASellToday()
 			<< "position_b_sell" << stg->getStgPositionBSell()
 			<< "spread_shift" << stg->getStgSpreadShift()
 			<< "position_b_sell_today" << stg->getStgPositionBSellToday()
@@ -905,7 +917,7 @@ void Strategy::UpdateStrategy(Strategy *stg) {
 			<< "trading_day" << stg->getStgTradingDay()
 			<< "list_instrument_id" << BSON_ARRAY(stg->getStgInstrumentIdA() << stg->getStgInstrumentIdB()))));
 
-		USER_PRINT("DBManager::UpdateStrategy ok");
+		USER_PRINT("Strategy::UpdateStrategy ok");
 	}
 	else
 	{
@@ -920,7 +932,7 @@ void Strategy::CreatePositionDetail(USER_CThostFtdcOrderField *posd) {
 	int posd_count_num = 0;
 
 	if (posd != NULL) {
-		posd_count_num = this->stg_save_strategy_conn->count("CTP.positiondetail",
+		posd_count_num = this->stg_save_strategy_conn->count(DB_POSITIONDETAIL_COLLECTION,
 			BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "is_active" << ISACTIVE));
 		if (posd_count_num != 0) { //session_id存在
 			std::cout << "持仓明细已经存在了!" << std::endl;
@@ -933,8 +945,12 @@ void Strategy::CreatePositionDetail(USER_CThostFtdcOrderField *posd) {
 			b.append("orderref", posd->OrderRef);
 			b.append("userid", posd->UserID);
 			b.append("direction", posd->Direction);
-			b.append("comboffsetflag", string(1, posd->CombOffsetFlag[0]));
-			b.append("combhedgeflag", string(1, posd->CombHedgeFlag[0]));
+			/*b.append("comboffsetflag", string(1, posd->CombOffsetFlag[0]));
+			b.append("combhedgeflag", string(1, posd->CombHedgeFlag[0]));*/
+
+			b.append("comboffsetflag", posd->CombOffsetFlag);
+			b.append("combhedgeflag", posd->CombHedgeFlag);
+
 			b.append("limitprice", posd->LimitPrice);
 			b.append("volumetotaloriginal", posd->VolumeTotalOriginal);
 			b.append("tradingday", posd->TradingDay);
@@ -945,13 +961,56 @@ void Strategy::CreatePositionDetail(USER_CThostFtdcOrderField *posd) {
 			b.append("inserttime", posd->InsertTime);
 			b.append("strategyid", posd->StrategyID);
 			b.append("volumetradedbatch", posd->VolumeTradedBatch);
+			b.append("is_active", ISACTIVE);
 
 			BSONObj p = b.obj();
-			this->stg_save_strategy_conn->insert("CTP.positiondetail", p);
+			this->stg_save_strategy_conn->insert(DB_POSITIONDETAIL_COLLECTION, p);
 			USER_PRINT("DBManager::CreatePositionDetail ok");
 		}
 	}
 	USER_PRINT("Strategy::CreatePositionDetail OK");
+}
+
+/// 数据库更新策略持仓明细
+void Strategy::Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
+	USER_PRINT("Strategy::Update_Position_Detail_To_DB");
+
+	int count_number = 0;
+
+	count_number = this->stg_save_strategy_conn->count(DB_POSITIONDETAIL_COLLECTION,
+		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "is_active" << ISACTIVE));
+
+	if (count_number > 0) {
+		this->stg_save_strategy_conn->update(DB_POSITIONDETAIL_COLLECTION, BSON("userid" << this->getStgUserId() << "strategyid" << this->getStgStrategyId() << "tradingday" << posd->TradingDay << "is_active" << ISACTIVE), BSON("$set" << BSON(
+			"instrumentid" << posd->InstrumentID 
+			<< "orderref" << posd->OrderRef
+			<< "userid" << posd->UserID
+			<< "direction" << posd->Direction
+			/*<< "comboffsetflag" << string(1, posd->CombOffsetFlag[0])
+			<< "combhedgeflag" << string(1, posd->CombHedgeFlag[0])*/
+
+			<< "comboffsetflag" << posd->CombOffsetFlag
+			<< "combhedgeflag" << posd->CombHedgeFlag
+
+			<< "limitprice" << posd->LimitPrice
+			<< "volumetotaloriginal" << posd->VolumeTotalOriginal
+			<< "tradingday" << posd->TradingDay
+			<< "orderstatus" << posd->OrderStatus
+			<< "volumetraded" << posd->VolumeTraded
+			<< "volumetotal" << posd->VolumeTotal
+			<< "insertdate" << posd->InsertDate
+			<< "inserttime" << posd->InsertTime
+			<< "strategyid" << posd->StrategyID
+			<< "volumetradedbatch" << posd->VolumeTradedBatch
+			)));
+		USER_PRINT("Strategy::Update_Position_Detail_To_DB ok");
+	}
+	else {
+		std::cout << "Strategy::Update_Position_Detail_To_DB()" << std::endl;
+		std::cout << "\tPositionDetail Not Exists!" << std::endl;
+	}
+
+	USER_PRINT("Strategy::Update_Position_Detail_To_DB OK");
 }
 
 /// 设置开关
@@ -1344,34 +1403,34 @@ void Strategy::setL_query_order(list<CThostFtdcOrderField *> *l_query_order) {
 
 }
 
-void Strategy::add_position_detail(PositionDetail *posd) {
+void Strategy::add_position_detail(USER_CThostFtdcOrderField *posd) {
 	USER_PRINT("Strategy::add_position_detail");
-	USER_CThostFtdcOrderField *new_order = new USER_CThostFtdcOrderField();
+	/*USER_CThostFtdcOrderField *new_order = new USER_CThostFtdcOrderField();
 	memset(new_order, 0, sizeof(USER_CThostFtdcOrderField));
-	this->CopyPositionData(posd, new_order);
-	this->stg_list_position_detail_from_order->push_back(new_order);
+	this->CopyPositionData(posd, new_order);*/
+	this->stg_list_position_detail_from_order->push_back(posd);
 }
 
-void Strategy::CopyPositionData(PositionDetail *posd, USER_CThostFtdcOrderField *order) {
-	USER_PRINT("Strategy::CopyPositionData");
-	strcpy(order->InstrumentID, posd->getInstrumentID().c_str());
-	strcpy(order->OrderRef, posd->getOrderRef().c_str());
-	strcpy(order->UserID, posd->getUserID().c_str());
-	order->Direction = posd->getDirection();
-	order->CombOffsetFlag[0] = posd->getCombOffsetFlag().c_str()[0];
-	order->CombHedgeFlag[0] = posd->getCombHedgeFlag().c_str()[0];
-	order->LimitPrice = posd->getLimitPrice();
-	order->VolumeTotalOriginal = posd->getVolumeTotalOriginal();
-	strcpy(order->TradingDay, posd->getTradingDay().c_str());
-	order->OrderStatus = posd->getOrderStatus();
-	order->VolumeTraded = posd->getVolumeTraded();
-	order->VolumeTotal = posd->getVolumeTotal();
-	strcpy(order->InsertDate, posd->getInsertDate().c_str());
-	strcpy(order->InsertTime, posd->getInsertTime().c_str());
-	//order->StrategyID = posd->getStrategyID();
-	strcpy(order->StrategyID, posd->getStrategyID().c_str());
-	order->VolumeTradedBatch = posd->getVolumeTradedBatch();
-}
+//void Strategy::CopyPositionData(PositionDetail *posd, USER_CThostFtdcOrderField *order) {
+//	USER_PRINT("Strategy::CopyPositionData");
+//	strcpy(order->InstrumentID, posd->getInstrumentID().c_str());
+//	strcpy(order->OrderRef, posd->getOrderRef().c_str());
+//	strcpy(order->UserID, posd->getUserID().c_str());
+//	order->Direction = posd->getDirection();
+//	order->CombOffsetFlag[0] = posd->getCombOffsetFlag().c_str()[0];
+//	order->CombHedgeFlag[0] = posd->getCombHedgeFlag().c_str()[0];
+//	order->LimitPrice = posd->getLimitPrice();
+//	order->VolumeTotalOriginal = posd->getVolumeTotalOriginal();
+//	strcpy(order->TradingDay, posd->getTradingDay().c_str());
+//	order->OrderStatus = posd->getOrderStatus();
+//	order->VolumeTraded = posd->getVolumeTraded();
+//	order->VolumeTotal = posd->getVolumeTotal();
+//	strcpy(order->InsertDate, posd->getInsertDate().c_str());
+//	strcpy(order->InsertTime, posd->getInsertTime().c_str());
+//	//order->StrategyID = posd->getStrategyID();
+//	strcpy(order->StrategyID, posd->getStrategyID().c_str());
+//	order->VolumeTradedBatch = posd->getVolumeTradedBatch();
+//}
 
 void Strategy::printStrategyInfo(string message) {
 	time_t tt = system_clock::to_time_t(system_clock::now()); 

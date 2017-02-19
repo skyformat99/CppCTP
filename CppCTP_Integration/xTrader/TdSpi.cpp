@@ -192,9 +192,13 @@ void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 		this->current_user->setTradingDay(s_trading_day);
 
 		this->setIsConfirmSettlement(false);
-		Session *sid = new Session(this->current_user->getUserID(), this->SessionID, this->FrontID, s_trading_day);
-		this->current_user->getL_Sessions()->push_back(sid);
-		this->current_user->getDBManager()->CreateSession(sid);
+
+		/************************************************************************/
+		/* 系统登录的session_id暂时不用维护,通过order_ref来判断是否属于本系统发单                                                                     */
+		/************************************************************************/
+		//Session *sid = new Session(this->current_user->getUserID(), this->SessionID, this->FrontID, s_trading_day);
+		//this->current_user->getL_Sessions()->push_back(sid);
+		//this->current_user->getDBManager()->CreateSession(sid);
 
 		USER_PRINT(this->current_user);
 		USER_PRINT(this->current_user->getUserID());
@@ -755,7 +759,7 @@ void TdSpi::QryOrder() {
 	//strcpy(pQryOrder->BrokerID, const_cast<char *>(this->getBrokerID().c_str()));
 	//strcpy(pQryOrder->InvestorID, const_cast<char *>(this->getUserID().c_str()));
 	int error_no = this->tdapi->ReqQryOrder(pQryOrder, this->getRequestID());
-	std::cout << "error_no = " << error_no << endl;
+	//std::cout << "error_no = " << error_no << endl;
 	delete pQryOrder;
 }
 
@@ -763,9 +767,9 @@ void TdSpi::QryOrder() {
 void TdSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspQryOrder");
 	//list<Session *>::iterator sid_itor;
-	if (!pOrder) {
-		std::cout << "None Order Return!" << endl;
-	}
+
+
+
 	if (!this->IsErrorRspInfo(pRspInfo)) {
 
 		if (this->isFirstQryOrder == false) //如果新一轮接收，清空list列表
@@ -914,7 +918,10 @@ void TdSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *
 				}
 			}
 		} else {
-			std::cout << "报单回报为空!" << endl;
+			std::cout << "TdSpi::OnRspQryOrder()" << std::endl;
+			std::cout << "\t当前账户 = " << this->current_user->getUserID() << std::endl;
+			std::cout << "\t报单回报为空!" << std::endl;
+			std::cout << "\t是否最后一条 = " << bIsLast << std::endl;
 		}
 		
 	}

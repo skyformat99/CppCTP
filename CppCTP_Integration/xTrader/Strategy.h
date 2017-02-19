@@ -6,7 +6,6 @@
 #include "Debug.h"
 #include "DBManager.h"
 #include "xTradeStruct.h"
-#include "PositionDetail.h"
 
 using std::list;
 class DBManager;
@@ -349,6 +348,9 @@ public:
 	/// 创建持仓明细
 	void CreatePositionDetail(USER_CThostFtdcOrderField *posd);
 
+	/// 数据库更新策略持仓明细
+	void Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd);
+
 	/// 设置开关
 	int getOn_Off();
 	void setOn_Off(int on_off);
@@ -422,9 +424,9 @@ public:
 	void addOrderToListQueryOrder(CThostFtdcOrderField *order);
 	void setL_query_order(list<CThostFtdcOrderField *> *l_query_order);
 
-	void add_position_detail(PositionDetail *posd);
+	void add_position_detail(USER_CThostFtdcOrderField *posd);
 
-	void CopyPositionData(PositionDetail *posd, USER_CThostFtdcOrderField *order);
+	//void CopyPositionData(PositionDetail *posd, USER_CThostFtdcOrderField *order);
 
 	list<USER_CThostFtdcOrderField *> * getStg_List_Position_Detail_From_Order(); // 持仓明细
 

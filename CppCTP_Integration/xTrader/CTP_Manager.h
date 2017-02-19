@@ -11,6 +11,7 @@
 #include "Trader.h"
 #include "Session.h"
 #include "PositionDetail.h"
+#include "xTradeStruct.h"
 
 using std::map;
 class MdSpi;
@@ -103,6 +104,9 @@ public:
 	/// 保存strategy_list
 	void saveStrategy();
 
+	/// 保存所有策略持仓明细
+	void saveStrategyPositionDetail();
+
 	/// 保存position_detail
 	void savePositionDetail();
 
@@ -128,8 +132,8 @@ public:
 	/// 获得交易日
 	string getTradingDay();
 
-	/// 初始化昨仓
-	bool initYesterdayPosition();
+	/// 初始化策略(策略更新trading_day, 期货账户更新order_ref)
+	bool initStrategyAndFutureAccount();
 
 	/// 初始化昨仓明细
 	bool initYesterdayPositionDetail();
@@ -150,6 +154,6 @@ private:
 	string trading_day;
 	bool isClosingSaved;
 	list<Session *> *l_sessions;
-	list<PositionDetail *> *l_posdetail;
+	list<USER_CThostFtdcOrderField *> *l_posdetail;
 };
 #endif

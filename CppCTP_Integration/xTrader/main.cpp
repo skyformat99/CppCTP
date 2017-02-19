@@ -47,11 +47,20 @@ CTP_Manager *ctp_m = NULL;
 /*信号处理*/
 void sig_handler(int signo) {
 	if (signo == SIGINT) {
-		printf("服务端已关闭!!!\n");
+		printf("main.cpp sig_handler()");
+		printf("\t服务端关闭，开始保存策略持仓明细");
 
-
-
+		if (ctp_m) {
+			ctp_m->saveStrategyPositionDetail();
+		}
+		else {
+			printf("\t服务端 未 正常关闭!!!\n");
+			exit(1);
+		}
+		
+		
 		close(sockfd);
+		printf("\t服务端正常关闭\n");
 		exit(1);
 	}
 }
