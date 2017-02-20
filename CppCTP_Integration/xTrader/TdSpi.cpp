@@ -15,6 +15,9 @@
 //转码数组
 char codeDst[90] = { 0 };
 std::condition_variable cv;
+std::mutex mtx;
+#define RSP_TIMEOUT	120
+
 
 
 //协程控制
@@ -91,7 +94,8 @@ void TdSpi::Connect(User *user) {
 	USER_PRINT("TdSpi::Connect");
 	USER_PRINT(const_cast<char *>(user->getFrontAddress().c_str()));
 	this->tdapi = user->getUserTradeAPI();
-	cout << "TdSpi::Connect This.Tdapi = " << this->tdapi << std::endl;
+	cout << "TdSpi::Connect()" << std::endl;
+	cout << "\t已创建连接 = " << this->tdapi << std::endl;
 	this->tdapi->RegisterFront(const_cast<char *>(user->getFrontAddress().c_str()));
 	//注册事件处理对象
 	this->tdapi->RegisterSpi(user->getUserTradeSPI());
@@ -100,10 +104,14 @@ void TdSpi::Connect(User *user) {
 	this->tdapi->SubscribePrivateTopic(THOST_TERT_QUICK);
 	this->tdapi->Init();
 
-	int ret = this->controlTimeOut(&connect_sem);
-	if (ret == -1) {
-		USER_PRINT("MdSpi::Connect TimeOut!")
+	//等待回调
+	std::unique_lock<std::mutex> lck(mtx);
+	while (cv.wait_for(lck, std::chrono::seconds(RSP_TIMEOUT)) == std::cv_status::timeout) {
+		std::cout << "TdSpi::Connect()" << std::endl;
+		std::cout << "\t连接等待超时" << std::endl;
+		return;
 	}
+
 }
 
 //当客户端与交易后台建立起通信连接时（还未登录前），该方法被调用。
@@ -118,6 +126,7 @@ void TdSpi::OnFrontConnected() {
 		
 		//this->Login(this->c_BrokerID, this->c_UserID, this->c_Password);
 	}
+	cv.notify_one();
 }
 
 //登录
@@ -139,11 +148,20 @@ void TdSpi::Login(User *user) {
 	strcpy(loginField->Password, user->getPassword().c_str());
 	this->tdapi->ReqUserLogin(loginField, user->getRequestID());
 
-	int ret = this->controlTimeOut(&login_sem);
+	/*int ret = this->controlTimeOut(&login_sem);
 
 	if (ret == -1) {
 		USER_PRINT("TdSpi::Login TimeOut!");
+	}*/
+
+	//等待登陆回调
+	std::unique_lock<std::mutex> lck(mtx);
+	while (cv.wait_for(lck, std::chrono::seconds(RSP_TIMEOUT)) == std::cv_status::timeout) {
+		std::cout << "TdSpi::Connect()" << std::endl;
+		std::cout << "\t登陆等待超时" << std::endl;
+		return;
 	}
+
 	delete loginField;
 }
 
@@ -207,6 +225,12 @@ void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 		USER_PRINT(this->current_user);
 		USER_PRINT(this->current_user->getUserID());
 	}
+	else {
+		std::cout << "TdSpi::OnRspUserLogin()" << std::endl;
+		std::cout << "\t登陆出错!" << std::endl;
+		return;
+	}
+	cv.notify_one();
 }
 
 //查询交易结算确认
@@ -221,10 +245,12 @@ void TdSpi::QrySettlementInfoConfirm(User *user) {
 	sleep(1);
 	this->tdapi->ReqQrySettlementInfoConfirm(qrySettlementField, user->getRequestID());
 
-	int ret = this->controlTimeOut(&sem_ReqQrySettlementInfoConfirm);
+	/*int ret = this->controlTimeOut(&sem_ReqQrySettlementInfoConfirm);
 	if (ret == -1) {
-		USER_PRINT("TdSpi::QrySettlementInfoConfirm TimeOut!")
-	}
+	USER_PRINT("TdSpi::QrySettlementInfoConfirm TimeOut!")
+	}*/
+
+
 	delete qrySettlementField;
 }
 
@@ -283,10 +309,11 @@ void TdSpi::QrySettlementInfo(User *user) {
 	this->tdapi->ReqQrySettlementInfo(pQrySettlementInfo, user->getRequestID());
 	USER_PRINT("after ReqQrySettlementInfo1");
 
-	int ret = this->controlTimeOut(&sem_ReqQrySettlementInfo);
+	/*int ret = this->controlTimeOut(&sem_ReqQrySettlementInfo);
 	if (ret == -1) {
 		USER_PRINT("TdSpi::QrySettlementInfo TimeOut!")
-	}
+	}*/
+
 	delete pQrySettlementInfo;
 	USER_PRINT("after ReqQrySettlementInfo2");
 }
@@ -766,9 +793,9 @@ void TdSpi::QryOrder() {
 	//std::cout << "error_no = " << error_no << endl;
 	delete pQryOrder;
 
-	std::mutex mtx;
+	
 	std::unique_lock<std::mutex> lck(mtx);
-	while (cv.wait_for(lck, std::chrono::seconds(10)) == std::cv_status::timeout) {
+	while (cv.wait_for(lck, std::chrono::seconds(RSP_TIMEOUT)) == std::cv_status::timeout) {
 		std::cout << "TdSpi::QryOrder()" << std::endl;
 		std::cout << "\t等待超时" << std::endl;
 		return;
@@ -935,10 +962,11 @@ void TdSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *
 			std::cout << "\t当前账户 = " << this->current_user->getUserID() << std::endl;
 			std::cout << "\t报单回报为空!" << std::endl;
 			std::cout << "\t是否最后一条 = " << bIsLast << std::endl;
-			cv.notify_one();
+			
 		}
 		
 	}
+	cv.notify_one();
 
 }
 

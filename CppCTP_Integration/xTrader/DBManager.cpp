@@ -30,7 +30,7 @@ using std::unique_ptr;
 #define ISACTIVE "1"
 #define ISNOTACTIVE "0"
 
-std::mutex mtx; // locks access to counter
+std::mutex update_futureaccount_mtx; // locks access to counter
 
 DBManager::DBManager() {
 	try
@@ -395,11 +395,11 @@ void DBManager::UpdateFutureAccountOrderRef(mongo::DBClientConnection * conn_tmp
 	
 	USER_PRINT(DB_FUTUREACCOUNT_COLLECTION);
 	
-	mtx.lock();
+	update_futureaccount_mtx.lock();
 	
 	conn_tmp->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (u->getUserID().c_str())), BSON("$set" << BSON("order_ref_base" << order_ref_base)));
 
-	mtx.unlock();
+	update_futureaccount_mtx.unlock();
 	USER_PRINT("DBManager::UpdateFutureAccountOrderRef ok");
 }
 
