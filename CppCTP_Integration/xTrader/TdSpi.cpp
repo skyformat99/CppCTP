@@ -117,15 +117,15 @@ void TdSpi::Connect(User *user) {
 //当客户端与交易后台建立起通信连接时（还未登录前），该方法被调用。
 void TdSpi::OnFrontConnected() {
 	USER_PRINT("TdSpi::OnFrontConnected");
-	if (this->isFirstTimeLogged) {
-		//sem_post(&connect_sem);
-		//this->Login("0187", "86001525", "206029");
-	}
-	else {
-		//sem_init(&login_sem, 0, 1);
-		
-		//this->Login(this->c_BrokerID, this->c_UserID, this->c_Password);
-	}
+	//if (this->isFirstTimeLogged) {
+	//	//sem_post(&connect_sem);
+	//	//this->Login("0187", "86001525", "206029");
+	//}
+	//else {
+	//	//sem_init(&login_sem, 0, 1);
+	//	
+	//	//this->Login(this->c_BrokerID, this->c_UserID, this->c_Password);
+	//}
 	cv.notify_one();
 }
 

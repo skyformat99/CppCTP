@@ -13,7 +13,6 @@
 #include "MarketConfig.h"
 #include "Algorithm.h"
 #include "Session.h"
-
 #include "xTradeStruct.h"
 
 class Strategy;
@@ -158,7 +157,7 @@ public:
 	//void CreatePositionDetailYesterday(PositionDetail *posd);
 	//void DeletePositionDetailYesterday(PositionDetail *posd);
 	//void UpdatePositionDetailYesterday(PositionDetail *posd);
-	//void getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> *l_posd, string trader_id, string userid);
+	void getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> *l_posd, string trader_id, string userid);
 
 	void setConn(mongo::DBClientConnection *conn);
 	mongo::DBClientConnection *getConn();

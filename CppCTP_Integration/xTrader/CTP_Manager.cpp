@@ -1971,7 +1971,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 			}
 			else if (msgtype == 15) { // 查询期货账户昨日持仓明细
 				std::cout << "查询期货账户昨日持仓明细..." << std::endl;
-#if 0
+#if 1
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
 				rapidjson::Value &MsgRef = doc["MsgRef"];
@@ -1989,7 +1989,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				std::cout << "收到交易员ID = " << s_TraderID << std::endl;
 				std::cout << "收到期货账户ID = " << s_UserID << std::endl;
 
-				list<PositionDetail *> l_posd;
+				list<USER_CThostFtdcOrderField *> l_posd;
 				static_dbm->getAllPositionDetailYesterday(&l_posd, s_TraderID, s_UserID);
 
 				/*构建策略昨仓Json*/
@@ -2004,14 +2004,14 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//创建Info数组
 				rapidjson::Value create_info_array(rapidjson::kArrayType);
 
-				list<PositionDetail *>::iterator pod_itor;
+				list<USER_CThostFtdcOrderField *>::iterator pod_itor;
 				for (pod_itor = l_posd.begin(); pod_itor != l_posd.end(); pod_itor++) {
 
 					/*构造内容json*/
 					rapidjson::Value create_info_object(rapidjson::kObjectType);
 					create_info_object.SetObject();
 
-					create_info_object.AddMember("instrumentid", rapidjson::StringRef((*pod_itor)->getInstrumentID().c_str()), allocator);
+					/*create_info_object.AddMember("instrumentid", rapidjson::StringRef((*pod_itor)->getInstrumentID().c_str()), allocator);
 					create_info_object.AddMember("orderref", rapidjson::StringRef((*pod_itor)->getOrderRef().c_str()), allocator);
 					create_info_object.AddMember("userid", rapidjson::StringRef((*pod_itor)->getUserID().c_str()), allocator);
 					create_info_object.AddMember("direction", (*pod_itor)->getDirection(), allocator);
@@ -2026,7 +2026,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					create_info_object.AddMember("insertdate", rapidjson::StringRef((*pod_itor)->getInsertDate().c_str()), allocator);
 					create_info_object.AddMember("inserttime", rapidjson::StringRef((*pod_itor)->getInsertTime().c_str()), allocator);
 					create_info_object.AddMember("strategyid", rapidjson::StringRef((*pod_itor)->getStrategyID().c_str()), allocator);
-					create_info_object.AddMember("volumetradedbatch", (*pod_itor)->getVolumeTradedBatch(), allocator);
+					create_info_object.AddMember("volumetradedbatch", (*pod_itor)->getVolumeTradedBatch(), allocator);*/
 
 					create_info_array.PushBack(create_info_object, allocator);
 

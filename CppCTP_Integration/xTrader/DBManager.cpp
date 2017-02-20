@@ -2353,13 +2353,18 @@ void DBManager::UpdatePositionDetailYesterday(PositionDetail *posd) {
 	}
 	USER_PRINT("DBManager::UpdatePositionDetailYesterday OK");
 }
+
+#endif
+
+#if 1
+
 void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> *l_posd,
 	string traderid, string userid) {
 	USER_PRINT("DBManager::getAllPositionDetailYesterday");
 	
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
-		list<PositionDetail *>::iterator itor;
+		list<USER_CThostFtdcOrderField *>::iterator itor;
 		for (itor = l_posd->begin(); itor != l_posd->end();) {
 			delete (*itor);
 			itor = l_posd->erase(itor);
@@ -2384,9 +2389,9 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 	while (cursor->more()) {
 		BSONObj p = cursor->next();
 
-		PositionDetail *new_pos = new PositionDetail();
+		USER_CThostFtdcOrderField *new_pos = new USER_CThostFtdcOrderField();
 
-		cout << "instrumentid = " << p.getStringField("instrumentid") << ", ";
+		/*cout << "instrumentid = " << p.getStringField("instrumentid") << ", ";
 		cout << "orderref = " << p.getStringField("orderref") << ", ";
 		cout << "userid = " << p.getStringField("userid") << ", ";
 		cout << "direction = " << p.getIntField("direction") << ", ";
@@ -2418,7 +2423,7 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 		new_pos->setInsertDate(p.getStringField("insertdate"));
 		new_pos->setInsertTime(p.getStringField("inserttime"));
 		new_pos->setStrategyID(p.getStringField("strategyid"));
-		new_pos->setVolumeTradedBatch(p.getIntField("volumetradedbatch"));
+		new_pos->setVolumeTradedBatch(p.getIntField("volumetradedbatch"));*/
 
 		l_posd->push_back(new_pos);
 	}
