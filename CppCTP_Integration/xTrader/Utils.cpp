@@ -160,11 +160,11 @@ string Utils::getNowTimeMs() {
 }
 
 string Utils::getNowTime() {
-	printf("---------------------------时间输出----------------------------------------\n");
-	printf("[time(NULL)]     :     %ld\n", time(NULL));
+	//printf("---------------------------时间输出----------------------------------------\n");
+	//printf("[time(NULL)]     :     %ld\n", time(NULL));
 	struct timespec ts;
 	clock_gettime(CLOCK_REALTIME, &ts);
-	printf("clock_gettime : tv_sec=%ld, tv_nsec=%ld\n", ts.tv_sec, ts.tv_nsec);
+	//printf("clock_gettime : tv_sec=%ld, tv_nsec=%ld\n", ts.tv_sec, ts.tv_nsec);
 
 	struct tm t;
 	char date_time[64];
@@ -204,9 +204,9 @@ bool Utils::compareTradingDaySeconds(const char *compare_day, const char *today)
 	struct tm tm_time = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	struct tm tm_time2 = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-	std::cout << "Utils::compareTradingDaySeconds()" << std::endl;
-	std::cout << "\t现在时间 = " << compare_day << std::endl;
-	std::cout << "\t对比时间 = " << today << std::endl;
+	//std::cout << "Utils::compareTradingDaySeconds()" << std::endl;
+	//std::cout << "\t现在时间 = " << compare_day << std::endl;
+	//std::cout << "\t对比时间 = " << today << std::endl;
 
 	//strptime(compare_day, "%Y%m%d%H%M%S", &tm_time); //时间格式：20161216 13:30:00
 	strptime(compare_day, "%Y%m%d%X", &tm_time);//时间格式：20161216 13:30:00
@@ -218,12 +218,12 @@ bool Utils::compareTradingDaySeconds(const char *compare_day, const char *today)
 
 	if (l_time1 >= l_time2) {
 		USER_PRINT("日期相等");
-		std::cout << "\t对比结果 = " << true << std::endl;
+		//std::cout << "\t对比结果 = " << true << std::endl;
 		return true; // 等于当前日期
 	}
 	else {
 		USER_PRINT("日期偏小了");
-		std::cout << "\t对比结果 = " << false << std::endl;
+		//std::cout << "\t对比结果 = " << false << std::endl;
 		return false; // 小于当前日期
 	}
 }

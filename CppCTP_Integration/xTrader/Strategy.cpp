@@ -14,6 +14,7 @@ using mongo::ConnectException;
 //std::mutex tick_mtx; // locks access to counter
 //std::mutex update_status_mtx; // locks access to counter
 //std::mutex select_order_algorithm_mtx; // locks access to counter
+std::mutex create_position_detail_mtx;
 
 #define ISACTIVE "1"
 #define ISNOTACTIVE "0"
@@ -954,6 +955,7 @@ void Strategy::CreatePositionDetail(USER_CThostFtdcOrderField *posd) {
 			b.append("limitprice", posd->LimitPrice);
 			b.append("volumetotaloriginal", posd->VolumeTotalOriginal);
 			b.append("tradingday", posd->TradingDay);
+			b.append("tradingdayrecord", posd->TradingDayRecord);
 			b.append("orderstatus", posd->OrderStatus);
 			b.append("volumetraded", posd->VolumeTraded);
 			b.append("volumetotal", posd->VolumeTotal);
@@ -964,7 +966,9 @@ void Strategy::CreatePositionDetail(USER_CThostFtdcOrderField *posd) {
 			b.append("is_active", ISACTIVE);
 
 			BSONObj p = b.obj();
+			create_position_detail_mtx.lock();
 			this->stg_save_strategy_conn->insert(DB_POSITIONDETAIL_COLLECTION, p);
+			create_position_detail_mtx.unlock();
 			USER_PRINT("DBManager::CreatePositionDetail ok");
 		}
 	}
@@ -995,6 +999,7 @@ void Strategy::Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
 			<< "limitprice" << posd->LimitPrice
 			<< "volumetotaloriginal" << posd->VolumeTotalOriginal
 			<< "tradingday" << posd->TradingDay
+			<< "tradingdayrecord" << posd->TradingDayRecord
 			<< "orderstatus" << posd->OrderStatus
 			<< "volumetraded" << posd->VolumeTraded
 			<< "volumetotal" << posd->VolumeTotal

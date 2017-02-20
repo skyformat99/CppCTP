@@ -75,6 +75,8 @@ struct USER_CThostFtdcOrderField
 	TThostFtdcSequenceNoType	NotifySequence;
 	///交易日
 	TThostFtdcDateType	TradingDay;
+	///记录保存日期
+	TThostFtdcDateType	TradingDayRecord;
 	///结算编号
 	TThostFtdcSettlementIDType	SettlementID;
 	///报单编号

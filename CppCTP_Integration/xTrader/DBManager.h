@@ -151,8 +151,8 @@ public:
 	//void CreatePositionDetail(USER_CThostFtdcOrderField *posd);
 	//void DeletePositionDetail(PositionDetail *posd);
 	//void UpdatePositionDetail(PositionDetail *posd);
-	//void getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, string trader_id = "", string userid = "");
-	//void DropPositionDetail();
+	void getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, string trader_id = "", string userid = "");
+	void DropPositionDetail();
 
 	//void CreatePositionDetailYesterday(PositionDetail *posd);
 	//void DeletePositionDetailYesterday(PositionDetail *posd);

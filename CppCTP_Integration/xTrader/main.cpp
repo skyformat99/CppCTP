@@ -269,9 +269,9 @@ void timer_handler() {
 
 	time_t tt = system_clock::to_time_t(system_clock::now()); 
 	std::string nowt(std::ctime(&tt));
-	std::cout << "main.cpp timer_handler()" << std::endl;
-	std::cout << "\t定时器输出" << std::endl;
-	std::cout << "\t现在时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
+	//std::cout << "main.cpp timer_handler()" << std::endl;
+	//std::cout << "\t定时器输出" << std::endl;
+	//std::cout << "\t现在时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
 
 
 	/************************************************************************/
@@ -289,7 +289,7 @@ void timer_handler() {
 	if (ctp_m->getCalTimer()->running()) {
 
 		string nowtime = Utils::getNowTime();
-		std::cout << "\t开始比较，现在时间 = " << nowtime << std::endl;
+		//std::cout << "\t开始比较，现在时间 = " << nowtime << std::endl;
 		
 		if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + one_min_time).c_str())) { // 时间大于14：50：00
 
@@ -304,10 +304,10 @@ void timer_handler() {
 					}
 
 				} 
-				else { // 时间大于14:59:00小于时间大于14:59:55，按照一秒一次计时
+				else { // 时间大于14:59:00小于时间小于14:59:55，按照一秒一次计时
 
 					if (!ctp_m->getOneSecondFlag()) {
-						std::cout << "\t开始进行1秒计时" << std::endl;
+						//std::cout << "\t开始进行1秒计时" << std::endl;
 						ctp_m->getCalTimer()->stop();
 						ctp_m->getCalTimer()->setSingleShot(false);
 						ctp_m->getCalTimer()->setInterval(Timer::Interval(1000));
@@ -320,7 +320,7 @@ void timer_handler() {
 			else { // 时间小于14:59:00,按照1分钟进行一次计时
 				if (!ctp_m->getOneMinFlag())
 				{
-					std::cout << "\t开始进行1分钟计时" << std::endl;
+					//std::cout << "\t开始进行1分钟计时" << std::endl;
 					ctp_m->getCalTimer()->stop();
 					ctp_m->getCalTimer()->setSingleShot(false);
 					ctp_m->getCalTimer()->setInterval(Timer::Interval(1000 * 60));
@@ -331,7 +331,7 @@ void timer_handler() {
 		}
 		else { // 时间小于14:50:00,按照10分钟进行一次计时
 			if (!ctp_m->getTenMinFlag()) {
-				std::cout << "\t开始进行10分钟计时" << std::endl;
+				//std::cout << "\t开始进行10分钟计时" << std::endl;
 				ctp_m->getCalTimer()->stop();
 				ctp_m->getCalTimer()->setSingleShot(false);
 				ctp_m->getCalTimer()->setInterval(Timer::Interval(1000 * 60 * 10));

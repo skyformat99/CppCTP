@@ -2188,6 +2188,10 @@ void DBManager::UpdatePositionDetail(PositionDetail *posd) {
 	USER_PRINT("DBManager::UpdatePositionDetail OK");
 }
 
+#endif
+
+#if 1
+
 void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, string traderid, string userid) {
 	USER_PRINT("DBManager::getAllPositionDetail");
 	
@@ -2229,6 +2233,7 @@ void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, 
 		cout << "limitprice = " << p.getField("limitprice").Double() << ", ";
 		cout << "volumetotaloriginal = " << p.getIntField("volumetotaloriginal") << ", ";
 		cout << "tradingday = " << p.getStringField("tradingday") << ", ";
+		cout << "tradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
 		cout << "orderstatus = " << p.getIntField("orderstatus") << ", ";
 		cout << "volumetraded = " << p.getIntField("volumetraded") << ", ";
 		cout << "volumetotal = " << p.getIntField("volumetotal") << ", ";
@@ -2246,6 +2251,7 @@ void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, 
 		new_pos->LimitPrice = p.getField("limitprice").Double();
 		new_pos->VolumeTotalOriginal = p.getIntField("volumetotaloriginal");
 		strcpy(new_pos->TradingDay, p.getStringField("tradingday"));
+		strcpy(new_pos->TradingDayRecord, p.getStringField("tradingdayrecord"));
 		new_pos->OrderStatus = p.getIntField("orderstatus");
 		new_pos->VolumeTraded = p.getIntField("volumetraded");
 		new_pos->VolumeTotal = p.getIntField("volumetotal");
@@ -2260,11 +2266,19 @@ void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, 
 	USER_PRINT("DBManager::getAllPositionDetail OK");
 }
 
+#endif
+
+#if 1
+
 void DBManager::DropPositionDetail() {
 	USER_PRINT("DBManager::DropPositionDetail");
 	this->conn->dropCollection(DB_POSITIONDETAIL_COLLECTION);
 	USER_PRINT("DBManager::DropPositionDetail ok");
 }
+
+#endif
+
+#if 0
 
 void DBManager::CreatePositionDetailYesterday(PositionDetail *posd) {
 	USER_PRINT("DBManager::CreatePositionDetailYesterday");

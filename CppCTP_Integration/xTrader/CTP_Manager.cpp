@@ -370,7 +370,7 @@ void CTP_Manager::saveStrategy() {
 	if (!this->isClosingSaved) {
 
 		// 删除持仓明细所有数据
-		//this->dbm->DropPositionDetail();
+		this->dbm->DropPositionDetail();
 
 		list<Strategy *>::iterator stg_itor;
 		list<USER_CThostFtdcOrderField *>::iterator posd_itor;
@@ -386,33 +386,34 @@ void CTP_Manager::saveStrategy() {
 			//this->dbm->UpdateStrategy((*stg_itor));
 			(*stg_itor)->UpdateStrategy((*stg_itor));
 
-			//// 遍历strategy持仓明细并保存
-			//for (posd_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
-			//	posd_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end();
-			//	posd_itor++) {
+			// 遍历strategy持仓明细并保存
+			for (posd_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
+				posd_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end();
+				posd_itor++) {
 
-			//	//this->dbm->CreatePositionDetail((*posd_itor));
-			//	std::cout << "\t================持仓明细输出BEGIN===================" << std::endl;
-			//	std::cout << "\tinstrumentid = " << (*posd_itor)->InstrumentID << std::endl;
-			//	std::cout << "\torderref = " << (*posd_itor)->OrderRef << std::endl;
-			//	std::cout << "\tuserid = " << (*posd_itor)->UserID << std::endl;
-			//	std::cout << "\tdirection = " << (*posd_itor)->Direction << std::endl;
-			//	std::cout << "\tcomboffsetflag = " << string(1, (*posd_itor)->CombOffsetFlag[0]) << std::endl;
-			//	std::cout << "\tcombhedgeflag = " << string(1, (*posd_itor)->CombHedgeFlag[0]) << std::endl;
-			//	std::cout << "\tlimitprice = " << (*posd_itor)->LimitPrice << std::endl;
-			//	std::cout << "\tvolumetotaloriginal = " << (*posd_itor)->VolumeTotalOriginal << std::endl;
-			//	std::cout << "\ttradingday = " << (*posd_itor)->TradingDay << std::endl;
-			//	std::cout << "\torderstatus = " << (*posd_itor)->OrderStatus << std::endl;
-			//	std::cout << "\tvolumetraded = " << (*posd_itor)->VolumeTraded << std::endl;
-			//	std::cout << "\tvolumetotal = " << (*posd_itor)->VolumeTotal << std::endl;
-			//	std::cout << "\tinsertdate = " << (*posd_itor)->InsertDate << std::endl;
-			//	std::cout << "\tinserttime = " << (*posd_itor)->InsertTime << std::endl;
-			//	std::cout << "\tstrategyid = " << (*posd_itor)->StrategyID << std::endl;
-			//	std::cout << "\tvolumetradedbatch = " << (*posd_itor)->VolumeTradedBatch << std::endl;
-			//	std::cout << "\t================持仓明细输出 END ===================" << std::endl;
+				//this->dbm->CreatePositionDetail((*posd_itor));
+				std::cout << "\t================持仓明细输出BEGIN===================" << std::endl;
+				std::cout << "\tinstrumentid = " << (*posd_itor)->InstrumentID << std::endl;
+				std::cout << "\torderref = " << (*posd_itor)->OrderRef << std::endl;
+				std::cout << "\tuserid = " << (*posd_itor)->UserID << std::endl;
+				std::cout << "\tdirection = " << (*posd_itor)->Direction << std::endl;
+				std::cout << "\tcomboffsetflag = " << (*posd_itor)->CombOffsetFlag << std::endl;
+				std::cout << "\tcombhedgeflag = " << (*posd_itor)->CombHedgeFlag << std::endl;
+				std::cout << "\tlimitprice = " << (*posd_itor)->LimitPrice << std::endl;
+				std::cout << "\tvolumetotaloriginal = " << (*posd_itor)->VolumeTotalOriginal << std::endl;
+				std::cout << "\ttradingday = " << (*posd_itor)->TradingDay << std::endl;
+				std::cout << "\ttradingdayrecord = " << (*posd_itor)->TradingDayRecord << std::endl;
+				std::cout << "\torderstatus = " << (*posd_itor)->OrderStatus << std::endl;
+				std::cout << "\tvolumetraded = " << (*posd_itor)->VolumeTraded << std::endl;
+				std::cout << "\tvolumetotal = " << (*posd_itor)->VolumeTotal << std::endl;
+				std::cout << "\tinsertdate = " << (*posd_itor)->InsertDate << std::endl;
+				std::cout << "\tinserttime = " << (*posd_itor)->InsertTime << std::endl;
+				std::cout << "\tstrategyid = " << (*posd_itor)->StrategyID << std::endl;
+				std::cout << "\tvolumetradedbatch = " << (*posd_itor)->VolumeTradedBatch << std::endl;
+				std::cout << "\t================持仓明细输出 END ===================" << std::endl;
 
-			//	(*stg_itor)->CreatePositionDetail((*posd_itor));
-			//}
+				(*stg_itor)->CreatePositionDetail((*posd_itor));
+			}
 		}
 		this->isClosingSaved = true;
 	}
@@ -435,33 +436,38 @@ void CTP_Manager::saveStrategyPositionDetail() {
 		//this->dbm->UpdateStrategy((*stg_itor));
 		(*stg_itor)->UpdateStrategy((*stg_itor));
 
-		//// 遍历strategy持仓明细并保存
-		//for (posd_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
-		//	posd_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end();
-		//	posd_itor++) {
+		// 遍历strategy持仓明细并保存
+		for (posd_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
+			posd_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end();
+			posd_itor++) {
 
-		//	//this->dbm->CreatePositionDetail((*posd_itor));
-		//	std::cout << "\t================持仓明细输出BEGIN===================" << std::endl;
-		//	std::cout << "\tinstrumentid = " << (*posd_itor)->InstrumentID << std::endl;
-		//	std::cout << "\torderref = " << (*posd_itor)->OrderRef << std::endl;
-		//	std::cout << "\tuserid = " << (*posd_itor)->UserID << std::endl;
-		//	std::cout << "\tdirection = " << (*posd_itor)->Direction << std::endl;
-		//	std::cout << "\tcomboffsetflag = " << string(1, (*posd_itor)->CombOffsetFlag[0]) << std::endl;
-		//	std::cout << "\tcombhedgeflag = " << string(1, (*posd_itor)->CombHedgeFlag[0]) << std::endl;
-		//	std::cout << "\tlimitprice = " << (*posd_itor)->LimitPrice << std::endl;
-		//	std::cout << "\tvolumetotaloriginal = " << (*posd_itor)->VolumeTotalOriginal << std::endl;
-		//	std::cout << "\ttradingday = " << (*posd_itor)->TradingDay << std::endl;
-		//	std::cout << "\torderstatus = " << (*posd_itor)->OrderStatus << std::endl;
-		//	std::cout << "\tvolumetraded = " << (*posd_itor)->VolumeTraded << std::endl;
-		//	std::cout << "\tvolumetotal = " << (*posd_itor)->VolumeTotal << std::endl;
-		//	std::cout << "\tinsertdate = " << (*posd_itor)->InsertDate << std::endl;
-		//	std::cout << "\tinserttime = " << (*posd_itor)->InsertTime << std::endl;
-		//	std::cout << "\tstrategyid = " << (*posd_itor)->StrategyID << std::endl;
-		//	std::cout << "\tvolumetradedbatch = " << (*posd_itor)->VolumeTradedBatch << std::endl;
-		//	std::cout << "\t================持仓明细输出 END ===================" << std::endl;
+			//this->dbm->CreatePositionDetail((*posd_itor));
+			std::cout << "\t================持仓明细输出BEGIN===================" << std::endl;
+			std::cout << "\tinstrumentid = " << (*posd_itor)->InstrumentID << std::endl;
+			std::cout << "\torderref = " << (*posd_itor)->OrderRef << std::endl;
+			std::cout << "\tuserid = " << (*posd_itor)->UserID << std::endl;
+			std::cout << "\tdirection = " << (*posd_itor)->Direction << std::endl;
+			/*std::cout << "\tcomboffsetflag = " << string(1, (*posd_itor)->CombOffsetFlag[0]) << std::endl;
+			std::cout << "\tcombhedgeflag = " << string(1, (*posd_itor)->CombHedgeFlag[0]) << std::endl;*/
 
-		//	(*stg_itor)->Update_Position_Detail_To_DB((*posd_itor));
-		//}
+			std::cout << "\tcomboffsetflag = " << (*posd_itor)->CombOffsetFlag << std::endl;
+			std::cout << "\tcombhedgeflag = " <<  (*posd_itor)->CombHedgeFlag << std::endl;
+
+			std::cout << "\tlimitprice = " << (*posd_itor)->LimitPrice << std::endl;
+			std::cout << "\tvolumetotaloriginal = " << (*posd_itor)->VolumeTotalOriginal << std::endl;
+			std::cout << "\ttradingday = " << (*posd_itor)->TradingDay << std::endl;
+			std::cout << "\ttradingdayrecord = " << (*posd_itor)->TradingDayRecord << std::endl;
+			std::cout << "\torderstatus = " << (*posd_itor)->OrderStatus << std::endl;
+			std::cout << "\tvolumetraded = " << (*posd_itor)->VolumeTraded << std::endl;
+			std::cout << "\tvolumetotal = " << (*posd_itor)->VolumeTotal << std::endl;
+			std::cout << "\tinsertdate = " << (*posd_itor)->InsertDate << std::endl;
+			std::cout << "\tinserttime = " << (*posd_itor)->InsertTime << std::endl;
+			std::cout << "\tstrategyid = " << (*posd_itor)->StrategyID << std::endl;
+			std::cout << "\tvolumetradedbatch = " << (*posd_itor)->VolumeTradedBatch << std::endl;
+			std::cout << "\t================持仓明细输出 END ===================" << std::endl;
+
+			(*stg_itor)->Update_Position_Detail_To_DB((*posd_itor));
+		}
 	}
 }
 
