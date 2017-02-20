@@ -174,11 +174,12 @@ private:
 	bool isClosingSaved;
 	list<Session *> *l_sessions;
 	list<USER_CThostFtdcOrderField *> *l_posdetail;
+	list<USER_CThostFtdcOrderField *> *l_posdetail_yesterday;
 	Timer *cal_timer;
 
-	bool ten_min_flag;
-	bool one_min_flag;
-	bool one_second_flag;
+	static bool ten_min_flag;
+	static bool one_min_flag;
+	static bool one_second_flag;
 
 };
 #endif

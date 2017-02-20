@@ -307,12 +307,13 @@ void timer_handler() {
 				else { // 时间大于14:59:00小于时间小于14:59:55，按照一秒一次计时
 
 					if (!ctp_m->getOneSecondFlag()) {
-						//std::cout << "\t开始进行1秒计时" << std::endl;
+						std::cout << "\t开始进行1秒计时" << std::endl;
 						ctp_m->getCalTimer()->stop();
 						ctp_m->getCalTimer()->setSingleShot(false);
 						ctp_m->getCalTimer()->setInterval(Timer::Interval(1000));
-						ctp_m->getCalTimer()->start();
 						ctp_m->setOneSecondFlag(true);
+						ctp_m->getCalTimer()->start();
+						
 					}
 				}
 
@@ -320,23 +321,26 @@ void timer_handler() {
 			else { // 时间小于14:59:00,按照1分钟进行一次计时
 				if (!ctp_m->getOneMinFlag())
 				{
-					//std::cout << "\t开始进行1分钟计时" << std::endl;
+					std::cout << "\t开始进行1分钟计时" << std::endl;
 					ctp_m->getCalTimer()->stop();
 					ctp_m->getCalTimer()->setSingleShot(false);
 					ctp_m->getCalTimer()->setInterval(Timer::Interval(1000 * 60));
-					ctp_m->getCalTimer()->start();
 					ctp_m->setOneMinFlag(true);
+					ctp_m->getCalTimer()->start();
+					
 				}
 			}
 		}
 		else { // 时间小于14:50:00,按照10分钟进行一次计时
 			if (!ctp_m->getTenMinFlag()) {
-				//std::cout << "\t开始进行10分钟计时" << std::endl;
+				std::cout << "\t开始进行10分钟计时" << std::endl;
 				ctp_m->getCalTimer()->stop();
 				ctp_m->getCalTimer()->setSingleShot(false);
 				ctp_m->getCalTimer()->setInterval(Timer::Interval(1000 * 60 * 10));
-				ctp_m->getCalTimer()->start();
 				ctp_m->setTenMinFlag(true);
+				ctp_m->getCalTimer()->start();
+				
+				
 			}
 		}
 	}

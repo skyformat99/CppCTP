@@ -2153,31 +2153,34 @@ void DBManager::DeletePositionDetail(PositionDetail *posd) {
 	}
 	USER_PRINT("DBManager::DeletePositionDetail OK");
 }
-void DBManager::UpdatePositionDetail(PositionDetail *posd) {
+#endif
+
+void DBManager::UpdatePositionDetail(USER_CThostFtdcOrderField *posd) {
 	USER_PRINT("DBManager::UpdatePositionDetail");
 	
 	int count_number = 0;
 
 	count_number = this->conn->count(DB_POSITIONDETAIL_COLLECTION,
-		BSON("userid" << posd->getUserID() << "strategyid" << posd->getStrategyID() << "tradingday" << posd->getTradingDay() << "is_active" << ISACTIVE));
+		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
-		this->conn->update(DB_POSITIONDETAIL_COLLECTION, BSON("userid" << posd->getUserID() << "strategyid" << posd->getStrategyID() << "tradingday" << posd->getTradingDay()), BSON("$set" << BSON("instrumentid" << posd->getInstrumentID()
-			<< "orderref" << posd->getOrderRef()
-			<< "userid" << posd->getUserID()
-			<< "direction" << posd->getDirection()
-			<< "comboffsetflag" << posd->getCombOffsetFlag()
-			<< "combhedgeflag" << posd->getCombHedgeFlag()
-			<< "limitprice" << posd->getLimitPrice()
-			<< "volumetotaloriginal" << posd->getVolumeTotalOriginal()
-			<< "tradingday" << posd->getTradingDay()
-			<< "orderstatus" << posd->getOrderStatus()
-			<< "volumetraded" << posd->getVolumeTraded()
-			<< "volumetotal" << posd->getVolumeTotal()
-			<< "insertdate" << posd->getInsertDate()
-			<< "inserttime" << posd->getInsertTime()
-			<< "strategyid" << posd->getStrategyID()
-			<< "volumetradedbatch" << posd->getVolumeTradedBatch()
+		this->conn->update(DB_POSITIONDETAIL_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("instrumentid" << posd->InstrumentID
+			<< "orderref" << posd->OrderRef
+			<< "userid" << posd->UserID
+			<< "direction" << posd->Direction
+			<< "comboffsetflag" << posd->CombOffsetFlag
+			<< "combhedgeflag" << posd->CombHedgeFlag
+			<< "limitprice" << posd->LimitPrice
+			<< "volumetotaloriginal" << posd->VolumeTotalOriginal
+			<< "tradingday" << posd->TradingDay
+			<< "tradingdayrecord" << posd->TradingDayRecord
+			<< "orderstatus" << posd->OrderStatus
+			<< "volumetraded" << posd->VolumeTraded
+			<< "volumetotal" << posd->VolumeTotal
+			<< "insertdate" << posd->InsertDate
+			<< "inserttime" << posd->InsertTime
+			<< "strategyid" << posd->StrategyID
+			<< "volumetradedbatch" << posd->VolumeTradedBatch
 			)));
 		USER_PRINT("DBManager::UpdatePositionDetail ok");
 	}
@@ -2188,9 +2191,7 @@ void DBManager::UpdatePositionDetail(PositionDetail *posd) {
 	USER_PRINT("DBManager::UpdatePositionDetail OK");
 }
 
-#endif
 
-#if 1
 
 void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, string traderid, string userid) {
 	USER_PRINT("DBManager::getAllPositionDetail");
@@ -2266,28 +2267,20 @@ void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, 
 	USER_PRINT("DBManager::getAllPositionDetail OK");
 }
 
-#endif
-
-#if 1
-
 void DBManager::DropPositionDetail() {
 	USER_PRINT("DBManager::DropPositionDetail");
 	this->conn->dropCollection(DB_POSITIONDETAIL_COLLECTION);
 	USER_PRINT("DBManager::DropPositionDetail ok");
 }
 
-#endif
-
-#if 0
-
-void DBManager::CreatePositionDetailYesterday(PositionDetail *posd) {
+void DBManager::CreatePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
 	USER_PRINT("DBManager::CreatePositionDetailYesterday");
 
 	int posd_count_num = 0;
 
 	if (posd != NULL) {
 		posd_count_num = this->conn->count(DB_POSITIONDETAIL_YESTERDAY_COLLECTION,
-			BSON("userid" << posd->getUserID() << "strategyid" << posd->getStrategyID() << "tradingday" << posd->getTradingDay() << "is_active" << ISACTIVE));
+			BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 		if (posd_count_num != 0) { //session_id存在
 			std::cout << "持仓明细已经存在了!" << std::endl;
 			return;
@@ -2295,22 +2288,23 @@ void DBManager::CreatePositionDetailYesterday(PositionDetail *posd) {
 		else { //posd 不存在
 			BSONObjBuilder b;
 
-			b.append("instrumentid", posd->getInstrumentID());
-			b.append("orderref", posd->getOrderRef());
-			b.append("userid", posd->getUserID());
-			b.append("direction", posd->getDirection());
-			b.append("comboffsetflag", posd->getCombOffsetFlag());
-			b.append("combhedgeflag", posd->getCombHedgeFlag());
-			b.append("limitprice", posd->getLimitPrice());
-			b.append("volumetotaloriginal", posd->getVolumeTotalOriginal());
-			b.append("tradingday", posd->getTradingDay());
-			b.append("orderstatus", posd->getOrderStatus());
-			b.append("volumetraded", posd->getVolumeTraded());
-			b.append("volumetotal", posd->getVolumeTotal());
-			b.append("insertdate", posd->getInsertDate());
-			b.append("inserttime", posd->getInsertTime());
-			b.append("strategyid", posd->getStrategyID());
-			b.append("volumetradedbatch", posd->getVolumeTradedBatch());
+			b.append("instrumentid", posd->InstrumentID);
+			b.append("orderref", posd->OrderRef);
+			b.append("userid", posd->UserID);
+			b.append("direction", posd->Direction);
+			b.append("comboffsetflag", posd->CombOffsetFlag);
+			b.append("combhedgeflag", posd->CombHedgeFlag);
+			b.append("limitprice", posd->LimitPrice);
+			b.append("volumetotaloriginal", posd->VolumeTotalOriginal);
+			b.append("tradingday", posd->TradingDay);
+			b.append("tradingdayrecord", posd->TradingDayRecord);
+			b.append("orderstatus", posd->OrderStatus);
+			b.append("volumetraded", posd->VolumeTraded);
+			b.append("volumetotal", posd->VolumeTotal);
+			b.append("insertdate", posd->InsertDate);
+			b.append("inserttime", posd->InsertTime);
+			b.append("strategyid", posd->StrategyID);
+			b.append("volumetradedbatch", posd->VolumeTradedBatch);
 
 			BSONObj p = b.obj();
 			conn->insert(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, p);
@@ -2319,15 +2313,15 @@ void DBManager::CreatePositionDetailYesterday(PositionDetail *posd) {
 	}
 	USER_PRINT("DBManager::CreatePositionDetailYesterday OK");
 }
-void DBManager::DeletePositionDetailYesterday(PositionDetail *posd) {
+void DBManager::DeletePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
 	USER_PRINT("DBManager::DeletePositionDetailYesterday");
 	int count_number = 0;
 
 	count_number = this->conn->count(DB_POSITIONDETAIL_YESTERDAY_COLLECTION,
-		BSON("userid" << posd->getUserID() << "strategyid" << posd->getStrategyID() << "tradingday" << posd->getTradingDay() << "is_active" << ISACTIVE));
+		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
-		this->conn->update(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, BSON("userid" << posd->getUserID() << "strategyid" << posd->getStrategyID() << "tradingday" << posd->getTradingDay()), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
+		this->conn->update(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
 		USER_PRINT("DBManager::DeletePositionDetail ok");
 	}
 	else {
@@ -2335,30 +2329,32 @@ void DBManager::DeletePositionDetailYesterday(PositionDetail *posd) {
 	}
 	USER_PRINT("DBManager::DeletePositionDetailYesterday OK");
 }
-void DBManager::UpdatePositionDetailYesterday(PositionDetail *posd) {
+
+void DBManager::UpdatePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
 	USER_PRINT("DBManager::UpdatePositionDetailYesterday");
 	int count_number = 0;
 
 	count_number = this->conn->count(DB_POSITIONDETAIL_YESTERDAY_COLLECTION,
-		BSON("userid" << posd->getUserID() << "strategyid" << posd->getStrategyID() << "tradingday" << posd->getTradingDay() << "is_active" << ISACTIVE));
+		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
-		this->conn->update(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, BSON("userid" << posd->getUserID() << "strategyid" << posd->getStrategyID() << "tradingday" << posd->getTradingDay()), BSON("$set" << BSON("instrumentid" << posd->getInstrumentID()
-			<< "orderref" << posd->getOrderRef()
-			<< "userid" << posd->getUserID()
-			<< "direction" << posd->getDirection()
-			<< "comboffsetflag" << posd->getCombOffsetFlag()
-			<< "combhedgeflag" << posd->getCombHedgeFlag()
-			<< "limitprice" << posd->getLimitPrice()
-			<< "volumetotaloriginal" << posd->getVolumeTotalOriginal()
-			<< "tradingday" << posd->getTradingDay()
-			<< "orderstatus" << posd->getOrderStatus()
-			<< "volumetraded" << posd->getVolumeTraded()
-			<< "volumetotal" << posd->getVolumeTotal()
-			<< "insertdate" << posd->getInsertDate()
-			<< "inserttime" << posd->getInsertTime()
-			<< "strategyid" << posd->getStrategyID()
-			<< "volumetradedbatch" << posd->getVolumeTradedBatch()
+		this->conn->update(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("instrumentid" << posd->InstrumentID
+			<< "orderref" << posd->OrderRef
+			<< "userid" << posd->UserID
+			<< "direction" << posd->Direction
+			<< "comboffsetflag" << posd->CombOffsetFlag
+			<< "combhedgeflag" << posd->CombHedgeFlag
+			<< "limitprice" << posd->LimitPrice
+			<< "volumetotaloriginal" << posd->VolumeTotalOriginal
+			<< "tradingday" << posd->TradingDay
+			<< "tradingdayrecord" << posd->TradingDayRecord
+			<< "orderstatus" << posd->OrderStatus
+			<< "volumetraded" << posd->VolumeTraded
+			<< "volumetotal" << posd->VolumeTotal
+			<< "insertdate" << posd->InsertDate
+			<< "inserttime" << posd->InsertTime
+			<< "strategyid" << posd->StrategyID
+			<< "volumetradedbatch" << posd->VolumeTradedBatch
 			)));
 		USER_PRINT("DBManager::UpdatePositionDetailYesterday ok");
 	}
@@ -2367,10 +2363,6 @@ void DBManager::UpdatePositionDetailYesterday(PositionDetail *posd) {
 	}
 	USER_PRINT("DBManager::UpdatePositionDetailYesterday OK");
 }
-
-#endif
-
-#if 1
 
 void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> *l_posd,
 	string traderid, string userid) {
@@ -2390,14 +2382,14 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 	if (traderid.compare("")) { //如果traderid不为空
 
 		if (userid.compare("")) { //如果userid不为空
-			cursor = this->conn->query(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid << "is_active" << ISACTIVE));
+			cursor = this->conn->query(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid << "is_active" << ISACTIVE));
 		}
 		else {
-			cursor = this->conn->query(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("trader_id" << traderid << "is_active" << ISNOTACTIVE));
+			cursor = this->conn->query(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "is_active" << ISACTIVE));
 		}
 	}
 	else {
-		cursor = this->conn->query(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
+		cursor = this->conn->query(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 	}
 
 	while (cursor->more()) {
@@ -2405,7 +2397,7 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 
 		USER_CThostFtdcOrderField *new_pos = new USER_CThostFtdcOrderField();
 
-		/*cout << "instrumentid = " << p.getStringField("instrumentid") << ", ";
+		cout << "instrumentid = " << p.getStringField("instrumentid") << ", ";
 		cout << "orderref = " << p.getStringField("orderref") << ", ";
 		cout << "userid = " << p.getStringField("userid") << ", ";
 		cout << "direction = " << p.getIntField("direction") << ", ";
@@ -2414,6 +2406,7 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 		cout << "limitprice = " << p.getField("limitprice").Double() << ", ";
 		cout << "volumetotaloriginal = " << p.getIntField("volumetotaloriginal") << ", ";
 		cout << "tradingday = " << p.getStringField("tradingday") << ", ";
+		cout << "tradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
 		cout << "orderstatus = " << p.getIntField("orderstatus") << ", ";
 		cout << "volumetraded = " << p.getIntField("volumetraded") << ", ";
 		cout << "volumetotal = " << p.getIntField("volumetotal") << ", ";
@@ -2422,29 +2415,35 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 		cout << "strategyid = " << p.getStringField("strategyid") << ", ";
 		cout << "volumetradedbatch = " << p.getIntField("volumetradedbatch") << ", ";
 
-		new_pos->setInstrumentID(p.getStringField("instrumentid"));
-		new_pos->setOrderRef(p.getStringField("orderref"));
-		new_pos->setUserID(p.getStringField("userid"));
-		new_pos->setDirection(p.getIntField("direction"));
-		new_pos->setCombOffsetFlag(p.getStringField("comboffsetflag"));
-		new_pos->setCombHedgeFlag(p.getStringField("combhedgeflag"));
-		new_pos->setLimitPrice(p.getField("limitprice").Double());
-		new_pos->setVolumeTotalOriginal(p.getIntField("volumetotaloriginal"));
-		new_pos->setTradingDay(p.getStringField("tradingday"));
-		new_pos->setOrderStatus(p.getIntField("orderstatus"));
-		new_pos->setVolumeTraded(p.getIntField("volumetraded"));
-		new_pos->setVolumeTotal(p.getIntField("volumetotal"));
-		new_pos->setInsertDate(p.getStringField("insertdate"));
-		new_pos->setInsertTime(p.getStringField("inserttime"));
-		new_pos->setStrategyID(p.getStringField("strategyid"));
-		new_pos->setVolumeTradedBatch(p.getIntField("volumetradedbatch"));*/
+		strcpy(new_pos->InstrumentID, p.getStringField("instrumentid"));
+		strcpy(new_pos->OrderRef, p.getStringField("orderref"));
+		strcpy(new_pos->UserID, p.getStringField("userid"));
+		new_pos->Direction = p.getIntField("direction");
+		strcpy(new_pos->CombOffsetFlag, p.getStringField("comboffsetflag"));
+		strcpy(new_pos->CombHedgeFlag, p.getStringField("combhedgeflag"));
+		new_pos->LimitPrice = p.getField("limitprice").Double();
+		new_pos->VolumeTotalOriginal = p.getIntField("volumetotaloriginal");
+		strcpy(new_pos->TradingDay, p.getStringField("tradingday"));
+		strcpy(new_pos->TradingDayRecord, p.getStringField("tradingdayrecord"));
+		new_pos->OrderStatus = p.getIntField("orderstatus");
+		new_pos->VolumeTraded = p.getIntField("volumetraded");
+		new_pos->VolumeTotal = p.getIntField("volumetotal");
+		strcpy(new_pos->InsertDate, p.getStringField("insertdate"));
+		strcpy(new_pos->InsertTime, p.getStringField("inserttime"));
+		strcpy(new_pos->StrategyID, p.getStringField("strategyid"));
+		new_pos->VolumeTradedBatch = p.getIntField("volumetradedbatch");
 
 		l_posd->push_back(new_pos);
 	}
 
 	USER_PRINT("DBManager::getAllPositionDetailYesterday OK");
 }
-#endif
+
+void DBManager::DropPositionDetailYesterday() {
+	USER_PRINT("DBManager::DropPositionDetailYesterday");
+	this->conn->dropCollection(DB_POSITIONDETAIL_YESTERDAY_COLLECTION);
+	USER_PRINT("DBManager::DropPositionDetailYesterday ok");
+}
 
 
 void DBManager::setConn(mongo::DBClientConnection *conn) {
