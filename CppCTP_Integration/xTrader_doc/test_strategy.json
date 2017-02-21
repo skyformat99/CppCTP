@@ -39,9 +39,9 @@
 	成功无数据:{"MsgRef":3,"MsgSendFlag":1,"MsgType":10,"TraderID":"1601","UserID":"058176","MsgResult":1,"MsgErrorReason":"未找到该策略昨仓信息","Info":[],"MsgSrc":0}
 	
 查询期货账户昨日持仓明细("UserID"值如果为空返回所有昨仓持仓明细，如果为某个期货账户，只返回对应期货账户的昨持仓明细):
-	请求:{"MsgRef":1,"MsgSendFlag":0,"MsgType":15,"TraderID":"1601","UserID":"058176","MsgSrc":0}
-	成功有数据:{"MsgRef":2,"MsgSendFlag":1,"MsgType":15,"TraderID":"1601","UserID":"058176","MsgResult":0,"MsgErrorReason":"","Info":[{"instrumentid":"cu1702","orderref":"101","userid":"058176","direction":0,"comboffsetflag":"1","combhedgeflag":"0","limitprice":99.99,"volumetotaloriginal":10,"tradingday":"20170111","orderstatus":3,"volumetraded":5,"volumetotal":5,"insertdate":"20170111","inserttime":"9:00:01","strategyid":"01","volumetradedbatch":0}],"MsgSrc":0}
-	成功无数据:{"MsgRef":1,"MsgSendFlag":1,"MsgType":15,"TraderID":"1601","UserID":"058176","MsgResult":0,"MsgErrorReason":"未找到该策略昨仓明细","Info":[],"MsgSrc":0}
+	请求:{"MsgRef":1,"MsgSendFlag":0,"MsgType":15,"TraderID":"1601","UserID":"063802","MsgSrc":0}
+	成功有数据:{"MsgRef":0,"MsgSendFlag":1,"MsgType":15,"TraderID":"1601","UserID":"063802","MsgResult":0,"MsgErrorReason":"","Info":[{"instrumentid":"","orderref":"100000000401","userid":"063802","direction":49,"comboffsetflag":"0","combhedgeflag":"1","limitprice":3401.0,"volumetotaloriginal":1,"tradingday":"20170220","tradingdayrecord":"20170221","orderstatus":48,"volumetraded":1,"volumetotal":0,"insertdate":"20170220","inserttime":"11:18:30","strategyid":"01","volumetradedbatch":1}],"MsgSrc":0}
+	成功无数据:{"MsgRef":0,"MsgSendFlag":1,"MsgType":15,"TraderID":"1601","UserID":"063802","MsgResult":0,"MsgErrorReason":"未找到该策略昨仓明细","Info":[],"MsgSrc":0}
 	
 查询sessions("UserID"值如果为空返回所有，如果为某个期货账户，只返回对应期货账户sessions):
 	请求:{"MsgRef":1,"MsgSendFlag":0,"MsgType":16,"TraderID":"1601","UserID":"","MsgSrc":0}

@@ -2185,7 +2185,7 @@ void DBManager::UpdatePositionDetail(USER_CThostFtdcOrderField *posd) {
 		USER_PRINT("DBManager::UpdatePositionDetail ok");
 	}
 	else {
-		cout << "PositionDetail Not Exists!" << endl;
+		cout << "更新今持仓明细,不存在!" << endl;
 	}
 
 	USER_PRINT("DBManager::UpdatePositionDetail OK");
@@ -2210,17 +2210,20 @@ void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, 
 	if (traderid.compare("")) { //如果traderid不为空
 
 		if (userid.compare("")) { //如果userid不为空
-			cursor = this->conn->query(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid << "is_active" << ISACTIVE));
+			cursor = this->conn->query(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("userid" << userid << "is_active" << ISACTIVE));
 		}
 		else {
-			cursor = this->conn->query(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("trader_id" << traderid << "is_active" << ISACTIVE));
+			cursor = this->conn->query(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 		}
 	}
 	else {
 		cursor = this->conn->query(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 	}
 
+	
+	std::cout << "DBManager::getAllPositionDetail" << std::endl;
 	while (cursor->more()) {
+		
 		BSONObj p = cursor->next();
 
 		USER_CThostFtdcOrderField *new_pos = new USER_CThostFtdcOrderField();
@@ -2258,7 +2261,11 @@ void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, 
 		new_pos->VolumeTotal = p.getIntField("volumetotal");
 		strcpy(new_pos->InsertDate, p.getStringField("insertdate"));
 		strcpy(new_pos->InsertTime, p.getStringField("inserttime"));
+		
 		strcpy(new_pos->StrategyID, p.getStringField("strategyid"));
+
+		std::cout << "\tnew_pos->StrategyID = " << new_pos->StrategyID << std::endl;
+
 		new_pos->VolumeTradedBatch = p.getIntField("volumetradedbatch");
 
 		l_posd->push_back(new_pos);
@@ -2305,6 +2312,7 @@ void DBManager::CreatePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
 			b.append("inserttime", posd->InsertTime);
 			b.append("strategyid", posd->StrategyID);
 			b.append("volumetradedbatch", posd->VolumeTradedBatch);
+			b.append("is_active", ISACTIVE);
 
 			BSONObj p = b.obj();
 			conn->insert(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, p);
@@ -2325,7 +2333,7 @@ void DBManager::DeletePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
 		USER_PRINT("DBManager::DeletePositionDetail ok");
 	}
 	else {
-		cout << "PositionDetail Not Exists!" << endl;
+		cout << "删除昨持仓明细,持仓明细不存在!" << endl;
 	}
 	USER_PRINT("DBManager::DeletePositionDetailYesterday OK");
 }
@@ -2359,7 +2367,7 @@ void DBManager::UpdatePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
 		USER_PRINT("DBManager::UpdatePositionDetailYesterday ok");
 	}
 	else {
-		cout << "PositionDetail Not Exists!" << endl;
+		cout << "更新昨持仓明细,持仓明细未找到!" << endl;
 	}
 	USER_PRINT("DBManager::UpdatePositionDetailYesterday OK");
 }
@@ -2367,7 +2375,7 @@ void DBManager::UpdatePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
 void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> *l_posd,
 	string traderid, string userid) {
 	USER_PRINT("DBManager::getAllPositionDetailYesterday");
-	
+
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
 		list<USER_CThostFtdcOrderField *>::iterator itor;
@@ -2381,14 +2389,19 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 
 	if (traderid.compare("")) { //如果traderid不为空
 
+		USER_PRINT("如果traderid不为空");
+
 		if (userid.compare("")) { //如果userid不为空
-			cursor = this->conn->query(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid << "is_active" << ISACTIVE));
+			USER_PRINT("如果userid不为空");
+			cursor = this->conn->query(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, MONGO_QUERY("userid" << userid << "is_active" << ISACTIVE));
 		}
 		else {
-			cursor = this->conn->query(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "is_active" << ISACTIVE));
+			USER_PRINT("如果userid为空");
+			cursor = this->conn->query(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 		}
 	}
 	else {
+		USER_PRINT("如果traderid为空");
 		cursor = this->conn->query(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 	}
 
@@ -2413,7 +2426,7 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 		cout << "insertdate = " << p.getStringField("insertdate") << ", ";
 		cout << "inserttime = " << p.getStringField("inserttime") << ", ";
 		cout << "strategyid = " << p.getStringField("strategyid") << ", ";
-		cout << "volumetradedbatch = " << p.getIntField("volumetradedbatch") << ", ";
+		cout << "volumetradedbatch = " << p.getIntField("volumetradedbatch") << std::endl;
 
 		strcpy(new_pos->InstrumentID, p.getStringField("instrumentid"));
 		strcpy(new_pos->OrderRef, p.getStringField("orderref"));

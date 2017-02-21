@@ -434,12 +434,10 @@ void CTP_Manager::saveStrategyPositionDetail() {
 	for (stg_itor = this->l_strategys->begin();
 		stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
 
-
-		std::cout << "\t关闭服务端,保存期货账户 = " << (*stg_itor)->getStgUserId() << std::endl;
-		std::cout << "\t关闭服务端,保存策略ID = " << (*stg_itor)->getStgStrategyId() << std::endl;
-
 		//this->dbm->UpdateStrategy((*stg_itor));
 		(*stg_itor)->UpdateStrategy((*stg_itor));
+		std::cout << "\t关闭服务端,保存期货账户 = " << (*stg_itor)->getStgUserId() << std::endl;
+		std::cout << "\t关闭服务端,保存策略ID = " << (*stg_itor)->getStgStrategyId() << std::endl;
 
 		// 遍历strategy持仓明细并保存
 		for (posd_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
@@ -447,29 +445,28 @@ void CTP_Manager::saveStrategyPositionDetail() {
 			posd_itor++) {
 
 			//this->dbm->CreatePositionDetail((*posd_itor));
-			std::cout << "\t================持仓明细输出BEGIN===================" << std::endl;
-			std::cout << "\tinstrumentid = " << (*posd_itor)->InstrumentID << std::endl;
-			std::cout << "\torderref = " << (*posd_itor)->OrderRef << std::endl;
-			std::cout << "\tuserid = " << (*posd_itor)->UserID << std::endl;
-			std::cout << "\tdirection = " << (*posd_itor)->Direction << std::endl;
+			std::cout << "\t\t================持仓明细输出BEGIN===================" << std::endl;
+			std::cout << "\t\tinstrumentid = " << (*posd_itor)->InstrumentID << std::endl;
+			std::cout << "\t\torderref = " << (*posd_itor)->OrderRef << std::endl;
+			std::cout << "\t\tuserid = " << (*posd_itor)->UserID << std::endl;
+			std::cout << "\t\tdirection = " << (*posd_itor)->Direction << std::endl;
 			/*std::cout << "\tcomboffsetflag = " << string(1, (*posd_itor)->CombOffsetFlag[0]) << std::endl;
 			std::cout << "\tcombhedgeflag = " << string(1, (*posd_itor)->CombHedgeFlag[0]) << std::endl;*/
 
-			std::cout << "\tcomboffsetflag = " << (*posd_itor)->CombOffsetFlag << std::endl;
-			std::cout << "\tcombhedgeflag = " <<  (*posd_itor)->CombHedgeFlag << std::endl;
-
-			std::cout << "\tlimitprice = " << (*posd_itor)->LimitPrice << std::endl;
-			std::cout << "\tvolumetotaloriginal = " << (*posd_itor)->VolumeTotalOriginal << std::endl;
-			std::cout << "\ttradingday = " << (*posd_itor)->TradingDay << std::endl;
-			std::cout << "\ttradingdayrecord = " << (*posd_itor)->TradingDayRecord << std::endl;
-			std::cout << "\torderstatus = " << (*posd_itor)->OrderStatus << std::endl;
-			std::cout << "\tvolumetraded = " << (*posd_itor)->VolumeTraded << std::endl;
-			std::cout << "\tvolumetotal = " << (*posd_itor)->VolumeTotal << std::endl;
-			std::cout << "\tinsertdate = " << (*posd_itor)->InsertDate << std::endl;
-			std::cout << "\tinserttime = " << (*posd_itor)->InsertTime << std::endl;
-			std::cout << "\tstrategyid = " << (*posd_itor)->StrategyID << std::endl;
-			std::cout << "\tvolumetradedbatch = " << (*posd_itor)->VolumeTradedBatch << std::endl;
-			std::cout << "\t================持仓明细输出 END ===================" << std::endl;
+			std::cout << "\t\tcomboffsetflag = " << (*posd_itor)->CombOffsetFlag << std::endl;
+			std::cout << "\t\tcombhedgeflag = " <<  (*posd_itor)->CombHedgeFlag << std::endl;
+			std::cout << "\t\tlimitprice = " << (*posd_itor)->LimitPrice << std::endl;
+			std::cout << "\t\tvolumetotaloriginal = " << (*posd_itor)->VolumeTotalOriginal << std::endl;
+			std::cout << "\t\ttradingday = " << (*posd_itor)->TradingDay << std::endl;
+			std::cout << "\t\ttradingdayrecord = " << (*posd_itor)->TradingDayRecord << std::endl;
+			std::cout << "\t\torderstatus = " << (*posd_itor)->OrderStatus << std::endl;
+			std::cout << "\t\tvolumetraded = " << (*posd_itor)->VolumeTraded << std::endl;
+			std::cout << "\t\tvolumetotal = " << (*posd_itor)->VolumeTotal << std::endl;
+			std::cout << "\t\tinsertdate = " << (*posd_itor)->InsertDate << std::endl;
+			std::cout << "\t\tinserttime = " << (*posd_itor)->InsertTime << std::endl;
+			std::cout << "\t\tstrategyid = " << (*posd_itor)->StrategyID << std::endl;
+			std::cout << "\t\tvolumetradedbatch = " << (*posd_itor)->VolumeTradedBatch << std::endl;
+			std::cout << "\t\t================持仓明细输出 END ===================" << std::endl;
 
 			(*stg_itor)->Update_Position_Detail_To_DB((*posd_itor));
 		}
@@ -2382,7 +2379,10 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 
 	// 将昨持仓明细添加到策略的持仓明细里
 	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
-		for (position_itor = this->l_posdetail_yesterday->begin(); position_itor != this->l_posdetail_yesterday->end(); l_posdetail_yesterday++) {
+		USER_PRINT("1111111");
+		for (position_itor = this->l_posdetail_yesterday->begin(); position_itor != this->l_posdetail_yesterday->end(); position_itor++) {
+
+			USER_PRINT("2222222");
 			
 			if ((!strcmp((*stg_itor)->getStgStrategyId().c_str(), (*position_itor)->StrategyID)) &&
 				(!strcmp((*stg_itor)->getStgUserId().c_str(), (*position_itor)->UserID))) { //策略id相同 && 用户ID相同
@@ -2394,6 +2394,8 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 
 		}
 	}
+
+	USER_PRINT("finish CTP_Manager::initStrategyAndFutureAccount()");
 
 	return flag;
 }

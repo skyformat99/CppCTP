@@ -20,7 +20,7 @@ struct USER_CThostFtdcOrderField
 	/*///策略编号
 	string StrategyID;*/
 	///策略编号
-	char StrategyID[2];
+	char StrategyID[3];
 	///用户代码
 	TThostFtdcUserIDType	UserID;
 	///报单价格条件
