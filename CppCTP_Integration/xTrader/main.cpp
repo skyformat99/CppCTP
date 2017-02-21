@@ -45,7 +45,7 @@ int sockfd;
 CTP_Manager *ctp_m = NULL;
 
 string one_min_time = "14:50:00";
-string one_sec_time = "14:59:00";
+string one_sec_time = "14:58:00";
 string stop_trading_time = "14:59:55";
 string close_time = "15:00:00";
 
@@ -276,7 +276,7 @@ void timer_handler() {
 
 	/************************************************************************/
 	/*	string one_min_time = "14：50：00";
-		string one_sec_time = "14：59：00";
+		string one_sec_time = "14：58：00";
 		string stop_trading_time = "14：59：55";
 		string close_time = "15：00：00";
 		时间在14:49:00之前，按照10分钟一次计时
@@ -293,18 +293,18 @@ void timer_handler() {
 		
 		if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + one_min_time).c_str())) { // 时间大于14：50：00
 
-			if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + one_sec_time).c_str())) { // 时间大于14:59:00
+			if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + one_sec_time).c_str())) { // 时间大于14:58:00
 				
 				if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + stop_trading_time).c_str())) { // 时间大于14:59:55
 					//关闭任务开关,防止刷单
 
 					if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + close_time).c_str())) { // 时间大于15:00:00
-						// 保存策略参数
-
+						// 保存策略参数,关闭定时器
+						ctp_m->getCalTimer()->stop();
 					}
 
 				} 
-				else { // 时间大于14:59:00小于时间小于14:59:55，按照一秒一次计时
+				else { // 时间大于14:58:00小于时间小于14:59:55，按照一秒一次计时
 
 					if (!ctp_m->getOneSecondFlag()) {
 						std::cout << "\t开始进行1秒计时" << std::endl;
@@ -318,7 +318,7 @@ void timer_handler() {
 				}
 
 			}
-			else { // 时间小于14:59:00,按照1分钟进行一次计时
+			else { // 时间小于14:58:00,按照1分钟进行一次计时
 				if (!ctp_m->getOneMinFlag())
 				{
 					std::cout << "\t开始进行1分钟计时" << std::endl;
