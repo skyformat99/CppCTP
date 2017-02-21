@@ -2297,7 +2297,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 	list<Strategy *>::iterator stg_itor_yesterday;
 	list<USER_CThostFtdcOrderField *>::iterator position_itor;
 
-	std::cout << "CTP_Manager::initYesterdayPositionDetail()" << std::endl;
+	std::cout << "CTP_Manager::initStrategyAndFutureAccount()" << std::endl;
 	std::cout << "\tCTP_Manager 系统交易日 = " << this->getTradingDay() << std::endl;
 	bool is_equal = false;
 	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
@@ -2353,26 +2353,28 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 	b:等于本交易日,直接从昨仓持仓明细列表进行初始化*/
 	/************************************************************************/
 
-	if (strcmp(this->l_posdetail->front()->TradingDayRecord, this->getTradingDay().c_str())) { //当今持仓明细第一条数据记录时间与CTP TradingDay时间不相等，清空操作昨持仓明细集合
-		this->dbm->DropPositionDetailYesterday();
+	if (this->l_posdetail->size() > 0) { // 如果今持仓明细有记录
+		if (strcmp(this->l_posdetail->front()->TradingDayRecord, this->getTradingDay().c_str())) { //当今持仓明细第一条数据记录时间与CTP TradingDay时间不相等，清空操作昨持仓明细集合
+			this->dbm->DropPositionDetailYesterday();
 
-		for (position_itor = this->l_posdetail->begin(); position_itor != this->l_posdetail->end(); position_itor++) { // 遍历今持仓明细列表
+			for (position_itor = this->l_posdetail->begin(); position_itor != this->l_posdetail->end(); position_itor++) { // 遍历今持仓明细列表
 
-			if (!strcmp((*position_itor)->TradingDayRecord, this->getTradingDay().c_str())) // 日期相等
-			{
-				;
+				if (!strcmp((*position_itor)->TradingDayRecord, this->getTradingDay().c_str())) // 日期相等
+				{
+					;
+				}
+				else { //日期不等
+					// 删除昨持仓明细对象,如果存在就删除,没有跳出
+					// this->dbm->DeletePositionDetailYesterday((*position_itor));
+					// 创建新的策略昨仓
+					// 记录更新时间为本交易日
+					strcpy((*position_itor)->TradingDayRecord, this->getTradingDay().c_str());
+					this->dbm->CreatePositionDetailYesterday((*position_itor));
+					this->dbm->UpdatePositionDetail((*position_itor));
+				}
 			}
-			else { //日期不等
-				// 删除昨持仓明细对象,如果存在就删除,没有跳出
-				// this->dbm->DeletePositionDetailYesterday((*position_itor));
-				// 创建新的策略昨仓
-				// 记录更新时间为本交易日
-				strcpy((*position_itor)->TradingDayRecord, this->getTradingDay().c_str());
-				this->dbm->CreatePositionDetailYesterday((*position_itor));
-				this->dbm->UpdatePositionDetail((*position_itor));
-			}
+
 		}
-
 	}
 
 	// 获取昨持仓明细
