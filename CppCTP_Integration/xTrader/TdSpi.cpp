@@ -129,6 +129,19 @@ void TdSpi::OnFrontConnected() {
 	cv.notify_one();
 }
 
+///当客户端与交易后台通信连接断开时，该方法被调用。当发生这个情况后，API会自动重新连接，客户端可不做处理。
+///@param nReason 错误原因
+///        0x1001 网络读失败
+///        0x1002 网络写失败
+///        0x2001 接收心跳超时
+///        0x2002 发送心跳失败
+///        0x2003 收到错误报文
+void TdSpi::OnFrontDisconnected(int nReason) {
+	std::cout << "TdSpi::OnFrontDisconnected()" << std::endl;
+	std::cout << "\t断线原因 = " << nReason << std::endl;
+	//std::cout << "\t当前用户 = " << this-> << std::endl;
+}
+
 //登录
 void TdSpi::Login(User *user) {
 	USER_PRINT("TdSpi::Login");
@@ -2084,14 +2097,17 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 		//}
 
 		string temp(pOrder->OrderRef);
-		string result = temp.substr(0, 1);
+		std::cout << "\t报单引用 = " << temp << std::endl;
 		int len_order_ref = temp.length();
-		string strategyid = temp.substr(len_order_ref - 2, 2);
+		std::cout << "\t报单引用长度 = " << len_order_ref << std::endl;
+		
+		string result = temp.substr(0, 1);
+		string strategyid = "";
 		
 		if (temp.length() == 12 && result == "1") { // 通过本交易系统发出去的order长度12,首位字符为1
 			this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pOrder);
 			//delete[] codeDst;
-
+			strategyid = temp.substr(len_order_ref - 2, 2);
 			list<Strategy *>::iterator itor;
 			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 				if ((*itor)->getStgStrategyId() == strategyid) {
