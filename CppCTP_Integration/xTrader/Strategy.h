@@ -306,6 +306,7 @@ public:
 
 	/// 更新持仓明细(Order)
 	void update_position_detail(USER_CThostFtdcOrderField *pOrder);
+	void update_position_detail(USER_CThostFtdcTradeField *pTrade_cal);
 
 	/// 更新交易状态
 	void update_task_status();
@@ -336,8 +337,15 @@ public:
 	/// 拷贝结构体USER_CThostFtdcOrderField
 	void CopyNewOrderData(USER_CThostFtdcOrderField *dst, USER_CThostFtdcOrderField *src);
 
+	
+
 	/// 拷贝结构体CThostFtdcTradeField
 	void CopyTradeData(CThostFtdcTradeField *dst, CThostFtdcTradeField *src);
+
+	/// 拷贝结构体CThostFtdcTradeField
+	void CopyTradeDataToNew(USER_CThostFtdcTradeField *dst, CThostFtdcTradeField *src);
+
+	void CopyNewTradeData(USER_CThostFtdcTradeField *dst, USER_CThostFtdcTradeField *src);
 
 	/// 收盘保存数据
 	void DropPositionDetail();
@@ -347,9 +355,14 @@ public:
 
 	/// 创建持仓明细
 	void CreatePositionDetail(USER_CThostFtdcOrderField *posd);
-
+	
 	/// 数据库更新策略持仓明细
 	void Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd);
+
+	/// 创建持仓明细
+	void CreatePositionTradeDetail(USER_CThostFtdcTradeField *posd);
+	/// 数据库更新策略持仓明细
+	void Update_Position_Trade_Detail_To_DB(USER_CThostFtdcTradeField *posd);
 
 	/// 设置开关
 	int getOn_Off();
@@ -428,7 +441,8 @@ public:
 
 	//void CopyPositionData(PositionDetail *posd, USER_CThostFtdcOrderField *order);
 
-	list<USER_CThostFtdcOrderField *> * getStg_List_Position_Detail_From_Order(); // 持仓明细
+	list<USER_CThostFtdcOrderField *> * getStg_List_Position_Detail_From_Order(); // 持仓明细(order)
+	list<USER_CThostFtdcTradeField *> * getStg_List_Position_Detail_From_Trade(); // 持仓明细(trade)
 
 	void printStrategyInfo(string message); //调试输出
 	void printStrategyInfoPosition();
@@ -523,6 +537,7 @@ private:
 	list<CThostFtdcOrderField *> *stg_list_order_pending;	// 挂单列表，报单、成交、撤单回报
 	list<CThostFtdcTradeField *> *stg_list_position_detail; // 持仓明细
 	list<USER_CThostFtdcOrderField *> *stg_list_position_detail_from_order; // 持仓明细
+	list<USER_CThostFtdcTradeField *> *stg_list_position_detail_from_trade; // 持仓明细
 	list<CThostFtdcTradeField *> *l_query_trade;
 	list<USER_CThostFtdcOrderField *> *l_query_order;
 

@@ -26,8 +26,13 @@ CTP_Manager::CTP_Manager() {
 	this->l_obj_trader = new list<Trader *>();
 	this->l_strategys = new list<Strategy *>();
 	this->l_strategys_yesterday = new list<Strategy *>();
+
+	this->l_posdetail_trade = new list<USER_CThostFtdcTradeField *>();
+	this->l_posdetail_trade_yesterday = new list<USER_CThostFtdcTradeField *>();
+
 	this->l_posdetail = new list<USER_CThostFtdcOrderField *>();
 	this->l_posdetail_yesterday = new list<USER_CThostFtdcOrderField *>();
+
 	this->l_instrument = new list<string>();
 	this->l_unsubinstrument = new list<string>();
 	this->l_sessions = new list<Session *>();
@@ -2018,7 +2023,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					rapidjson::Value create_info_object(rapidjson::kObjectType);
 					create_info_object.SetObject();
 
-					create_info_object.AddMember("instrumentid", rapidjson::StringRef((*pod_itor)->InvestorID), allocator);
+					create_info_object.AddMember("instrumentid", rapidjson::StringRef((*pod_itor)->InstrumentID), allocator);
 					create_info_object.AddMember("orderref", rapidjson::StringRef((*pod_itor)->OrderRef), allocator);
 					create_info_object.AddMember("userid", rapidjson::StringRef((*pod_itor)->UserID), allocator);
 					create_info_object.AddMember("direction", (*pod_itor)->Direction, allocator);
@@ -2125,6 +2130,77 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				
 
 				build_doc.AddMember("Info", info_array, allocator);
+				build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
+			}
+			else if (msgtype == 17) { // 查询期货账户昨日持仓明细(trade)
+				std::cout << "查询期货账户昨日持仓明细..." << std::endl;
+				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
+				rapidjson::Value &TraderID = doc["TraderID"];
+				rapidjson::Value &MsgRef = doc["MsgRef"];
+				rapidjson::Value &MsgSrc = doc["MsgSrc"];
+				rapidjson::Value &UserID = doc["UserID"];
+
+				string s_TraderID = TraderID.GetString();
+				string s_UserID = UserID.GetString();
+				int i_MsgRef = MsgRef.GetInt();
+				int i_MsgSendFlag = MsgSendFlag.GetInt();
+				int i_MsgSrc = MsgSrc.GetInt();
+
+				bool bFind = false;
+
+				std::cout << "收到交易员ID = " << s_TraderID << std::endl;
+				std::cout << "收到期货账户ID = " << s_UserID << std::endl;
+
+				list<USER_CThostFtdcTradeField *> l_posd;
+				static_dbm->getAllPositionDetailTradeYesterday(&l_posd, s_TraderID, s_UserID);
+
+				/*构建策略昨仓Json*/
+				build_doc.SetObject();
+				rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
+				build_doc.AddMember("MsgRef", server_msg_ref++, allocator);
+				build_doc.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator);
+				build_doc.AddMember("MsgType", 15, allocator);
+				build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
+				build_doc.AddMember("UserID", rapidjson::StringRef(s_UserID.c_str()), allocator);
+
+				//创建Info数组
+				rapidjson::Value create_info_array(rapidjson::kArrayType);
+
+				list<USER_CThostFtdcTradeField *>::iterator pod_itor;
+				for (pod_itor = l_posd.begin(); pod_itor != l_posd.end(); pod_itor++) {
+
+					/*构造内容json*/
+					rapidjson::Value create_info_object(rapidjson::kObjectType);
+					create_info_object.SetObject();
+
+					create_info_object.AddMember("instrumentid", rapidjson::StringRef((*pod_itor)->InstrumentID), allocator);
+					create_info_object.AddMember("orderref", rapidjson::StringRef((*pod_itor)->OrderRef), allocator);
+					create_info_object.AddMember("userid", rapidjson::StringRef((*pod_itor)->UserID), allocator);
+					create_info_object.AddMember("direction", (*pod_itor)->Direction, allocator);
+					create_info_object.AddMember("offsetflag", (*pod_itor)->OffsetFlag, allocator);
+					create_info_object.AddMember("hedgeflag", (*pod_itor)->HedgeFlag, allocator);
+					create_info_object.AddMember("price", (*pod_itor)->Price, allocator);
+					create_info_object.AddMember("tradingday", rapidjson::StringRef((*pod_itor)->TradingDay), allocator);
+					create_info_object.AddMember("tradingdayrecord", rapidjson::StringRef((*pod_itor)->TradingDayRecord), allocator);
+					create_info_object.AddMember("tradedate", rapidjson::StringRef((*pod_itor)->TradeDate), allocator);
+					create_info_object.AddMember("strategyid", rapidjson::StringRef((*pod_itor)->StrategyID), allocator);
+					create_info_object.AddMember("volume", (*pod_itor)->Volume, allocator);
+
+					create_info_array.PushBack(create_info_object, allocator);
+
+					bFind = true;
+				}
+
+				if (bFind) {
+					build_doc.AddMember("MsgResult", 0, allocator);
+					build_doc.AddMember("MsgErrorReason", "", allocator);
+				}
+				else {
+					build_doc.AddMember("MsgResult", 0, allocator);
+					build_doc.AddMember("MsgErrorReason", "未找到该策略昨仓明细(trade)", allocator);
+				}
+
+				build_doc.AddMember("Info", create_info_array, allocator);
 				build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
 			}
 			else {
@@ -2293,6 +2369,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 	list<Strategy *>::iterator stg_itor;
 	list<Strategy *>::iterator stg_itor_yesterday;
 	list<USER_CThostFtdcOrderField *>::iterator position_itor;
+	list<USER_CThostFtdcTradeField *>::iterator position_trade_itor;
 
 	std::cout << "CTP_Manager::initStrategyAndFutureAccount()" << std::endl;
 	std::cout << "\tCTP_Manager 系统交易日 = " << this->getTradingDay() << std::endl;
@@ -2344,8 +2421,8 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 		}
 	}
 
-	/************************************************************************/
-	/* 遍历今仓列表,对比TradingDayRecord,
+	/***************************Order**********************************/
+	/* 遍历今仓列表(order),对比TradingDayRecord,
 	a:小于本交易日TradingDay,覆盖到昨仓持仓明细列表
 	b:等于本交易日,直接从昨仓持仓明细列表进行初始化*/
 	/************************************************************************/
@@ -2394,6 +2471,60 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 
 		}
 	}
+
+	/*******************************Trade******************************/
+	/* 遍历今仓列表(trade),对比TradingDayRecord,
+	a:小于本交易日TradingDay,覆盖到昨仓持仓明细列表
+	b:等于本交易日,直接从昨仓持仓明细列表进行初始化*/
+	/************************************************************************/
+
+	if (this->l_posdetail_trade->size() > 0) { // 如果今持仓明细有记录
+		if (strcmp(this->l_posdetail->front()->TradingDayRecord, this->getTradingDay().c_str())) { //当今持仓明细第一条数据记录时间与CTP TradingDay时间不相等，清空操作昨持仓明细集合
+			this->dbm->DropPositionDetailTradeYesterday();
+
+			for (position_trade_itor = this->l_posdetail_trade->begin(); position_trade_itor != this->l_posdetail_trade->end(); position_trade_itor++) { // 遍历今持仓明细列表
+
+				if (!strcmp((*position_trade_itor)->TradingDayRecord, this->getTradingDay().c_str())) // 日期相等
+				{
+					;
+				}
+				else { //日期不等
+					// 删除昨持仓明细对象,如果存在就删除,没有跳出
+					// this->dbm->DeletePositionDetailYesterday((*position_itor));
+					// 创建新的策略昨仓
+					// 记录更新时间为本交易日
+					strcpy((*position_trade_itor)->TradingDayRecord, this->getTradingDay().c_str());
+					this->dbm->CreatePositionDetailTradeYesterday((*position_trade_itor));
+					this->dbm->UpdatePositionDetailTrade((*position_trade_itor));
+				}
+			}
+
+		}
+	}
+
+	// 获取昨持仓明细
+	this->dbm->getAllPositionDetailTradeYesterday(this->l_posdetail_trade_yesterday);
+
+	// 将昨持仓明细添加到策略的持仓明细里
+	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
+		USER_PRINT("1111111");
+		for (position_trade_itor = this->l_posdetail_trade_yesterday->begin(); position_trade_itor != this->l_posdetail_trade_yesterday->end(); position_trade_itor++) {
+
+			USER_PRINT("2222222");
+
+			if ((!strcmp((*stg_itor)->getStgStrategyId().c_str(), (*position_trade_itor)->StrategyID)) &&
+				(!strcmp((*stg_itor)->getStgUserId().c_str(), (*position_trade_itor)->UserID))) { //策略id相同 && 用户ID相同
+
+				//添加到对应策略的持仓明细列表里
+				(*stg_itor)->getStg_List_Position_Detail_From_Trade()->push_back((*position_trade_itor));
+
+			}
+
+		}
+	}
+
+
+
 
 	USER_PRINT("finish CTP_Manager::initStrategyAndFutureAccount()");
 
@@ -2550,10 +2681,12 @@ bool CTP_Manager::init(bool is_online) {
 	
 	std::cout << "\t初始化策略完成..." << std::endl;
 
-	/// 查询昨仓持仓明细
+	/// 查询昨仓持仓明细(order)
 	this->dbm->getAllPositionDetail(this->l_posdetail);
-	
 
+	/// 查询昨仓持仓明细(trade)
+	this->dbm->getAllPositionDetailTrade(this->l_posdetail_trade);
+	
 
 	/// 绑定操作：账户绑定到对应交易员名下
 	/// 绑定操作：策略绑定到对应期货账户下

@@ -149,4 +149,73 @@ struct USER_CThostFtdcOrderField
 
 };
 
+///成交
+struct USER_CThostFtdcTradeField
+{
+	///经纪公司代码
+	TThostFtdcBrokerIDType	BrokerID;
+	///投资者代码
+	TThostFtdcInvestorIDType	InvestorID;
+	///合约代码
+	TThostFtdcInstrumentIDType	InstrumentID;
+	///策略编号
+	char StrategyID[3];
+	///报单引用
+	TThostFtdcOrderRefType	OrderRef;
+	///用户代码
+	TThostFtdcUserIDType	UserID;
+	///交易所代码
+	TThostFtdcExchangeIDType	ExchangeID;
+	///成交编号
+	TThostFtdcTradeIDType	TradeID;
+	///买卖方向
+	TThostFtdcDirectionType	Direction;
+	///报单编号
+	TThostFtdcOrderSysIDType	OrderSysID;
+	///会员代码
+	TThostFtdcParticipantIDType	ParticipantID;
+	///客户代码
+	TThostFtdcClientIDType	ClientID;
+	///交易角色
+	TThostFtdcTradingRoleType	TradingRole;
+	///合约在交易所的代码
+	TThostFtdcExchangeInstIDType	ExchangeInstID;
+	///开平标志
+	TThostFtdcOffsetFlagType	OffsetFlag;
+	///投机套保标志
+	TThostFtdcHedgeFlagType	HedgeFlag;
+	///价格
+	TThostFtdcPriceType	Price;
+	///数量
+	TThostFtdcVolumeType	Volume;
+	///成交时期
+	TThostFtdcDateType	TradeDate;
+	///成交时间
+	TThostFtdcTimeType	TradeTime;
+	///成交类型
+	TThostFtdcTradeTypeType	TradeType;
+	///成交价来源
+	TThostFtdcPriceSourceType	PriceSource;
+	///交易所交易员代码
+	TThostFtdcTraderIDType	TraderID;
+	///本地报单编号
+	TThostFtdcOrderLocalIDType	OrderLocalID;
+	///结算会员编号
+	TThostFtdcParticipantIDType	ClearingPartID;
+	///业务单元
+	TThostFtdcBusinessUnitType	BusinessUnit;
+	///序号
+	TThostFtdcSequenceNoType	SequenceNo;
+	///交易日
+	TThostFtdcDateType	TradingDay;
+	///记录保存日期
+	TThostFtdcDateType	TradingDayRecord;
+	///结算编号
+	TThostFtdcSettlementIDType	SettlementID;
+	///经纪公司报单编号
+	TThostFtdcSequenceNoType	BrokerOrderSeq;
+	///成交来源
+	TThostFtdcTradeSourceType	TradeSource;
+};
+
 #endif

@@ -175,6 +175,10 @@ private:
 	list<Session *> *l_sessions;
 	list<USER_CThostFtdcOrderField *> *l_posdetail;
 	list<USER_CThostFtdcOrderField *> *l_posdetail_yesterday;
+
+	list<USER_CThostFtdcTradeField *> *l_posdetail_trade;
+	list<USER_CThostFtdcTradeField *> *l_posdetail_trade_yesterday;
+
 	Timer *cal_timer;
 
 	static bool ten_min_flag;

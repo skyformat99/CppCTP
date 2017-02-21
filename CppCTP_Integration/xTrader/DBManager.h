@@ -143,9 +143,9 @@ public:
 
 	/************************************************************************/
 	/*    
-	创建持仓明细
-	删除持仓明细
-	更新持仓明细*/
+	创建持仓明细(order)
+	删除持仓明细(order)
+	更新持仓明细(order)*/
 	/************************************************************************/
 	//void CreatePositionDetail(PositionDetail *posd);
 	//void CreatePositionDetail(USER_CThostFtdcOrderField *posd);
@@ -159,6 +159,26 @@ public:
 	void UpdatePositionDetailYesterday(USER_CThostFtdcOrderField *posd);
 	void getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> *l_posd, string trader_id = "", string userid = "");
 	void DropPositionDetailYesterday();
+
+
+	/************************************************************************/
+	/*
+	创建持仓明细(trade)
+	删除持仓明细(trade)
+	更新持仓明细(trade)*/
+	/************************************************************************/
+	void UpdatePositionDetailTrade(USER_CThostFtdcTradeField *posd);
+	void getAllPositionDetailTrade(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id = "", string userid = "");
+	void DropPositionDetailTrade();
+
+	void CreatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *posd);
+	void DeletePositionDetailTradeYesterday(USER_CThostFtdcTradeField *posd);
+	void UpdatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *posd);
+	void getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id = "", string userid = "");
+	void DropPositionDetailTradeYesterday();
+
+
+
 
 	void setConn(mongo::DBClientConnection *conn);
 	mongo::DBClientConnection *getConn();
