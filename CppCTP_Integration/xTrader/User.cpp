@@ -38,6 +38,9 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 	this->l_sessions = new list<Session *>();
 	this->stg_map_instrument_action_counter = new map<string, int>();
 	this->stg_order_ref_base = Utils::strtolonglong(stg_order_ref_base);
+	this->isLogged = true;
+	this->isConnected = true;
+	this->isLoggedError = false;
 	USER_PRINT(this->stg_order_ref_base);
 }
 
@@ -56,6 +59,9 @@ User::User(string BrokerID, string UserID, int nRequestID, string stg_order_ref_
 	this->l_sessions = new list<Session *>();
 	this->stg_map_instrument_action_counter = new map<string, int>();
 	this->stg_order_ref_base = Utils::strtolonglong(stg_order_ref_base);
+	this->isLogged = true;
+	this->isConnected = true;
+	this->isLoggedError = false;
 }
 
 User::~User() {
@@ -78,6 +84,15 @@ int User::getRequestID() {
 bool User::getIsLogged() {
 	return this->isLogged;
 }
+
+bool User::getIsLoggedError() {
+	return this->isLoggedError;
+}
+
+bool User::getIsConnected() {
+	return this->isConnected;
+}
+
 bool User::getIsFirstTimeLogged() {
 	return this->isFirstTimeLogged;
 }
@@ -115,6 +130,14 @@ void User::setRequestID(int nRequestID) {
 }
 void User::setIsLogged(bool isLogged) {
 	this->isLogged = isLogged;
+}
+
+void User::setIsLoggedError(bool isLoggedError) {
+	this->isLoggedError = isLoggedError;
+}
+
+void User::setIsConnected(bool isConnected) {
+	this->isConnected = isConnected;
 }
 
 void User::setIsFirstTimeLogged(bool isFirstTimeLogged) {

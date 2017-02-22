@@ -34,6 +34,8 @@ public:
 	string getPassword();
 	int getRequestID();
 	bool getIsLogged();
+	bool getIsLoggedError();
+	bool getIsConnected();
 	bool getIsFirstTimeLogged();
 	bool getIsConfirmSettlement();
 	int getLoginRequestID();
@@ -46,6 +48,8 @@ public:
 	void setPassword(string Password);
 	void setRequestID(int nRequestID);
 	void setIsLogged(bool isLogged);
+	void setIsLoggedError(bool isLoggedError);
+	void setIsConnected(bool isConnected);
 	void setIsFirstTimeLogged(bool isFirstTimeLogged);
 	void setIsConfirmSettlement(bool isConfirmSettlement);
 	void setLoginRequestID(int loginRequestID);
@@ -142,6 +146,8 @@ private:
 	string frontAddress;
 	int nRequestID;
 	bool isLogged;
+	bool isConnected;
+	bool isLoggedError;
 	bool isFirstTimeLogged;
 	bool isConfirmSettlement;
 	int loginRequestID;

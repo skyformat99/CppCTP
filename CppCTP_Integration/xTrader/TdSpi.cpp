@@ -109,6 +109,7 @@ void TdSpi::Connect(User *user) {
 	while (cv.wait_for(lck, std::chrono::seconds(RSP_TIMEOUT)) == std::cv_status::timeout) {
 		std::cout << "TdSpi::Connect()" << std::endl;
 		std::cout << "\t连接等待超时" << std::endl;
+		user->setIsConnected(false);
 		return;
 	}
 
@@ -172,6 +173,7 @@ void TdSpi::Login(User *user) {
 	while (cv.wait_for(lck, std::chrono::seconds(RSP_TIMEOUT)) == std::cv_status::timeout) {
 		std::cout << "TdSpi::Connect()" << std::endl;
 		std::cout << "\t登陆等待超时" << std::endl;
+		user->setIsLogged(false);
 		return;
 	}
 
@@ -241,8 +243,10 @@ void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 	else {
 		std::cout << "TdSpi::OnRspUserLogin()" << std::endl;
 		std::cout << "\t登陆出错!" << std::endl;
+		this->current_user->setIsLoggedError(true);
 		return;
 	}
+	//释放
 	cv.notify_one();
 }
 

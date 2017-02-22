@@ -61,14 +61,16 @@ int main() {
 
 	#ifdef EMU_EMU
 		/*模拟*/
-		string frontAddr = "tcp://180.168.146.187:10030"; //仿真
+		string frontAddr = "tcp://180.168.146.187:10030"; //盘后
 	#else
-		string frontAddr = "tcp://180.168.146.187:10000"; //实盘
+		string frontAddr = "tcp://180.168.146.187:10000"; //盘中
 	#endif
 	
 	string broker_id = "9999";
-	string user_id = "058176";
-	string password = "669822";
+	//string user_id = "058176";
+	//string password = "669822";
+	string user_id = "078681";
+	string password = "123456";
 #else
 	/*真实*/
 	string frontAddr = "tcp://101.95.8.190:41205"; //实盘

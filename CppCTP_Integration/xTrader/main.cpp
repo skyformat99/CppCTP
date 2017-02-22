@@ -63,7 +63,6 @@ void sig_handler(int signo) {
 			exit(1);
 		}
 		
-		
 		close(sockfd);
 		printf("\t服务端正常关闭\n");
 		exit(1);

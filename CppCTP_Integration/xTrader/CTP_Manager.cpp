@@ -676,8 +676,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				int i_MsgSrc = MsgSrc.GetInt();
 
 				std::cout << "收到交易员ID = " << s_TraderID << std::endl;
-				list<FutureAccount *> l_futureaccount;
-				static_dbm->SearchFutrueListByTraderID(s_TraderID, &l_futureaccount);
+				//list<FutureAccount *> l_futureaccount;
+				//static_dbm->SearchFutrueListByTraderID(s_TraderID, &l_futureaccount);
 
 				/*构建UserInfo的Json*/
 				build_doc.SetObject();
@@ -691,8 +691,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//创建Info数组
 				rapidjson::Value info_array(rapidjson::kArrayType);
 
-				list<FutureAccount *>::iterator future_itor;
-				for (future_itor = l_futureaccount.begin(); future_itor != l_futureaccount.end(); future_itor++) {
+				list<User *>::iterator future_itor;
+				for (future_itor = ctp_m->getL_User()->begin(); future_itor != ctp_m->getL_User()->end(); future_itor++) {
 
 					rapidjson::Value info_object(rapidjson::kObjectType);
 					info_object.SetObject();
@@ -2795,6 +2795,23 @@ bool CTP_Manager::init(bool is_online) {
 		std::cout << "\t账户 : " << (*user_itor)->getUserID() << " 初始化完成!" << std::endl;
 		sleep(3);
 	}
+
+	/// 进行登录检查,把登录失败的user从当前账户列表移出去
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end();) { // 遍历User
+		//已经连接+已经登录+登录无错误
+		if ((*user_itor)->getIsConnected() &&
+			(*user_itor)->getIsLogged() &&
+			(!(*user_itor)->getIsLoggedError()))
+		{
+			user_itor++;
+		} 
+		else
+		{
+			delete (*user_itor);
+			user_itor = this->l_user->erase(user_itor);
+		}
+	}
+
 	std::cout << "\t初始化期货账户和策略绑定完成..." << std::endl;
 
 
