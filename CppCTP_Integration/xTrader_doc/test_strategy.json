@@ -96,15 +96,3 @@ msgtype = 17
 	请求:{"MsgRef":1,"MsgSendFlag":0,"MsgType":17,"TraderID":"1601","UserID":"063802","MsgSrc":0}
 	成功有数据:{"MsgRef":0,"MsgSendFlag":1,"MsgType":15,"TraderID":"1601","UserID":"063802","MsgResult":0,"MsgErrorReason":"","Info":[{"instrumentid":"","orderref":"100000000401","userid":"063802","direction":49,"offsetflag":"0","hedgeflag":"1","price":3401.0,"tradingday":"20170220","tradingdayrecord":"20170221","tradedate":20170221,"strategyid":"01","volume":1}],"MsgSrc":0}
 	成功无数据:{"MsgRef":0,"MsgSendFlag":1,"MsgType":15,"TraderID":"1601","UserID":"063802","MsgResult":0,"MsgErrorReason":"未找到该策略昨仓明细(trade)","Info":[],"MsgSrc":0}
-
-
-	
-
-
-
-	
-	
-
-
-
-	
