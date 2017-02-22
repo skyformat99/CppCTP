@@ -384,6 +384,7 @@ void CTP_Manager::saveStrategy() {
 
 		list<Strategy *>::iterator stg_itor;
 		list<USER_CThostFtdcOrderField *>::iterator posd_itor;
+		list<USER_CThostFtdcTradeField *>::iterator posd_itor_trade;
 		USER_PRINT("CTP_Manager::saveStrategy");
 		std::cout << "CTP_Manager::saveStrategy()" << std::endl;
 		for (stg_itor = this->l_strategys->begin(); 
@@ -396,7 +397,7 @@ void CTP_Manager::saveStrategy() {
 			//this->dbm->UpdateStrategy((*stg_itor));
 			(*stg_itor)->UpdateStrategy((*stg_itor));
 
-			// 遍历strategy持仓明细并保存
+			// 遍历strategy持仓明细并保存(order)
 			for (posd_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
 				posd_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end();
 				posd_itor++) {
@@ -424,6 +425,30 @@ void CTP_Manager::saveStrategy() {
 
 				(*stg_itor)->CreatePositionDetail((*posd_itor));
 			}
+
+			// 遍历strategy持仓明细并保存(trade)
+			for (posd_itor_trade = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
+				posd_itor_trade != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end();
+				posd_itor_trade++) {
+
+				//this->dbm->CreatePositionDetail((*posd_itor));
+				std::cout << "\t================持仓明细输出BEGIN===================" << std::endl;
+				std::cout << "\tinstrumentid = " << (*posd_itor_trade)->InstrumentID << std::endl;
+				std::cout << "\torderref = " << (*posd_itor_trade)->OrderRef << std::endl;
+				std::cout << "\tuserid = " << (*posd_itor_trade)->UserID << std::endl;
+				std::cout << "\tdirection = " << (*posd_itor_trade)->Direction << std::endl;
+				std::cout << "\toffsetflag = " << (*posd_itor_trade)->OffsetFlag << std::endl;
+				std::cout << "\thedgeflag = " << (*posd_itor_trade)->HedgeFlag << std::endl;
+				std::cout << "\tprice = " << (*posd_itor_trade)->Price << std::endl;
+				std::cout << "\ttradingday = " << (*posd_itor_trade)->TradingDay << std::endl;
+				std::cout << "\ttradingdayrecord = " << (*posd_itor_trade)->TradingDayRecord << std::endl;
+				std::cout << "\ttradedate = " << (*posd_itor_trade)->TradeDate << std::endl;
+				std::cout << "\tstrategyid = " << (*posd_itor_trade)->StrategyID << std::endl;
+				std::cout << "\tvolume = " << (*posd_itor_trade)->Volume << std::endl;
+				std::cout << "\t================持仓明细输出 END ===================" << std::endl;
+
+				(*stg_itor)->CreatePositionTradeDetail((*posd_itor_trade));
+			}
 		}
 		this->isClosingSaved = true;
 	}
@@ -434,6 +459,7 @@ void CTP_Manager::saveStrategyPositionDetail() {
 
 	list<Strategy *>::iterator stg_itor;
 	list<USER_CThostFtdcOrderField *>::iterator posd_itor;
+	list<USER_CThostFtdcTradeField *>::iterator posd_itor_trade;
 	USER_PRINT("CTP_Manager::saveStrategyPositionDetail()");
 	std::cout << "CTP_Manager::saveStrategyPositionDetail()" << std::endl;
 	for (stg_itor = this->l_strategys->begin();
@@ -474,6 +500,33 @@ void CTP_Manager::saveStrategyPositionDetail() {
 			std::cout << "\t\t================持仓明细输出 END ===================" << std::endl;
 
 			(*stg_itor)->Update_Position_Detail_To_DB((*posd_itor));
+		}
+
+		// 遍历strategy持仓明细并保存
+		for (posd_itor_trade = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
+			posd_itor_trade != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end();
+			posd_itor_trade++) {
+
+			//this->dbm->CreatePositionDetail((*posd_itor));
+			std::cout << "\t\t================持仓明细输出BEGIN===================" << std::endl;
+			std::cout << "\t\tinstrumentid = " << (*posd_itor_trade)->InstrumentID << std::endl;
+			std::cout << "\t\torderref = " << (*posd_itor_trade)->OrderRef << std::endl;
+			std::cout << "\t\tuserid = " << (*posd_itor_trade)->UserID << std::endl;
+			std::cout << "\t\tdirection = " << (*posd_itor_trade)->Direction << std::endl;
+			/*std::cout << "\tcomboffsetflag = " << string(1, (*posd_itor)->CombOffsetFlag[0]) << std::endl;
+			std::cout << "\tcombhedgeflag = " << string(1, (*posd_itor)->CombHedgeFlag[0]) << std::endl;*/
+
+			std::cout << "\t\toffsetflag = " << (*posd_itor_trade)->OffsetFlag << std::endl;
+			std::cout << "\t\thedgeflag = " << (*posd_itor_trade)->HedgeFlag << std::endl;
+			std::cout << "\t\tprice = " << (*posd_itor_trade)->Price << std::endl;
+			std::cout << "\t\ttradingday = " << (*posd_itor_trade)->TradingDay << std::endl;
+			std::cout << "\t\ttradingdayrecord = " << (*posd_itor_trade)->TradingDayRecord << std::endl;
+			std::cout << "\t\ttradingdate = " << (*posd_itor_trade)->TradeDate << std::endl;
+			std::cout << "\t\tstrategyid = " << (*posd_itor_trade)->StrategyID << std::endl;
+			std::cout << "\t\tvolume = " << (*posd_itor_trade)->Volume << std::endl;
+			std::cout << "\t\t================持仓明细输出 END ===================" << std::endl;
+
+			(*stg_itor)->Update_Position_Trade_Detail_To_DB((*posd_itor_trade));
 		}
 	}
 }
@@ -2052,7 +2105,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				}
 				else {
 					build_doc.AddMember("MsgResult", 0, allocator);
-					build_doc.AddMember("MsgErrorReason", "未找到该策略昨仓明细", allocator);
+					build_doc.AddMember("MsgErrorReason", "未找到该策略昨仓明细(order)", allocator);
 				}
 
 				build_doc.AddMember("Info", create_info_array, allocator);
