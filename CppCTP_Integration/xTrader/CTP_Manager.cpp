@@ -2578,8 +2578,6 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 	}
 
 
-
-
 	USER_PRINT("finish CTP_Manager::initStrategyAndFutureAccount()");
 
 	return flag;
@@ -2634,55 +2632,55 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 //	return flag;
 //}
 
-/// 初始化昨仓明细
-bool CTP_Manager::initYesterdayPositionDetail() {
-	bool flag = false;
-	list<USER_CThostFtdcOrderField *>::iterator posd_itor;
-	list<Strategy *>::iterator stg_itor;
-
-	std::cout << "CTP_Manager::initYesterdayPositionDetail()" << std::endl;
-	std::cout << "\tCTP_Manager 系统交易日 = " << this->getTradingDay() << std::endl;
-	/// 遍历策略，遍历昨仓明细，进行绑定
-	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++)
-	{
-		for (posd_itor = this->l_posdetail->begin(); posd_itor != this->l_posdetail->end(); posd_itor++) {
-
-			// 绑定策略对应的持仓明细
-			if ((!strcmp((*stg_itor)->getStgUserId().c_str(), (*posd_itor)->UserID)) &&
-				(!strcmp((*stg_itor)->getStgStrategyId().c_str(), (*posd_itor)->StrategyID))) {
-
-				/************************************************************************/
-				/* 判断持仓明细的trading_day
-				1:如果trading_day等于CTP系统交易日,那么持仓明细已经更新过了，毋需更新
-				2:如果trading_day小于CTP系统交易日,那么过期的持仓明细进行更新，将过期的今仓数据更新为昨仓数据，并且更新trading_day*/
-				/************************************************************************/
-
-				if (!Utils::compareTradingDay((*posd_itor)->TradingDay, this->getTradingDay().c_str())) { // 持仓明细的trading_day不等于ctp系统交易日
-					//trading_day小于CTP系统交易日,那么过期的持仓明细进行更新，将过期的今仓数据更新为昨仓数据，并且更新trading_day
-
-				}
-
-				(*stg_itor)->printStrategyInfo("CTP_Manager::initYesterdayPositionDetail() 添加昨仓明细到各自策略持仓明细列表");
-				// 将持仓明细添加到对应策略持仓明细列表
-				(*stg_itor)->add_position_detail((*posd_itor));
-				flag = true;
-			}
-
-		}
-	}
-
-	if ((this->l_posdetail->size() > 0) && flag) {
-		flag = true;
-	}
-	else if ((this->l_posdetail->size() == 0) && (flag == false)) {
-		flag = true;
-	}
-	else
-	{
-		flag = false;
-	}
-	return flag;
-}
+///// 初始化昨仓明细
+//bool CTP_Manager::initYesterdayPositionDetail() {
+//	bool flag = false;
+//	list<USER_CThostFtdcOrderField *>::iterator posd_itor;
+//	list<Strategy *>::iterator stg_itor;
+//
+//	std::cout << "CTP_Manager::initYesterdayPositionDetail()" << std::endl;
+//	std::cout << "\tCTP_Manager 系统交易日 = " << this->getTradingDay() << std::endl;
+//	/// 遍历策略，遍历昨仓明细，进行绑定
+//	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++)
+//	{
+//		for (posd_itor = this->l_posdetail->begin(); posd_itor != this->l_posdetail->end(); posd_itor++) {
+//
+//			// 绑定策略对应的持仓明细
+//			if ((!strcmp((*stg_itor)->getStgUserId().c_str(), (*posd_itor)->UserID)) &&
+//				(!strcmp((*stg_itor)->getStgStrategyId().c_str(), (*posd_itor)->StrategyID))) {
+//
+//				/************************************************************************/
+//				/* 判断持仓明细的trading_day
+//				1:如果trading_day等于CTP系统交易日,那么持仓明细已经更新过了，毋需更新
+//				2:如果trading_day小于CTP系统交易日,那么过期的持仓明细进行更新，将过期的今仓数据更新为昨仓数据，并且更新trading_day*/
+//				/************************************************************************/
+//
+//				if (!Utils::compareTradingDay((*posd_itor)->TradingDay, this->getTradingDay().c_str())) { // 持仓明细的trading_day不等于ctp系统交易日
+//					//trading_day小于CTP系统交易日,那么过期的持仓明细进行更新，将过期的今仓数据更新为昨仓数据，并且更新trading_day
+//
+//				}
+//
+//				(*stg_itor)->printStrategyInfo("CTP_Manager::initYesterdayPositionDetail() 添加昨仓明细到各自策略持仓明细列表");
+//				// 将持仓明细添加到对应策略持仓明细列表
+//				(*stg_itor)->add_position_detail((*posd_itor));
+//				flag = true;
+//			}
+//
+//		}
+//	}
+//
+//	if ((this->l_posdetail->size() > 0) && flag) {
+//		flag = true;
+//	}
+//	else if ((this->l_posdetail->size() == 0) && (flag == false)) {
+//		flag = true;
+//	}
+//	else
+//	{
+//		flag = false;
+//	}
+//	return flag;
+//}
 
 /// 初始化
 bool CTP_Manager::init(bool is_online) {
@@ -2781,15 +2779,16 @@ bool CTP_Manager::init(bool is_online) {
 			}
 		}
 	}
-	std::cout << "\t初始化交易员期货账户绑定完成..." << std::endl;
+	std::cout << "\t初始化交易员,期货账户绑定完成..." << std::endl;
 
 	/// 绑定期货账户和策略
+	/// 绑定期货账户和策略
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
-		
+
 		USER_PRINT((*user_itor)->getUserID());
 
 		for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
-			
+
 			if ((*stg_itor)->getStgUserId() == (*user_itor)->getUserID()) {
 				USER_PRINT("Strategy Bind To User");
 				(*user_itor)->addStrategyToList((*stg_itor)); // 将策略添加到期货账户策略列表里
@@ -2797,9 +2796,52 @@ bool CTP_Manager::init(bool is_online) {
 				//(*stg_itor)->setStgTradingDay((*user_itor)->getTradingDay()); // 更新时间
 			}
 		}
+	}
+	std::cout << "\t初始化期货账户,策略绑定完成..." << std::endl;
+
+	/*/// 设置时间
+	this->setTradingDay(this->l_user->front()->getUserTradeSPI()->getTradingDay());*/
+
+	/// 行情初始化
+	MarketConfig *mc = this->dbm->getOneMarketConfig();
+	if (mc != NULL) {
+		this->mdspi = this->CreateMd(mc->getMarketFrontAddr(), mc->getBrokerID(), mc->getUserID(), mc->getPassword(), this->l_strategys);
+		if (this->mdspi != NULL) {
+			/// 向mdspi赋值strategys
+			//this->mdspi->setListStrategy(this->l_strategys);
+			/// 订阅合约
+			for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
+				USER_PRINT((*stg_itor)->getStgInstrumentIdA());
+				USER_PRINT((*stg_itor)->getStgInstrumentIdB());
+				/// 添加策略的合约到l_instrument
+				this->addSubInstrument((*stg_itor)->getStgInstrumentIdA(), this->l_instrument);
+				this->addSubInstrument((*stg_itor)->getStgInstrumentIdB(), this->l_instrument);
+			}
+			/// 订阅合约
+			this->SubmarketData(this->mdspi, this->l_instrument);
+		}
+	}
+	std::cout << "\t初始化行情完成..." << std::endl;
+
+	/// 如果是新的交易日，更新策略，今昨持仓量以及期货账户报单引用
+	if (!(this->initStrategyAndFutureAccount())) {
+		USER_PRINT("初始化策略，仓位失败...");
+		std::cout << "\t初始化策略，仓位失败..." << std::endl;
+		init_flag = false;
+		return init_flag;
+	}
+	else {
+		USER_PRINT("策略，仓位完成...");
+		std::cout << "t初始化策略，仓位完成..." << std::endl;
+	}
+	
+	/// 绑定期货账户和策略
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
+		
+		USER_PRINT((*user_itor)->getUserID());
 		/// 遍历设值后进行TD初始化，初始化绑定对应的策略列表
 		this->CreateAccount((*user_itor), (*user_itor)->getListStrategy());
-		std::cout << "\t账户 : " << (*user_itor)->getUserID() << " 初始化完成!" << std::endl;
+		//std::cout << "\t账户 : " << (*user_itor)->getUserID() << " 初始化完成!" << std::endl;
 		sleep(3);
 	}
 
@@ -2819,8 +2861,27 @@ bool CTP_Manager::init(bool is_online) {
 		}
 	}
 
-	std::cout << "\t初始化期货账户和策略绑定完成..." << std::endl;
+	if ((this->l_user->size() <= 0)) {
+		USER_PRINT("可用期货账户为空!");
+		std::cout << "\t期货账户登录均失败,请检查id与密码" << std::endl;
+		init_flag = false;
+		return init_flag;
+	}
+	else {
+		std::cout << "\t初始化期货账户和策略绑定完成..." << std::endl;
+	}
 
+	/// 查询投资者持仓
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
+
+		USER_PRINT((*user_itor)->getUserID());
+		(*user_itor)->getUserTradeSPI()->QryInvestorPosition();
+		sleep(1);
+		(*user_itor)->getUserTradeSPI()->QryInvestorPositionDetail();
+		sleep(2);
+	}
+	
+	
 
 	/// 合约查询后对策略合约最小跳进行赋值
 	this->l_user->front()->getUserTradeSPI()->QryInstrument();
@@ -2841,8 +2902,7 @@ bool CTP_Manager::init(bool is_online) {
 	}
 	std::cout << "\t初始化合约最小跳价格完成..." << std::endl;
 
-	/// 设置时间
-	this->setTradingDay(this->l_user->front()->getUserTradeSPI()->getTradingDay());
+	
 
 	/// session维护，如果不是本交易日的session，就要删除
 	/*for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) {
@@ -2864,17 +2924,7 @@ bool CTP_Manager::init(bool is_online) {
 	}*/
 
 
-	/// 如果是新的交易日，更新策略，今昨持仓量以及期货账户报单引用
-	if (!(this->initStrategyAndFutureAccount())) {
-		USER_PRINT("初始化账户，策略，仓位失败...");
-		std::cout << "\t初始化账户，策略，仓位失败..." << std::endl;
-		init_flag = false;
-		return init_flag;
-	}
-	else {
-		USER_PRINT("初始化账户，策略，仓位完成...");
-		std::cout << "t初始化账户，策略，仓位完成..." << std::endl;
-	}
+	
 
 	/// 昨仓持仓明细初始化
 	/*if (!(this->initYesterdayPositionDetail())) {
@@ -2897,6 +2947,11 @@ bool CTP_Manager::init(bool is_online) {
 	//	}
 	//}
 
+
+	/************************************************************************/
+	/* 初始化今持仓明细，通过QryOrder回调进行计算(此法不可靠，由于返回值乱序，无法维护)                                                                     */
+	/************************************************************************/
+#if 0
 	USER_PRINT("初始化持仓明细");
 	list<CThostFtdcOrderField *> *l_query_order;
 	list<CThostFtdcOrderField *>::iterator order_itor;
@@ -2919,27 +2974,8 @@ bool CTP_Manager::init(bool is_online) {
 		}
 	}
 	std::cout << "t初始化今仓持仓明细完成..." << std::endl;
-
-	/// 行情初始化
-	MarketConfig *mc = this->dbm->getOneMarketConfig();
-	if (mc != NULL) {
-		this->mdspi = this->CreateMd(mc->getMarketFrontAddr(), mc->getBrokerID(), mc->getUserID(), mc->getPassword(), this->l_strategys);
-		if (this->mdspi != NULL) {
-			/// 向mdspi赋值strategys
-			//this->mdspi->setListStrategy(this->l_strategys);
-			/// 订阅合约
-			for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
-				USER_PRINT((*stg_itor)->getStgInstrumentIdA());
-				USER_PRINT((*stg_itor)->getStgInstrumentIdB());
-				/// 添加策略的合约到l_instrument
-				this->addSubInstrument((*stg_itor)->getStgInstrumentIdA(), this->l_instrument);
-				this->addSubInstrument((*stg_itor)->getStgInstrumentIdB(), this->l_instrument);
-			}
-			/// 订阅合约
-			this->SubmarketData(this->mdspi, this->l_instrument);
-		}
-	}
-	std::cout << "\t初始化行情完成..." << std::endl;
+#endif
+	
 	std::cout << "===========恭喜============" << std::endl;
 	std::cout << "|=!xTrader系统初始化完成!=|" << std::endl;
 	std::cout << "===========================" << std::endl;

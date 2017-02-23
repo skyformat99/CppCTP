@@ -3,6 +3,10 @@
 //
 #include <iostream>
 #include <string>
+#include <chrono>
+#include <thread>
+#include <mutex>              // std::mutex, std::unique_lock
+#include <condition_variable> // std::condition_variable, std::cv_status
 #include "MdSpi.h"
 
 using namespace std;
@@ -11,7 +15,9 @@ const string BROKER_ID = "9999";
 const string USER_ID = "058176";
 const string PASS = "669822";
 struct timespec outtime = {3, 0};
-
+std::condition_variable md_cv;
+std::mutex md_mtx;
+#define RSP_TIMEOUT	120
 
 //初始化构造函数
 MdSpi::MdSpi(CThostFtdcMdApi *mdapi) {
@@ -69,10 +75,14 @@ void MdSpi::Connect(char *frontAddress) {
 	USER_PRINT("MdSpi::Connect")
 	this->mdapi->RegisterFront(frontAddress); //24H
 	this->mdapi->Init();
-	int ret = this->controlTimeOut(&connect_sem);
+	//int ret = this->controlTimeOut(&connect_sem);
 
-	if (ret == -1) {
-		USER_PRINT("MdSpi::Connect TimeOut!")
+	//等待回调
+	std::unique_lock<std::mutex> lck(md_mtx);
+	while (md_cv.wait_for(lck, std::chrono::seconds(RSP_TIMEOUT)) == std::cv_status::timeout) {
+		std::cout << "MdSpi::Connect()" << std::endl;
+		std::cout << "\t行情连接等待超时" << std::endl;
+		return;
 	}
 }
 
@@ -99,6 +109,7 @@ void MdSpi::OnFrontConnected() {
 		
 		this->Login(r_BrokerID, r_UserID, r_Password);
 	}
+	md_cv.notify_one();
 	
 	//this->Login("9999", "058176", "669822");
 }
@@ -115,9 +126,16 @@ void MdSpi::Login(char *BrokerID, char *UserID, char *Password) {
 	strcpy(loginField->Password, Password);
 	this->mdapi->ReqUserLogin(loginField, this->loginRequestID);
 	
-	int ret = this->controlTimeOut(&login_sem);
+	/*int ret = this->controlTimeOut(&login_sem);
 	if (ret == -1) {
-		USER_PRINT("MdSpi::Login TimeOut!")
+	USER_PRINT("MdSpi::Login TimeOut!")
+	}*/
+	//等待回调
+	std::unique_lock<std::mutex> lck(md_mtx);
+	while (md_cv.wait_for(lck, std::chrono::seconds(RSP_TIMEOUT)) == std::cv_status::timeout) {
+		std::cout << "MdSpi::Connect()" << std::endl;
+		std::cout << "\t行情登录等待超时" << std::endl;
+		return;
 	}
 }
 
@@ -129,8 +147,6 @@ void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtd
 	if (bIsLast && !(this->IsErrorRspInfo(pRspInfo))) {
 		///交易日
 		cout << "交易日" << pRspUserLogin->TradingDay << ", ";
-
-		
 		///登录成功时间
 		cout << "登录成功时间" << pRspUserLogin->LoginTime << ", ";
 		///经纪公司代码
@@ -165,7 +181,8 @@ void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtd
 			this->SubMarketData(this->ppInstrumentID, this->nCount);
 		}
 	}
-    
+	//释放
+	md_cv.notify_one();
 }
 
 //返回数据是否报错

@@ -64,6 +64,7 @@ Strategy::Strategy(User *stg_user) {
 	init_finished = false;
 
 	this->l_query_order = new list<USER_CThostFtdcOrderField *>();
+	this->l_position_detail_from_ctp = new list<CThostFtdcInvestorPositionDetailField *>();
 }
 
 
@@ -1708,6 +1709,18 @@ void Strategy::add_position_detail(USER_CThostFtdcOrderField *posd) {
 	this->stg_list_position_detail_from_order->push_back(posd);
 }
 
+void Strategy::setL_Position_Detail_From_CTP(list<CThostFtdcInvestorPositionDetailField *> *l_position_detail_from_ctp) {
+	this->l_position_detail_from_ctp = l_position_detail_from_ctp;
+}
+
+list<CThostFtdcInvestorPositionDetailField *> *Strategy::getL_Position_Detail_From_CTP() {
+	return this->l_position_detail_from_ctp;
+}
+
+void Strategy::addL_Position_Detail_From_CTP(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail) {
+	this->l_position_detail_from_ctp->push_back(pInvestorPositionDetail);
+}
+
 //void Strategy::CopyPositionData(PositionDetail *posd, USER_CThostFtdcOrderField *order) {
 //	USER_PRINT("Strategy::CopyPositionData");
 //	strcpy(order->InstrumentID, posd->getInstrumentID().c_str());
@@ -2075,8 +2088,11 @@ void Strategy::Order_Algorithm_One() {
 	//USER_PRINT(this->getOn_Off());
 
 
-	/// 策略开关，期货账户开关，总开关
-	if (!((this->getOn_Off()) && (this->stg_user->getOn_Off()) && (this->stg_user->GetTrader()->getOn_Off()))) {
+	/// 策略开关，期货账户开关，交易员开关，系统总开关
+	if (!((this->getOn_Off()) && 
+		(this->stg_user->getOn_Off()) && 
+		(this->stg_user->GetTrader()->getOn_Off()) && 
+		(this->stg_user->getCTP_Manager()->getOn_Off()))) {
 		USER_PRINT("请检查开关状态!");
 		//this->printStrategyInfo("请检查开关状态!");
 		/*std::cout << "策略开关 = " << this->getOn_Off() << std::endl;

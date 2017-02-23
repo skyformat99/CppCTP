@@ -155,7 +155,7 @@ public:
 	bool initStrategyAndFutureAccount();
 
 	/// ³õÊ¼»¯×ò²ÖÃ÷Ï¸
-	bool initYesterdayPositionDetail();
+	//bool initYesterdayPositionDetail();
 
 private:
 	Login *login;

@@ -1134,6 +1134,13 @@ void TdSpi::QryInvestorPositionDetail() {
 	CThostFtdcQryInvestorPositionDetailField *pQryInvestorPositionDetail = new CThostFtdcQryInvestorPositionDetailField();
 	this->tdapi->ReqQryInvestorPositionDetail(pQryInvestorPositionDetail, this->getRequestID());
 	delete pQryInvestorPositionDetail;
+	//等待回调
+	std::unique_lock<std::mutex> lck(mtx);
+	while (cv.wait_for(lck, std::chrono::seconds(RSP_TIMEOUT)) == std::cv_status::timeout) {
+		std::cout << "TdSpi::QryInvestorPositionDetail()" << std::endl;
+		std::cout << "\t查询持仓明细等待超时" << std::endl;
+		return;
+	}
 }
 
 ///请求查询投资者持仓明细响应
@@ -1197,6 +1204,7 @@ void TdSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField
 			cout << "=================================================================================" << endl;
 		}
 	}
+	cv.notify_one();
 }
 
 //请求查询投资者持仓响应
@@ -2118,9 +2126,12 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 		std::cout << "\t报单引用长度 = " << len_order_ref << std::endl;
 		
 		string result = temp.substr(0, 1);
+		std::cout << "\tafter substr temp = " << temp << std::endl;
 		string strategyid = "";
 		
-		if (temp.length() == 12 && result == "1") { // 通过本交易系统发出去的order长度12,首位字符为1
+		if (len_order_ref == 12 && result == "1") { // 通过本交易系统发出去的order长度12,首位字符为1
+
+
 			this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pOrder);
 			//delete[] codeDst;
 			strategyid = temp.substr(len_order_ref - 2, 2);
@@ -2207,10 +2218,27 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 
 		//this->current_user->DB_OnRtnTrade(this->current_user->GetTradeConn(), pTrade);
 
-		if (this->l_strategys != NULL) {
+		
+		string temp(pTrade->OrderRef);
+		std::cout << "\t报单引用 = " << temp << std::endl;
+		int len_order_ref = temp.length();
+		std::cout << "\t报单引用长度 = " << len_order_ref << std::endl;
+
+		string result = temp.substr(0, 1);
+		std::cout << "\tafter substr temp = " << temp << std::endl;
+		string strategyid = "";
+
+		if (len_order_ref == 12 && result == "1") { // 通过本交易系统发出去的order长度12,首位字符为1
+
+			//this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pOrder);
+			//delete[] codeDst;
+			strategyid = temp.substr(len_order_ref - 2, 2);
 			list<Strategy *>::iterator itor;
 			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
-				(*itor)->OnRtnTrade(pTrade);
+				if ((*itor)->getStgStrategyId() == strategyid) {
+					(*itor)->OnRtnTrade(pTrade);
+					//break;
+				}
 			}
 		}
 	}
