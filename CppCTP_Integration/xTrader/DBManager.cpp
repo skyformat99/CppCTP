@@ -18,17 +18,17 @@ using std::vector;
 using std::auto_ptr;
 using std::unique_ptr;
 
-
+#define DB_NAME									"CTP"
 #define DB_OPERATOR_COLLECTION					"CTP.trader"
 #define DB_SESSIONS_COLLECTION					"CTP.sessions"
 #define DB_ADMIN_COLLECTION						"CTP.admin"
 #define DB_STRATEGY_COLLECTION					"CTP.strategy"
 #define DB_POSITIONDETAIL_COLLECTION			"CTP.positiondetail"
 #define DB_POSITIONDETAIL_YESTERDAY_COLLECTION	"CTP.positiondetail_yesterday"
-
-#define DB_POSITIONDETAIL_TRADE_COLLECTION	"CTP.positiondetail_trade"
+#define DB_POSITIONDETAIL_TRADE_COLLECTION		"CTP.positiondetail_trade"
 #define DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION	"CTP.positiondetail_trade_yesterday"
-
+#define DB_SYSTEM_RUNNING_STATUS_COLLECTION		"CTP.system_running_status"
+#define DB_RUNNING_KEY							"BEES_HOME"
 #define DB_STRATEGY_YESTERDAY_COLLECTION		"CTP.strategy_yesterday"
 #define DB_ALGORITHM_COLLECTION					"CTP.algorithm"
 #define ISACTIVE "1"
@@ -93,6 +93,40 @@ void DBManager::setIs_Online(bool is_online) {
 bool DBManager::getIs_Online() {
 	return this->is_online;
 }
+
+/************************************************************************/
+/* 查询mongodb是否存在昨持仓明细(trade,order)集合。
+如果存在说明上次程序正常关闭；
+如果不存在说明程序关闭有误*/
+/************************************************************************/
+bool DBManager::CheckSystemStartFlag() {
+	std::cout << "DBManager::CheckSystemStartFlag()" << std::endl;
+	list<string> collection_names;
+	bool flag_one = false;
+	bool flag_two = false;
+	collection_names = this->conn->getCollectionNames(DB_NAME);
+	list<string>::iterator str_itor;
+	for (str_itor = collection_names.begin(); str_itor != collection_names.end(); str_itor++) {
+		std::cout << "\tcollection_name = " << (*str_itor) << std::endl;
+		if ((*str_itor) == "positiondetail_yesterday") {
+			flag_one = true;
+		}
+		else if ((*str_itor) == "positiondetail_trade_yesterday") {
+			flag_two = true;
+		}
+	}
+	
+	if (flag_one && flag_two) {
+	}
+	else {
+		if (flag_one) { std::cout << "\tpositiondetail_yesterday exists." << std::endl; }
+		else { std::cout << "\tpositiondetail_yesterday NOT exists." << std::endl; }
+		if (flag_two) { std::cout << "\tpositiondetail_trade_yesterday exists." << std::endl; }
+		else { std::cout << "\tpositiondetail_trade_yesterday NOT exists." << std::endl; }
+		return false;
+	}
+}
+
 
 // 创建Trader
 void DBManager::CreateTrader(Trader *op) {
@@ -2724,6 +2758,29 @@ void DBManager::DropPositionDetailTradeYesterday() {
 	USER_PRINT("DBManager::DropPositionDetailTradeYesterday");
 	this->conn->dropCollection(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION);
 	USER_PRINT("DBManager::DropPositionDetailTradeYesterday ok");
+}
+
+void DBManager::UpdateSystemRunningStatus(string key, string value) {
+	USER_PRINT("DBManager::UpdateSystemRunningStatus");
+	std::cout << "DBManager::UpdateSystemRunningStatus(" << value << ")" << std::endl;
+	this->conn->update(DB_SYSTEM_RUNNING_STATUS_COLLECTION, BSON("key" << DB_RUNNING_KEY), BSON("$set" << BSON("status" << value)));
+	USER_PRINT("DBManager::UpdateSystemRunningStatus ok");
+}
+
+bool DBManager::GetSystemRunningStatus() {
+	USER_PRINT("DBManager::GetSystemRunningStatus");
+	bool flag = false;;
+	BSONObj obj = this->conn->findOne(DB_SYSTEM_RUNNING_STATUS_COLLECTION, MONGO_QUERY("key" << DB_RUNNING_KEY));
+	if (!obj.isEmpty()) {
+		if (!strcmp("off", obj.getStringField("status"))) {
+			flag = true;
+		}
+		else {
+			flag = false;
+		}
+	}
+	return flag;
+	USER_PRINT("DBManager::GetSystemRunningStatus ok");
 }
 
 

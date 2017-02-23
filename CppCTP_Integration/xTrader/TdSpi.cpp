@@ -90,18 +90,30 @@ void TdSpi::addApi(User *user, string flowpath) {
 }
 
 //建立连接
-void TdSpi::Connect(User *user) {
+void TdSpi::Connect(User *user, bool init_flag) {
 	USER_PRINT("TdSpi::Connect");
 	USER_PRINT(const_cast<char *>(user->getFrontAddress().c_str()));
 	this->tdapi = user->getUserTradeAPI();
 	cout << "TdSpi::Connect()" << std::endl;
-	cout << "\t已创建连接 = " << this->tdapi << std::endl;
+	cout << "\t已创建连接对象 = " << this->tdapi << std::endl;
 	this->tdapi->RegisterFront(const_cast<char *>(user->getFrontAddress().c_str()));
 	//注册事件处理对象
 	this->tdapi->RegisterSpi(user->getUserTradeSPI());
-	//订阅共有流和私有流
+	//订阅共有流
 	this->tdapi->SubscribePublicTopic(THOST_TERT_QUICK);
-	this->tdapi->SubscribePrivateTopic(THOST_TERT_QUICK);
+	/************************************************************************/
+	/* 根据读取数据库数据决定订阅私有流是否需要重新传输                                                                     */
+	/************************************************************************/
+	//订阅私有流
+	if (init_flag) //系统正常初始化,从上次退出继续初始化
+	{
+		this->tdapi->SubscribePrivateTopic(THOST_TERT_RESUME);
+	} 
+	else	// 系统非正常退出,重新传送所有数据
+	{
+		this->tdapi->SubscribePrivateTopic(THOST_TERT_RESTART);
+	}
+
 	this->tdapi->Init();
 
 	//等待回调
@@ -2119,11 +2131,7 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 					//break;
 				}
 			}
-
-			
-
 		}
-		
 
 	} else {
 		USER_PRINT("OnRtnOrder no pOrder");

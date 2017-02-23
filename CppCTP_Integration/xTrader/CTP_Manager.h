@@ -184,6 +184,7 @@ private:
 	static bool ten_min_flag;
 	static bool one_min_flag;
 	static bool one_second_flag;
+	bool system_init_flag;
 
 };
 #endif

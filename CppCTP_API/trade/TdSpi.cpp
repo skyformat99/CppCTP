@@ -1,15 +1,20 @@
 #include <iostream>
 #include <cstring>
-#include <chrono>
 #include <thread>
+#include <ratio>
+#include <chrono>  // chrono::system_clock
+#include <ctime>   // localtime
+#include <sstream> // stringstream
+#include <string>  // string
 
 #include "TdSpi.h"
 using namespace std;
 using std::string;
+using namespace std::chrono;
 
 #define DEBUG
 #ifdef DEBUG
-#define USER_PRINT(x) std::cout << "DEBUG - " << __DATE__ << ", " << __TIME__<< ", " << __FILE__ << ", Line - " << __LINE__ << endl; std::cout << #x << " = " << x << std::endl;
+#define USER_PRINT(x) {time_t tt = system_clock::to_time_t(system_clock::now()); std::string nowt(std::ctime(&tt)); std::cerr << "[DEBUG] - " << nowt.substr(0, nowt.length() - 1) << ", " << __FILE__ << ", Line - " << __LINE__ << " - " << #x << " = " << x << std::endl;}
 #else
 #define USER_PRINT(x)
 #endif
@@ -79,8 +84,8 @@ void TdSpi::Connect(char *frontAddress) {
 	//注册事件处理对象
 	this->tdapi->RegisterSpi(this);
 	//订阅共有流和私有流
-	this->tdapi->SubscribePublicTopic(THOST_TERT_RESUME);
-	this->tdapi->SubscribePrivateTopic(THOST_TERT_RESUME);
+	this->tdapi->SubscribePublicTopic(THOST_TERT_RESTART);
+	this->tdapi->SubscribePrivateTopic(THOST_TERT_RESTART);
 	this->tdapi->Init();
 
 	int ret = this->controlTimeOut(&connect_sem);

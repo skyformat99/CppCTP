@@ -39,6 +39,12 @@ public:
 	void setIs_Online(bool is_online);
 	bool getIs_Online();
 
+	/************************************************************************/
+	/* 查询mongodb是否存在昨持仓明细(trade,order)集合。
+	如果存在说明上次程序正常关闭；
+	如果不存在说明程序关闭有误*/
+	/************************************************************************/
+	bool CheckSystemStartFlag();
 
 	/************************************************************************/
 	/* 创建交易员
@@ -177,8 +183,17 @@ public:
 	void getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id = "", string userid = "");
 	void DropPositionDetailTradeYesterday();
 
+	/************************************************************************/
+	/* 系统状态维护
+	系统每次启动之后，初始化系统状态running为on,当系统正常关闭,running状态更新为off
+	如果启动发现running状态为on，说明上次未正常关闭,那么今天的持仓明细维护可能出错,私有流采取THOST_TERT_RESTART模式,对今持仓明细全部重新统计
+	如果启动发现running状态为off，说明上次正常关闭，私有流采取THOST_TERT_RESUME模式，从上次断开的地方重新传送数据即可
 
-
+	任何模式初始化完成之后,本地仓位统计结果需要和CTP接口查询持仓数据结果保持一致,一旦存在不相同情况,系统要重新初始化.
+	*/
+	/************************************************************************/
+	void UpdateSystemRunningStatus(string key, string value);
+	bool GetSystemRunningStatus();
 
 	void setConn(mongo::DBClientConnection *conn);
 	mongo::DBClientConnection *getConn();

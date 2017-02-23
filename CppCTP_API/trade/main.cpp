@@ -67,10 +67,10 @@ int main() {
 	#endif
 	
 	string broker_id = "9999";
-	//string user_id = "058176";
-	//string password = "669822";
-	string user_id = "078681";
-	string password = "123456";
+	string user_id = "058176";
+	string password = "669822";
+	//string user_id = "078681";
+	//string password = "123456";
 #else
 	/*真实*/
 	string frontAddr = "tcp://101.95.8.190:41205"; //实盘
@@ -116,11 +116,11 @@ int main() {
 	//登录
 	//tdspi->Login("0187", "86001525", "206029");
 	//tdspi->Login("0187", "801859", "162860");
-	sleep(1);
+	//sleep(1);
 	//查询交易结算确认
-	tdspi->QrySettlementInfoConfirm(const_cast<char *>(tdspi->getBrokerID().c_str()), const_cast<char *>(tdspi->getUserID().c_str()), tdspi->getRequestID());
+	//tdspi->QrySettlementInfoConfirm(const_cast<char *>(tdspi->getBrokerID().c_str()), const_cast<char *>(tdspi->getUserID().c_str()), tdspi->getRequestID());
 	//查询交易所
-	sleep(6);
+	//sleep(6);
 	//tdspi->QryExchange();
 	//查询合约
 	//sleep(1);
@@ -134,8 +134,8 @@ int main() {
 	//cout << "oh?" << endl;
 
 	//查询账户资金
-	//sleep(1);
-	//tdspi->QryTradingAccount();
+	sleep(1);
+	tdspi->QryTradingAccount();
 
 	//查询保证金率
 	//sleep(1);
@@ -146,8 +146,8 @@ int main() {
 	//tdspi->QryInstrumentCommissionRate();
 
 	//查询账户
-	//sleep(1);
-	//tdspi->QryInvestor();
+	sleep(1);
+	tdspi->QryInvestor();
 
 	//查询账户持仓情况
 	//sleep(1);

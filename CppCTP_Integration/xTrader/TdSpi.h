@@ -45,7 +45,7 @@ public:
 	void addApi(User *user, string flowpath);
 
 	//建立连接
-	void Connect(User *user);
+	void Connect(User *user, bool init_flag = false);
 
     //当客户端与交易后台建立起通信连接时（还未登录前），该方法被调用。
     void OnFrontConnected();

@@ -36,7 +36,8 @@ CTP_Manager::CTP_Manager() {
 	this->l_instrument = new list<string>();
 	this->l_unsubinstrument = new list<string>();
 	this->l_sessions = new list<Session *>();
-	isClosingSaved = false;
+	this->isClosingSaved = false;
+	this->system_init_flag = false;
 	//this->ten_min_flag = false;
 	//this->one_min_flag = false;
 	//this->one_second_flag = false;
@@ -97,7 +98,7 @@ User * CTP_Manager::CreateAccount(User *user, list<Strategy *> *l_strategys) {
 		std::cout << "\t期货账户 = " << user->getUserID() << endl;
 		std::cout << "\tBrokerID = " << user->getBrokerID() << endl;
 		std::cout << "\t期货密码 = " << user->getPassword() << endl;
-		user->getUserTradeSPI()->Connect(user); // 连接
+		user->getUserTradeSPI()->Connect(user, this->system_init_flag); // 连接
 		sleep(1);
 		user->getUserTradeSPI()->Login(user); // 登陆
 		sleep(1);
@@ -2733,6 +2734,12 @@ bool CTP_Manager::init(bool is_online) {
 	this->dbm->getAllStrategyYesterdayByActiveUser(this->l_strategys_yesterday, this->l_user);
 	
 	std::cout << "\t初始化策略完成..." << std::endl;
+
+	/// 查询上次系统结束是否正常结束
+	//this->dbm->CheckSystemStartFlag();
+
+	this->system_init_flag = this->dbm->GetSystemRunningStatus();
+	std::cout << "\t系统初始化状态 = " << this->system_init_flag << std::endl;
 
 	/// 查询昨仓持仓明细(order)
 	this->dbm->getAllPositionDetail(this->l_posdetail);
