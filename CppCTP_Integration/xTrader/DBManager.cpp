@@ -2762,8 +2762,19 @@ void DBManager::DropPositionDetailTradeYesterday() {
 
 void DBManager::UpdateSystemRunningStatus(string value) {
 	USER_PRINT("DBManager::UpdateSystemRunningStatus");
-	std::cout << "DBManager::UpdateSystemRunningStatus(" << value << ")" << std::endl;
-	this->conn->update(DB_SYSTEM_RUNNING_STATUS_COLLECTION, BSON("key" << DB_RUNNING_KEY), BSON("$set" << BSON("status" << value)));
+
+	std::cout << "DBManager::UpdateSystemRunningStatus value = " << value << std::endl;
+	std::cout << "DBManager::UpdateSystemRunningStatus key = " << DB_RUNNING_KEY << std::endl;
+	int count_number = this->conn->count(DB_SYSTEM_RUNNING_STATUS_COLLECTION,
+		BSON("key" << DB_RUNNING_KEY));
+
+	if (count_number > 0) {
+		this->conn->update(DB_SYSTEM_RUNNING_STATUS_COLLECTION, MONGO_QUERY("key" << DB_RUNNING_KEY), BSON("$set" << BSON("status" << value)));
+	}
+	else {
+		std::cout << "\t查找数量为0！" << std::endl;
+	}
+	
 	USER_PRINT("DBManager::UpdateSystemRunningStatus ok");
 }
 

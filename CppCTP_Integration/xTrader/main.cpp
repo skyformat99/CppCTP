@@ -48,6 +48,7 @@ string one_min_time = "14:50:00";
 string one_sec_time = "14:58:00";
 string stop_trading_time = "14:59:55";
 string close_time = "15:00:00";
+string stopsave_time = "15:01:00";
 
 /*信号处理*/
 void sig_handler(int signo) {
@@ -300,14 +301,19 @@ void timer_handler() {
 
 					if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + close_time).c_str())) { // 时间大于15:00:00
 						
-						std::cout << "\t保存最后策略参数,更新运行状态正常收盘，停止计时器." << std::endl;
-						
-						// 保存最后策略参数,更新运行状态正常收盘
-						ctp_m->saveStrategy();
-						ctp_m->updateSystemFlag();
-						
-						// 保存策略参数,关闭定时器
-						ctp_m->getCalTimer()->stop();
+						if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + stopsave_time).c_str())) { // 时间大于15:01:00
+							ctp_m->getCalTimer()->stop();
+						}
+						else { // 时间大于15:00:00小于15:01:00
+							std::cout << "\t保存最后策略参数,更新运行状态正常收盘，停止计时器." << std::endl;
+
+							// 保存最后策略参数,更新运行状态正常收盘
+							ctp_m->saveStrategy();
+							ctp_m->updateSystemFlag();
+
+							// 保存策略参数,关闭定时器
+							ctp_m->getCalTimer()->stop();
+						}
 					}
 
 				} 

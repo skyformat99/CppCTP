@@ -261,7 +261,8 @@ void CTP_Manager::addTraderToLTrader(string trader) {
 
 /// 更新系统交易状态
 void CTP_Manager::updateSystemFlag() {
-	this->dbm->UpdateSystemRunningStatus("off");
+	string status = "off";
+	this->dbm->UpdateSystemRunningStatus(status);
 }
 
 
@@ -3040,6 +3041,7 @@ bool CTP_Manager::init(bool is_online) {
 	
 	//初始化完毕,开启系统全局开关
 	this->setOn_Off(1);
+	this->dbm->UpdateSystemRunningStatus("on");
 
 	std::cout << "===========恭喜============" << std::endl;
 	std::cout << "|=!xTrader系统初始化完成!=|" << std::endl;
