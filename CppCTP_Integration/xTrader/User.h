@@ -51,6 +51,9 @@ public:
 	void setIsLogged(bool isLogged);
 	void setIsLoggedError(bool isLoggedError);
 	void setIsConnected(bool isConnected);
+	void setIsPositionRight(bool isPositionRight);
+	bool getIsPositionRight();
+
 	void setIsFirstTimeLogged(bool isFirstTimeLogged);
 	void setIsConfirmSettlement(bool isConfirmSettlement);
 	void setLoginRequestID(int loginRequestID);
@@ -170,6 +173,7 @@ private:
 	bool isLogged;
 	bool isConnected;
 	bool isLoggedError;
+	bool isPositionRight;
 	bool isFirstTimeLogged;
 	bool isConfirmSettlement;
 	int loginRequestID;

@@ -2846,20 +2846,6 @@ bool CTP_Manager::init(bool is_online) {
 	MarketConfig *mc = this->dbm->getOneMarketConfig();
 	if (mc != NULL) {
 		this->mdspi = this->CreateMd(mc->getMarketFrontAddr(), mc->getBrokerID(), mc->getUserID(), mc->getPassword(), this->l_strategys);
-		if (this->mdspi != NULL) {
-			/// 向mdspi赋值strategys
-			//this->mdspi->setListStrategy(this->l_strategys);
-			/// 订阅合约
-			for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
-				USER_PRINT((*stg_itor)->getStgInstrumentIdA());
-				USER_PRINT((*stg_itor)->getStgInstrumentIdB());
-				/// 添加策略的合约到l_instrument
-				this->addSubInstrument((*stg_itor)->getStgInstrumentIdA(), this->l_instrument);
-				this->addSubInstrument((*stg_itor)->getStgInstrumentIdB(), this->l_instrument);
-			}
-			/// 订阅合约
-			this->SubmarketData(this->mdspi, this->l_instrument);
-		}
 	}
 	std::cout << "\t初始化行情完成..." << std::endl;
 
@@ -2945,6 +2931,38 @@ bool CTP_Manager::init(bool is_online) {
 		}
 	}
 
+	/// 将仓位出现问题的user从列表里移出去
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end();) { // 遍历User
+		/// 仓位问题出错
+		if (!((*user_itor)->getIsPositionRight()))
+		{
+			delete (*user_itor);
+			user_itor = this->l_user->erase(user_itor);
+		}
+		else
+		{
+			user_itor++;
+		}
+	}
+
+	/// 把失效的user对应的策略移除掉
+	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end();) { // 遍历Strategy
+
+		if (!(*stg_itor)->getStgUser()) {
+			delete (*stg_itor);
+			stg_itor = this->l_strategys->erase(stg_itor);
+		}
+		else {
+			stg_itor++;
+		}
+	}
+
+	if ((this->l_user->size() <= 0)) {
+		USER_PRINT("可用期货账户为空!");
+		std::cout << "\t期货账户仓位全部不一致!全部均初始化失败!" << std::endl;
+		init_flag = false;
+		return init_flag;
+	}
 
 	/// 合约查询后对策略合约最小跳进行赋值
 	this->l_user->front()->getUserTradeSPI()->QryInstrument();
@@ -3042,6 +3060,22 @@ bool CTP_Manager::init(bool is_online) {
 	//初始化完毕,开启系统全局开关
 	this->setOn_Off(1);
 	this->dbm->UpdateSystemRunningStatus("on");
+
+	if (this->mdspi != NULL) {
+		/// 向mdspi赋值strategys
+		//this->mdspi->setListStrategy(this->l_strategys);
+		/// 订阅合约
+		for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
+			USER_PRINT((*stg_itor)->getStgInstrumentIdA());
+			USER_PRINT((*stg_itor)->getStgInstrumentIdB());
+			/// 添加策略的合约到l_instrument
+			this->addSubInstrument((*stg_itor)->getStgInstrumentIdA(), this->l_instrument);
+			this->addSubInstrument((*stg_itor)->getStgInstrumentIdB(), this->l_instrument);
+		}
+		/// 订阅合约
+		this->SubmarketData(this->mdspi, this->l_instrument);
+		std::cout << "\t行情订阅已初始化!" << std::endl;
+	}
 
 	std::cout << "===========恭喜============" << std::endl;
 	std::cout << "|=!xTrader系统初始化完成!=|" << std::endl;

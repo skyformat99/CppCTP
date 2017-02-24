@@ -41,6 +41,7 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 	this->isLogged = true;
 	this->isConnected = true;
 	this->isLoggedError = false;
+	this->isPositionRight = true;
 	this->l_position_detail_from_ctp = new list<USER_INSTRUMENT_POSITION *>();
 	this->l_position_detail_from_local_order = new list<USER_INSTRUMENT_POSITION *>();
 	this->l_position_detail_from_local_trade = new list<USER_INSTRUMENT_POSITION *>();
@@ -65,6 +66,7 @@ User::User(string BrokerID, string UserID, int nRequestID, string stg_order_ref_
 	this->isLogged = true;
 	this->isConnected = true;
 	this->isLoggedError = false;
+	this->isPositionRight = true;
 	this->l_position_detail_from_ctp = new list<USER_INSTRUMENT_POSITION *>();
 	this->l_position_detail_from_local_order = new list<USER_INSTRUMENT_POSITION *>();
 	this->l_position_detail_from_local_trade = new list<USER_INSTRUMENT_POSITION *>();
@@ -144,6 +146,13 @@ void User::setIsLoggedError(bool isLoggedError) {
 
 void User::setIsConnected(bool isConnected) {
 	this->isConnected = isConnected;
+}
+
+void User::setIsPositionRight(bool isPositionRight) {
+	this->isPositionRight = isPositionRight;
+}
+bool User::getIsPositionRight() {
+	return this->isPositionRight;
 }
 
 void User::setIsFirstTimeLogged(bool isFirstTimeLogged) {
@@ -1649,6 +1658,7 @@ bool User::ComparePositionTotal() {
 		std::cout << "\t期货账户 = " << this->getUserID() << std::endl;
 		std::cout << "\t持仓明细列表数目总数不正确!" << std::endl;
 		is_same_flag = false;
+		this->setIsPositionRight(is_same_flag);
 		return is_same_flag;
 	}
 
@@ -1713,6 +1723,7 @@ bool User::ComparePositionTotal() {
 	if (!is_same_flag) {
 		std::cout << "\t期货账户 = " << this->getUserID() << std::endl;
 		std::cout << "\tOrder与Trade维护持仓明细不一致!请重新初始化或检查数据!" << std::endl;
+		this->setIsPositionRight(is_same_flag);
 		return is_same_flag;
 	}
 
@@ -1756,6 +1767,7 @@ bool User::ComparePositionTotal() {
 	if (!is_same_flag) {
 		std::cout << "\t期货账户 = " << this->getUserID() << std::endl;
 		std::cout << "\tOrder与Trade维护持仓明细不一致!请重新初始化或检查数据!" << std::endl;
+		this->setIsPositionRight(is_same_flag);
 		return is_same_flag;
 	}
 
