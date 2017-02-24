@@ -438,10 +438,6 @@ public:
 	void setL_query_order(list<CThostFtdcOrderField *> *l_query_order);
 	void add_position_detail(USER_CThostFtdcOrderField *posd);
 
-	void setL_Position_Detail_From_CTP(list<CThostFtdcInvestorPositionDetailField *> *l_position_detail_from_ctp);
-	list<CThostFtdcInvestorPositionDetailField *> *getL_Position_Detail_From_CTP();
-	void addL_Position_Detail_From_CTP(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail);
-
 
 	//void CopyPositionData(PositionDetail *posd, USER_CThostFtdcOrderField *order);
 

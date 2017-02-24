@@ -1709,18 +1709,6 @@ void Strategy::add_position_detail(USER_CThostFtdcOrderField *posd) {
 	this->stg_list_position_detail_from_order->push_back(posd);
 }
 
-void Strategy::setL_Position_Detail_From_CTP(list<CThostFtdcInvestorPositionDetailField *> *l_position_detail_from_ctp) {
-	this->l_position_detail_from_ctp = l_position_detail_from_ctp;
-}
-
-list<CThostFtdcInvestorPositionDetailField *> *Strategy::getL_Position_Detail_From_CTP() {
-	return this->l_position_detail_from_ctp;
-}
-
-void Strategy::addL_Position_Detail_From_CTP(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail) {
-	this->l_position_detail_from_ctp->push_back(pInvestorPositionDetail);
-}
-
 //void Strategy::CopyPositionData(PositionDetail *posd, USER_CThostFtdcOrderField *order) {
 //	USER_PRINT("Strategy::CopyPositionData");
 //	strcpy(order->InstrumentID, posd->getInstrumentID().c_str());

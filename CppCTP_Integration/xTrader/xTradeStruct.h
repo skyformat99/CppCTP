@@ -218,4 +218,18 @@ struct USER_CThostFtdcTradeField
 	TThostFtdcTradeSourceType	TradeSource;
 };
 
+struct USER_INSTRUMENT_POSITION
+{
+	///合约代码
+	TThostFtdcInstrumentIDType	InstrumentID;
+	///今买
+	int Buy_Today;
+	///昨买
+	int Buy_Yesterday;
+	/// 今卖
+	int Sell_Today;
+	/// 昨卖
+	int Sell_Yesterday;
+};
+
 #endif

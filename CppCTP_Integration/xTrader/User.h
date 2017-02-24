@@ -13,6 +13,7 @@
 #include "Strategy.h"
 #include "CTP_Manager.h"
 #include "Session.h"
+#include "xTradeStruct.h"
 
 using namespace mongo;
 using namespace std;
@@ -84,6 +85,12 @@ public:
 
 	/// 设置策略内合约最小跳价格
 	void setStgInstrumnetPriceTick();
+
+
+	void setL_Position_Detail_From_CTP(list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_ctp);
+	list<USER_INSTRUMENT_POSITION *> *getL_Position_Detail_From_CTP();
+	void addL_Position_Detail_From_CTP(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail);
+
 
 	/************************************************************************/
 	/* 获取数据库连接                                                         */
@@ -169,6 +176,7 @@ private:
 	string trading_day;				// 交易日
 	int sid;	// 会话ID
 	list<Session *> *l_sessions;
+	list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_ctp;
 };
 
 #endif

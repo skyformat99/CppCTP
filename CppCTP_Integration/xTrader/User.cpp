@@ -41,6 +41,7 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 	this->isLogged = true;
 	this->isConnected = true;
 	this->isLoggedError = false;
+	this->l_position_detail_from_ctp = new list<USER_INSTRUMENT_POSITION *>();
 	USER_PRINT(this->stg_order_ref_base);
 }
 
@@ -62,6 +63,7 @@ User::User(string BrokerID, string UserID, int nRequestID, string stg_order_ref_
 	this->isLogged = true;
 	this->isConnected = true;
 	this->isLoggedError = false;
+	this->l_position_detail_from_ctp = new list<USER_INSTRUMENT_POSITION *>();
 }
 
 User::~User() {
@@ -295,6 +297,37 @@ void User::setStgInstrumnetPriceTick() {
 			}
 		}
 	}
+}
+
+void User::setL_Position_Detail_From_CTP(list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_ctp) {
+	this->l_position_detail_from_ctp = l_position_detail_from_ctp;
+}
+
+list<USER_INSTRUMENT_POSITION *> * User::getL_Position_Detail_From_CTP() {
+	return this->l_position_detail_from_ctp;
+}
+
+void User::addL_Position_Detail_From_CTP(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail) {
+	
+	list<USER_INSTRUMENT_POSITION *>::iterator itor;
+	bool isFind = false;
+	for (itor = this->l_position_detail_from_ctp->begin(); itor != this->l_position_detail_from_ctp->end(); itor++)
+	{
+
+		if ((*itor)->InstrumentID)
+		{
+		}
+
+		if ((!strcmp(this->getTradingDay().c_str(), pInvestorPositionDetail->TradingDay))) //今天的持仓
+		{
+
+		} 
+		else // 昨天的持仓
+		{
+
+		}
+	}
+
 }
 
 /************************************************************************/

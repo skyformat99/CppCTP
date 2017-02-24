@@ -1202,9 +1202,14 @@ void TdSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField
 			///平仓金额
 			cout << "平仓金额:" << pInvestorPositionDetail->CloseAmount << endl;
 			cout << "=================================================================================" << endl;
+		
+			/*将持仓明细添加到对应user统计列表里*/
+			this->current_user->addL_Position_Detail_From_CTP(pInvestorPositionDetail);
 		}
 	}
 	cv.notify_one();
+
+
 }
 
 //请求查询投资者持仓响应
