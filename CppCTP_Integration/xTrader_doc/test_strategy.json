@@ -7,7 +7,7 @@ msgtype = 1
 msgtype = 2	
 查询期货账户:
 	请求:{"MsgRef":1,"MsgSendFlag": 0,"MsgType":2,"TraderID":"1601","MsgSrc":0}
-	成功有数据:{"MsgRef":47,"MsgSendFlag":1,"MsgType":2,"TraderID":"1601","MsgResult":0,"MsgErrorReason":"","Info":[{"brokerid":"9999","traderid":"1601","password":"669822","userid":"058176","frontaddress":"tcp://180.168.146.187:10000", "on_off":1, "sessionid":-1699777334},{"brokerid":"9999","traderid":"1601","password":"123456","userid":"063802","frontaddress":"tcp://180.168.146.187:10000", "on_off":1, "sessionid":-1699777334}],"MsgSrc":0}
+	成功有数据:{"MsgRef":47,"MsgSendFlag":1,"MsgType":2,"TraderID":"1601","MsgResult":0,"MsgErrorReason":"","Info":[{"brokerid":"9999","traderid":"1601","password":"669822","userid":"058176","frontaddress":"tcp://180.168.146.187:10000", "on_off":1, "sessionid":-1699777334,"positionflag":1},{"brokerid":"9999","traderid":"1601","password":"123456","userid":"063802","frontaddress":"tcp://180.168.146.187:10000", "on_off":1, "sessionid":-1699777334,"positionflag":0}],"MsgSrc":0}
 	成功无数据:{"MsgRef":48,"MsgSendFlag":1,"MsgType":2,"TraderID":"161","MsgResult":0,"MsgErrorReason":"","Info":[],"MsgSrc":0}
 
 msgtype = 3
