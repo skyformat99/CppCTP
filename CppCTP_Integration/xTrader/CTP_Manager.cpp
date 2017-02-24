@@ -710,6 +710,14 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					info_object.AddMember("userid", rapidjson::StringRef((*future_itor)->getUserID().c_str()), allocator);
 					info_object.AddMember("frontaddress", rapidjson::StringRef((*future_itor)->getFrontAddress().c_str()), allocator);
 					info_object.AddMember("on_off", (*future_itor)->getOn_Off(), allocator);
+					if ((*future_itor)->getIsPositionRight())
+					{
+						info_object.AddMember("positionflag", 1, allocator);
+					} 
+					else
+					{
+						info_object.AddMember("positionflag", 0, allocator);
+					}
 
 					info_array.PushBack(info_object, allocator);
 				}
@@ -2931,6 +2939,7 @@ bool CTP_Manager::init(bool is_online) {
 		}
 	}
 
+#if 0
 	/// 将仓位出现问题的user从列表里移出去
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end();) { // 遍历User
 		/// 仓位问题出错
@@ -2956,6 +2965,7 @@ bool CTP_Manager::init(bool is_online) {
 			stg_itor++;
 		}
 	}
+#endif
 
 	if ((this->l_user->size() <= 0)) {
 		USER_PRINT("可用期货账户为空!");
