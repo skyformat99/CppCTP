@@ -1,10 +1,10 @@
-#include <sstream>
+ï»¿#include <sstream>
 #include "User.h"
 #include "DBManager.h"
 #include "Debug.h"
 #include "Utils.h"
 
-/// OrderÏà¹ØµÄ¼¯ºÏ
+/// Orderç›¸å…³çš„é›†åˆ
 #define DB_ORDERINSERT_COLLECTION         "CTP.orderinsert"
 #define DB_ONRTNORDER_COLLECTION          "CTP.onrtnorder"
 #define DB_ONRTNTRADE_COLLECTION          "CTP.onrtntrade"
@@ -17,7 +17,7 @@
 #define DB_ONRSPQRYINVESTORPOSITION       "CTP.onrspqryinvestorposition"
 
 
-//×ªÂëÊı×é
+//è½¬ç æ•°ç»„
 char codeDst_2[90] = { 0 };
 
 User::User(string frontAddress, string BrokerID, string UserID, string Password, string nRequestID, int on_off, string TraderID, string stg_order_ref_base) {
@@ -42,6 +42,8 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 	this->isConnected = true;
 	this->isLoggedError = false;
 	this->l_position_detail_from_ctp = new list<USER_INSTRUMENT_POSITION *>();
+	this->l_position_detail_from_local_order = new list<USER_INSTRUMENT_POSITION *>();
+	this->l_position_detail_from_local_trade = new list<USER_INSTRUMENT_POSITION *>();
 	USER_PRINT(this->stg_order_ref_base);
 }
 
@@ -64,6 +66,8 @@ User::User(string BrokerID, string UserID, int nRequestID, string stg_order_ref_
 	this->isConnected = true;
 	this->isLoggedError = false;
 	this->l_position_detail_from_ctp = new list<USER_INSTRUMENT_POSITION *>();
+	this->l_position_detail_from_local_order = new list<USER_INSTRUMENT_POSITION *>();
+	this->l_position_detail_from_local_trade = new list<USER_INSTRUMENT_POSITION *>();
 }
 
 User::~User() {
@@ -180,75 +184,131 @@ void User::setTraderID(string TraderID) {
 	this->TraderID = TraderID;
 }
 
-/// µÃµ½strategy_list
+/// å¾—åˆ°strategy_list
 list<Strategy *> * User::getListStrategy() {
 	return this->l_strategys;
 }
 
-/// ÉèÖÃstrategy_list
+/// è®¾ç½®strategy_list
 void User::setListStrategy(list<Strategy *> * l_strategys) {
 	this->l_strategys = l_strategys;
 }
 
-/// Ìí¼Óstrategyµ½list
+/// æ·»åŠ strategyåˆ°list
 void User::addStrategyToList(Strategy *stg) {
 	this->l_strategys->push_back(stg);
 }
 
-/// ³õÊ¼»¯ºÏÔ¼³·µ¥´ÎÊı,ÀıÈç"cu1601":0 "cu1701":0
-void User::init_instrument_id_action_counter(string instrument_id) {
-	//³õÊ¼»¯Îª0
-	//this->stg_map_instrument_action_counter->insert(map < string, int >::value_type(instrument_id, 0)); µÚÒ»ÖÖmap²åÈë·½·¨
-	this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0)); //µÚ¶şÖÖmap²åÈë·½·¨
+/// æ‹·è´æŒä»“æ˜ç»†æ•°æ®
+void User::CopyPositionDetailData(CThostFtdcInvestorPositionDetailField *dst, CThostFtdcInvestorPositionDetailField *src) {
+	///åˆçº¦ä»£ç 
+	strcpy(dst->InstrumentID, src->InstrumentID);
+	///ç»çºªå…¬å¸ä»£ç 
+	strcpy(dst->BrokerID, src->BrokerID);
+	///æŠ•èµ„è€…ä»£ç 
+	strcpy(dst->InvestorID, src->InvestorID);
+	///æŠ•æœºå¥—ä¿æ ‡å¿—
+	dst->HedgeFlag = src->HedgeFlag;
+	///ä¹°å–
+	dst->Direction = src->Direction;
+	///å¼€ä»“æ—¥æœŸ
+	strcpy(dst->OpenDate, src->OpenDate);
+	///æˆäº¤ç¼–å·
+	strcpy(dst->TradeID, src->TradeID);
+	///æ•°é‡
+	dst->Volume = src->Volume;
+	///å¼€ä»“ä»·
+	dst->OpenPrice = src->OpenPrice;
+	///äº¤æ˜“æ—¥
+	strcpy(dst->TradingDay, src->TradingDay);
+	///ç»“ç®—ç¼–å·
+	dst->SettlementID = src->SettlementID;
+	///æˆäº¤ç±»å‹
+	dst->TradeType = src->TradeType;
+	///ç»„åˆåˆçº¦ä»£ç 
+	strcpy(dst->CombInstrumentID, src->CombInstrumentID);
+	///äº¤æ˜“æ‰€ä»£ç 
+	strcpy(dst->ExchangeID, src->ExchangeID);
+	///é€æ—¥ç›¯å¸‚å¹³ä»“ç›ˆäº
+	dst->CloseProfitByDate = src->CloseProfitByDate;
+	///é€ç¬”å¯¹å†²å¹³ä»“ç›ˆäº
+	dst->CloseProfitByTrade = src->CloseProfitByTrade;
+	///é€æ—¥ç›¯å¸‚æŒä»“ç›ˆäº
+	dst->PositionProfitByDate = src->PositionProfitByDate;
+	///é€ç¬”å¯¹å†²æŒä»“ç›ˆäº
+	dst->PositionProfitByTrade = src->PositionProfitByTrade;
+	///æŠ•èµ„è€…ä¿è¯é‡‘
+	dst->Margin = src->Margin;
+	///äº¤æ˜“æ‰€ä¿è¯é‡‘
+	dst->ExchMargin = src->ExchMargin;
+	///ä¿è¯é‡‘ç‡
+	dst->MarginRateByMoney = src->MarginRateByMoney;
+	///ä¿è¯é‡‘ç‡(æŒ‰æ‰‹æ•°)
+	dst->MarginRateByVolume = src->MarginRateByVolume;
+	///æ˜¨ç»“ç®—ä»·
+	dst->LastSettlementPrice = src->LastSettlementPrice;
+	///ç»“ç®—ä»·
+	dst->SettlementPrice = src->SettlementPrice;
+	///å¹³ä»“é‡
+	dst->CloseVolume = src->CloseVolume;
+	///å¹³ä»“é‡‘é¢
+	dst->CloseAmount = src->CloseAmount;
 }
 
-/// »ñµÃºÏÔ¼³·µ¥´ÎÊı,ÀıÈç"cu1710":0
+/// åˆå§‹åŒ–åˆçº¦æ’¤å•æ¬¡æ•°,ä¾‹å¦‚"cu1601":0 "cu1701":0
+void User::init_instrument_id_action_counter(string instrument_id) {
+	//åˆå§‹åŒ–ä¸º0
+	//this->stg_map_instrument_action_counter->insert(map < string, int >::value_type(instrument_id, 0)); ç¬¬ä¸€ç§mapæ’å…¥æ–¹æ³•
+	this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0)); //ç¬¬äºŒç§mapæ’å…¥æ–¹æ³•
+}
+
+/// è·å¾—åˆçº¦æ’¤å•æ¬¡æ•°,ä¾‹å¦‚"cu1710":0
 int User::get_instrument_id_action_counter(string instrument_id) {
 	USER_PRINT("User::get_instrument_id_action_counter");
-	//¶ÔÄ³¸öºÏÔ¼½øĞĞ¼Ó1²Ù×÷
+	//å¯¹æŸä¸ªåˆçº¦è¿›è¡ŒåŠ 1æ“ä½œ
 	map<string, int>::iterator m_itor;
 	m_itor = this->stg_map_instrument_action_counter->find(instrument_id);
 	if (m_itor == (this->stg_map_instrument_action_counter->end())) {
-		cout << "³·µ¥ÁĞ±íÀï²»´æÔÚ¸ÃºÏÔ¼ = " << instrument_id << endl;
+		cout << "æ’¤å•åˆ—è¡¨é‡Œä¸å­˜åœ¨è¯¥åˆçº¦ = " << instrument_id << endl;
 		// this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0));
 		// this->init_instrument_id_action_counter(string(pOrder->InstrumentID));
 		return 0;
 	}
 	else {
-		cout << "³·µ¥ÁĞ±íÀïÕÒµ½¸ÃºÏÔ¼ = " << instrument_id << endl;
+		cout << "æ’¤å•åˆ—è¡¨é‡Œæ‰¾åˆ°è¯¥åˆçº¦ = " << instrument_id << endl;
 		return m_itor->second;
 	}
 }
 
-/// Ìí¼Ó¶ÔÓ¦ºÏÔ¼³·µ¥´ÎÊı¼ÆÊıÆ÷,ÀıÈç"cu1602":1 "cu1701":1
+/// æ·»åŠ å¯¹åº”åˆçº¦æ’¤å•æ¬¡æ•°è®¡æ•°å™¨,ä¾‹å¦‚"cu1602":1 "cu1701":1
 void User::add_instrument_id_action_counter(CThostFtdcOrderField *pOrder) {
 	USER_PRINT("User::add_instrument_id_action_counter");
 
-	if (strlen(pOrder->OrderSysID) == 0) { //Ö»Í³¼ÆÕë¶Ô½»Ò×Ëù±àÂëµÄorder
+	if (strlen(pOrder->OrderSysID) == 0) { //åªç»Ÿè®¡é’ˆå¯¹äº¤æ˜“æ‰€ç¼–ç çš„order
 		return;
 	}
-	if (pOrder->OrderStatus != '5') { //³·µ¥
+	if (pOrder->OrderStatus != '5') { //æ’¤å•
 		return;
 	}
 
-	if (pOrder->OrderStatus == '5') { // µ±ÊÕµ½³·µ¥
-		//¶ÔÄ³¸öºÏÔ¼½øĞĞ¼Ó1²Ù×÷
+	if (pOrder->OrderStatus == '5') { // å½“æ”¶åˆ°æ’¤å•
+		//å¯¹æŸä¸ªåˆçº¦è¿›è¡ŒåŠ 1æ“ä½œ
 		map<string, int>::iterator m_itor;
 		m_itor = this->stg_map_instrument_action_counter->find(string(pOrder->InstrumentID));
 		if (m_itor == (this->stg_map_instrument_action_counter->end())) {
-			cout << "³·µ¥ÁĞ±íÀï²»´æÔÚ¸ÃºÏÔ¼ = " << pOrder->InstrumentID << endl;
-			cout << "Ìí¼Ó " << pOrder->InstrumentID << " ºÏÔ¼µ½ÁĞ±íÖĞ..." << endl;
+			cout << "æ’¤å•åˆ—è¡¨é‡Œä¸å­˜åœ¨è¯¥åˆçº¦ = " << pOrder->InstrumentID << endl;
+			cout << "æ·»åŠ  " << pOrder->InstrumentID << " åˆçº¦åˆ°åˆ—è¡¨ä¸­..." << endl;
 			//this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0));
 			this->init_instrument_id_action_counter(string(pOrder->InstrumentID));
 		}
 		else {
-			cout << "³·µ¥ÁĞ±íÀïÕÒµ½¸ÃºÏÔ¼ = " << pOrder->InstrumentID << endl;
+			cout << "æ’¤å•åˆ—è¡¨é‡Œæ‰¾åˆ°è¯¥åˆçº¦ = " << pOrder->InstrumentID << endl;
 			m_itor->second += 1;
 		}
 
-		// ½«³·µ¥´ÎÊı¸³Óè¸ÃÕË»§ÏÂËùÓĞµÄ²ßÂÔ
+		// å°†æ’¤å•æ¬¡æ•°èµ‹äºˆè¯¥è´¦æˆ·ä¸‹æ‰€æœ‰çš„ç­–ç•¥
 		list<Strategy *>::iterator stg_itor;
-		for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // ±éÀúStrategy
+		for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // éå†Strategy
 
 			USER_PRINT((*stg_itor)->getStgInstrumentIdA());
 			USER_PRINT((*stg_itor)->getStgInstrumentIdB());
@@ -274,14 +334,14 @@ long long User::getStgOrderRefBase() {
 	return this->stg_order_ref_base;
 }
 
-/// ÉèÖÃ²ßÂÔÄÚºÏÔ¼×îĞ¡Ìø¼Û¸ñ
+/// è®¾ç½®ç­–ç•¥å†…åˆçº¦æœ€å°è·³ä»·æ ¼
 void User::setStgInstrumnetPriceTick() {
 	USER_PRINT("User::setStgInstrumnetPriceTick");
-	//1:±éÀústrategy list
+	//1:éå†strategy list
 	list<Strategy *>::iterator stg_itor;
 	list<CThostFtdcInstrumentField *>::iterator instrument_info_itor;
 	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
-		//2:±éÀúºÏÔ¼ĞÅÏ¢ÁĞ±í,ÕÒµ½¶ÔÓ¦ºÏÔ¼µÄ×îĞ¡Ìø
+		//2:éå†åˆçº¦ä¿¡æ¯åˆ—è¡¨,æ‰¾åˆ°å¯¹åº”åˆçº¦çš„æœ€å°è·³
 		for (instrument_info_itor = this->getUserTradeSPI()->getL_Instruments_Info()->begin();
 			instrument_info_itor != this->getUserTradeSPI()->getL_Instruments_Info()->end();
 			instrument_info_itor++) {
@@ -307,31 +367,249 @@ list<USER_INSTRUMENT_POSITION *> * User::getL_Position_Detail_From_CTP() {
 	return this->l_position_detail_from_ctp;
 }
 
+
 void User::addL_Position_Detail_From_CTP(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail) {
-	
+
 	list<USER_INSTRUMENT_POSITION *>::iterator itor;
 	bool isFind = false;
+
 	for (itor = this->l_position_detail_from_ctp->begin(); itor != this->l_position_detail_from_ctp->end(); itor++)
 	{
 
-		if ((*itor)->InstrumentID)
+		if ((!strcmp((*itor)->InstrumentID, pInvestorPositionDetail->InstrumentID))) // å¦‚æœç›¸ç­‰
 		{
+			// æ‰¾åˆ°æ ‡å¿—ä½èµ‹å€¼
+			isFind = true;
+
+			if ((!strcmp(this->getTradingDay().c_str(), pInvestorPositionDetail->TradingDay))) //ä»Šå¤©çš„æŒä»“
+			{
+				if (pInvestorPositionDetail->Direction == '0') { // ä»Šä¹°
+					(*itor)->Buy_Today += pInvestorPositionDetail->Volume;
+				}
+				else if (pInvestorPositionDetail->Direction == '1') // ä»Šå–
+				{
+					(*itor)->Sell_Today += pInvestorPositionDetail->Volume;
+				}
+			}
+			else // æ˜¨å¤©çš„æŒä»“
+			{
+				if (pInvestorPositionDetail->Direction == '0') { // æ˜¨ä¹°
+					(*itor)->Buy_Yesterday += pInvestorPositionDetail->Volume;
+				}
+				else if (pInvestorPositionDetail->Direction == '1') // æ˜¨å–
+				{
+					(*itor)->Sell_Yesterday += pInvestorPositionDetail->Volume;
+				}
+			}
 		}
 
-		if ((!strcmp(this->getTradingDay().c_str(), pInvestorPositionDetail->TradingDay))) //½ñÌìµÄ³Ö²Ö
-		{
+		
+	}
 
-		} 
-		else // ×òÌìµÄ³Ö²Ö
-		{
+	if (!isFind) // å¦‚æœæœªæ‰¾åˆ°,ç›´æ¥æ·»åŠ åˆ°ç»Ÿè®¡åˆ—è¡¨é‡Œ
+	{
+		USER_INSTRUMENT_POSITION *new_position_from_ctp = new USER_INSTRUMENT_POSITION();
+		memset(new_position_from_ctp, 0, sizeof(USER_INSTRUMENT_POSITION));
+		strcpy(new_position_from_ctp->InstrumentID, pInvestorPositionDetail->InstrumentID);
+		new_position_from_ctp->Is_Same = false;
 
+		if ((!strcmp(this->getTradingDay().c_str(), pInvestorPositionDetail->OpenDate))) //ä»Šå¤©çš„æŒä»“
+		{
+			if (pInvestorPositionDetail->Direction == '0') { // ä»Šä¹°
+				new_position_from_ctp->Buy_Today += pInvestorPositionDetail->Volume;
+			}
+			else if (pInvestorPositionDetail->Direction == '1') // ä»Šå–
+			{
+				new_position_from_ctp->Sell_Today += pInvestorPositionDetail->Volume;
+			}
 		}
+		else // æ˜¨å¤©çš„æŒä»“
+		{
+			if (pInvestorPositionDetail->Direction == '0') { // æ˜¨ä¹°
+				new_position_from_ctp->Buy_Yesterday += pInvestorPositionDetail->Volume;
+			}
+			else if (pInvestorPositionDetail->Direction == '1') // æ˜¨å–
+			{
+				new_position_from_ctp->Sell_Yesterday += pInvestorPositionDetail->Volume;
+			}
+		}
+		this->l_position_detail_from_ctp->push_back(new_position_from_ctp);
 	}
 
 }
 
+void User::setL_Position_Detail_From_Local_Order(list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_local_order) {
+	this->l_position_detail_from_local_order = l_position_detail_from_local_order;
+}
+
+list<USER_INSTRUMENT_POSITION *> * User::getL_Position_Detail_From_Local_Order() {
+	return this->l_position_detail_from_local_order;
+}
+
+void User::addL_Position_Detail_From_Local_Order(USER_CThostFtdcOrderField *order) {
+	list<USER_INSTRUMENT_POSITION *>::iterator itor;
+	bool isFind = false;
+
+	for (itor = this->l_position_detail_from_local_order->begin(); itor != this->l_position_detail_from_local_order->end(); itor++)
+	{
+
+		if ((!strcmp((*itor)->InstrumentID, order->InstrumentID))) // å¦‚æœç›¸ç­‰
+		{
+			// æ‰¾åˆ°æ ‡å¿—ä½èµ‹å€¼
+			isFind = true;
+
+			if ((!strcmp(this->getTradingDay().c_str(), order->InsertDate))) //ä»Šå¤©çš„æŒä»“
+			{
+				if (order->Direction == '0') { // ä»Šä¹°
+					(*itor)->Buy_Today += order->VolumeTradedBatch;
+				}
+				else if (order->Direction == '1') // ä»Šå–
+				{
+					(*itor)->Sell_Today += order->VolumeTradedBatch;
+				}
+			}
+			else // æ˜¨å¤©çš„æŒä»“
+			{
+				if (order->Direction == '0') { // æ˜¨ä¹°
+					(*itor)->Buy_Yesterday += order->VolumeTradedBatch;
+				}
+				else if (order->Direction == '1') // æ˜¨å–
+				{
+					(*itor)->Sell_Yesterday += order->VolumeTradedBatch;
+				}
+			}
+		}
+
+
+	}
+
+	if (!isFind) // å¦‚æœæœªæ‰¾åˆ°,ç›´æ¥æ·»åŠ åˆ°ç»Ÿè®¡åˆ—è¡¨é‡Œ
+	{
+		USER_INSTRUMENT_POSITION *new_position_from_local_order = new USER_INSTRUMENT_POSITION();
+		memset(new_position_from_local_order, 0, sizeof(USER_INSTRUMENT_POSITION));
+		strcpy(new_position_from_local_order->InstrumentID, order->InstrumentID);
+		new_position_from_local_order->Is_Same = false;
+
+		if ((!strcmp(this->getTradingDay().c_str(), order->InsertDate))) //ä»Šå¤©çš„æŒä»“
+		{
+			if (order->Direction == '0') { // ä»Šä¹°
+				new_position_from_local_order->Buy_Today += order->VolumeTradedBatch;
+			}
+			else if (order->Direction == '1') // ä»Šå–
+			{
+				new_position_from_local_order->Sell_Today += order->VolumeTradedBatch;
+			}
+		}
+		else // æ˜¨å¤©çš„æŒä»“
+		{
+			if (order->Direction == '0') { // æ˜¨ä¹°
+				new_position_from_local_order->Buy_Yesterday += order->VolumeTradedBatch;
+			}
+			else if (order->Direction == '1') // æ˜¨å–
+			{
+				new_position_from_local_order->Sell_Yesterday += order->VolumeTradedBatch;
+			}
+		}
+		this->l_position_detail_from_local_order->push_back(new_position_from_local_order);
+	}
+
+}
+
+void User::setL_Position_Detail_From_Local_Trade(list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_local_trade) {
+	this->l_position_detail_from_local_trade = l_position_detail_from_local_trade;
+}
+
+list<USER_INSTRUMENT_POSITION *> * User::getL_Position_Detail_From_Local_Trade() {
+	return this->l_position_detail_from_local_trade;
+}
+
+void User::addL_Position_Detail_From_Local_Trade(USER_CThostFtdcTradeField *trade) {
+	list<USER_INSTRUMENT_POSITION *>::iterator itor;
+	bool isFind = false;
+
+	for (itor = this->l_position_detail_from_local_trade->begin(); itor != this->l_position_detail_from_local_trade->end(); itor++)
+	{
+
+		if ((!strcmp((*itor)->InstrumentID, trade->InstrumentID))) // å¦‚æœç›¸ç­‰
+		{
+			// æ‰¾åˆ°æ ‡å¿—ä½èµ‹å€¼
+			isFind = true;
+
+			if ((!strcmp(this->getTradingDay().c_str(), trade->TradeDate))) //ä»Šå¤©çš„æŒä»“
+			{
+				if (trade->Direction == '0') { // ä»Šä¹°
+					(*itor)->Buy_Today += trade->Volume;
+				}
+				else if (trade->Direction == '1') // ä»Šå–
+				{
+					(*itor)->Sell_Today += trade->Volume;
+				}
+			}
+			else // æ˜¨å¤©çš„æŒä»“
+			{
+				if (trade->Direction == '0') { // æ˜¨ä¹°
+					(*itor)->Buy_Yesterday += trade->Volume;
+				}
+				else if (trade->Direction == '1') // æ˜¨å–
+				{
+					(*itor)->Sell_Yesterday += trade->Volume;
+				}
+			}
+		}
+
+
+	}
+
+	if (!isFind) // å¦‚æœæœªæ‰¾åˆ°,ç›´æ¥æ·»åŠ åˆ°ç»Ÿè®¡åˆ—è¡¨é‡Œ
+	{
+		USER_INSTRUMENT_POSITION *new_position_from_local_trade = new USER_INSTRUMENT_POSITION();
+		memset(new_position_from_local_trade, 0, sizeof(USER_INSTRUMENT_POSITION));
+		strcpy(new_position_from_local_trade->InstrumentID, trade->InstrumentID);
+		new_position_from_local_trade->Is_Same = false;
+
+		if ((!strcmp(this->getTradingDay().c_str(), trade->TradeDate))) //ä»Šå¤©çš„æŒä»“
+		{
+			if (trade->Direction == '0') { // ä»Šä¹°
+				new_position_from_local_trade->Buy_Today += trade->Volume;
+			}
+			else if (trade->Direction == '1') // ä»Šå–
+			{
+				new_position_from_local_trade->Sell_Today += trade->Volume;
+			}
+		}
+		else // æ˜¨å¤©çš„æŒä»“
+		{
+			if (trade->Direction == '0') { // æ˜¨ä¹°
+				new_position_from_local_trade->Buy_Yesterday += trade->Volume;
+			}
+			else if (trade->Direction == '1') // æ˜¨å–
+			{
+				new_position_from_local_trade->Sell_Yesterday += trade->Volume;
+			}
+		}
+		this->l_position_detail_from_local_trade->push_back(new_position_from_local_trade);
+	}
+}
+
+/// è·å–ç»Ÿè®¡æŒä»“æ˜ç»†ç»“æœ
+void User::getL_Position_Detail_Data(list<USER_INSTRUMENT_POSITION *> *l_position_detail_cal) {
+	std::cout << "\t=\tUser::getL_Position_Detail_Data()" << std::endl;
+	std::cout << "\t=\tæœŸè´§è´¦æˆ· = " << this->getUserID() << std::endl;
+	list<USER_INSTRUMENT_POSITION *>::iterator itor;
+	for (itor = l_position_detail_cal->begin(); itor != l_position_detail_cal->end(); itor++)
+	{
+		std::cout << "\t=\t\t**********" << std::endl;
+		std::cout << "\t=\t\t*åˆçº¦ID = " << (*itor)->InstrumentID << std::endl;
+		std::cout << "\t=\t\t*ä»Šä¹° = " << (*itor)->Buy_Today << std::endl;
+		std::cout << "\t=\t\t*ä»Šå– = " << (*itor)->Sell_Today << std::endl;
+		std::cout << "\t=\t\t*æ˜¨ä¹° = " << (*itor)->Buy_Yesterday << std::endl;
+		std::cout << "\t=\t\t*æ˜¨å– = " << (*itor)->Sell_Yesterday << std::endl;
+		std::cout << "\t=\t\t**********" << std::endl;
+	}
+}
+
 /************************************************************************/
-/* »ñÈ¡Êı¾İ¿âÁ¬½Ó                                                         */
+/* è·å–æ•°æ®åº“è¿æ¥                                                         */
 /************************************************************************/
 mongo::DBClientConnection * User::GetPositionConn() {
 	return this->PositionConn;
@@ -347,75 +625,75 @@ mongo::DBClientConnection * User::GetOrderActionConn() {
 }
 
 /************************************************************************/
-/* Íê³ÉOrderµÄMongoDB²Ù×÷                                                 */
+/* å®ŒæˆOrderçš„MongoDBæ“ä½œ                                                 */
 /************************************************************************/
 void User::DB_OrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderField *pInputOrder) {
 	USER_PRINT("User::DB_OrderInsert DB Connection!");
 	USER_PRINT(conn);
 	BSONObjBuilder b;
 
-	/// ½»Ò×Ô±id
+	/// äº¤æ˜“å‘˜id
 	b.append("OperatorID", this->getTraderID());
 
-	///¾­¼Í¹«Ë¾´úÂë
+	///ç»çºªå…¬å¸ä»£ç 
 	b.append("BrokerID", pInputOrder->BrokerID);
-	///Í¶×ÊÕß´úÂë
+	///æŠ•èµ„è€…ä»£ç 
 	b.append("InvestorID", pInputOrder->InvestorID);
-	///ºÏÔ¼´úÂë
+	///åˆçº¦ä»£ç 
 	b.append("InstrumentID", pInputOrder->InstrumentID);
-	///±¨µ¥ÒıÓÃ
+	///æŠ¥å•å¼•ç”¨
 	b.append("OrderRef", pInputOrder->OrderRef);
-	///ÓÃ»§´úÂë
+	///ç”¨æˆ·ä»£ç 
 	b.append("UserID", pInputOrder->UserID);
-	///±¨µ¥¼Û¸ñÌõ¼ş
+	///æŠ¥å•ä»·æ ¼æ¡ä»¶
 	b.append("OrderPriceType", pInputOrder->OrderPriceType);
-	///ÂòÂô·½Ïò
+	///ä¹°å–æ–¹å‘
 	b.append("Direction", pInputOrder->Direction);
-	///×éºÏ¿ªÆ½±êÖ¾
+	///ç»„åˆå¼€å¹³æ ‡å¿—
 	b.append("CombOffsetFlag", pInputOrder->CombOffsetFlag);
-	///×éºÏÍ¶»úÌ×±£±êÖ¾
+	///ç»„åˆæŠ•æœºå¥—ä¿æ ‡å¿—
 	b.append("CombHedgeFlag", pInputOrder->CombHedgeFlag);
-	///¼Û¸ñ
+	///ä»·æ ¼
 	b.append("LimitPrice", pInputOrder->LimitPrice);
-	///ÊıÁ¿
+	///æ•°é‡
 	b.append("VolumeTotalOriginal", pInputOrder->VolumeTotalOriginal);
-	///ÓĞĞ§ÆÚÀàĞÍ
+	///æœ‰æ•ˆæœŸç±»å‹
 	b.append("TimeCondition", pInputOrder->TimeCondition);
-	///GTDÈÕÆÚ
+	///GTDæ—¥æœŸ
 	b.append("GTDDate", pInputOrder->GTDDate);
-	///³É½»Á¿ÀàĞÍ
+	///æˆäº¤é‡ç±»å‹
 	b.append("VolumeCondition", pInputOrder->VolumeCondition);
-	///×îĞ¡³É½»Á¿
+	///æœ€å°æˆäº¤é‡
 	b.append("MinVolume", pInputOrder->MinVolume);
-	///´¥·¢Ìõ¼ş
+	///è§¦å‘æ¡ä»¶
 	b.append("ContingentCondition", pInputOrder->ContingentCondition);
-	///Ö¹Ëğ¼Û
+	///æ­¢æŸä»·
 	b.append("StopPrice", pInputOrder->StopPrice);
-	///Ç¿Æ½Ô­Òò
+	///å¼ºå¹³åŸå› 
 	b.append("ForceCloseReason", pInputOrder->ForceCloseReason);
-	///×Ô¶¯¹ÒÆğ±êÖ¾
+	///è‡ªåŠ¨æŒ‚èµ·æ ‡å¿—
 	b.append("IsAutoSuspend", pInputOrder->IsAutoSuspend);
-	///ÒµÎñµ¥Ôª
+	///ä¸šåŠ¡å•å…ƒ
 	b.append("BusinessUnit", pInputOrder->BusinessUnit);
-	///ÇëÇó±àºÅ
+	///è¯·æ±‚ç¼–å·
 	b.append("RequestID", pInputOrder->RequestID);
-	///ÓÃ»§Ç¿ÆÀ±êÖ¾
+	///ç”¨æˆ·å¼ºè¯„æ ‡å¿—
 	b.append("UserForceClose", pInputOrder->UserForceClose);
-	///»¥»»µ¥±êÖ¾
+	///äº’æ¢å•æ ‡å¿—
 	b.append("IsSwapOrder", pInputOrder->IsSwapOrder);
-	///½»Ò×Ëù´úÂë
+	///äº¤æ˜“æ‰€ä»£ç 
 	b.append("ExchangeID", pInputOrder->ExchangeID);
-	///Í¶×Êµ¥Ôª´úÂë
+	///æŠ•èµ„å•å…ƒä»£ç 
 	b.append("InvestUnitID", pInputOrder->InvestUnitID);
-	///×Ê½ğÕËºÅ
+	///èµ„é‡‘è´¦å·
 	b.append("AccountID", pInputOrder->AccountID);
-	///±ÒÖÖ´úÂë
+	///å¸ç§ä»£ç 
 	b.append("CurrencyID", pInputOrder->CurrencyID);
-	///½»Ò×±àÂë
+	///äº¤æ˜“ç¼–ç 
 	b.append("ClientID", pInputOrder->ClientID);
-	///IPµØÖ·
+	///IPåœ°å€
 	b.append("IPAddress", pInputOrder->IPAddress);
-	///MacµØÖ·
+	///Macåœ°å€
 	b.append("MacAddress", pInputOrder->MacAddress);
 
 	string time_str = string(Utils::getNowTimeMs());
@@ -429,18 +707,18 @@ void User::DB_OrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderF
 	//std::cout << pos << '\n';
 	string SendOrderTime = time_str.substr(pos1 + 1, pos - 1);
 	string SendOrderMicrosecond = time_str.substr(pos + 1);
-	/// ²åÈëÊ±¼ä
+	/// æ’å…¥æ—¶é—´
 	b.append("SendOrderTime", SendOrderTime);
-	/// ²åÈëÊ±¼äÎ¢Ãë
+	/// æ’å…¥æ—¶é—´å¾®ç§’
 	b.append("SendOrderMicrosecond", SendOrderMicrosecond);
 
-	/// ¿Í»§¶ËÕËºÅ£¨Ò²ÄÜÇø·ÖÓÃ»§Éí·İ»ò½»Ò×Ô±Éí·İ£©:OperatorID
+	/// å®¢æˆ·ç«¯è´¦å·ï¼ˆä¹Ÿèƒ½åŒºåˆ†ç”¨æˆ·èº«ä»½æˆ–äº¤æ˜“å‘˜èº«ä»½ï¼‰:OperatorID
 	b.append("OperatorID", this->getTraderID());
 
 	string temp(pInputOrder->OrderRef);
 	int len_order_ref = temp.length();
 	string result = temp.substr(len_order_ref - 2, 2);
-	/// ½»Ò×²ßÂÔ±àºÅ£ºStrategyID
+	/// äº¤æ˜“ç­–ç•¥ç¼–å·ï¼šStrategyID
 	b.append("StrategyID", result);
 
 	BSONObj p = b.obj();
@@ -456,7 +734,7 @@ void User::DB_OrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderF
 	USER_PRINT("DBManager::DB_OrderInsert ok");
 }
 
-// ¸üĞÂ±¨µ¥ÒıÓÃ
+// æ›´æ–°æŠ¥å•å¼•ç”¨
 void User::DB_UpdateOrderRef(string order_ref_base) {
 	USER_PRINT("User::DB_UpdateOrderRef!");
 	int len_order_ref_base = order_ref_base.length();
@@ -469,140 +747,140 @@ void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *
 	USER_PRINT("User::DB_OnRtnOrder DB Connection!");
 	USER_PRINT(conn);
 	BSONObjBuilder b;
-	/// ½»Ò×Ô±id
+	/// äº¤æ˜“å‘˜id
 	b.append("OperatorID", this->getTraderID());
-	///¾­¼Í¹«Ë¾´úÂë
+	///ç»çºªå…¬å¸ä»£ç 
 	b.append("BrokerID", pOrder->BrokerID);
-	///Í¶×ÊÕß´úÂë
+	///æŠ•èµ„è€…ä»£ç 
 	b.append("InvestorID", pOrder->InvestorID);
-	///ºÏÔ¼´úÂë
+	///åˆçº¦ä»£ç 
 	b.append("InstrumentID", pOrder->InstrumentID);
-	///±¨µ¥ÒıÓÃ
+	///æŠ¥å•å¼•ç”¨
 	b.append("OrderRef", pOrder->OrderRef);
-	///ÓÃ»§´úÂë
+	///ç”¨æˆ·ä»£ç 
 	b.append("UserID", pOrder->UserID);
-	///±¨µ¥¼Û¸ñÌõ¼ş
+	///æŠ¥å•ä»·æ ¼æ¡ä»¶
 	b.append("OrderPriceType", pOrder->OrderPriceType);
-	///ÂòÂô·½Ïò
+	///ä¹°å–æ–¹å‘
 	b.append("Direction", pOrder->Direction);
-	///×éºÏ¿ªÆ½±êÖ¾
+	///ç»„åˆå¼€å¹³æ ‡å¿—
 	b.append("CombOffsetFlag", pOrder->CombOffsetFlag);
-	///×éºÏÍ¶»úÌ×±£±êÖ¾
+	///ç»„åˆæŠ•æœºå¥—ä¿æ ‡å¿—
 	b.append("CombHedgeFlag", pOrder->CombHedgeFlag);
-	///¼Û¸ñ
+	///ä»·æ ¼
 	b.append("LimitPrice", pOrder->LimitPrice);
-	///ÊıÁ¿
+	///æ•°é‡
 	b.append("VolumeTotalOriginal", pOrder->VolumeTotalOriginal);
-	///ÓĞĞ§ÆÚÀàĞÍ
+	///æœ‰æ•ˆæœŸç±»å‹
 	b.append("TimeCondition", pOrder->TimeCondition);
-	///GTDÈÕÆÚ
+	///GTDæ—¥æœŸ
 	b.append("GTDDate", pOrder->GTDDate);
-	///³É½»Á¿ÀàĞÍ
+	///æˆäº¤é‡ç±»å‹
 	b.append("VolumeCondition", pOrder->VolumeCondition);
-	///×îĞ¡³É½»Á¿
+	///æœ€å°æˆäº¤é‡
 	b.append("MinVolume", pOrder->MinVolume);
-	///´¥·¢Ìõ¼ş
+	///è§¦å‘æ¡ä»¶
 	b.append("ContingentCondition", pOrder->ContingentCondition);
-	///Ö¹Ëğ¼Û
+	///æ­¢æŸä»·
 	b.append("StopPrice", pOrder->StopPrice);
-	///Ç¿Æ½Ô­Òò
+	///å¼ºå¹³åŸå› 
 	b.append("ForceCloseReason", pOrder->ForceCloseReason);
-	///×Ô¶¯¹ÒÆğ±êÖ¾
+	///è‡ªåŠ¨æŒ‚èµ·æ ‡å¿—
 	b.append("IsAutoSuspend", pOrder->IsAutoSuspend);
-	///ÒµÎñµ¥Ôª
+	///ä¸šåŠ¡å•å…ƒ
 	b.append("BusinessUnit", pOrder->BusinessUnit);
-	///ÇëÇó±àºÅ
+	///è¯·æ±‚ç¼–å·
 	b.append("RequestID", pOrder->RequestID);
-	///±¾µØ±¨µ¥±àºÅ
+	///æœ¬åœ°æŠ¥å•ç¼–å·
 	b.append("OrderLocalID", pOrder->OrderLocalID);
-	///½»Ò×Ëù´úÂë
+	///äº¤æ˜“æ‰€ä»£ç 
 	b.append("ExchangeID", pOrder->ExchangeID);
-	///»áÔ±´úÂë
+	///ä¼šå‘˜ä»£ç 
 	b.append("ParticipantID", pOrder->ParticipantID);
-	///¿Í»§´úÂë
+	///å®¢æˆ·ä»£ç 
 	b.append("ClientID", pOrder->ClientID);
-	///ºÏÔ¼ÔÚ½»Ò×ËùµÄ´úÂë
+	///åˆçº¦åœ¨äº¤æ˜“æ‰€çš„ä»£ç 
 	b.append("ExchangeInstID", pOrder->ExchangeInstID);
-	///½»Ò×Ëù½»Ò×Ô±´úÂë
+	///äº¤æ˜“æ‰€äº¤æ˜“å‘˜ä»£ç 
 	b.append("TraderID", pOrder->TraderID);
-	///°²×°±àºÅ
+	///å®‰è£…ç¼–å·
 	b.append("InstallID", pOrder->InstallID);
-	///±¨µ¥Ìá½»×´Ì¬
+	///æŠ¥å•æäº¤çŠ¶æ€
 	b.append("OrderSubmitStatus", pOrder->OrderSubmitStatus);
-	///±¨µ¥ÌáÊ¾ĞòºÅ
+	///æŠ¥å•æç¤ºåºå·
 	b.append("NotifySequence", pOrder->NotifySequence);
-	///½»Ò×ÈÕ
+	///äº¤æ˜“æ—¥
 	b.append("TradingDay", pOrder->TradingDay);
-	///½áËã±àºÅ
+	///ç»“ç®—ç¼–å·
 	b.append("SettlementID", pOrder->SettlementID);
-	///±¨µ¥±àºÅ
+	///æŠ¥å•ç¼–å·
 	b.append("OrderSysID", pOrder->OrderSysID);
-	///±¨µ¥À´Ô´
+	///æŠ¥å•æ¥æº
 	b.append("OrderSource", pOrder->OrderSource);
-	///±¨µ¥×´Ì¬
+	///æŠ¥å•çŠ¶æ€
 	stringstream ss;
 	string OrderStatus;
 	ss << pOrder->OrderStatus;
 	ss >> OrderStatus;
 	b.append("OrderStatus", OrderStatus);
-	///±¨µ¥ÀàĞÍ
+	///æŠ¥å•ç±»å‹
 	b.append("OrderType", pOrder->OrderType);
-	///½ñ³É½»ÊıÁ¿
+	///ä»Šæˆäº¤æ•°é‡
 	b.append("VolumeTraded", pOrder->VolumeTraded);
-	///Ê£ÓàÊıÁ¿
+	///å‰©ä½™æ•°é‡
 	b.append("VolumeTotal", pOrder->VolumeTotal);
-	///±¨µ¥ÈÕÆÚ
+	///æŠ¥å•æ—¥æœŸ
 	b.append("InsertDate", pOrder->InsertDate);
-	///Î¯ÍĞÊ±¼ä
+	///å§”æ‰˜æ—¶é—´
 	b.append("InsertTime", pOrder->InsertTime);
-	///¼¤»îÊ±¼ä
+	///æ¿€æ´»æ—¶é—´
 	b.append("ActiveTime", pOrder->ActiveTime);
-	///¹ÒÆğÊ±¼ä
+	///æŒ‚èµ·æ—¶é—´
 	b.append("SuspendTime", pOrder->SuspendTime);
-	///×îºóĞŞ¸ÄÊ±¼ä
+	///æœ€åä¿®æ”¹æ—¶é—´
 	b.append("UpdateTime", pOrder->UpdateTime);
-	///³·ÏúÊ±¼ä
+	///æ’¤é”€æ—¶é—´
 	b.append("CancelTime", pOrder->CancelTime);
-	///×îºóĞŞ¸Ä½»Ò×Ëù½»Ò×Ô±´úÂë
+	///æœ€åä¿®æ”¹äº¤æ˜“æ‰€äº¤æ˜“å‘˜ä»£ç 
 	b.append("ActiveTraderID", pOrder->ActiveTraderID);
-	///½áËã»áÔ±±àºÅ
+	///ç»“ç®—ä¼šå‘˜ç¼–å·
 	b.append("ClearingPartID", pOrder->ClearingPartID);
-	///ĞòºÅ
+	///åºå·
 	b.append("SequenceNo", pOrder->SequenceNo);
-	///Ç°ÖÃ±àºÅ
+	///å‰ç½®ç¼–å·
 	b.append("FrontID", pOrder->FrontID);
-	///»á»°±àºÅ
+	///ä¼šè¯ç¼–å·
 	b.append("SessionID", pOrder->SessionID);
-	///ÓÃ»§¶Ë²úÆ·ĞÅÏ¢
+	///ç”¨æˆ·ç«¯äº§å“ä¿¡æ¯
 	b.append("UserProductInfo", pOrder->UserProductInfo);
-	///×´Ì¬ĞÅÏ¢
-	///×´Ì¬ĞÅÏ¢
+	///çŠ¶æ€ä¿¡æ¯
+	///çŠ¶æ€ä¿¡æ¯
 	codeDst_2[90] = { 0 };
 	Utils::Gb2312ToUtf8(codeDst_2, 90, pOrder->StatusMsg, strlen(pOrder->StatusMsg)); // Gb2312ToUtf8
 	b.append("StatusMsg", codeDst_2);
-	///ÓÃ»§Ç¿ÆÀ±êÖ¾
+	///ç”¨æˆ·å¼ºè¯„æ ‡å¿—
 	b.append("UserForceClose", pOrder->UserForceClose);
-	///²Ù×÷ÓÃ»§´úÂë
+	///æ“ä½œç”¨æˆ·ä»£ç 
 	b.append("ActiveUserID", pOrder->ActiveUserID);
-	///¾­¼Í¹«Ë¾±¨µ¥±àºÅ
+	///ç»çºªå…¬å¸æŠ¥å•ç¼–å·
 	b.append("BrokerOrderSeq", pOrder->BrokerOrderSeq);
-	///Ïà¹Ø±¨µ¥
+	///ç›¸å…³æŠ¥å•
 	b.append("RelativeOrderSysID", pOrder->RelativeOrderSysID);
-	///Ö£ÉÌËù³É½»ÊıÁ¿
+	///éƒ‘å•†æ‰€æˆäº¤æ•°é‡
 	b.append("ZCETotalTradedVolume", pOrder->ZCETotalTradedVolume);
-	///»¥»»µ¥±êÖ¾
+	///äº’æ¢å•æ ‡å¿—
 	b.append("IsSwapOrder", pOrder->IsSwapOrder);
-	///ÓªÒµ²¿±àºÅ
+	///è¥ä¸šéƒ¨ç¼–å·
 	b.append("BranchID", pOrder->BranchID);
-	///Í¶×Êµ¥Ôª´úÂë
+	///æŠ•èµ„å•å…ƒä»£ç 
 	b.append("InvestUnitID", pOrder->InvestUnitID);
-	///×Ê½ğÕËºÅ
+	///èµ„é‡‘è´¦å·
 	b.append("AccountID", pOrder->AccountID);
-	///±ÒÖÖ´úÂë
+	///å¸ç§ä»£ç 
 	b.append("CurrencyID", pOrder->CurrencyID);
-	///IPµØÖ·
+	///IPåœ°å€
 	b.append("IPAddress", pOrder->IPAddress);
-	///MacµØÖ·
+	///Macåœ°å€
 	b.append("MacAddress", pOrder->MacAddress);
 
 	string time_str = Utils::getNowTimeMs();
@@ -612,24 +890,24 @@ void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *
 	//std::cout << pos << '\n';
 	string CtpRtnOrderTime = time_str.substr(pos1 + 1, pos - 1);
 	string CtpRtnOrderMicrosecond = time_str.substr(pos + 1);
-	/// ²åÈëÊ±¼ä
+	/// æ’å…¥æ—¶é—´
 	b.append("CtpRtnOrderTime", CtpRtnOrderTime);
-	/// ²åÈëÊ±¼äÎ¢Ãë
+	/// æ’å…¥æ—¶é—´å¾®ç§’
 	b.append("CtpRtnOrderMicrosecond", CtpRtnOrderMicrosecond);
 
-	/// ²åÈëÊ±¼ä
+	/// æ’å…¥æ—¶é—´
 	b.append("ExchRtnOrderTime", CtpRtnOrderTime);
-	/// ²åÈëÊ±¼äÎ¢Ãë
+	/// æ’å…¥æ—¶é—´å¾®ç§’
 	b.append("ExchRtnOrderMicrosecond", CtpRtnOrderMicrosecond);
 
-	/// ¿Í»§¶ËÕËºÅ£¨Ò²ÄÜÇø·ÖÓÃ»§Éí·İ»ò½»Ò×Ô±Éí·İ£©:OperatorID
+	/// å®¢æˆ·ç«¯è´¦å·ï¼ˆä¹Ÿèƒ½åŒºåˆ†ç”¨æˆ·èº«ä»½æˆ–äº¤æ˜“å‘˜èº«ä»½ï¼‰:OperatorID
 	b.append("OperatorID", this->getTraderID());
 
 	string temp(pOrder->OrderRef);
 	USER_PRINT(temp);
 	int len_order_ref = temp.length();
 	string result = temp.substr(len_order_ref - 2, 2);
-	/// ½»Ò×²ßÂÔ±àºÅ£ºStrategyID
+	/// äº¤æ˜“ç­–ç•¥ç¼–å·ï¼šStrategyID
 	b.append("StrategyID", result);
 
 	BSONObj p = b.obj();
@@ -649,67 +927,67 @@ void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *
 void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *pTrade){
 	USER_PRINT(DB_ONRTNORDER_COLLECTION"User::DB_OnRtnTrade DB Connection!");
 	BSONObjBuilder b;
-	/// ½»Ò×Ô±id
+	/// äº¤æ˜“å‘˜id
 	b.append("OperatorID", this->getTraderID());
-	///¾­¼Í¹«Ë¾´úÂë
+	///ç»çºªå…¬å¸ä»£ç 
 	b.append("BrokerID", pTrade->BrokerID);
-	///Í¶×ÊÕß´úÂë
+	///æŠ•èµ„è€…ä»£ç 
 	b.append("InvestorID", pTrade->InvestorID);
-	///ºÏÔ¼´úÂë
+	///åˆçº¦ä»£ç 
 	b.append("InstrumentID", pTrade->InstrumentID);
-	///±¨µ¥ÒıÓÃ
+	///æŠ¥å•å¼•ç”¨
 	b.append("OrderRef", pTrade->OrderRef);
-	///ÓÃ»§´úÂë
+	///ç”¨æˆ·ä»£ç 
 	b.append("UserID", pTrade->UserID);
-	///½»Ò×Ëù´úÂë
+	///äº¤æ˜“æ‰€ä»£ç 
 	b.append("ExchangeID", pTrade->ExchangeID);
-	///³É½»±àºÅ
+	///æˆäº¤ç¼–å·
 	b.append("TradeID", pTrade->TradeID);
-	///ÂòÂô·½Ïò
+	///ä¹°å–æ–¹å‘
 	b.append("Direction", pTrade->Direction);
-	///±¨µ¥±àºÅ
+	///æŠ¥å•ç¼–å·
 	b.append("OrderSysID", pTrade->OrderSysID);
-	///»áÔ±´úÂë
+	///ä¼šå‘˜ä»£ç 
 	b.append("ParticipantID", pTrade->ParticipantID);
-	///¿Í»§´úÂë
+	///å®¢æˆ·ä»£ç 
 	b.append("ClientID", pTrade->ClientID);
-	///½»Ò×½ÇÉ«
+	///äº¤æ˜“è§’è‰²
 	b.append("TradingRole", pTrade->TradingRole);
-	///ºÏÔ¼ÔÚ½»Ò×ËùµÄ´úÂë
+	///åˆçº¦åœ¨äº¤æ˜“æ‰€çš„ä»£ç 
 	b.append("ExchangeInstID", pTrade->ExchangeInstID);
-	///¿ªÆ½±êÖ¾
+	///å¼€å¹³æ ‡å¿—
 	b.append("OffsetFlag", pTrade->OffsetFlag);
-	///Í¶»úÌ×±£±êÖ¾
+	///æŠ•æœºå¥—ä¿æ ‡å¿—
 	b.append("HedgeFlag", pTrade->HedgeFlag);
-	///¼Û¸ñ
+	///ä»·æ ¼
 	b.append("Price", pTrade->Price);
-	///ÊıÁ¿
+	///æ•°é‡
 	b.append("Volume", pTrade->Volume);
-	///³É½»Ê±ÆÚ
+	///æˆäº¤æ—¶æœŸ
 	b.append("TradeDate", pTrade->TradeDate);
-	///³É½»Ê±¼ä
+	///æˆäº¤æ—¶é—´
 	b.append("TradeTime", pTrade->TradeTime);
-	///³É½»ÀàĞÍ
+	///æˆäº¤ç±»å‹
 	b.append("TradeType", pTrade->TradeType);
-	///³É½»¼ÛÀ´Ô´
+	///æˆäº¤ä»·æ¥æº
 	b.append("PriceSource", pTrade->PriceSource);
-	///½»Ò×Ëù½»Ò×Ô±´úÂë
+	///äº¤æ˜“æ‰€äº¤æ˜“å‘˜ä»£ç 
 	b.append("TraderID", pTrade->TraderID);
-	///±¾µØ±¨µ¥±àºÅ
+	///æœ¬åœ°æŠ¥å•ç¼–å·
 	b.append("OrderLocalID", pTrade->OrderLocalID);
-	///½áËã»áÔ±±àºÅ
+	///ç»“ç®—ä¼šå‘˜ç¼–å·
 	b.append("ClearingPartID", pTrade->ClearingPartID);
-	///ÒµÎñµ¥Ôª
+	///ä¸šåŠ¡å•å…ƒ
 	b.append("BusinessUnit", pTrade->BusinessUnit);
-	///ĞòºÅ
+	///åºå·
 	b.append("SequenceNo", pTrade->SequenceNo);
-	///½»Ò×ÈÕ
+	///äº¤æ˜“æ—¥
 	b.append("TradingDay", pTrade->TradingDay);
-	///½áËã±àºÅ
+	///ç»“ç®—ç¼–å·
 	b.append("SettlementID", pTrade->SettlementID);
-	///¾­¼Í¹«Ë¾±¨µ¥±àºÅ
+	///ç»çºªå…¬å¸æŠ¥å•ç¼–å·
 	b.append("BrokerOrderSeq", pTrade->BrokerOrderSeq);
-	///³É½»À´Ô´
+	///æˆäº¤æ¥æº
 	b.append("TradeSource", pTrade->TradeSource);
 
 
@@ -727,12 +1005,12 @@ void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *
 	USER_PRINT(time_str);
 	string RecTradeMicrosecond = time_str.substr(21);
 	USER_PRINT(RecTradeMicrosecond);
-	/// ²åÈëÊ±¼ä
+	/// æ’å…¥æ—¶é—´
 	b.append("RecTradeTime", RecTradeTime);
-	/// ²åÈëÊ±¼äÎ¢Ãë
+	/// æ’å…¥æ—¶é—´å¾®ç§’
 	b.append("RecTradeMicrosecond", RecTradeMicrosecond);
 
-	/// ¿Í»§¶ËÕËºÅ£¨Ò²ÄÜÇø·ÖÓÃ»§Éí·İ»ò½»Ò×Ô±Éí·İ£©:OperatorID
+	/// å®¢æˆ·ç«¯è´¦å·ï¼ˆä¹Ÿèƒ½åŒºåˆ†ç”¨æˆ·èº«ä»½æˆ–äº¤æ˜“å‘˜èº«ä»½ï¼‰:OperatorID
 	b.append("OperatorID", this->getTraderID());
 
 	string temp(pTrade->OrderRef);
@@ -742,7 +1020,7 @@ void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *
 	int len_order_ref = temp.length();
 	string result = temp.substr(len_order_ref - 2, 2);
 	USER_PRINT(result);
-	/// ½»Ò×²ßÂÔ±àºÅ£ºStrategyID
+	/// äº¤æ˜“ç­–ç•¥ç¼–å·ï¼šStrategyID
 	b.append("StrategyID", result);
 
 	BSONObj p = b.obj();
@@ -758,41 +1036,41 @@ void User::DB_OrderAction(mongo::DBClientConnection *conn, CThostFtdcInputOrderA
 	USER_PRINT("User::DB_OrderAction DB Connection!");
 	USER_PRINT(conn);
 	BSONObjBuilder b;
-	/// ½»Ò×Ô±id
+	/// äº¤æ˜“å‘˜id
 	b.append("OperatorID", this->getTraderID());
-	///¾­¼Í¹«Ë¾´úÂë
+	///ç»çºªå…¬å¸ä»£ç 
 	b.append("BrokerID", pOrderAction->BrokerID);
-	///Í¶×ÊÕß´úÂë
+	///æŠ•èµ„è€…ä»£ç 
 	b.append("InvestorID", pOrderAction->InvestorID);
-	///±¨µ¥²Ù×÷ÒıÓÃ
+	///æŠ¥å•æ“ä½œå¼•ç”¨
 	b.append("OrderActionRef", pOrderAction->OrderActionRef);
-	///±¨µ¥ÒıÓÃ
+	///æŠ¥å•å¼•ç”¨
 	b.append("OrderRef", pOrderAction->OrderRef);
-	///ÇëÇó±àºÅ
+	///è¯·æ±‚ç¼–å·
 	b.append("RequestID", pOrderAction->RequestID);
-	///Ç°ÖÃ±àºÅ
+	///å‰ç½®ç¼–å·
 	b.append("FrontID", pOrderAction->FrontID);
-	///»á»°±àºÅ
+	///ä¼šè¯ç¼–å·
 	b.append("SessionID", pOrderAction->SessionID);
-	///½»Ò×Ëù´úÂë
+	///äº¤æ˜“æ‰€ä»£ç 
 	b.append("ExchangeID", pOrderAction->ExchangeID);
-	///±¨µ¥±àºÅ
+	///æŠ¥å•ç¼–å·
 	b.append("OrderSysID", pOrderAction->OrderSysID);
-	///²Ù×÷±êÖ¾
+	///æ“ä½œæ ‡å¿—
 	b.append("ActionFlag", pOrderAction->ActionFlag);
-	///¼Û¸ñ
+	///ä»·æ ¼
 	b.append("LimitPrice", pOrderAction->LimitPrice);
-	///ÊıÁ¿±ä»¯
+	///æ•°é‡å˜åŒ–
 	b.append("VolumeChange", pOrderAction->VolumeChange);
-	///ÓÃ»§´úÂë
+	///ç”¨æˆ·ä»£ç 
 	b.append("UserID", pOrderAction->UserID);
-	///ºÏÔ¼´úÂë
+	///åˆçº¦ä»£ç 
 	b.append("InstrumentID", pOrderAction->InstrumentID);
-	///Í¶×Êµ¥Ôª´úÂë
+	///æŠ•èµ„å•å…ƒä»£ç 
 	b.append("InvestUnitID", pOrderAction->InvestUnitID);
-	///IPµØÖ·
+	///IPåœ°å€
 	b.append("IPAddress", pOrderAction->IPAddress);
-	///MacµØÖ·
+	///Macåœ°å€
 	b.append("MacAddress", pOrderAction->MacAddress);
 	BSONObj p = b.obj();
 	this->OrderActionConn->insert(DB_ORDERACTION_COLLECTION, p);
@@ -804,137 +1082,137 @@ void User::DB_OrderCombine(mongo::DBClientConnection *conn, CThostFtdcOrderField
 	USER_PRINT("User::DB_OrderCombine DB Connection!");
 	USER_PRINT(conn);
 	BSONObjBuilder b;
-	/// ½»Ò×Ô±id
+	/// äº¤æ˜“å‘˜id
 	b.append("OperatorID", this->getTraderID());
-	///¾­¼Í¹«Ë¾´úÂë
+	///ç»çºªå…¬å¸ä»£ç 
 	b.append("BrokerID", pOrder->BrokerID);
-	///Í¶×ÊÕß´úÂë
+	///æŠ•èµ„è€…ä»£ç 
 	b.append("InvestorID", pOrder->InvestorID);
-	///ºÏÔ¼´úÂë
+	///åˆçº¦ä»£ç 
 	b.append("InstrumentID", pOrder->InstrumentID);
-	///±¨µ¥ÒıÓÃ
+	///æŠ¥å•å¼•ç”¨
 	b.append("OrderRef", pOrder->OrderRef);
-	///ÓÃ»§´úÂë
+	///ç”¨æˆ·ä»£ç 
 	b.append("UserID", pOrder->UserID);
-	///±¨µ¥¼Û¸ñÌõ¼ş
+	///æŠ¥å•ä»·æ ¼æ¡ä»¶
 	b.append("OrderPriceType", pOrder->OrderPriceType);
-	///ÂòÂô·½Ïò
+	///ä¹°å–æ–¹å‘
 	b.append("Direction", pOrder->Direction);
-	///×éºÏ¿ªÆ½±êÖ¾
+	///ç»„åˆå¼€å¹³æ ‡å¿—
 	b.append("CombOffsetFlag", pOrder->CombOffsetFlag);
-	///×éºÏÍ¶»úÌ×±£±êÖ¾
+	///ç»„åˆæŠ•æœºå¥—ä¿æ ‡å¿—
 	b.append("CombHedgeFlag", pOrder->CombHedgeFlag);
-	///¼Û¸ñ
+	///ä»·æ ¼
 	b.append("LimitPrice", pOrder->LimitPrice);
-	///ÊıÁ¿
+	///æ•°é‡
 	b.append("VolumeTotalOriginal", pOrder->VolumeTotalOriginal);
-	///ÓĞĞ§ÆÚÀàĞÍ
+	///æœ‰æ•ˆæœŸç±»å‹
 	b.append("TimeCondition", pOrder->TimeCondition);
-	///GTDÈÕÆÚ
+	///GTDæ—¥æœŸ
 	b.append("GTDDate", pOrder->GTDDate);
-	///³É½»Á¿ÀàĞÍ
+	///æˆäº¤é‡ç±»å‹
 	b.append("VolumeCondition", pOrder->VolumeCondition);
-	///×îĞ¡³É½»Á¿
+	///æœ€å°æˆäº¤é‡
 	b.append("MinVolume", pOrder->MinVolume);
-	///´¥·¢Ìõ¼ş
+	///è§¦å‘æ¡ä»¶
 	b.append("ContingentCondition", pOrder->ContingentCondition);
-	///Ö¹Ëğ¼Û
+	///æ­¢æŸä»·
 	b.append("StopPrice", pOrder->StopPrice);
-	///Ç¿Æ½Ô­Òò
+	///å¼ºå¹³åŸå› 
 	b.append("ForceCloseReason", pOrder->ForceCloseReason);
-	///×Ô¶¯¹ÒÆğ±êÖ¾
+	///è‡ªåŠ¨æŒ‚èµ·æ ‡å¿—
 	b.append("IsAutoSuspend", pOrder->IsAutoSuspend);
-	///ÒµÎñµ¥Ôª
+	///ä¸šåŠ¡å•å…ƒ
 	b.append("BusinessUnit", pOrder->BusinessUnit);
-	///ÇëÇó±àºÅ
+	///è¯·æ±‚ç¼–å·
 	b.append("RequestID", pOrder->RequestID);
-	///±¾µØ±¨µ¥±àºÅ
+	///æœ¬åœ°æŠ¥å•ç¼–å·
 	b.append("OrderLocalID", pOrder->OrderLocalID);
-	///½»Ò×Ëù´úÂë
+	///äº¤æ˜“æ‰€ä»£ç 
 	b.append("ExchangeID", pOrder->ExchangeID);
-	///»áÔ±´úÂë
+	///ä¼šå‘˜ä»£ç 
 	b.append("ParticipantID", pOrder->ParticipantID);
-	///¿Í»§´úÂë
+	///å®¢æˆ·ä»£ç 
 	b.append("ClientID", pOrder->ClientID);
-	///ºÏÔ¼ÔÚ½»Ò×ËùµÄ´úÂë
+	///åˆçº¦åœ¨äº¤æ˜“æ‰€çš„ä»£ç 
 	b.append("ExchangeInstID", pOrder->ExchangeInstID);
-	///½»Ò×Ëù½»Ò×Ô±´úÂë
+	///äº¤æ˜“æ‰€äº¤æ˜“å‘˜ä»£ç 
 	b.append("TraderID", pOrder->TraderID);
-	///°²×°±àºÅ
+	///å®‰è£…ç¼–å·
 	b.append("InstallID", pOrder->InstallID);
-	///±¨µ¥Ìá½»×´Ì¬
+	///æŠ¥å•æäº¤çŠ¶æ€
 	b.append("OrderSubmitStatus", pOrder->OrderSubmitStatus);
-	///±¨µ¥ÌáÊ¾ĞòºÅ
+	///æŠ¥å•æç¤ºåºå·
 	b.append("NotifySequence", pOrder->NotifySequence);
-	///½»Ò×ÈÕ
+	///äº¤æ˜“æ—¥
 	b.append("TradingDay", pOrder->TradingDay);
-	///½áËã±àºÅ
+	///ç»“ç®—ç¼–å·
 	b.append("SettlementID", pOrder->SettlementID);
-	///±¨µ¥±àºÅ
+	///æŠ¥å•ç¼–å·
 	b.append("OrderSysID", pOrder->OrderSysID);
-	///±¨µ¥À´Ô´
+	///æŠ¥å•æ¥æº
 	b.append("OrderSource", pOrder->OrderSource);
-	///±¨µ¥×´Ì¬
+	///æŠ¥å•çŠ¶æ€
 	stringstream ss;
 	string OrderStatus;
 	ss << pOrder->OrderStatus;
 	ss >> OrderStatus;
 	b.append("OrderStatus", OrderStatus);
-	///±¨µ¥ÀàĞÍ
+	///æŠ¥å•ç±»å‹
 	b.append("OrderType", pOrder->OrderType);
-	///½ñ³É½»ÊıÁ¿
+	///ä»Šæˆäº¤æ•°é‡
 	b.append("VolumeTraded", pOrder->VolumeTraded);
-	///Ê£ÓàÊıÁ¿
+	///å‰©ä½™æ•°é‡
 	b.append("VolumeTotal", pOrder->VolumeTotal);
-	///±¨µ¥ÈÕÆÚ
+	///æŠ¥å•æ—¥æœŸ
 	b.append("InsertDate", pOrder->InsertDate);
-	///Î¯ÍĞÊ±¼ä
+	///å§”æ‰˜æ—¶é—´
 	b.append("InsertTime", pOrder->InsertTime);
-	///¼¤»îÊ±¼ä
+	///æ¿€æ´»æ—¶é—´
 	b.append("ActiveTime", pOrder->ActiveTime);
-	///¹ÒÆğÊ±¼ä
+	///æŒ‚èµ·æ—¶é—´
 	b.append("SuspendTime", pOrder->SuspendTime);
-	///×îºóĞŞ¸ÄÊ±¼ä
+	///æœ€åä¿®æ”¹æ—¶é—´
 	b.append("UpdateTime", pOrder->UpdateTime);
-	///³·ÏúÊ±¼ä
+	///æ’¤é”€æ—¶é—´
 	b.append("CancelTime", pOrder->CancelTime);
-	///×îºóĞŞ¸Ä½»Ò×Ëù½»Ò×Ô±´úÂë
+	///æœ€åä¿®æ”¹äº¤æ˜“æ‰€äº¤æ˜“å‘˜ä»£ç 
 	b.append("ActiveTraderID", pOrder->ActiveTraderID);
-	///½áËã»áÔ±±àºÅ
+	///ç»“ç®—ä¼šå‘˜ç¼–å·
 	b.append("ClearingPartID", pOrder->ClearingPartID);
-	///ĞòºÅ
+	///åºå·
 	b.append("SequenceNo", pOrder->SequenceNo);
-	///Ç°ÖÃ±àºÅ
+	///å‰ç½®ç¼–å·
 	b.append("FrontID", pOrder->FrontID);
-	///»á»°±àºÅ
+	///ä¼šè¯ç¼–å·
 	b.append("SessionID", pOrder->SessionID);
-	///ÓÃ»§¶Ë²úÆ·ĞÅÏ¢
+	///ç”¨æˆ·ç«¯äº§å“ä¿¡æ¯
 	b.append("UserProductInfo", pOrder->UserProductInfo);
-	///×´Ì¬ĞÅÏ¢
+	///çŠ¶æ€ä¿¡æ¯
 	b.append("StatusMsg", pOrder->StatusMsg);
-	///ÓÃ»§Ç¿ÆÀ±êÖ¾
+	///ç”¨æˆ·å¼ºè¯„æ ‡å¿—
 	b.append("UserForceClose", pOrder->UserForceClose);
-	///²Ù×÷ÓÃ»§´úÂë
+	///æ“ä½œç”¨æˆ·ä»£ç 
 	b.append("ActiveUserID", pOrder->ActiveUserID);
-	///¾­¼Í¹«Ë¾±¨µ¥±àºÅ
+	///ç»çºªå…¬å¸æŠ¥å•ç¼–å·
 	b.append("BrokerOrderSeq", pOrder->BrokerOrderSeq);
-	///Ïà¹Ø±¨µ¥
+	///ç›¸å…³æŠ¥å•
 	b.append("RelativeOrderSysID", pOrder->RelativeOrderSysID);
-	///Ö£ÉÌËù³É½»ÊıÁ¿
+	///éƒ‘å•†æ‰€æˆäº¤æ•°é‡
 	b.append("ZCETotalTradedVolume", pOrder->ZCETotalTradedVolume);
-	///»¥»»µ¥±êÖ¾
+	///äº’æ¢å•æ ‡å¿—
 	b.append("IsSwapOrder", pOrder->IsSwapOrder);
-	///ÓªÒµ²¿±àºÅ
+	///è¥ä¸šéƒ¨ç¼–å·
 	b.append("BranchID", pOrder->BranchID);
-	///Í¶×Êµ¥Ôª´úÂë
+	///æŠ•èµ„å•å…ƒä»£ç 
 	b.append("InvestUnitID", pOrder->InvestUnitID);
-	///×Ê½ğÕËºÅ
+	///èµ„é‡‘è´¦å·
 	b.append("AccountID", pOrder->AccountID);
-	///±ÒÖÖ´úÂë
+	///å¸ç§ä»£ç 
 	b.append("CurrencyID", pOrder->CurrencyID);
-	///IPµØÖ·
+	///IPåœ°å€
 	b.append("IPAddress", pOrder->IPAddress);
-	///MacµØÖ·
+	///Macåœ°å€
 	b.append("MacAddress", pOrder->MacAddress);
 	BSONObj p = b.obj();
 	conn->insert(DB_ORDERCOMBINE_COLLECTION, p);
@@ -945,358 +1223,358 @@ void User::DB_OnRspOrderAction(mongo::DBClientConnection *conn, CThostFtdcInputO
 	USER_PRINT("User::DB_OnRspOrderAction DB Connection!");
 	USER_PRINT(conn);
 	BSONObjBuilder b;
-	/// ½»Ò×Ô±id
+	/// äº¤æ˜“å‘˜id
 	b.append("OperatorID", this->getTraderID());
-	///¾­¼Í¹«Ë¾´úÂë
+	///ç»çºªå…¬å¸ä»£ç 
 	b.append("BrokerID", pInputOrderAction->BrokerID);
-	///Í¶×ÊÕß´úÂë
+	///æŠ•èµ„è€…ä»£ç 
 	b.append("InvestorID", pInputOrderAction->InvestorID);
-	///±¨µ¥²Ù×÷ÒıÓÃ
+	///æŠ¥å•æ“ä½œå¼•ç”¨
 	b.append("OrderActionRef", pInputOrderAction->OrderActionRef);
-	///±¨µ¥ÒıÓÃ
+	///æŠ¥å•å¼•ç”¨
 	b.append("OrderRef", pInputOrderAction->OrderRef);
-	///ÇëÇó±àºÅ
+	///è¯·æ±‚ç¼–å·
 	b.append("RequestID", pInputOrderAction->RequestID);
-	///Ç°ÖÃ±àºÅ
+	///å‰ç½®ç¼–å·
 	b.append("FrontID", pInputOrderAction->FrontID);
-	///»á»°±àºÅ
+	///ä¼šè¯ç¼–å·
 	b.append("SessionID", pInputOrderAction->SessionID);
-	///½»Ò×Ëù´úÂë
+	///äº¤æ˜“æ‰€ä»£ç 
 	b.append("ExchangeID", pInputOrderAction->ExchangeID);
-	///±¨µ¥±àºÅ
+	///æŠ¥å•ç¼–å·
 	b.append("OrderSysID", pInputOrderAction->OrderSysID);
-	///²Ù×÷±êÖ¾
+	///æ“ä½œæ ‡å¿—
 	b.append("ActionFlag", pInputOrderAction->ActionFlag);
-	///¼Û¸ñ
+	///ä»·æ ¼
 	b.append("LimitPrice", pInputOrderAction->LimitPrice);
-	///ÊıÁ¿±ä»¯
+	///æ•°é‡å˜åŒ–
 	b.append("VolumeChange", pInputOrderAction->VolumeChange);
-	///ÓÃ»§´úÂë
+	///ç”¨æˆ·ä»£ç 
 	b.append("UserID", pInputOrderAction->UserID);
-	///ºÏÔ¼´úÂë
+	///åˆçº¦ä»£ç 
 	b.append("InstrumentID", pInputOrderAction->InstrumentID);
-	///Í¶×Êµ¥Ôª´úÂë
+	///æŠ•èµ„å•å…ƒä»£ç 
 	b.append("InvestUnitID", pInputOrderAction->InvestUnitID);
-	///IPµØÖ·
+	///IPåœ°å€
 	b.append("IPAddress", pInputOrderAction->IPAddress);
-	///MacµØÖ·
+	///Macåœ°å€
 	b.append("MacAddress", pInputOrderAction->MacAddress);
 	BSONObj p = b.obj();
 	conn->insert(DB_ONRSPORDERACTION_COLLECTION, p);
 	USER_PRINT("DBManager::DB_OnRspOrderAction ok");
-} // CTPÈÏÎª³·µ¥²ÎÊı´íÎó
+} // CTPè®¤ä¸ºæ’¤å•å‚æ•°é”™è¯¯
 
 void User::DB_OnErrRtnOrderAction(mongo::DBClientConnection *conn, CThostFtdcOrderActionField *pOrderAction){
 	USER_PRINT("User::DB_OnErrRtnOrderAction DB Connection!");
 	USER_PRINT(conn);
 	BSONObjBuilder b;
-	/// ½»Ò×Ô±id
+	/// äº¤æ˜“å‘˜id
 	b.append("OperatorID", this->getTraderID());
-	///¾­¼Í¹«Ë¾´úÂë
+	///ç»çºªå…¬å¸ä»£ç 
 	b.append("BrokerID", pOrderAction->BrokerID);
-	///Í¶×ÊÕß´úÂë
+	///æŠ•èµ„è€…ä»£ç 
 	b.append("InvestorID", pOrderAction->InvestorID);
-	///±¨µ¥²Ù×÷ÒıÓÃ
+	///æŠ¥å•æ“ä½œå¼•ç”¨
 	b.append("OrderActionRef", pOrderAction->OrderActionRef);
-	///±¨µ¥ÒıÓÃ
+	///æŠ¥å•å¼•ç”¨
 	b.append("OrderRef", pOrderAction->OrderRef);
-	///ÇëÇó±àºÅ
+	///è¯·æ±‚ç¼–å·
 	b.append("RequestID", pOrderAction->RequestID);
-	///Ç°ÖÃ±àºÅ
+	///å‰ç½®ç¼–å·
 	b.append("FrontID", pOrderAction->FrontID);
-	///»á»°±àºÅ
+	///ä¼šè¯ç¼–å·
 	b.append("SessionID", pOrderAction->SessionID);
-	///½»Ò×Ëù´úÂë
+	///äº¤æ˜“æ‰€ä»£ç 
 	b.append("ExchangeID", pOrderAction->ExchangeID);
-	///±¨µ¥±àºÅ
+	///æŠ¥å•ç¼–å·
 	b.append("OrderSysID", pOrderAction->OrderSysID);
-	///²Ù×÷±êÖ¾
+	///æ“ä½œæ ‡å¿—
 	b.append("ActionFlag", pOrderAction->ActionFlag);
-	///¼Û¸ñ
+	///ä»·æ ¼
 	b.append("LimitPrice", pOrderAction->LimitPrice);
-	///ÊıÁ¿±ä»¯
+	///æ•°é‡å˜åŒ–
 	b.append("VolumeChange", pOrderAction->VolumeChange);
-	///²Ù×÷ÈÕÆÚ
+	///æ“ä½œæ—¥æœŸ
 	b.append("ActionDate", pOrderAction->ActionDate);
-	///²Ù×÷Ê±¼ä
+	///æ“ä½œæ—¶é—´
 	b.append("ActionTime", pOrderAction->ActionTime);
-	///½»Ò×Ëù½»Ò×Ô±´úÂë
+	///äº¤æ˜“æ‰€äº¤æ˜“å‘˜ä»£ç 
 	b.append("TraderID", pOrderAction->TraderID);
-	///°²×°±àºÅ
+	///å®‰è£…ç¼–å·
 	b.append("InstallID", pOrderAction->InstallID);
-	///±¾µØ±¨µ¥±àºÅ
+	///æœ¬åœ°æŠ¥å•ç¼–å·
 	b.append("OrderLocalID", pOrderAction->OrderLocalID);
-	///²Ù×÷±¾µØ±àºÅ
+	///æ“ä½œæœ¬åœ°ç¼–å·
 	b.append("ActionLocalID", pOrderAction->ActionLocalID);
-	///»áÔ±´úÂë
+	///ä¼šå‘˜ä»£ç 
 	b.append("ParticipantID", pOrderAction->ParticipantID);
-	///¿Í»§´úÂë
+	///å®¢æˆ·ä»£ç 
 	b.append("ClientID", pOrderAction->ClientID);
-	///ÒµÎñµ¥Ôª
+	///ä¸šåŠ¡å•å…ƒ
 	b.append("BusinessUnit", pOrderAction->BusinessUnit);
-	///±¨µ¥²Ù×÷×´Ì¬
+	///æŠ¥å•æ“ä½œçŠ¶æ€
 	b.append("OrderActionStatus", pOrderAction->OrderActionStatus);
-	///ÓÃ»§´úÂë
+	///ç”¨æˆ·ä»£ç 
 	b.append("UserID", pOrderAction->UserID);
-	///×´Ì¬ĞÅÏ¢
+	///çŠ¶æ€ä¿¡æ¯
 	b.append("StatusMsg", pOrderAction->StatusMsg);
-	///ºÏÔ¼´úÂë
+	///åˆçº¦ä»£ç 
 	b.append("InstrumentID", pOrderAction->InstrumentID);
-	///ÓªÒµ²¿±àºÅ
+	///è¥ä¸šéƒ¨ç¼–å·
 	b.append("BranchID", pOrderAction->BranchID);
-	///Í¶×Êµ¥Ôª´úÂë
+	///æŠ•èµ„å•å…ƒä»£ç 
 	b.append("InvestUnitID", pOrderAction->InvestUnitID);
-	///IPµØÖ·
+	///IPåœ°å€
 	b.append("IPAddress", pOrderAction->IPAddress);
-	///MacµØÖ·
+	///Macåœ°å€
 	b.append("MacAddress", pOrderAction->MacAddress);
 	BSONObj p = b.obj();
 	conn->insert(DB_ONERRRTNORDERACTION_COLLECTION, p);
 	USER_PRINT("DBManager::DB_OnErrRtnOrderAction ok");
-} // ½»Ò×ËùÈÏÎª³·µ¥´íÎó
+} // äº¤æ˜“æ‰€è®¤ä¸ºæ’¤å•é”™è¯¯
 
 void User::DB_OnRspOrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderField *pInputOrder){
 	USER_PRINT("User::DB_OnRspOrderInsert DB Connection!");
 	USER_PRINT(conn);
 	BSONObjBuilder b;
-	/// ½»Ò×Ô±id
+	/// äº¤æ˜“å‘˜id
 	b.append("OperatorID", this->getTraderID());
-	///¾­¼Í¹«Ë¾´úÂë
+	///ç»çºªå…¬å¸ä»£ç 
 	b.append("BrokerID", pInputOrder->BrokerID);
-	///Í¶×ÊÕß´úÂë
+	///æŠ•èµ„è€…ä»£ç 
 	b.append("InvestorID", pInputOrder->InvestorID);
-	///ºÏÔ¼´úÂë
+	///åˆçº¦ä»£ç 
 	b.append("InstrumentID", pInputOrder->InstrumentID);
-	///±¨µ¥ÒıÓÃ
+	///æŠ¥å•å¼•ç”¨
 	b.append("OrderRef", pInputOrder->OrderRef);
-	///ÓÃ»§´úÂë
+	///ç”¨æˆ·ä»£ç 
 	b.append("UserID", pInputOrder->UserID);
-	///±¨µ¥¼Û¸ñÌõ¼ş
+	///æŠ¥å•ä»·æ ¼æ¡ä»¶
 	b.append("OrderPriceType", pInputOrder->OrderPriceType);
-	///ÂòÂô·½Ïò
+	///ä¹°å–æ–¹å‘
 	b.append("Direction", pInputOrder->Direction);
-	///×éºÏ¿ªÆ½±êÖ¾
+	///ç»„åˆå¼€å¹³æ ‡å¿—
 	b.append("CombOffsetFlag", pInputOrder->CombOffsetFlag);
-	///×éºÏÍ¶»úÌ×±£±êÖ¾
+	///ç»„åˆæŠ•æœºå¥—ä¿æ ‡å¿—
 	b.append("CombHedgeFlag", pInputOrder->CombHedgeFlag);
-	///¼Û¸ñ
+	///ä»·æ ¼
 	b.append("LimitPrice", pInputOrder->LimitPrice);
-	///ÊıÁ¿
+	///æ•°é‡
 	b.append("VolumeTotalOriginal", pInputOrder->VolumeTotalOriginal);
-	///ÓĞĞ§ÆÚÀàĞÍ
+	///æœ‰æ•ˆæœŸç±»å‹
 	b.append("TimeCondition", pInputOrder->TimeCondition);
-	///GTDÈÕÆÚ
+	///GTDæ—¥æœŸ
 	b.append("GTDDate", pInputOrder->GTDDate);
-	///³É½»Á¿ÀàĞÍ
+	///æˆäº¤é‡ç±»å‹
 	b.append("VolumeCondition", pInputOrder->VolumeCondition);
-	///×îĞ¡³É½»Á¿
+	///æœ€å°æˆäº¤é‡
 	b.append("MinVolume", pInputOrder->MinVolume);
-	///´¥·¢Ìõ¼ş
+	///è§¦å‘æ¡ä»¶
 	b.append("ContingentCondition", pInputOrder->ContingentCondition);
-	///Ö¹Ëğ¼Û
+	///æ­¢æŸä»·
 	b.append("StopPrice", pInputOrder->StopPrice);
-	///Ç¿Æ½Ô­Òò
+	///å¼ºå¹³åŸå› 
 	b.append("ForceCloseReason", pInputOrder->ForceCloseReason);
-	///×Ô¶¯¹ÒÆğ±êÖ¾
+	///è‡ªåŠ¨æŒ‚èµ·æ ‡å¿—
 	b.append("IsAutoSuspend", pInputOrder->IsAutoSuspend);
-	///ÒµÎñµ¥Ôª
+	///ä¸šåŠ¡å•å…ƒ
 	b.append("BusinessUnit", pInputOrder->BusinessUnit);
-	///ÇëÇó±àºÅ
+	///è¯·æ±‚ç¼–å·
 	b.append("RequestID", pInputOrder->RequestID);
-	///ÓÃ»§Ç¿ÆÀ±êÖ¾
+	///ç”¨æˆ·å¼ºè¯„æ ‡å¿—
 	b.append("UserForceClose", pInputOrder->UserForceClose);
-	///»¥»»µ¥±êÖ¾
+	///äº’æ¢å•æ ‡å¿—
 	b.append("IsSwapOrder", pInputOrder->IsSwapOrder);
-	///½»Ò×Ëù´úÂë
+	///äº¤æ˜“æ‰€ä»£ç 
 	b.append("ExchangeID", pInputOrder->ExchangeID);
-	///Í¶×Êµ¥Ôª´úÂë
+	///æŠ•èµ„å•å…ƒä»£ç 
 	b.append("InvestUnitID", pInputOrder->InvestUnitID);
-	///×Ê½ğÕËºÅ
+	///èµ„é‡‘è´¦å·
 	b.append("AccountID", pInputOrder->AccountID);
-	///±ÒÖÖ´úÂë
+	///å¸ç§ä»£ç 
 	b.append("CurrencyID", pInputOrder->CurrencyID);
-	///½»Ò×±àÂë
+	///äº¤æ˜“ç¼–ç 
 	b.append("ClientID", pInputOrder->ClientID);
-	///IPµØÖ·
+	///IPåœ°å€
 	b.append("IPAddress", pInputOrder->IPAddress);
-	///MacµØÖ·
+	///Macåœ°å€
 	b.append("MacAddress", pInputOrder->MacAddress);
 	
 	BSONObj p = b.obj();
 	conn->insert(DB_ONRSPORDERINSERT_COLLECTION, p);
 	USER_PRINT("DBManager::DB_OnRspOrderInsert ok");
-} // CTPÈÏÎª±¨µ¥²ÎÊı´íÎó
+} // CTPè®¤ä¸ºæŠ¥å•å‚æ•°é”™è¯¯
 
 
 void User::DB_OnErrRtnOrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderField *pInputOrder){
 	USER_PRINT("User::DB_OnErrRtnOrderInsert DB Connection!");
 	USER_PRINT(conn);
 	BSONObjBuilder b;
-	/// ½»Ò×Ô±id
+	/// äº¤æ˜“å‘˜id
 	b.append("OperatorID", this->getTraderID());
-	///¾­¼Í¹«Ë¾´úÂë
+	///ç»çºªå…¬å¸ä»£ç 
 	b.append("BrokerID", pInputOrder->BrokerID);
-	///Í¶×ÊÕß´úÂë
+	///æŠ•èµ„è€…ä»£ç 
 	b.append("InvestorID", pInputOrder->InvestorID);
-	///ºÏÔ¼´úÂë
+	///åˆçº¦ä»£ç 
 	b.append("InstrumentID", pInputOrder->InstrumentID);
-	///±¨µ¥ÒıÓÃ
+	///æŠ¥å•å¼•ç”¨
 	b.append("OrderRef", pInputOrder->OrderRef);
-	///ÓÃ»§´úÂë
+	///ç”¨æˆ·ä»£ç 
 	b.append("UserID", pInputOrder->UserID);
-	///±¨µ¥¼Û¸ñÌõ¼ş
+	///æŠ¥å•ä»·æ ¼æ¡ä»¶
 	b.append("OrderPriceType", pInputOrder->OrderPriceType);
-	///ÂòÂô·½Ïò
+	///ä¹°å–æ–¹å‘
 	b.append("Direction", pInputOrder->Direction);
-	///×éºÏ¿ªÆ½±êÖ¾
+	///ç»„åˆå¼€å¹³æ ‡å¿—
 	b.append("CombOffsetFlag", pInputOrder->CombOffsetFlag);
-	///×éºÏÍ¶»úÌ×±£±êÖ¾
+	///ç»„åˆæŠ•æœºå¥—ä¿æ ‡å¿—
 	b.append("CombHedgeFlag", pInputOrder->CombHedgeFlag);
-	///¼Û¸ñ
+	///ä»·æ ¼
 	b.append("LimitPrice", pInputOrder->LimitPrice);
-	///ÊıÁ¿
+	///æ•°é‡
 	b.append("VolumeTotalOriginal", pInputOrder->VolumeTotalOriginal);
-	///ÓĞĞ§ÆÚÀàĞÍ
+	///æœ‰æ•ˆæœŸç±»å‹
 	b.append("TimeCondition", pInputOrder->TimeCondition);
-	///GTDÈÕÆÚ
+	///GTDæ—¥æœŸ
 	b.append("GTDDate", pInputOrder->GTDDate);
-	///³É½»Á¿ÀàĞÍ
+	///æˆäº¤é‡ç±»å‹
 	b.append("VolumeCondition", pInputOrder->VolumeCondition);
-	///×îĞ¡³É½»Á¿
+	///æœ€å°æˆäº¤é‡
 	b.append("MinVolume", pInputOrder->MinVolume);
-	///´¥·¢Ìõ¼ş
+	///è§¦å‘æ¡ä»¶
 	b.append("ContingentCondition", pInputOrder->ContingentCondition);
-	///Ö¹Ëğ¼Û
+	///æ­¢æŸä»·
 	b.append("StopPrice", pInputOrder->StopPrice);
-	///Ç¿Æ½Ô­Òò
+	///å¼ºå¹³åŸå› 
 	b.append("ForceCloseReason", pInputOrder->ForceCloseReason);
-	///×Ô¶¯¹ÒÆğ±êÖ¾
+	///è‡ªåŠ¨æŒ‚èµ·æ ‡å¿—
 	b.append("IsAutoSuspend", pInputOrder->IsAutoSuspend);
-	///ÒµÎñµ¥Ôª
+	///ä¸šåŠ¡å•å…ƒ
 	b.append("BusinessUnit", pInputOrder->BusinessUnit);
-	///ÇëÇó±àºÅ
+	///è¯·æ±‚ç¼–å·
 	b.append("RequestID", pInputOrder->RequestID);
-	///ÓÃ»§Ç¿ÆÀ±êÖ¾
+	///ç”¨æˆ·å¼ºè¯„æ ‡å¿—
 	b.append("UserForceClose", pInputOrder->UserForceClose);
-	///»¥»»µ¥±êÖ¾
+	///äº’æ¢å•æ ‡å¿—
 	b.append("IsSwapOrder", pInputOrder->IsSwapOrder);
-	///½»Ò×Ëù´úÂë
+	///äº¤æ˜“æ‰€ä»£ç 
 	b.append("ExchangeID", pInputOrder->ExchangeID);
-	///Í¶×Êµ¥Ôª´úÂë
+	///æŠ•èµ„å•å…ƒä»£ç 
 	b.append("InvestUnitID", pInputOrder->InvestUnitID);
-	///×Ê½ğÕËºÅ
+	///èµ„é‡‘è´¦å·
 	b.append("AccountID", pInputOrder->AccountID);
-	///±ÒÖÖ´úÂë
+	///å¸ç§ä»£ç 
 	b.append("CurrencyID", pInputOrder->CurrencyID);
-	///½»Ò×±àÂë
+	///äº¤æ˜“ç¼–ç 
 	b.append("ClientID", pInputOrder->ClientID);
-	///IPµØÖ·
+	///IPåœ°å€
 	b.append("IPAddress", pInputOrder->IPAddress);
-	///MacµØÖ·
+	///Macåœ°å€
 	b.append("MacAddress", pInputOrder->MacAddress);
 	BSONObj p = b.obj();
 	conn->insert(DB_ONERRRTNORDERINSERT_COLLECTION, p);
 	USER_PRINT("DBManager::DB_OnErrRtnOrderInsert ok");
-} // ½»Ò×ËùÈÏÎª±¨µ¥´íÎó
+} // äº¤æ˜“æ‰€è®¤ä¸ºæŠ¥å•é”™è¯¯
 
 void User::DB_OnRspQryInvestorPosition(mongo::DBClientConnection *conn, CThostFtdcInvestorPositionField *pInvestorPosition){
 	USER_PRINT("User::DB_OnRspQryInvestorPosition DB Connection!");
 	USER_PRINT(conn);
 	BSONObjBuilder b;
-	/// ½»Ò×Ô±id
+	/// äº¤æ˜“å‘˜id
 	b.append("OperatorID", this->getTraderID());
-	///ºÏÔ¼´úÂë
+	///åˆçº¦ä»£ç 
 	b.append("InstrumentID", pInvestorPosition->InstrumentID);
-	///¾­¼Í¹«Ë¾´úÂë
+	///ç»çºªå…¬å¸ä»£ç 
 	b.append("BrokerID", pInvestorPosition->BrokerID);
-	///Í¶×ÊÕß´úÂë
+	///æŠ•èµ„è€…ä»£ç 
 	b.append("InvestorID", pInvestorPosition->InvestorID);
-	///³Ö²Ö¶à¿Õ·½Ïò
+	///æŒä»“å¤šç©ºæ–¹å‘
 	b.append("PosiDirection", pInvestorPosition->PosiDirection);
-	///Í¶»úÌ×±£±êÖ¾
+	///æŠ•æœºå¥—ä¿æ ‡å¿—
 	b.append("HedgeFlag", pInvestorPosition->HedgeFlag);
-	///³Ö²ÖÈÕÆÚ
+	///æŒä»“æ—¥æœŸ
 	b.append("PositionDate", pInvestorPosition->PositionDate);
-	///ÉÏÈÕ³Ö²Ö
+	///ä¸Šæ—¥æŒä»“
 	b.append("YdPosition", pInvestorPosition->YdPosition);
-	///½ñÈÕ³Ö²Ö
+	///ä»Šæ—¥æŒä»“
 	b.append("Position", pInvestorPosition->Position);
-	///¶àÍ·¶³½á
+	///å¤šå¤´å†»ç»“
 	b.append("LongFrozen", pInvestorPosition->LongFrozen);
-	///¿ÕÍ·¶³½á
+	///ç©ºå¤´å†»ç»“
 	b.append("ShortFrozen", pInvestorPosition->ShortFrozen);
-	///¿ª²Ö¶³½á½ğ¶î
+	///å¼€ä»“å†»ç»“é‡‘é¢
 	b.append("LongFrozenAmount", pInvestorPosition->LongFrozenAmount);
-	///¿ª²Ö¶³½á½ğ¶î
+	///å¼€ä»“å†»ç»“é‡‘é¢
 	b.append("ShortFrozenAmount", pInvestorPosition->ShortFrozenAmount);
-	///¿ª²ÖÁ¿
+	///å¼€ä»“é‡
 	b.append("OpenVolume", pInvestorPosition->OpenVolume);
-	///Æ½²ÖÁ¿
+	///å¹³ä»“é‡
 	b.append("CloseVolume", pInvestorPosition->CloseVolume);
-	///¿ª²Ö½ğ¶î
+	///å¼€ä»“é‡‘é¢
 	b.append("OpenAmount", pInvestorPosition->OpenAmount);
-	///Æ½²Ö½ğ¶î
+	///å¹³ä»“é‡‘é¢
 	b.append("CloseAmount", pInvestorPosition->CloseAmount);
-	///³Ö²Ö³É±¾
+	///æŒä»“æˆæœ¬
 	b.append("PositionCost", pInvestorPosition->PositionCost);
-	///ÉÏ´ÎÕ¼ÓÃµÄ±£Ö¤½ğ
+	///ä¸Šæ¬¡å ç”¨çš„ä¿è¯é‡‘
 	b.append("PreMargin", pInvestorPosition->PreMargin);
-	///Õ¼ÓÃµÄ±£Ö¤½ğ
+	///å ç”¨çš„ä¿è¯é‡‘
 	b.append("UseMargin", pInvestorPosition->UseMargin);
-	///¶³½áµÄ±£Ö¤½ğ
+	///å†»ç»“çš„ä¿è¯é‡‘
 	b.append("FrozenMargin", pInvestorPosition->FrozenMargin);
-	///¶³½áµÄ×Ê½ğ
+	///å†»ç»“çš„èµ„é‡‘
 	b.append("FrozenCash", pInvestorPosition->FrozenCash);
-	///¶³½áµÄÊÖĞø·Ñ
+	///å†»ç»“çš„æ‰‹ç»­è´¹
 	b.append("FrozenCommission", pInvestorPosition->FrozenCommission);
-	///×Ê½ğ²î¶î
+	///èµ„é‡‘å·®é¢
 	b.append("CashIn", pInvestorPosition->CashIn);
-	///ÊÖĞø·Ñ
+	///æ‰‹ç»­è´¹
 	b.append("Commission", pInvestorPosition->Commission);
-	///Æ½²ÖÓ¯¿÷
+	///å¹³ä»“ç›ˆäº
 	b.append("CloseProfit", pInvestorPosition->CloseProfit);
-	///³Ö²ÖÓ¯¿÷
+	///æŒä»“ç›ˆäº
 	b.append("PositionProfit", pInvestorPosition->PositionProfit);
-	///ÉÏ´Î½áËã¼Û
+	///ä¸Šæ¬¡ç»“ç®—ä»·
 	b.append("PreSettlementPrice", pInvestorPosition->PreSettlementPrice);
-	///±¾´Î½áËã¼Û
+	///æœ¬æ¬¡ç»“ç®—ä»·
 	b.append("SettlementPrice", pInvestorPosition->SettlementPrice);
-	///½»Ò×ÈÕ
+	///äº¤æ˜“æ—¥
 	b.append("TradingDay", pInvestorPosition->TradingDay);
-	///½áËã±àºÅ
+	///ç»“ç®—ç¼–å·
 	b.append("SettlementID", pInvestorPosition->SettlementID);
-	///¿ª²Ö³É±¾
+	///å¼€ä»“æˆæœ¬
 	b.append("OpenCost", pInvestorPosition->OpenCost);
-	///½»Ò×Ëù±£Ö¤½ğ
+	///äº¤æ˜“æ‰€ä¿è¯é‡‘
 	b.append("ExchangeMargin", pInvestorPosition->ExchangeMargin);
-	///×éºÏ³É½»ĞÎ³ÉµÄ³Ö²Ö
+	///ç»„åˆæˆäº¤å½¢æˆçš„æŒä»“
 	b.append("CombPosition", pInvestorPosition->CombPosition);
-	///×éºÏ¶àÍ·¶³½á
+	///ç»„åˆå¤šå¤´å†»ç»“
 	b.append("CombLongFrozen", pInvestorPosition->CombLongFrozen);
-	///×éºÏ¿ÕÍ·¶³½á
+	///ç»„åˆç©ºå¤´å†»ç»“
 	b.append("CombShortFrozen", pInvestorPosition->CombShortFrozen);
-	///ÖğÈÕ¶¢ÊĞÆ½²ÖÓ¯¿÷
+	///é€æ—¥ç›¯å¸‚å¹³ä»“ç›ˆäº
 	b.append("CloseProfitByDate", pInvestorPosition->CloseProfitByDate);
-	///Öğ±Ê¶Ô³åÆ½²ÖÓ¯¿÷
+	///é€ç¬”å¯¹å†²å¹³ä»“ç›ˆäº
 	b.append("CloseProfitByTrade", pInvestorPosition->CloseProfitByTrade);
-	///½ñÈÕ³Ö²Ö
+	///ä»Šæ—¥æŒä»“
 	b.append("TodayPosition", pInvestorPosition->TodayPosition);
-	///±£Ö¤½ğÂÊ
+	///ä¿è¯é‡‘ç‡
 	b.append("MarginRateByMoney", pInvestorPosition->MarginRateByMoney);
-	///±£Ö¤½ğÂÊ(°´ÊÖÊı)
+	///ä¿è¯é‡‘ç‡(æŒ‰æ‰‹æ•°)
 	b.append("MarginRateByVolume", pInvestorPosition->MarginRateByVolume);
-	///Ö´ĞĞ¶³½á
+	///æ‰§è¡Œå†»ç»“
 	b.append("StrikeFrozen", pInvestorPosition->StrikeFrozen);
-	///Ö´ĞĞ¶³½á½ğ¶î
+	///æ‰§è¡Œå†»ç»“é‡‘é¢
 	b.append("StrikeFrozenAmount", pInvestorPosition->StrikeFrozenAmount);
-	///·ÅÆúÖ´ĞĞ¶³½á
+	///æ”¾å¼ƒæ‰§è¡Œå†»ç»“
 	b.append("AbandonFrozen", pInvestorPosition->AbandonFrozen);
 	BSONObj p = b.obj();
 	conn->insert(DB_ONRSPQRYINVESTORPOSITION, p);
 	USER_PRINT("DBManager::DB_OnRspQryInvestorPosition ok");
-} // ³Ö²ÖĞÅÏ¢
+} // æŒä»“ä¿¡æ¯
 
-/// ÉèÖÃ¿ª¹Ø
+/// è®¾ç½®å¼€å…³
 int User::getOn_Off() {
 	return this->on_off;
 }
@@ -1304,7 +1582,7 @@ void User::setOn_Off(int on_off) {
 	this->on_off = on_off;
 }
 
-/// ÉèÖÃCTP_Manager
+/// è®¾ç½®CTP_Manager
 void User::setCTP_Manager(CTP_Manager *o_ctp) {
 	this->o_ctp = o_ctp;
 }
@@ -1335,7 +1613,7 @@ void User::QueryOrder() {
 	this->UserTradeSPI->QryOrder();
 }
 
-/// µÃµ½Êı¾İ¿â²Ù×÷¶ÔÏó
+/// å¾—åˆ°æ•°æ®åº“æ“ä½œå¯¹è±¡
 DBManager * User::getDBManager() {
 	return this->dbm;
 }
@@ -1358,4 +1636,124 @@ list<Session *> * User::getL_Sessions() {
 
 void User::setL_Sessions(list<Session *> *l_sessions) {
 	this->l_sessions = l_sessions;
+}
+
+// å¯¹æ¯”æœ¬åœ°ç»´æŠ¤æŒä»“ç»“æœä¸CTP APIè¿”å›æŒä»“å¯¹æ¯”ç»“æœ
+bool User::ComparePositionTotal() {
+	std::cout << "User::ComparePositionTotal()" << std::endl;
+	bool is_same_flag = true;
+
+	if ((this->l_position_detail_from_ctp->size() == 0) &&
+		(this->l_position_detail_from_local_order->size() == 0) &&
+		(this->l_position_detail_from_local_trade->size() == 0)
+		)
+	{
+		std::cout << "\tæœŸè´§è´¦æˆ· = " << this->getUserID() << std::endl;
+		std::cout << "\tæŒä»“æ˜ç»†å‡ä¸ºç©º!" << std::endl;
+		return is_same_flag;
+	}
+
+	if ((this->l_position_detail_from_ctp->size() != this->l_position_detail_from_local_order->size()) ||
+		(this->l_position_detail_from_local_order->size() != this->l_position_detail_from_local_trade->size())) {
+		std::cout << "\tæœŸè´§è´¦æˆ· = " << this->getUserID() << std::endl;
+		std::cout << "\tæŒä»“æ˜ç»†åˆ—è¡¨æ•°ç›®æ€»æ•°ä¸æ­£ç¡®!" << std::endl;
+		is_same_flag = false;
+		return is_same_flag;
+	}
+
+
+	list<USER_INSTRUMENT_POSITION *>::iterator order_itor;
+	list<USER_INSTRUMENT_POSITION *>::iterator trade_itor;
+	list<USER_INSTRUMENT_POSITION *>::iterator ctp_itor;
+
+
+
+
+	//æ¯”è¾ƒorder ä¸ trade
+	for (order_itor = this->l_position_detail_from_local_order->begin(); order_itor != this->l_position_detail_from_local_order->end(); order_itor++)
+	{
+		for (trade_itor = this->l_position_detail_from_local_trade->begin(); trade_itor != this->l_position_detail_from_local_trade->end(); trade_itor++)
+		{
+			if ((!strcmp((*order_itor)->InstrumentID, (*trade_itor)->InstrumentID)))
+			{
+				if (((*order_itor)->Buy_Today == (*trade_itor)->Buy_Today) &&
+					((*order_itor)->Buy_Yesterday == (*trade_itor)->Buy_Yesterday) &&
+					((*order_itor)->Sell_Today == (*trade_itor)->Sell_Today) &&
+					((*order_itor)->Sell_Yesterday == (*trade_itor)->Sell_Yesterday)
+					)
+				{
+					(*order_itor)->Is_Same = true;
+					(*trade_itor)->Is_Same = true;
+				}
+			}
+		}
+	}
+
+	// å¯¹æ¯”order ä¸ tradeåæ£€æŸ¥æ ‡å¿—ä½
+	for (order_itor = this->l_position_detail_from_local_order->begin(); order_itor != this->l_position_detail_from_local_order->end(); order_itor++)
+	{
+		if (!(*order_itor)->Is_Same)
+		{
+			is_same_flag = false;
+		}
+	}
+	for (trade_itor = this->l_position_detail_from_local_trade->begin(); trade_itor != this->l_position_detail_from_local_trade->end(); trade_itor++)
+	{
+		if (!(*trade_itor)->Is_Same)
+		{
+			is_same_flag = false;
+		}
+	}
+
+
+	if (!is_same_flag) {
+		std::cout << "\tæœŸè´§è´¦æˆ· = " << this->getUserID() << std::endl;
+		std::cout << "\tOrderä¸Tradeç»´æŠ¤æŒä»“æ˜ç»†ä¸ä¸€è‡´!è¯·é‡æ–°åˆå§‹åŒ–æˆ–æ£€æŸ¥æ•°æ®!" << std::endl;
+		return is_same_flag;
+	}
+
+	// å¯¹æ¯”ctp ä¸ order
+	for (order_itor = this->l_position_detail_from_local_order->begin(); order_itor != this->l_position_detail_from_local_order->end(); order_itor++)
+	{
+		for (ctp_itor = this->l_position_detail_from_ctp->begin(); ctp_itor != this->l_position_detail_from_ctp->end(); ctp_itor++)
+		{
+			if ((!strcmp((*order_itor)->InstrumentID, (*ctp_itor)->InstrumentID)))
+			{
+				if (((*order_itor)->Buy_Today == (*ctp_itor)->Buy_Today) &&
+					((*order_itor)->Buy_Yesterday == (*ctp_itor)->Buy_Yesterday) &&
+					((*order_itor)->Sell_Today == (*ctp_itor)->Sell_Today) &&
+					((*order_itor)->Sell_Yesterday == (*ctp_itor)->Sell_Yesterday)
+					)
+				{
+					(*order_itor)->Is_Same = true;
+					(*ctp_itor)->Is_Same = true;
+				}
+			}
+		}
+	}
+
+	// å¯¹æ¯”order ä¸ tradeåæ£€æŸ¥æ ‡å¿—ä½
+	for (order_itor = this->l_position_detail_from_local_order->begin(); order_itor != this->l_position_detail_from_local_order->end(); order_itor++)
+	{
+		if (!(*order_itor)->Is_Same)
+		{
+			is_same_flag = false;
+		}
+	}
+	
+	for (ctp_itor = this->l_position_detail_from_ctp->begin(); ctp_itor != this->l_position_detail_from_ctp->end(); ctp_itor++)
+	{
+		if (!(*ctp_itor)->Is_Same)
+		{
+			is_same_flag = false;
+		}
+	}
+
+	if (!is_same_flag) {
+		std::cout << "\tæœŸè´§è´¦æˆ· = " << this->getUserID() << std::endl;
+		std::cout << "\tOrderä¸Tradeç»´æŠ¤æŒä»“æ˜ç»†ä¸ä¸€è‡´!è¯·é‡æ–°åˆå§‹åŒ–æˆ–æ£€æŸ¥æ•°æ®!" << std::endl;
+		return is_same_flag;
+	}
+
+	return is_same_flag;
 }

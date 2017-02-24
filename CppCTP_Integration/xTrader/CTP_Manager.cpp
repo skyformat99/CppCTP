@@ -259,6 +259,12 @@ void CTP_Manager::addTraderToLTrader(string trader) {
 	this->l_trader->push_back(trader);
 }
 
+/// 更新系统交易状态
+void CTP_Manager::updateSystemFlag() {
+	this->dbm->UpdateSystemRunningStatus("off");
+}
+
+
 /// 获取trader是否在l_trader里
 bool CTP_Manager::checkInLTrader(string trader) {
 	bool flag = false;
@@ -2583,6 +2589,39 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 	return flag;
 }
 
+/// 统计本地order,trade持仓明细
+void CTP_Manager::initPositionDetailDataFromLocalOrderAndTrade() {
+	list<USER_CThostFtdcOrderField *>::iterator position_itor;
+	list<USER_CThostFtdcTradeField *>::iterator position_trade_itor;
+	list<User *>::iterator user_itor;
+
+	/// 遍历User,绑定对应持仓明细(Order)
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
+		for (position_itor = this->l_posdetail->begin(); position_itor != this->l_posdetail->end(); position_itor++) { // 遍历今持仓明细列表
+
+			if (!strcmp((*position_itor)->UserID, (*user_itor)->getUserID().c_str()))
+			{
+				(*user_itor)->addL_Position_Detail_From_Local_Order((*position_itor));
+			}
+
+		}
+	}
+
+	/// 遍历User,绑定对应持仓明细(Trade)
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
+		for (position_trade_itor = this->l_posdetail_trade->begin(); position_trade_itor != this->l_posdetail_trade->end(); position_trade_itor++) { // 遍历今持仓明细列表
+
+			if (!strcmp((*position_trade_itor)->UserID, (*user_itor)->getUserID().c_str())) // 日期相等
+			{
+				(*user_itor)->addL_Position_Detail_From_Local_Trade((*position_trade_itor));
+			}
+		}
+	}
+	
+
+	
+}
+
 ///// 初始化昨仓明细
 //bool CTP_Manager::initYesterdayPositionDetail() {
 //	bool flag = false;
@@ -2687,7 +2726,7 @@ bool CTP_Manager::init(bool is_online) {
 
 	bool init_flag = true;
 
-	std::cout << "CTP_Manager::init()" << std::endl;
+	std::cout << "Trade Server开始初始化..." << std::endl;
 
 	/************************************************************************/
 	/* 初始化工作按顺序执行
@@ -2881,7 +2920,30 @@ bool CTP_Manager::init(bool is_online) {
 		sleep(2);
 	}
 	
-	
+	/// 进行仓位数据核对
+
+	/// 统计本地仓位
+	this->initPositionDetailDataFromLocalOrderAndTrade();
+
+	/// 打印输出各自结果
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
+		std::cout << "\t=====================================================" << std::endl;
+		std::cout << "\t=从CTP API查询统计结果" << std::endl;
+		(*user_itor)->getL_Position_Detail_Data((*user_itor)->getL_Position_Detail_From_CTP());
+		std::cout << "\t=从本地Order查询统计结果" << std::endl;
+		(*user_itor)->getL_Position_Detail_Data((*user_itor)->getL_Position_Detail_From_Local_Order());
+		std::cout << "\t=从本地Trade查询统计结果" << std::endl;
+		(*user_itor)->getL_Position_Detail_Data((*user_itor)->getL_Position_Detail_From_Local_Trade());
+		std::cout << "\t=====================================================" << std::endl;
+	}
+
+	/// 判断输出仓位对比，如果不正确，关闭该期货账户开关
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
+		if (!(*user_itor)->ComparePositionTotal()) {
+			(*user_itor)->setOn_Off(0);
+		}
+	}
+
 
 	/// 合约查询后对策略合约最小跳进行赋值
 	this->l_user->front()->getUserTradeSPI()->QryInstrument();
@@ -2976,6 +3038,9 @@ bool CTP_Manager::init(bool is_online) {
 	std::cout << "t初始化今仓持仓明细完成..." << std::endl;
 #endif
 	
+	//初始化完毕,开启系统全局开关
+	this->setOn_Off(1);
+
 	std::cout << "===========恭喜============" << std::endl;
 	std::cout << "|=!xTrader系统初始化完成!=|" << std::endl;
 	std::cout << "===========================" << std::endl;

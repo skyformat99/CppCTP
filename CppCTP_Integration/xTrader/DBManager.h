@@ -192,7 +192,7 @@ public:
 	任何模式初始化完成之后,本地仓位统计结果需要和CTP接口查询持仓数据结果保持一致,一旦存在不相同情况,系统要重新初始化.
 	*/
 	/************************************************************************/
-	void UpdateSystemRunningStatus(string key, string value);
+	void UpdateSystemRunningStatus(string value);
 	bool GetSystemRunningStatus();
 
 	void setConn(mongo::DBClientConnection *conn);

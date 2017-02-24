@@ -175,14 +175,17 @@ void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtd
 		string s_trading_day = this->mdapi->GetTradingDay();
 		std::cout << "MdSpi.cpp s_trading_day = " << s_trading_day << std::endl;
 		this->ctp_m->setTradingDay(s_trading_day);
-		sem_post(&login_sem);
+		/*sem_post(&login_sem);
 		if (this->isFirstTimeLogged == false) {
-			sem_init(&submarket_sem, 0, 1);
-			this->SubMarketData(this->ppInstrumentID, this->nCount);
-		}
+		sem_init(&submarket_sem, 0, 1);
+		this->SubMarketData(this->ppInstrumentID, this->nCount);
+		}*/
 	}
-	//释放
-	md_cv.notify_one();
+
+	if (bIsLast) {
+		//释放
+		md_cv.notify_one();
+	}
 }
 
 //返回数据是否报错

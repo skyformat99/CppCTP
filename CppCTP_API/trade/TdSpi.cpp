@@ -84,8 +84,8 @@ void TdSpi::Connect(char *frontAddress) {
 	//注册事件处理对象
 	this->tdapi->RegisterSpi(this);
 	//订阅共有流和私有流
-	this->tdapi->SubscribePublicTopic(THOST_TERT_RESTART);
-	this->tdapi->SubscribePrivateTopic(THOST_TERT_RESTART);
+	this->tdapi->SubscribePublicTopic(THOST_TERT_QUICK);
+	this->tdapi->SubscribePrivateTopic(THOST_TERT_QUICK);
 	this->tdapi->Init();
 
 	int ret = this->controlTimeOut(&connect_sem);

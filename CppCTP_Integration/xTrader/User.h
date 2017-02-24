@@ -69,6 +69,8 @@ public:
 	/// 添加strategy到list
 	void addStrategyToList(Strategy *stg);
 
+	/// 拷贝持仓明细数据
+	void CopyPositionDetailData(CThostFtdcInvestorPositionDetailField *dst, CThostFtdcInvestorPositionDetailField *src);
 
 	/// 初始化合约撤单次数,例如"cu1601":0 "cu1701":0
 	void init_instrument_id_action_counter(string instrument_id);
@@ -91,6 +93,16 @@ public:
 	list<USER_INSTRUMENT_POSITION *> *getL_Position_Detail_From_CTP();
 	void addL_Position_Detail_From_CTP(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail);
 
+	void setL_Position_Detail_From_Local_Order(list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_local_order);
+	list<USER_INSTRUMENT_POSITION *> *getL_Position_Detail_From_Local_Order();
+	void addL_Position_Detail_From_Local_Order(USER_CThostFtdcOrderField *order);
+
+	void setL_Position_Detail_From_Local_Trade(list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_local_trade);
+	list<USER_INSTRUMENT_POSITION *> *getL_Position_Detail_From_Local_Trade();
+	void addL_Position_Detail_From_Local_Trade(USER_CThostFtdcTradeField *order);
+
+	/// 获取统计持仓明细结果
+	void getL_Position_Detail_Data(list<USER_INSTRUMENT_POSITION *> *l_position_detail_cal);
 
 	/************************************************************************/
 	/* 获取数据库连接                                                         */
@@ -145,6 +157,9 @@ public:
 	list<Session *> * getL_Sessions();
 	void setL_Sessions(list<Session *> *l_sessions);
 
+	// 对比本地维护持仓结果与CTP API返回持仓对比结果
+	bool ComparePositionTotal();
+
 private:
 	int on_off; //开关
 	string BrokerID;
@@ -177,6 +192,8 @@ private:
 	int sid;	// 会话ID
 	list<Session *> *l_sessions;
 	list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_ctp;
+	list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_local_order;
+	list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_local_trade;
 };
 
 #endif

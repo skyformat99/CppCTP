@@ -2760,7 +2760,7 @@ void DBManager::DropPositionDetailTradeYesterday() {
 	USER_PRINT("DBManager::DropPositionDetailTradeYesterday ok");
 }
 
-void DBManager::UpdateSystemRunningStatus(string key, string value) {
+void DBManager::UpdateSystemRunningStatus(string value) {
 	USER_PRINT("DBManager::UpdateSystemRunningStatus");
 	std::cout << "DBManager::UpdateSystemRunningStatus(" << value << ")" << std::endl;
 	this->conn->update(DB_SYSTEM_RUNNING_STATUS_COLLECTION, BSON("key" << DB_RUNNING_KEY), BSON("$set" << BSON("status" << value)));

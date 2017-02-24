@@ -16,6 +16,7 @@
 char codeDst[90] = { 0 };
 std::condition_variable cv;
 std::mutex mtx;
+std::mutex position_add_mtx;
 #define RSP_TIMEOUT	120
 
 
@@ -107,10 +108,12 @@ void TdSpi::Connect(User *user, bool init_flag) {
 	//订阅私有流
 	if (init_flag) //系统正常初始化,从上次退出继续初始化
 	{
+		std::cout << "\t启动模式 = THOST_TERT_RESUME" << std::endl;
 		this->tdapi->SubscribePrivateTopic(THOST_TERT_RESUME);
 	} 
 	else	// 系统非正常退出,重新传送所有数据
 	{
+		std::cout << "\t启动模式 = THOST_TERT_RESTART" << std::endl;
 		this->tdapi->SubscribePrivateTopic(THOST_TERT_RESTART);
 	}
 
@@ -798,14 +801,14 @@ void TdSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentSt
 		///进入本状态时间
 		std::cout << "|进入本状态时间     = " << pInstrumentStatus->EnterTime << endl;
 
-		string status_time(pInstrumentStatus->EnterTime);
-		string real_status_time = this->getTradingDay() + status_time;
-		string localtime = this->getTradingDay() + "15:00:00";
-		if (Utils::compareTradingDaySeconds(real_status_time.c_str(), localtime.c_str())) { // 时间相等进行收盘工作
-			USER_PRINT("收盘了...策略进行保存");
-			std::cout << "TdSpi::OnRtnInstrumentStatus() 收盘了开始策略保存" << std::endl;
-			this->current_user->getCTP_Manager()->saveStrategy();
-		}
+		//string status_time(pInstrumentStatus->EnterTime);
+		//string real_status_time = this->getTradingDay() + status_time;
+		//string localtime = this->getTradingDay() + "15:00:00";
+		//if (Utils::compareTradingDaySeconds(real_status_time.c_str(), localtime.c_str())) { // 时间相等进行收盘工作
+		//	USER_PRINT("收盘了...策略进行保存");
+		//	std::cout << "TdSpi::OnRtnInstrumentStatus() 收盘了开始策略保存" << std::endl;
+		//	this->current_user->getCTP_Manager()->saveStrategy();
+		//}
 		///进入本状态原因
 		std::cout << "|进入本状态原因     = " << pInstrumentStatus->EnterReason << endl;
 		std::cout << "|==================== " << endl;
@@ -836,8 +839,6 @@ void TdSpi::QryOrder() {
 void TdSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspQryOrder");
 	//list<Session *>::iterator sid_itor;
-
-
 
 	if (!this->IsErrorRspInfo(pRspInfo)) {
 
@@ -1083,6 +1084,8 @@ void TdSpi::QryInvestor() {
 	delete pQryInvestor;
 }
 
+
+
 //查询投资者响应
 void TdSpi::OnRspQryInvestor(CThostFtdcInvestorField *pInvestor, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspQryInvestor");
@@ -1120,6 +1123,62 @@ void TdSpi::OnRspQryInvestor(CThostFtdcInvestorField *pInvestor, CThostFtdcRspIn
 	}
 }
 
+/// 拷贝持仓明细数据
+void TdSpi::CopyPositionDetailData(CThostFtdcInvestorPositionDetailField *dst, CThostFtdcInvestorPositionDetailField *src) {
+	///合约代码
+	strcpy(dst->InstrumentID, src->InstrumentID);
+	///经纪公司代码
+	strcpy(dst->BrokerID, src->BrokerID);
+	///投资者代码
+	strcpy(dst->InvestorID, src->InvestorID);
+	///投机套保标志
+	dst->HedgeFlag = src->HedgeFlag;
+	///买卖
+	dst->Direction = src->Direction;
+	///开仓日期
+	strcpy(dst->OpenDate, src->OpenDate);
+	///成交编号
+	strcpy(dst->TradeID, src->TradeID);
+	///数量
+	dst->Volume = src->Volume;
+	///开仓价
+	dst->OpenPrice = src->OpenPrice;
+	///交易日
+	strcpy(dst->TradingDay, src->TradingDay);
+	///结算编号
+	dst->SettlementID = src->SettlementID;
+	///成交类型
+	dst->TradeType = src->TradeType;
+	///组合合约代码
+	strcpy(dst->CombInstrumentID, src->CombInstrumentID);
+	///交易所代码
+	strcpy(dst->ExchangeID, src->ExchangeID);
+	///逐日盯市平仓盈亏
+	dst->CloseProfitByDate = src->CloseProfitByDate;
+	///逐笔对冲平仓盈亏
+	dst->CloseProfitByTrade = src->CloseProfitByTrade;
+	///逐日盯市持仓盈亏
+	dst->PositionProfitByDate = src->PositionProfitByDate;
+	///逐笔对冲持仓盈亏
+	dst->PositionProfitByTrade = src->PositionProfitByTrade;
+	///投资者保证金
+	dst->Margin = src->Margin;
+	///交易所保证金
+	dst->ExchMargin = src->ExchMargin;
+	///保证金率
+	dst->MarginRateByMoney = src->MarginRateByMoney;
+	///保证金率(按手数)
+	dst->MarginRateByVolume = src->MarginRateByVolume;
+	///昨结算价
+	dst->LastSettlementPrice = src->LastSettlementPrice;
+	///结算价
+	dst->SettlementPrice = src->SettlementPrice;
+	///平仓量
+	dst->CloseVolume = src->CloseVolume;
+	///平仓金额
+	dst->CloseAmount = src->CloseAmount;
+}
+
 //查询投资者持仓
 void TdSpi::QryInvestorPosition() {
 	USER_PRINT("TdSpi::QryInvestorPosition");
@@ -1145,6 +1204,7 @@ void TdSpi::QryInvestorPositionDetail() {
 
 ///请求查询投资者持仓明细响应
 void TdSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+
 	USER_PRINT("TdSpi::OnRspQryInvestorPositionDetail");
 	if (!this->IsErrorRspInfo(pRspInfo)) {
 		if (pInvestorPositionDetail) {
@@ -1203,13 +1263,17 @@ void TdSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField
 			cout << "平仓金额:" << pInvestorPositionDetail->CloseAmount << endl;
 			cout << "=================================================================================" << endl;
 		
+			CThostFtdcInvestorPositionDetailField *tmp = new CThostFtdcInvestorPositionDetailField();
+			this->CopyPositionDetailData(tmp, pInvestorPositionDetail);
+
 			/*将持仓明细添加到对应user统计列表里*/
-			this->current_user->addL_Position_Detail_From_CTP(pInvestorPositionDetail);
+			this->current_user->addL_Position_Detail_From_CTP(tmp);
 		}
 	}
-	cv.notify_one();
 
-
+	if (bIsLast) {
+		cv.notify_one();
+	}
 }
 
 //请求查询投资者持仓响应

@@ -72,6 +72,9 @@ public:
 	/// 设置l_trader
 	void addTraderToLTrader(string trader);
 
+	/// 更新系统交易状态
+	void updateSystemFlag();
+
 	/// 获取trader是否在l_trader里
 	bool checkInLTrader(string trader);
 
@@ -153,6 +156,9 @@ public:
 
 	/// 初始化策略(策略更新trading_day, 期货账户更新order_ref)
 	bool initStrategyAndFutureAccount();
+
+	/// 统计本地order,trade持仓明细
+	void initPositionDetailDataFromLocalOrderAndTrade();
 
 	/// 初始化昨仓明细
 	//bool initYesterdayPositionDetail();

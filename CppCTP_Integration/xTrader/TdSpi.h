@@ -150,6 +150,9 @@ public:
 	//查询投资者响应
 	void OnRspQryInvestor(CThostFtdcInvestorField *pInvestor, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
+	/// 拷贝持仓明细数据
+	void CopyPositionDetailData(CThostFtdcInvestorPositionDetailField *dst, CThostFtdcInvestorPositionDetailField *src);
+
 	//查询投资者持仓
 	void QryInvestorPosition();
 

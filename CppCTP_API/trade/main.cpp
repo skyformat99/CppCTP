@@ -67,16 +67,17 @@ int main() {
 	#endif
 	
 	string broker_id = "9999";
-	string user_id = "058176";
-	string password = "669822";
-	//string user_id = "078681";
-	//string password = "123456";
+	//string user_id = "058176";
+	//string password = "669822";
+	string user_id = "078681";
+	string password = "123456";
 #else
 	/*真实*/
-	string frontAddr = "tcp://101.95.8.190:41205"; //实盘
-	string broker_id = "0187";
-	string user_id = "86001780";
-	string password = "";
+	//string frontAddr = "tcp://101.95.8.190:41205"; //实盘
+	//string frontAddr = "tcp://101.95.8.190:61205";
+	//string broker_id = "0187";
+	//string user_id = "800692";
+	//string password = "255026";
 #endif
 
 
