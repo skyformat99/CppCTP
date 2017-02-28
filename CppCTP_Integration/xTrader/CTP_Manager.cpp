@@ -2095,7 +2095,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					create_info_object.AddMember("instrumentid", rapidjson::StringRef((*pod_itor)->InstrumentID), allocator);
 					create_info_object.AddMember("orderref", rapidjson::StringRef((*pod_itor)->OrderRef), allocator);
 					create_info_object.AddMember("userid", rapidjson::StringRef((*pod_itor)->UserID), allocator);
-					create_info_object.AddMember("direction", (*pod_itor)->Direction, allocator);
+					//create_info_object.AddMember("direction", (*pod_itor)->Direction, allocator);
+					string direction;
+					direction = (*pod_itor)->Direction;
+					create_info_object.AddMember("direction", rapidjson::StringRef(direction.c_str()), allocator);
 					create_info_object.AddMember("comboffsetflag", rapidjson::StringRef((*pod_itor)->CombOffsetFlag), allocator);
 					create_info_object.AddMember("combhedgeflag", rapidjson::StringRef((*pod_itor)->CombHedgeFlag), allocator);
 					create_info_object.AddMember("limitprice", (*pod_itor)->LimitPrice, allocator);
@@ -2245,9 +2248,22 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					create_info_object.AddMember("instrumentid", rapidjson::StringRef((*pod_itor)->InstrumentID), allocator);
 					create_info_object.AddMember("orderref", rapidjson::StringRef((*pod_itor)->OrderRef), allocator);
 					create_info_object.AddMember("userid", rapidjson::StringRef((*pod_itor)->UserID), allocator);
-					create_info_object.AddMember("direction", (*pod_itor)->Direction, allocator);
-					create_info_object.AddMember("offsetflag", (*pod_itor)->OffsetFlag, allocator);
-					create_info_object.AddMember("hedgeflag", (*pod_itor)->HedgeFlag, allocator);
+
+					string direction;
+					direction = (*pod_itor)->Direction;
+					create_info_object.AddMember("direction", rapidjson::StringRef(direction.c_str()), allocator);
+
+					string OffsetFlag;
+					OffsetFlag = (*pod_itor)->OffsetFlag;
+					create_info_object.AddMember("offsetflag", rapidjson::StringRef(OffsetFlag.c_str()), allocator);
+
+					string HedgeFlag;
+					HedgeFlag = (*pod_itor)->HedgeFlag;
+					create_info_object.AddMember("hedgeflag", rapidjson::StringRef(HedgeFlag.c_str()), allocator);
+
+					//create_info_object.AddMember("direction", (*pod_itor)->Direction, allocator);
+					//create_info_object.AddMember("offsetflag", (*pod_itor)->OffsetFlag, allocator);
+					//create_info_object.AddMember("hedgeflag", (*pod_itor)->HedgeFlag, allocator);
 					create_info_object.AddMember("price", (*pod_itor)->Price, allocator);
 					create_info_object.AddMember("tradingday", rapidjson::StringRef((*pod_itor)->TradingDay), allocator);
 					create_info_object.AddMember("tradingdayrecord", rapidjson::StringRef((*pod_itor)->TradingDayRecord), allocator);

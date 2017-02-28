@@ -2200,7 +2200,6 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 		
 		if (len_order_ref == 12 && result == "1") { // 通过本交易系统发出去的order长度12,首位字符为1
 
-
 			this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pOrder);
 			//delete[] codeDst;
 			strategyid = temp.substr(len_order_ref - 2, 2);
