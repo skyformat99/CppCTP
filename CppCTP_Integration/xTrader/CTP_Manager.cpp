@@ -1819,6 +1819,13 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								
 								static_dbm->UpdateStrategy((*stg_itor));
 
+								/************************************************************************/
+								/* 校准仓位之后,更新所有的运行标志位
+									a:期货账户开关打开
+									b:更新交易执行状态标志位task_status
+									c:更新tick锁stg_select_order_algorithm_flag为释放*/
+								/************************************************************************/
+								(*stg_itor)->getStgUser()->setOn_Off(1);
 								(*stg_itor)->update_task_status();
 								(*stg_itor)->setStgSelectOrderAlgorithmFlag("CTP_Manager::HandleMessage() msgtype == 12", false);
 
