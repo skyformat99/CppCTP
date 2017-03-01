@@ -111,7 +111,7 @@ void TdSpi::Connect(User *user, bool init_flag) {
 		std::cout << "\t启动模式 = THOST_TERT_RESUME" << std::endl;
 		this->tdapi->SubscribePrivateTopic(THOST_TERT_RESUME);
 	} 
-	else	// 系统非正常退出,重新传送所有数据
+	else // 系统非正常退出,重新传送所有数据
 	{
 		std::cout << "\t启动模式 = THOST_TERT_RESTART" << std::endl;
 		this->tdapi->SubscribePrivateTopic(THOST_TERT_RESTART);
