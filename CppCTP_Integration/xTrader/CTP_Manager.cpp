@@ -814,6 +814,18 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					info_object.AddMember("a_limit_price_shift", (*stg_itor)->getStgALimitPriceShift(), allocator);
 					info_object.AddMember("b_limit_price_shift", (*stg_itor)->getStgBLimitPriceShift(), allocator);
 
+					/*2017.03.03新增参数*/
+					info_object.AddMember("on_off", (*stg_itor)->getOn_Off(), allocator);
+					info_object.AddMember("a_instrument_id", rapidjson::StringRef((*stg_itor)->getStgInstrumentIdA().c_str()), allocator);
+					info_object.AddMember("b_instrument_id", rapidjson::StringRef((*stg_itor)->getStgInstrumentIdB().c_str()), allocator);
+					info_object.AddMember("a_limit_price_shift", (*stg_itor)->getStgALimitPriceShift(), allocator);
+					info_object.AddMember("b_limit_price_shift", (*stg_itor)->getStgBLimitPriceShift(), allocator);
+					info_object.AddMember("sell_open_on_off", (*stg_itor)->getStgSellOpenOnOff(), allocator);
+					info_object.AddMember("buy_close_on_off", (*stg_itor)->getStgBuyCloseOnOff(), allocator);
+					info_object.AddMember("buy_open_on_off", (*stg_itor)->getStgBuyOpenOnOff(), allocator);
+					info_object.AddMember("sell_close_on_off", (*stg_itor)->getStgSellCloseOnOff(), allocator);
+
+
 
 					rapidjson::Value instrument_array(rapidjson::kArrayType);
 					for (int j = 0; j < 2; j++) {
@@ -956,7 +968,6 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								//(*stg_itor)->setStgPositionABuy(object["position_a_buy"].GetInt());
 								
 								/* PyQt更新参数如下 */
-								(*stg_itor)->setStgTraderId(object["trader_id"].GetString());
 								(*stg_itor)->setStgUserId(object["user_id"].GetString());
 								(*stg_itor)->setStgStrategyId(object["strategy_id"].GetString());
 								(*stg_itor)->setStgTradeModel(object["trade_model"].GetString());
@@ -964,7 +975,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								(*stg_itor)->setStgLots(object["lots"].GetInt());
 								(*stg_itor)->setStgLotsBatch(object["lots_batch"].GetInt());
 								(*stg_itor)->setStgStopLoss(object["stop_loss"].GetDouble());
+								(*stg_itor)->setOn_Off(object["on_off"].GetInt());
 								(*stg_itor)->setStgSpreadShift(object["spread_shift"].GetDouble());
+								(*stg_itor)->setStgInstrumentIdA(object["a_instrument_id"].GetString());
+								(*stg_itor)->setStgInstrumentIdB(object["b_instrument_id"].GetString());
 								(*stg_itor)->setStgALimitPriceShift(object["a_limit_price_shift"].GetInt());
 								(*stg_itor)->setStgBLimitPriceShift(object["b_limit_price_shift"].GetInt());
 								(*stg_itor)->setStgAWaitPriceTick(object["a_wait_price_tick"].GetDouble());
@@ -975,13 +989,18 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								(*stg_itor)->setStgSellClose(object["sell_close"].GetDouble());
 								(*stg_itor)->setStgBuyClose(object["buy_close"].GetDouble());
 								(*stg_itor)->setStgBuyOpen(object["buy_open"].GetDouble());
-
-								/*(*stg_itor)->setStgBuyOpen(object["only_close"].GetInt());
-								(*stg_itor)->setOn_Off(object["strategy_on_off"].GetInt());*/
 								(*stg_itor)->setStgSellOpenOnOff(object["sell_open_on_off"].GetInt());
 								(*stg_itor)->setStgBuyCloseOnOff(object["buy_close_on_off"].GetInt());
 								(*stg_itor)->setStgSellCloseOnOff(object["sell_close_on_off"].GetInt());
 								(*stg_itor)->setStgBuyOpenOnOff(object["buy_open_on_off"].GetInt());
+
+
+
+								//(*stg_itor)->setStgTraderId(object["trader_id"].GetString());
+
+								/*(*stg_itor)->setStgBuyOpen(object["only_close"].GetInt());
+								(*stg_itor)->setOn_Off(object["strategy_on_off"].GetInt());*/
+								
 								
 								//(*stg_itor)->setStgOnlyClose(object["only_close"].GetInt());
 								//(*stg_itor)->setStgHoldProfit(object["hold_profit"].GetDouble());
@@ -1021,32 +1040,28 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								/*构造内容json*/
 								rapidjson::Value create_info_object(rapidjson::kObjectType);
 								create_info_object.SetObject();
-								//create_info_object.AddMember("position_a_sell_today", (*stg_itor)->getStgPositionASellToday(), allocator);
-								//create_info_object.AddMember("position_b_sell", (*stg_itor)->getStgPositionBSell(), allocator);
+
+								create_info_object.AddMember("user_id", rapidjson::StringRef((*stg_itor)->getStgUserId().c_str()), allocator);
+								create_info_object.AddMember("strategy_id", rapidjson::StringRef((*stg_itor)->getStgStrategyId().c_str()), allocator);
+								create_info_object.AddMember("trade_model", rapidjson::StringRef((*stg_itor)->getStgTradeModel().c_str()), allocator);
+								create_info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator);
+								create_info_object.AddMember("lots", (*stg_itor)->getStgLots(), allocator);
+								create_info_object.AddMember("lots_batch", (*stg_itor)->getStgLotsBatch(), allocator);
+								create_info_object.AddMember("stop_loss", (*stg_itor)->getStgStopLoss(), allocator);
+								create_info_object.AddMember("on_off", (*stg_itor)->getOn_Off(), allocator);
 								create_info_object.AddMember("spread_shift", (*stg_itor)->getStgSpreadShift(), allocator);
+								create_info_object.AddMember("a_instrument_id", rapidjson::StringRef((*stg_itor)->getStgInstrumentIdA().c_str()), allocator);
+								create_info_object.AddMember("b_instrument_id", rapidjson::StringRef((*stg_itor)->getStgInstrumentIdB().c_str()), allocator);
 								create_info_object.AddMember("a_limit_price_shift", (*stg_itor)->getStgALimitPriceShift(), allocator);
 								create_info_object.AddMember("b_limit_price_shift", (*stg_itor)->getStgBLimitPriceShift(), allocator);
-								//create_info_object.AddMember("position_b_sell_today", (*stg_itor)->getStgPositionBSellToday(), allocator);
-								//create_info_object.AddMember("position_b_buy_today", (*stg_itor)->getStgPositionBBuyToday(), allocator);
-								//create_info_object.AddMember("position_a_sell", (*stg_itor)->getStgPositionASell(), allocator);
-								create_info_object.AddMember("buy_close", (*stg_itor)->getStgBuyClose(), allocator);
-								create_info_object.AddMember("stop_loss", (*stg_itor)->getStgStopLoss(), allocator);
-								//create_info_object.AddMember("position_b_buy_yesterday", (*stg_itor)->getStgPositionBBuyYesterday(), allocator);
-								//create_info_object.AddMember("is_active", (*stg_itor)->isStgIsActive(), allocator);
-								//create_info_object.AddMember("position_b_sell_yesterday", (*stg_itor)->getStgPositionBSellYesterday(), allocator);
-								create_info_object.AddMember("strategy_id", rapidjson::StringRef((*stg_itor)->getStgStrategyId().c_str()), allocator);
-								//create_info_object.AddMember("position_b_buy", (*stg_itor)->getStgPositionBBuy(), allocator);
-								create_info_object.AddMember("lots_batch", (*stg_itor)->getStgLotsBatch(), allocator);
-								//create_info_object.AddMember("position_a_buy", (*stg_itor)->getStgPositionABuy(), allocator);
-								create_info_object.AddMember("sell_open", (*stg_itor)->getStgSellOpen(), allocator);
-								create_info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator);
-								create_info_object.AddMember("trader_id", rapidjson::StringRef((*stg_itor)->getStgTraderId().c_str()), allocator);
+								create_info_object.AddMember("a_wait_price_tick", (*stg_itor)->getStgAWaitPriceTick(), allocator);
+								create_info_object.AddMember("b_wait_price_tick", (*stg_itor)->getStgBWaitPriceTick(), allocator);
 								create_info_object.AddMember("a_order_action_limit", (*stg_itor)->getStgAOrderActionTiresLimit(), allocator);
 								create_info_object.AddMember("b_order_action_limit", (*stg_itor)->getStgBOrderActionTiresLimit(), allocator);
 								create_info_object.AddMember("sell_close", (*stg_itor)->getStgSellClose(), allocator);
 								create_info_object.AddMember("buy_open", (*stg_itor)->getStgBuyOpen(), allocator);
-								
-								create_info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator);
+								create_info_object.AddMember("sell_open", (*stg_itor)->getStgSellOpen(), allocator);
+								create_info_object.AddMember("buy_close", (*stg_itor)->getStgBuyClose(), allocator);
 								create_info_object.AddMember("strategy_on_off", (*stg_itor)->getOn_Off(), allocator);
 								create_info_object.AddMember("sell_open_on_off", (*stg_itor)->getStgSellOpenOnOff(), allocator);
 								create_info_object.AddMember("buy_close_on_off", (*stg_itor)->getStgBuyCloseOnOff(), allocator);
@@ -1054,8 +1069,32 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								create_info_object.AddMember("buy_open_on_off", (*stg_itor)->getStgBuyOpenOnOff(), allocator);
 
 
+								//create_info_object.AddMember("position_a_sell_today", (*stg_itor)->getStgPositionASellToday(), allocator);
+								//create_info_object.AddMember("position_b_sell", (*stg_itor)->getStgPositionBSell(), allocator);
+								
+								
+								//create_info_object.AddMember("position_b_sell_today", (*stg_itor)->getStgPositionBSellToday(), allocator);
+								//create_info_object.AddMember("position_b_buy_today", (*stg_itor)->getStgPositionBBuyToday(), allocator);
+								//create_info_object.AddMember("position_a_sell", (*stg_itor)->getStgPositionASell(), allocator);
+								
+								
+								//create_info_object.AddMember("position_b_buy_yesterday", (*stg_itor)->getStgPositionBBuyYesterday(), allocator);
+								//create_info_object.AddMember("is_active", (*stg_itor)->isStgIsActive(), allocator);
+								//create_info_object.AddMember("position_b_sell_yesterday", (*stg_itor)->getStgPositionBSellYesterday(), allocator);
+								
+								//create_info_object.AddMember("position_b_buy", (*stg_itor)->getStgPositionBBuy(), allocator);
+								
+								//create_info_object.AddMember("position_a_buy", (*stg_itor)->getStgPositionABuy(), allocator);
+								
+								
+								create_info_object.AddMember("trader_id", rapidjson::StringRef((*stg_itor)->getStgTraderId().c_str()), allocator);
+								create_info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator);
+						
+								
+
+
 								/*新增字段*/
-								create_info_object.AddMember("trade_model", rapidjson::StringRef((*stg_itor)->getStgTradeModel().c_str()), allocator);
+								
 								create_info_object.AddMember("hold_profit", (*stg_itor)->getStgHoldProfit(), allocator);
 								create_info_object.AddMember("close_profit", (*stg_itor)->getStgCloseProfit(), allocator);
 								create_info_object.AddMember("commission", (*stg_itor)->getStgCommission(), allocator);
@@ -1066,7 +1105,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								create_info_object.AddMember("amount", (*stg_itor)->getStgAmount(), allocator);
 								create_info_object.AddMember("average_shift", (*stg_itor)->getStgAverageShift(), allocator);
 
-								rapidjson::Value instrument_array(rapidjson::kArrayType);
+								/*rapidjson::Value instrument_array(rapidjson::kArrayType);
 								for (int j = 0; j < 2; j++) {
 									rapidjson::Value instrument_object(rapidjson::kObjectType);
 									instrument_object.SetObject();
@@ -1079,14 +1118,13 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 									instrument_array.PushBack(instrument_object, allocator);
 								}
-								create_info_object.AddMember("list_instrument_id", instrument_array, allocator);
+								create_info_object.AddMember("list_instrument_id", instrument_array, allocator);*/
 								//create_info_object.AddMember("position_a_buy_yesterday", (*stg_itor)->getStgPositionABuyYesterday(), allocator);
-								create_info_object.AddMember("user_id", rapidjson::StringRef((*stg_itor)->getStgUserId().c_str()), allocator);
+								
 								//create_info_object.AddMember("position_a_buy_today", (*stg_itor)->getStgPositionABuyToday(), allocator);
 								//create_info_object.AddMember("position_a_sell_yesterday", (*stg_itor)->getStgPositionASellYesterday(), allocator);
-								create_info_object.AddMember("lots", (*stg_itor)->getStgLots(), allocator);
-								create_info_object.AddMember("a_wait_price_tick", (*stg_itor)->getStgAWaitPriceTick(), allocator);
-								create_info_object.AddMember("b_wait_price_tick", (*stg_itor)->getStgBWaitPriceTick(), allocator);
+								
+								
 								//create_info_object.AddMember("StrategyOnoff", (*stg_itor)->getOn_Off(), allocator);
 
 								create_info_array.PushBack(create_info_object, allocator);
@@ -1163,31 +1201,37 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							USER_PRINT(user_tmp);
 							Strategy *new_stg = new Strategy(user_tmp);
 
-							new_stg->setStgTradingDay(ctp_m->getTradingDay());
-							new_stg->setStgPositionASellToday(object["position_a_sell_today"].GetInt());
-							new_stg->setStgPositionBSell(object["position_b_sell"].GetInt());
-							new_stg->setStgSpreadShift(object["spread_shift"].GetDouble());
-							new_stg->setStgALimitPriceShift(object["a_limit_price_shift"].GetInt());
-							new_stg->setStgBLimitPriceShift(object["b_limit_price_shift"].GetInt());
-							new_stg->setStgPositionBSellToday(object["position_b_sell_today"].GetInt());
-							new_stg->setStgPositionBBuyToday(object["position_b_buy_today"].GetInt());
-							new_stg->setStgPositionASell(object["position_a_sell"].GetInt());
-							new_stg->setStgBuyClose(object["buy_close"].GetDouble());
-							new_stg->setStgStopLoss(object["stop_loss"].GetDouble());
-							new_stg->setStgPositionBBuyYesterday(object["position_b_buy_yesterday"].GetInt());
-							//new_stg->setStgIsActive(object["is_active"].GetBool());
-							new_stg->setStgPositionBSellYesterday(object["position_b_sell_yesterday"].GetInt());
-							new_stg->setStgStrategyId(object["strategy_id"].GetString());
-							new_stg->setStgPositionBBuy(object["position_b_buy"].GetInt());
-							new_stg->setStgLotsBatch(object["lots_batch"].GetInt());
-							new_stg->setStgPositionABuy(object["position_a_buy"].GetInt());
-							new_stg->setStgSellOpen(object["sell_open"].GetDouble());
-							new_stg->setStgOrderAlgorithm(object["order_algorithm"].GetString());
 							new_stg->setStgTraderId(object["trader_id"].GetString());
-							new_stg->setStgAOrderActionTiresLimit(object["a_order_action_limit"].GetInt());
-							new_stg->setStgBOrderActionTiresLimit(object["b_order_action_limit"].GetInt());
-							new_stg->setStgSellClose(object["sell_close"].GetDouble());
-							new_stg->setStgBuyOpen(object["buy_open"].GetDouble());
+							new_stg->setStgUserId(object["user_id"].GetString());
+							new_stg->setStgStrategyId(object["strategy_id"].GetString());
+							new_stg->setStgInstrumentIdA(object["a_instrument_id"].GetString());
+							new_stg->setStgInstrumentIdB(object["b_instrument_id"].GetString());
+							new_stg->setStgTradingDay(ctp_m->getTradingDay());
+
+							//new_stg->setStgPositionASellToday(object["position_a_sell_today"].GetInt());
+							//new_stg->setStgPositionBSell(object["position_b_sell"].GetInt());
+							//new_stg->setStgSpreadShift(object["spread_shift"].GetDouble());
+							//new_stg->setStgALimitPriceShift(object["a_limit_price_shift"].GetInt());
+							//new_stg->setStgBLimitPriceShift(object["b_limit_price_shift"].GetInt());
+							//new_stg->setStgPositionBSellToday(object["position_b_sell_today"].GetInt());
+							//new_stg->setStgPositionBBuyToday(object["position_b_buy_today"].GetInt());
+							//new_stg->setStgPositionASell(object["position_a_sell"].GetInt());
+							//new_stg->setStgBuyClose(object["buy_close"].GetDouble());
+							//new_stg->setStgStopLoss(object["stop_loss"].GetDouble());
+							//new_stg->setStgPositionBBuyYesterday(object["position_b_buy_yesterday"].GetInt());
+							////new_stg->setStgIsActive(object["is_active"].GetBool());
+							//new_stg->setStgPositionBSellYesterday(object["position_b_sell_yesterday"].GetInt());
+							//
+							//new_stg->setStgPositionBBuy(object["position_b_buy"].GetInt());
+							//new_stg->setStgLotsBatch(object["lots_batch"].GetInt());
+							//new_stg->setStgPositionABuy(object["position_a_buy"].GetInt());
+							//new_stg->setStgSellOpen(object["sell_open"].GetDouble());
+							//new_stg->setStgOrderAlgorithm(object["order_algorithm"].GetString());
+							//
+							//new_stg->setStgAOrderActionTiresLimit(object["a_order_action_limit"].GetInt());
+							//new_stg->setStgBOrderActionTiresLimit(object["b_order_action_limit"].GetInt());
+							//new_stg->setStgSellClose(object["sell_close"].GetDouble());
+							//new_stg->setStgBuyOpen(object["buy_open"].GetDouble());
 
 
 							/*new_stg->setStgOnlyClose(object["only_close"].GetInt());
@@ -1198,7 +1242,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							new_stg->setStgBuyOpenOnOff(object["buy_open_on_off"].GetInt());*/
 
 							/*新增字段*/
-							new_stg->setStgTradeModel(object["trade_model"].GetString());
+							/*new_stg->setStgTradeModel(object["trade_model"].GetString());
 							new_stg->setStgHoldProfit(object["hold_profit"].GetDouble());
 							new_stg->setStgCloseProfit(object["close_profit"].GetDouble());
 							new_stg->setStgCommisstion(object["commission"].GetDouble());
@@ -1207,32 +1251,32 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							new_stg->setStgPositionSell(object["position_sell"].GetInt());
 							new_stg->setStgTradeVolume(object["trade_volume"].GetInt());
 							new_stg->setStgAmount(object["amount"].GetDouble());
-							new_stg->setStgAverageShift(object["average_shift"].GetDouble());
+							new_stg->setStgAverageShift(object["average_shift"].GetDouble());*/
 
 
-							//遍历list_instrument_id
-							const Value& info_object = object["list_instrument_id"];
-							if (info_object.IsArray()) {
-								for (int j = 0; j < info_object.Size(); j++) {
-									std::string instrument = info_object[j].GetString();
-									std::cout << "instrument[" << j << "] = " << instrument << std::endl;
-									if (j == 0) {
-										new_stg->setStgInstrumentIdA(instrument);
-									}
-									else if (j == 1) {
-										new_stg->setStgInstrumentIdB(instrument);
-									}
-								}
-							}
+							////遍历list_instrument_id
+							//const Value& info_object = object["list_instrument_id"];
+							//if (info_object.IsArray()) {
+							//	for (int j = 0; j < info_object.Size(); j++) {
+							//		std::string instrument = info_object[j].GetString();
+							//		std::cout << "instrument[" << j << "] = " << instrument << std::endl;
+							//		if (j == 0) {
+							//			new_stg->setStgInstrumentIdA(instrument);
+							//		}
+							//		else if (j == 1) {
+							//			new_stg->setStgInstrumentIdB(instrument);
+							//		}
+							//	}
+							//}
 
 
-							new_stg->setStgPositionABuyYesterday(object["position_a_buy_yesterday"].GetInt());
-							new_stg->setStgUserId(object["user_id"].GetString());
-							new_stg->setStgPositionABuyToday(object["position_a_buy_today"].GetInt());
-							new_stg->setStgPositionASellYesterday(object["position_a_sell_yesterday"].GetInt());
-							new_stg->setStgLots(object["lots"].GetInt());
-							new_stg->setStgAWaitPriceTick(object["a_wait_price_tick"].GetDouble());
-							new_stg->setStgBWaitPriceTick(object["b_wait_price_tick"].GetDouble());
+							//new_stg->setStgPositionABuyYesterday(object["position_a_buy_yesterday"].GetInt());
+							//
+							//new_stg->setStgPositionABuyToday(object["position_a_buy_today"].GetInt());
+							//new_stg->setStgPositionASellYesterday(object["position_a_sell_yesterday"].GetInt());
+							//new_stg->setStgLots(object["lots"].GetInt());
+							//new_stg->setStgAWaitPriceTick(object["a_wait_price_tick"].GetDouble());
+							//new_stg->setStgBWaitPriceTick(object["b_wait_price_tick"].GetDouble());
 
 							int flag = static_dbm->CreateStrategy(new_stg);
 							int flag1 = static_dbm->CreateStrategyYesterday(new_stg);
@@ -1582,8 +1626,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						create_info_object.AddMember("position_a_sell_today", (*stg_itor)->getStgPositionASellToday(), allocator);
 						create_info_object.AddMember("position_b_sell", (*stg_itor)->getStgPositionBSell(), allocator);
 						create_info_object.AddMember("spread_shift", (*stg_itor)->getStgSpreadShift(), allocator);
-						create_info_object.AddMember("a_limit_price_shift", (*stg_itor)->getStgALimitPriceShift(), allocator);
-						create_info_object.AddMember("b_limit_price_shift", (*stg_itor)->getStgBLimitPriceShift(), allocator);
+						
 						create_info_object.AddMember("position_b_sell_today", (*stg_itor)->getStgPositionBSellToday(), allocator);
 						create_info_object.AddMember("position_b_buy_today", (*stg_itor)->getStgPositionBBuyToday(), allocator);
 						create_info_object.AddMember("position_a_sell", (*stg_itor)->getStgPositionASell(), allocator);
@@ -1599,8 +1642,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						create_info_object.AddMember("sell_open", (*stg_itor)->getStgSellOpen(), allocator);
 						create_info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator);
 						create_info_object.AddMember("trader_id", rapidjson::StringRef((*stg_itor)->getStgTraderId().c_str()), allocator);
-						create_info_object.AddMember("a_order_action_limit", (*stg_itor)->getStgAOrderActionTiresLimit(), allocator);
-						create_info_object.AddMember("b_order_action_limit", (*stg_itor)->getStgBOrderActionTiresLimit(), allocator);
+						
 						create_info_object.AddMember("sell_close", (*stg_itor)->getStgSellClose(), allocator);
 						create_info_object.AddMember("buy_open", (*stg_itor)->getStgBuyOpen(), allocator);
 						create_info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator);
@@ -1616,22 +1658,36 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						create_info_object.AddMember("trade_volume", (*stg_itor)->getStgTradeVolume(), allocator);
 						create_info_object.AddMember("amount", (*stg_itor)->getStgAmount(), allocator);
 						create_info_object.AddMember("average_shift", (*stg_itor)->getStgAverageShift(), allocator);
+						
+						create_info_object.AddMember("on_off", (*stg_itor)->getOn_Off(), allocator);
+						create_info_object.AddMember("a_instrument_id", rapidjson::StringRef((*stg_itor)->getStgInstrumentIdA().c_str()), allocator);
+						create_info_object.AddMember("b_instrument_id", rapidjson::StringRef((*stg_itor)->getStgInstrumentIdB().c_str()), allocator);
+						create_info_object.AddMember("a_limit_price_shift", (*stg_itor)->getStgALimitPriceShift(), allocator);
+						create_info_object.AddMember("b_limit_price_shift", (*stg_itor)->getStgBLimitPriceShift(), allocator);
+						create_info_object.AddMember("a_order_action_limit", (*stg_itor)->getStgAOrderActionTiresLimit(), allocator);
+						create_info_object.AddMember("b_order_action_limit", (*stg_itor)->getStgBOrderActionTiresLimit(), allocator);
+						create_info_object.AddMember("sell_open_on_off", (*stg_itor)->getStgSellOpenOnOff(), allocator);
+						create_info_object.AddMember("buy_close_on_off", (*stg_itor)->getStgBuyCloseOnOff(), allocator);
+						create_info_object.AddMember("buy_open_on_off", (*stg_itor)->getStgBuyOpenOnOff(), allocator);
+						create_info_object.AddMember("sell_close_on_off", (*stg_itor)->getStgSellCloseOnOff(), allocator);
 
-
-						rapidjson::Value instrument_array(rapidjson::kArrayType);
+						/*rapidjson::Value instrument_array(rapidjson::kArrayType);
 						for (int j = 0; j < 2; j++) {
-							rapidjson::Value instrument_object(rapidjson::kObjectType);
-							instrument_object.SetObject();
-							if (j == 0) {
-								instrument_object.SetString(rapidjson::StringRef((*stg_itor)->getStgInstrumentIdA().c_str()));
-							}
-							else if (j == 1) {
-								instrument_object.SetString(rapidjson::StringRef((*stg_itor)->getStgInstrumentIdB().c_str()));
-							}
-
-							instrument_array.PushBack(instrument_object, allocator);
+						rapidjson::Value instrument_object(rapidjson::kObjectType);
+						instrument_object.SetObject();
+						if (j == 0) {
+						instrument_object.SetString(rapidjson::StringRef((*stg_itor)->getStgInstrumentIdA().c_str()));
 						}
-						create_info_object.AddMember("list_instrument_id", instrument_array, allocator);
+						else if (j == 1) {
+						instrument_object.SetString(rapidjson::StringRef((*stg_itor)->getStgInstrumentIdB().c_str()));
+						}
+
+						instrument_array.PushBack(instrument_object, allocator);
+						}
+
+						create_info_object.AddMember("list_instrument_id", instrument_array, allocator);*/
+
+
 						create_info_object.AddMember("position_a_buy_yesterday", (*stg_itor)->getStgPositionABuyYesterday(), allocator);
 						create_info_object.AddMember("user_id", rapidjson::StringRef((*stg_itor)->getStgUserId().c_str()), allocator);
 						create_info_object.AddMember("position_a_buy_today", (*stg_itor)->getStgPositionABuyToday(), allocator);
@@ -1753,18 +1809,24 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							if (((*stg_itor)->getStgUserId() == q_user_id) && ((*stg_itor)->getStgStrategyId() == q_strategy_id)) {
 								std::cout << "找到即将修改的Strategy" << std::endl;
 
-								(*stg_itor)->setStgPositionASellToday(object["position_a_sell_today"].GetInt());
-								(*stg_itor)->setStgPositionBSellToday(object["position_b_sell_today"].GetInt());
-								(*stg_itor)->setStgPositionABuyToday(object["position_a_buy_today"].GetInt());
-								(*stg_itor)->setStgPositionBBuyToday(object["position_b_buy_today"].GetInt());
-								(*stg_itor)->setStgPositionASell(object["position_a_sell"].GetInt());
-								(*stg_itor)->setStgPositionBSell(object["position_b_sell"].GetInt());
-								(*stg_itor)->setStgPositionABuyYesterday(object["position_a_buy_yesterday"].GetInt());
-								(*stg_itor)->setStgPositionBBuyYesterday(object["position_b_buy_yesterday"].GetInt());
-								(*stg_itor)->setStgPositionASellYesterday(object["position_a_sell_yesterday"].GetInt());
-								(*stg_itor)->setStgPositionBSellYesterday(object["position_b_sell_yesterday"].GetInt());
 								(*stg_itor)->setStgPositionABuy(object["position_a_buy"].GetInt());
+								(*stg_itor)->setStgPositionABuyToday(object["position_a_buy_today"].GetInt());
+								(*stg_itor)->setStgPositionABuyYesterday(object["position_a_buy_yesterday"].GetInt());
+
 								(*stg_itor)->setStgPositionBBuy(object["position_b_buy"].GetInt());
+								(*stg_itor)->setStgPositionBBuyToday(object["position_b_buy_today"].GetInt());
+								(*stg_itor)->setStgPositionBBuyYesterday(object["position_b_buy_yesterday"].GetInt());
+
+
+
+								(*stg_itor)->setStgPositionASell(object["position_a_sell"].GetInt());
+								(*stg_itor)->setStgPositionASellToday(object["position_a_sell_today"].GetInt());
+								(*stg_itor)->setStgPositionASellYesterday(object["position_a_sell_yesterday"].GetInt());
+
+
+								(*stg_itor)->setStgPositionBSell(object["position_b_sell"].GetInt());
+								(*stg_itor)->setStgPositionBSellToday(object["position_b_sell_today"].GetInt());
+								(*stg_itor)->setStgPositionBSellYesterday(object["position_b_sell_yesterday"].GetInt());
 								
 								//(*stg_itor)->setStgSpreadShift(object["spread_shift"].GetDouble());
 								//(*stg_itor)->setStgBuyClose(object["buy_close"].GetDouble());
