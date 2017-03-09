@@ -2915,7 +2915,6 @@ bool CTP_Manager::init(bool is_online) {
 	std::cout << "\t初始化交易员,期货账户绑定完成..." << std::endl;
 
 	/// 绑定期货账户和策略
-	/// 绑定期货账户和策略
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
 
 		USER_PRINT((*user_itor)->getUserID());
@@ -2960,6 +2959,13 @@ bool CTP_Manager::init(bool is_online) {
 		USER_PRINT((*user_itor)->getUserID());
 		/// 遍历设值后进行TD初始化，初始化绑定对应的策略列表
 		this->CreateAccount((*user_itor), (*user_itor)->getListStrategy());
+
+		/************************************************************************/
+		/* 改为多线程创建Account                                                                     */
+		/************************************************************************/
+		//std::thread t1(&Test::calculate, this,  0, 10);
+
+
 		//std::cout << "\t账户 : " << (*user_itor)->getUserID() << " 初始化完成!" << std::endl;
 		sleep(3);
 	}
@@ -2989,6 +2995,8 @@ bool CTP_Manager::init(bool is_online) {
 	else {
 		std::cout << "\t初始化期货账户和策略绑定完成..." << std::endl;
 	}
+
+
 
 	/// 查询投资者持仓
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
