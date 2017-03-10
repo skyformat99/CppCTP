@@ -14,6 +14,7 @@ using namespace rapidjson;
 
 static DBManager *static_dbm = new DBManager();
 static Trader *op = new Trader();
+static const int MAX_THREAD_COUNT = 100;
 
 int server_msg_ref = 0;
 
@@ -103,9 +104,20 @@ User * CTP_Manager::CreateAccount(User *user, list<Strategy *> *l_strategys) {
 		user->getUserTradeSPI()->Login(user); // 登陆
 		sleep(1);
 		user->getUserTradeSPI()->QrySettlementInfoConfirm(user); // 确认交易结算
+		/// 设置初始化状态完成
+		user->setThread_Init_Status(true);
 
+		std::cout << "In Thread = " << std::this_thread::get_id() << ", UserID = " << user->getUserID() << std::endl;
+
+		/// 等待结束
+		user->getUserTradeAPI()->Join();
 	}
 
+	/*while (true)
+	{
+		std::cout << "In Thread = " << std::this_thread::get_id() << ", UserID = " << user->getUserID() << std::endl;
+		sleep(5);
+	}*/
 	return user;
 }
 
@@ -2952,24 +2964,65 @@ bool CTP_Manager::init(bool is_online) {
 		USER_PRINT("策略，仓位完成...");
 		std::cout << "t初始化策略，仓位完成..." << std::endl;
 	}
+
 	
+	//std::thread* thr[MAX_THREAD_COUNT] = { nullptr };
+
 	/// 绑定期货账户和策略
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
 		
 		USER_PRINT((*user_itor)->getUserID());
 		/// 遍历设值后进行TD初始化，初始化绑定对应的策略列表
-		this->CreateAccount((*user_itor), (*user_itor)->getListStrategy());
+		//this->CreateAccount((*user_itor), (*user_itor)->getListStrategy());
 
 		/************************************************************************/
 		/* 改为多线程创建Account                                                                     */
 		/************************************************************************/
-		//std::thread t1(&Test::calculate, this,  0, 10);
+		
+		this->user_threads.push_back(std::thread(&CTP_Manager::CreateAccount, this, (*user_itor), (*user_itor)->getListStrategy()));
 
+		/*thr[thread_index] = new std::thread(&CTP_Manager::CreateAccount, this, (*user_itor), (*user_itor)->getListStrategy());
+		thr[thread_index]->detach();*/
+		//std::thread(&CTP_Manager::CreateAccount, this,  (*user_itor), (*user_itor)->getListStrategy()).detach();
 
 		//std::cout << "\t账户 : " << (*user_itor)->getUserID() << " 初始化完成!" << std::endl;
-		sleep(3);
+		//sleep(3);
 	}
 
+	std::cout << "In Main Thread = " << std::this_thread::get_id() << std::endl;
+	std::cout << "主线程设置子线程分离..." << std::endl;
+	/// 设置线程分离
+	for (auto& t: this->user_threads)
+	{
+		t.detach();
+	}
+
+	bool is_all_user_finished_init = true;
+	while (true)
+	{
+		/// 初始值为true,一旦有账户不满足初始化完成条件，置false操作
+		is_all_user_finished_init = true;
+		/// 检查USER初始化是否完成
+		std::cout << "In Main Thread = " << std::this_thread::get_id() << std::endl;
+		std::cout << "检查期货账户登录状态" << std::endl;
+
+		for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
+
+			if (!(*user_itor)->getThread_Init_Status()) {
+				std::cout << (*user_itor)->getUserID() << "账户还在初始化中..." << std::endl;
+				is_all_user_finished_init = false;
+			}
+			
+		}
+
+		if (is_all_user_finished_init) {
+			std::cout << "账户初始化完成,进入登录检查..." << std::endl;
+			break;
+		}
+
+		sleep(2);
+	}
+	
 	/// 进行登录检查,把登录失败的user从当前账户列表移出去
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end();) { // 遍历User
 		//已经连接+已经登录+登录无错误
@@ -3002,6 +3055,7 @@ bool CTP_Manager::init(bool is_online) {
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
 
 		USER_PRINT((*user_itor)->getUserID());
+		sleep(1);
 		(*user_itor)->getUserTradeSPI()->QryInvestorPosition();
 		sleep(1);
 		(*user_itor)->getUserTradeSPI()->QryInvestorPositionDetail();

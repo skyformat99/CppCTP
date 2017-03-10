@@ -381,8 +381,12 @@ int main(int argc, char *argv[]) {
 	// 初始化mongoDB
 	mongo::client::initialize();
 
+	
+
 	// 初始化CTP_Manager
 	ctp_m = new CTP_Manager();
+
+	
 	bool init_flag = true;
 
 	if (!strcmp("1", argv[2])) {
@@ -412,6 +416,8 @@ int main(int argc, char *argv[]) {
 	//CTPManager设置定时器
 	ctp_m->setCalTimer(&tHello);
 
+	
+
 	// 程序入口，初始化资源
 	if (!ctp_m->init(init_flag)) {
 		std::cout << "系统初始化失败!" << std::endl;
@@ -423,6 +429,12 @@ int main(int argc, char *argv[]) {
 	//tHello.setInterval(Timer::Interval(1000 * 60 * 10));
 	tHello.setInterval(Timer::Interval(1000));
 	tHello.start(true);
+
+	/*while (true)
+	{
+	std::cout << "In Thread = " << std::this_thread::get_id() << std::endl;
+	sleep(5);
+	}*/
 
 	/*算法单元测试
 	Algorithm *alg = new Algorithm();

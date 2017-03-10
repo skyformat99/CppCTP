@@ -186,6 +186,7 @@ private:
 	list<USER_CThostFtdcTradeField *> *l_posdetail_trade_yesterday;
 
 	Timer *cal_timer;
+	std::vector<std::thread> user_threads;
 
 	static bool ten_min_flag;
 	static bool one_min_flag;

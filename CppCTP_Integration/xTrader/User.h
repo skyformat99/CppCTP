@@ -136,6 +136,10 @@ public:
 	int getOn_Off();
 	void setOn_Off(int on_off);
 
+	/// 设置线程初始化状态，完成为true，否则false
+	bool getThread_Init_Status();
+	void setThread_Init_Status(bool thread_init_status);
+
 	/// 设置CTP_Manager
 	void setCTP_Manager(CTP_Manager *o_ctp);
 	CTP_Manager *getCTP_Manager();
@@ -162,6 +166,8 @@ public:
 
 	// 对比本地维护持仓结果与CTP API返回持仓对比结果
 	bool ComparePositionTotal();
+
+
 
 private:
 	int on_off; //开关
@@ -198,6 +204,7 @@ private:
 	list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_ctp;
 	list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_local_order;
 	list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_local_trade;
+	bool thread_init_status;
 };
 
 #endif

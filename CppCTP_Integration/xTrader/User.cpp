@@ -45,6 +45,7 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 	this->l_position_detail_from_ctp = new list<USER_INSTRUMENT_POSITION *>();
 	this->l_position_detail_from_local_order = new list<USER_INSTRUMENT_POSITION *>();
 	this->l_position_detail_from_local_trade = new list<USER_INSTRUMENT_POSITION *>();
+	this->thread_init_status = false;
 	USER_PRINT(this->stg_order_ref_base);
 }
 
@@ -67,6 +68,7 @@ User::User(string BrokerID, string UserID, int nRequestID, string stg_order_ref_
 	this->isConnected = true;
 	this->isLoggedError = false;
 	this->isPositionRight = true;
+	this->thread_init_status = false;
 	this->l_position_detail_from_ctp = new list<USER_INSTRUMENT_POSITION *>();
 	this->l_position_detail_from_local_order = new list<USER_INSTRUMENT_POSITION *>();
 	this->l_position_detail_from_local_trade = new list<USER_INSTRUMENT_POSITION *>();
@@ -1589,6 +1591,15 @@ int User::getOn_Off() {
 }
 void User::setOn_Off(int on_off) {
 	this->on_off = on_off;
+}
+
+/// 设置线程初始化状态，完成为true，否则false
+bool User::getThread_Init_Status() {
+	return this->thread_init_status;
+}
+
+void User::setThread_Init_Status(bool thread_init_status) {
+	this->thread_init_status = thread_init_status;
 }
 
 /// 设置CTP_Manager
