@@ -584,6 +584,502 @@ string CTP_Manager::getTradingDay() {
 	return this->trading_day;
 }
 
+/// 初始化数据发送
+void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, int i_MsgRef, int i_MsgSrc, string s_UserID, string s_StrategyID) {
+
+	rapidjson::Document build_doc;
+	rapidjson::StringBuffer buffer;
+	rapidjson::Writer<StringBuffer> writer(buffer);
+
+	std::cout << "服务端发送客户端初始化数据" << std::endl;
+
+	/************************************************************************/
+	/*请求行情接口配置信息     msgtype == 4                                                       */
+	/************************************************************************/
+	std::cout << "请求行情接口配置信息..." << std::endl;
+
+	list<MarketConfig *> l_marketconfig;
+	static_dbm->getAllMarketConfig(&l_marketconfig);
+
+	/*构建MarketInfo的Json*/
+	build_doc.SetObject();
+	rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
+	build_doc.AddMember("MsgRef", server_msg_ref++, allocator);
+	build_doc.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator);
+	build_doc.AddMember("MsgType", 4, allocator);
+	build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
+	build_doc.AddMember("MsgResult", 0, allocator);
+	build_doc.AddMember("MsgErrorReason", "", allocator);
+	//创建Info数组
+	rapidjson::Value info_array(rapidjson::kArrayType);
+
+	list<MarketConfig *>::iterator market_itor;
+	for (market_itor = l_marketconfig.begin(); market_itor != l_marketconfig.end(); market_itor++) {
+
+		rapidjson::Value info_object(rapidjson::kObjectType);
+		info_object.SetObject();
+		info_object.AddMember("brokerid", rapidjson::StringRef((*market_itor)->getBrokerID().c_str()), allocator);
+		info_object.AddMember("password", rapidjson::StringRef((*market_itor)->getPassword().c_str()), allocator);
+		info_object.AddMember("userid", rapidjson::StringRef((*market_itor)->getUserID().c_str()), allocator);
+		info_object.AddMember("frontaddress", rapidjson::StringRef((*market_itor)->getMarketFrontAddr().c_str()), allocator);
+
+		info_array.PushBack(info_object, allocator);
+	}
+
+	build_doc.AddMember("Info", info_array, allocator);
+	build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
+	build_doc.Accept(writer);
+	//rsp_msg = const_cast<char *>(buffer.GetString());
+	//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
+	std::cout << "服务端响应数据 = " << buffer.GetString() << std::endl;
+
+	if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
+		printf("先前客户端已断开!!!\n");
+		//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
+		if (errno == EPIPE) {
+			std::cout << "EPIPE" << std::endl;
+			//break;
+		}
+		perror("protocal error");
+	}
+
+
+	/************************************************************************/
+	/*请求账户信息        msgtype == 2                                                    */
+	/************************************************************************/
+	std::cout << "请求账户信息..." << std::endl;
+	//list<FutureAccount *> l_futureaccount;
+	//static_dbm->SearchFutrueListByTraderID(s_TraderID, &l_futureaccount);
+
+	rapidjson::Document build_doc2;
+	rapidjson::StringBuffer buffer2;
+	rapidjson::Writer<StringBuffer> writer2(buffer2);
+
+
+	/*构建UserInfo的Json*/
+	build_doc2.SetObject();
+	rapidjson::Document::AllocatorType& allocator1 = build_doc2.GetAllocator();
+	build_doc2.AddMember("MsgRef", server_msg_ref++, allocator1);
+	build_doc2.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator1);
+	build_doc2.AddMember("MsgType", 2, allocator1);
+	build_doc2.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator1);
+	build_doc2.AddMember("MsgResult", 0, allocator1);
+	build_doc2.AddMember("MsgErrorReason", "", allocator1);
+	//创建Info数组
+	rapidjson::Value info_array1(rapidjson::kArrayType);
+
+	list<User *>::iterator future_itor;
+	for (future_itor = ctp_m->getL_User()->begin(); future_itor != ctp_m->getL_User()->end(); future_itor++) {
+
+		rapidjson::Value info_object(rapidjson::kObjectType);
+		info_object.SetObject();
+		info_object.AddMember("brokerid", rapidjson::StringRef((*future_itor)->getBrokerID().c_str()), allocator1);
+		info_object.AddMember("traderid", rapidjson::StringRef((*future_itor)->getTraderID().c_str()), allocator1);
+		info_object.AddMember("password", rapidjson::StringRef((*future_itor)->getPassword().c_str()), allocator1);
+		info_object.AddMember("userid", rapidjson::StringRef((*future_itor)->getUserID().c_str()), allocator1);
+		info_object.AddMember("frontaddress", rapidjson::StringRef((*future_itor)->getFrontAddress().c_str()), allocator1);
+		info_object.AddMember("on_off", (*future_itor)->getOn_Off(), allocator1);
+		if ((*future_itor)->getIsPositionRight())
+		{
+			info_object.AddMember("positionflag", 1, allocator1);
+		}
+		else
+		{
+			info_object.AddMember("positionflag", 0, allocator1);
+		}
+
+		info_array1.PushBack(info_object, allocator1);
+	}
+
+	build_doc2.AddMember("Info", info_array1, allocator1);
+	build_doc2.AddMember("MsgSrc", i_MsgSrc, allocator1);
+	build_doc2.Accept(writer2);
+	//rsp_msg = const_cast<char *>(buffer2.GetString());
+	//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
+	std::cout << "服务端响应数据 = " << buffer2.GetString() << std::endl;
+
+	if (write_msg(fd, const_cast<char *>(buffer2.GetString()), strlen(buffer2.GetString())) < 0) {
+		printf("先前客户端已断开!!!\n");
+		//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
+		if (errno == EPIPE) {
+			std::cout << "EPIPE" << std::endl;
+			//break;
+		}
+		perror("protocal error");
+	}
+
+
+	/************************************************************************/
+	/*请求查询算法             msgtype == 11                                            */
+	/************************************************************************/
+	std::cout << "请求查询算法..." << std::endl;
+
+
+	rapidjson::Document build_doc3;
+	rapidjson::StringBuffer buffer3;
+	rapidjson::Writer<StringBuffer> writer3(buffer3);
+
+	list<Algorithm *> l_alg;
+	static_dbm->getAllAlgorithm(&l_alg);
+
+	/*构建MarketInfo的Json*/
+	build_doc3.SetObject();
+	rapidjson::Document::AllocatorType& allocator2 = build_doc3.GetAllocator();
+	build_doc3.AddMember("MsgRef", server_msg_ref++, allocator2);
+	build_doc3.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator2);
+	build_doc3.AddMember("MsgType", 11, allocator2);
+	build_doc3.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator2);
+	build_doc3.AddMember("MsgResult", 0, allocator2);
+	build_doc3.AddMember("MsgErrorReason", "", allocator2);
+	//创建Info数组
+	rapidjson::Value info_array2(rapidjson::kArrayType);
+
+	list<Algorithm *>::iterator alg_itor;
+	for (alg_itor = l_alg.begin(); alg_itor != l_alg.end(); alg_itor++) {
+
+		rapidjson::Value info_object(rapidjson::kObjectType);
+		info_object.SetObject();
+		info_object.AddMember("name", rapidjson::StringRef((*alg_itor)->getAlgName().c_str()), allocator2);
+		info_array2.PushBack(info_object, allocator2);
+	}
+
+	build_doc3.AddMember("Info", info_array2, allocator2);
+	build_doc3.AddMember("MsgSrc", i_MsgSrc, allocator2);
+	build_doc3.Accept(writer3);
+	//rsp_msg = const_cast<char *>(buffer.GetString());
+	//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
+	std::cout << "服务端响应数据 = " << buffer3.GetString() << std::endl;
+
+	if (write_msg(fd, const_cast<char *>(buffer3.GetString()), strlen(buffer3.GetString())) < 0) {
+		printf("先前客户端已断开!!!\n");
+		//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
+		if (errno == EPIPE) {
+			std::cout << "EPIPE" << std::endl;
+			//break;
+		}
+		perror("protocal error");
+	}
+
+
+
+
+	/************************************************************************/
+	/*请求查询策略信息      msgtype == 3                                                   */
+	/************************************************************************/
+	std::cout << "请求查询策略信息..." << std::endl;
+
+
+	rapidjson::Document build_doc4;
+	rapidjson::StringBuffer buffer4;
+	rapidjson::Writer<StringBuffer> writer4(buffer4);
+	list<Strategy *> l_strategys;
+	//static_dbm->getAllStrategy(&l_strategys, s_TraderID, s_UserID);
+	static_dbm->getAllStrategyByActiveUser(&l_strategys, ctp_m->getL_User(), s_TraderID);
+
+	/*构建StrategyInfo的Json*/
+	build_doc4.SetObject();
+	rapidjson::Document::AllocatorType& allocator3 = build_doc4.GetAllocator();
+	build_doc4.AddMember("MsgRef", server_msg_ref++, allocator3);
+	build_doc4.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator3);
+	build_doc4.AddMember("MsgType", 3, allocator3);
+	build_doc4.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator3);
+	build_doc4.AddMember("MsgResult", 0, allocator3);
+	build_doc4.AddMember("MsgErrorReason", "", allocator3);
+	build_doc4.AddMember("StrategyID", rapidjson::StringRef(s_StrategyID.c_str()), allocator3);
+	//创建Info数组
+	rapidjson::Value info_array3(rapidjson::kArrayType);
+
+	list<Strategy *>::iterator stg_itor;
+	for (stg_itor = l_strategys.begin(); stg_itor != l_strategys.end(); stg_itor++) {
+
+		rapidjson::Value info_object(rapidjson::kObjectType);
+		info_object.SetObject();
+		info_object.AddMember("position_a_sell_today", (*stg_itor)->getStgPositionASellToday(), allocator3);
+		info_object.AddMember("position_b_sell", (*stg_itor)->getStgPositionBSell(), allocator3);
+		info_object.AddMember("spread_shift", (*stg_itor)->getStgSpreadShift(), allocator3);
+		info_object.AddMember("position_b_sell_today", (*stg_itor)->getStgPositionBSellToday(), allocator3);
+		info_object.AddMember("position_b_buy_today", (*stg_itor)->getStgPositionBBuyToday(), allocator3);
+		info_object.AddMember("position_a_sell", (*stg_itor)->getStgPositionASell(), allocator3);
+		info_object.AddMember("buy_close", (*stg_itor)->getStgBuyClose(), allocator3);
+		info_object.AddMember("stop_loss", (*stg_itor)->getStgStopLoss(), allocator3);
+		info_object.AddMember("position_b_buy_yesterday", (*stg_itor)->getStgPositionBBuyYesterday(), allocator3);
+		//info_object.AddMember("is_active", (*stg_itor)->isStgIsActive(), allocator3);
+		info_object.AddMember("position_b_sell_yesterday", (*stg_itor)->getStgPositionBSellYesterday(), allocator3);
+		info_object.AddMember("strategy_id", rapidjson::StringRef((*stg_itor)->getStgStrategyId().c_str()), allocator3);
+		info_object.AddMember("position_b_buy", (*stg_itor)->getStgPositionBBuy(), allocator3);
+		info_object.AddMember("lots_batch", (*stg_itor)->getStgLotsBatch(), allocator3);
+		info_object.AddMember("position_a_buy", (*stg_itor)->getStgPositionABuy(), allocator3);
+		info_object.AddMember("sell_open", (*stg_itor)->getStgSellOpen(), allocator3);
+		info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator3);
+		info_object.AddMember("trader_id", rapidjson::StringRef((*stg_itor)->getStgTraderId().c_str()), allocator3);
+		info_object.AddMember("a_order_action_limit", (*stg_itor)->getStgAOrderActionTiresLimit(), allocator3);
+		info_object.AddMember("b_order_action_limit", (*stg_itor)->getStgBOrderActionTiresLimit(), allocator3);
+		info_object.AddMember("sell_close", (*stg_itor)->getStgSellClose(), allocator3);
+		info_object.AddMember("buy_open", (*stg_itor)->getStgBuyOpen(), allocator3);
+
+		/*开关字段*/
+		info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator3);
+		info_object.AddMember("strategy_on_off", (*stg_itor)->getOn_Off(), allocator3);
+		info_object.AddMember("sell_open_on_off", (*stg_itor)->getStgSellOpenOnOff(), allocator3);
+		info_object.AddMember("buy_close_on_off", (*stg_itor)->getStgBuyCloseOnOff(), allocator3);
+		info_object.AddMember("sell_close_on_off", (*stg_itor)->getStgSellCloseOnOff(), allocator3);
+		info_object.AddMember("buy_open_on_off", (*stg_itor)->getStgBuyOpenOnOff(), allocator3);
+
+
+		/*新增字段*/
+		info_object.AddMember("trade_model", rapidjson::StringRef((*stg_itor)->getStgTradeModel().c_str()), allocator3);
+		info_object.AddMember("hold_profit", (*stg_itor)->getStgHoldProfit(), allocator3);
+		info_object.AddMember("close_profit", (*stg_itor)->getStgCloseProfit(), allocator3);
+		info_object.AddMember("commission", (*stg_itor)->getStgCommission(), allocator3);
+		info_object.AddMember("position", (*stg_itor)->getStgPosition(), allocator3);
+		info_object.AddMember("position_buy", (*stg_itor)->getStgPositionBuy(), allocator3);
+		info_object.AddMember("position_sell", (*stg_itor)->getStgPositionSell(), allocator3);
+		info_object.AddMember("trade_volume", (*stg_itor)->getStgTradeVolume(), allocator3);
+		info_object.AddMember("amount", (*stg_itor)->getStgAmount(), allocator3);
+		info_object.AddMember("average_shift", (*stg_itor)->getStgAverageShift(), allocator3);
+		info_object.AddMember("a_limit_price_shift", (*stg_itor)->getStgALimitPriceShift(), allocator3);
+		info_object.AddMember("b_limit_price_shift", (*stg_itor)->getStgBLimitPriceShift(), allocator3);
+
+		/*2017.03.03新增参数*/
+		info_object.AddMember("on_off", (*stg_itor)->getOn_Off(), allocator3);
+		info_object.AddMember("a_instrument_id", rapidjson::StringRef((*stg_itor)->getStgInstrumentIdA().c_str()), allocator3);
+		info_object.AddMember("b_instrument_id", rapidjson::StringRef((*stg_itor)->getStgInstrumentIdB().c_str()), allocator3);
+		info_object.AddMember("a_limit_price_shift", (*stg_itor)->getStgALimitPriceShift(), allocator3);
+		info_object.AddMember("b_limit_price_shift", (*stg_itor)->getStgBLimitPriceShift(), allocator3);
+		info_object.AddMember("sell_open_on_off", (*stg_itor)->getStgSellOpenOnOff(), allocator3);
+		info_object.AddMember("buy_close_on_off", (*stg_itor)->getStgBuyCloseOnOff(), allocator3);
+		info_object.AddMember("buy_open_on_off", (*stg_itor)->getStgBuyOpenOnOff(), allocator3);
+		info_object.AddMember("sell_close_on_off", (*stg_itor)->getStgSellCloseOnOff(), allocator3);
+
+
+
+		rapidjson::Value instrument_array(rapidjson::kArrayType);
+		for (int j = 0; j < 2; j++) {
+			rapidjson::Value instrument_object(rapidjson::kObjectType);
+			instrument_object.SetObject();
+			if (j == 0) {
+				instrument_object.SetString(rapidjson::StringRef((*stg_itor)->getStgInstrumentIdA().c_str()));
+			}
+			else if (j == 1) {
+				instrument_object.SetString(rapidjson::StringRef((*stg_itor)->getStgInstrumentIdB().c_str()));
+			}
+
+			instrument_array.PushBack(instrument_object, allocator3);
+		}
+		info_object.AddMember("list_instrument_id", instrument_array, allocator3);
+		info_object.AddMember("position_a_buy_yesterday", (*stg_itor)->getStgPositionABuyYesterday(), allocator3);
+		info_object.AddMember("user_id", rapidjson::StringRef((*stg_itor)->getStgUserId().c_str()), allocator3);
+		info_object.AddMember("position_a_buy_today", (*stg_itor)->getStgPositionABuyToday(), allocator3);
+		info_object.AddMember("position_a_sell_yesterday", (*stg_itor)->getStgPositionASellYesterday(), allocator3);
+		info_object.AddMember("lots", (*stg_itor)->getStgLots(), allocator3);
+		info_object.AddMember("a_wait_price_tick", (*stg_itor)->getStgAWaitPriceTick(), allocator3);
+		info_object.AddMember("b_wait_price_tick", (*stg_itor)->getStgBWaitPriceTick(), allocator3);
+		//info_object.AddMember("StrategyOnoff", (*stg_itor)->getOn_Off(), allocator3);
+
+		info_array3.PushBack(info_object, allocator3);
+	}
+
+	build_doc4.AddMember("Info", info_array3, allocator3);
+	build_doc4.AddMember("MsgSrc", i_MsgSrc, allocator3);
+	build_doc4.Accept(writer4);
+	//rsp_msg = const_cast<char *>(buffer.GetString());
+	//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
+	std::cout << "服务端响应数据 = " << buffer4.GetString() << std::endl;
+
+	if (write_msg(fd, const_cast<char *>(buffer4.GetString()), strlen(buffer4.GetString())) < 0) {
+		printf("先前客户端已断开!!!\n");
+		//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
+		if (errno == EPIPE) {
+			std::cout << "EPIPE" << std::endl;
+			//break;
+		}
+		perror("protocal error");
+	}
+
+
+	/************************************************************************/
+	/* 查询期货账户昨日持仓明细(order)    msgtype == 15                                                                 */
+	/************************************************************************/
+	// 查询期货账户昨日持仓明细
+	std::cout << "查询期货账户昨日持仓明细..." << std::endl;
+
+
+	rapidjson::Document build_doc5;
+	rapidjson::StringBuffer buffer5;
+	rapidjson::Writer<StringBuffer> writer5(buffer5);
+
+	bool bFind = false;
+
+	list<USER_CThostFtdcOrderField *> l_posd;
+	static_dbm->getAllPositionDetailYesterday(&l_posd, s_TraderID, s_UserID);
+
+	/*构建策略昨仓Json*/
+	build_doc5.SetObject();
+	rapidjson::Document::AllocatorType& allocator4 = build_doc5.GetAllocator();
+	build_doc5.AddMember("MsgRef", server_msg_ref++, allocator4);
+	build_doc5.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator4);
+	build_doc5.AddMember("MsgType", 15, allocator4);
+	build_doc5.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator4);
+	build_doc5.AddMember("UserID", rapidjson::StringRef(s_UserID.c_str()), allocator4);
+
+	//创建Info数组
+	rapidjson::Value create_info_array4(rapidjson::kArrayType);
+
+	list<USER_CThostFtdcOrderField *>::iterator pod_itor;
+	for (pod_itor = l_posd.begin(); pod_itor != l_posd.end(); pod_itor++) {
+
+		/*构造内容json*/
+		rapidjson::Value create_info_object(rapidjson::kObjectType);
+		create_info_object.SetObject();
+
+		create_info_object.AddMember("instrumentid", rapidjson::StringRef((*pod_itor)->InstrumentID), allocator4);
+		create_info_object.AddMember("orderref", rapidjson::StringRef((*pod_itor)->OrderRef), allocator4);
+		create_info_object.AddMember("userid", rapidjson::StringRef((*pod_itor)->UserID), allocator4);
+		//create_info_object.AddMember("direction", (*pod_itor)->Direction, allocator4);
+		string direction;
+		direction = (*pod_itor)->Direction;
+		create_info_object.AddMember("direction", rapidjson::StringRef(direction.c_str()), allocator4);
+		create_info_object.AddMember("comboffsetflag", rapidjson::StringRef((*pod_itor)->CombOffsetFlag), allocator4);
+		create_info_object.AddMember("combhedgeflag", rapidjson::StringRef((*pod_itor)->CombHedgeFlag), allocator4);
+		create_info_object.AddMember("limitprice", (*pod_itor)->LimitPrice, allocator4);
+		create_info_object.AddMember("volumetotaloriginal", (*pod_itor)->VolumeTotalOriginal, allocator4);
+		create_info_object.AddMember("tradingday", rapidjson::StringRef((*pod_itor)->TradingDay), allocator4);
+		create_info_object.AddMember("tradingdayrecord", rapidjson::StringRef((*pod_itor)->TradingDayRecord), allocator4);
+		create_info_object.AddMember("orderstatus", (*pod_itor)->OrderStatus, allocator4);
+		create_info_object.AddMember("volumetraded", (*pod_itor)->VolumeTraded, allocator4);
+		create_info_object.AddMember("volumetotal", (*pod_itor)->VolumeTotal, allocator4);
+		create_info_object.AddMember("insertdate", rapidjson::StringRef((*pod_itor)->InsertDate), allocator4);
+		create_info_object.AddMember("inserttime", rapidjson::StringRef((*pod_itor)->InsertTime), allocator4);
+		create_info_object.AddMember("strategyid", rapidjson::StringRef((*pod_itor)->StrategyID), allocator4);
+		create_info_object.AddMember("volumetradedbatch", (*pod_itor)->VolumeTradedBatch, allocator4);
+
+		create_info_array4.PushBack(create_info_object, allocator4);
+
+		bFind = true;
+	}
+
+	if (bFind) {
+		build_doc5.AddMember("MsgResult", 0, allocator4);
+		build_doc5.AddMember("MsgErrorReason", "", allocator4);
+	}
+	else {
+		build_doc5.AddMember("MsgResult", 0, allocator4);
+		build_doc5.AddMember("MsgErrorReason", "未找到该策略昨仓明细(order)", allocator4);
+	}
+
+	build_doc5.AddMember("Info", create_info_array4, allocator4);
+	build_doc5.AddMember("MsgSrc", i_MsgSrc, allocator4);
+	build_doc5.Accept(writer5);
+	//rsp_msg = const_cast<char *>(buffer5.GetString());
+	//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
+	std::cout << "服务端响应数据 = " << buffer5.GetString() << std::endl;
+
+	if (write_msg(fd, const_cast<char *>(buffer5.GetString()), strlen(buffer5.GetString())) < 0) {
+		printf("先前客户端已断开!!!\n");
+		//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
+		if (errno == EPIPE) {
+			std::cout << "EPIPE" << std::endl;
+			//break;
+		}
+		perror("protocal error");
+	}
+
+
+
+
+
+	/************************************************************************/
+	/*查询期货账户昨日持仓明细(trade) msgtype == 17                                                                      */
+	/************************************************************************/
+	// 查询期货账户昨日持仓明细(trade)
+	std::cout << "查询期货账户昨日持仓明细..." << std::endl;
+
+	bFind = false;
+
+	rapidjson::Document build_doc6;
+	rapidjson::StringBuffer buffer6;
+	rapidjson::Writer<StringBuffer> writer6(buffer6);
+
+	list<USER_CThostFtdcTradeField *> l_posd_trade;
+	static_dbm->getAllPositionDetailTradeYesterday(&l_posd_trade, s_TraderID, s_UserID);
+
+	/*构建策略昨仓Json*/
+	build_doc6.SetObject();
+	rapidjson::Document::AllocatorType& allocator5 = build_doc6.GetAllocator();
+	build_doc6.AddMember("MsgRef", server_msg_ref++, allocator5);
+	build_doc6.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator5);
+	build_doc6.AddMember("MsgType", 17, allocator5);
+	build_doc6.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator5);
+	build_doc6.AddMember("UserID", rapidjson::StringRef(s_UserID.c_str()), allocator5);
+
+	//创建Info数组
+	rapidjson::Value create_info_array5(rapidjson::kArrayType);
+
+	list<USER_CThostFtdcTradeField *>::iterator pod_itor_trade;
+	for (pod_itor_trade = l_posd_trade.begin(); pod_itor_trade != l_posd_trade.end(); pod_itor_trade++) {
+
+		/*构造内容json*/
+		rapidjson::Value create_info_object(rapidjson::kObjectType);
+		create_info_object.SetObject();
+
+		create_info_object.AddMember("instrumentid", rapidjson::StringRef((*pod_itor_trade)->InstrumentID), allocator5);
+		create_info_object.AddMember("orderref", rapidjson::StringRef((*pod_itor_trade)->OrderRef), allocator5);
+		create_info_object.AddMember("userid", rapidjson::StringRef((*pod_itor_trade)->UserID), allocator5);
+
+		string direction;
+		direction = (*pod_itor_trade)->Direction;
+		create_info_object.AddMember("direction", rapidjson::StringRef(direction.c_str()), allocator5);
+
+		string OffsetFlag;
+		OffsetFlag = (*pod_itor_trade)->OffsetFlag;
+		create_info_object.AddMember("offsetflag", rapidjson::StringRef(OffsetFlag.c_str()), allocator5);
+
+		string HedgeFlag;
+		HedgeFlag = (*pod_itor_trade)->HedgeFlag;
+		create_info_object.AddMember("hedgeflag", rapidjson::StringRef(HedgeFlag.c_str()), allocator5);
+
+		//create_info_object.AddMember("direction", (*pod_itor)->Direction, allocator5);
+		//create_info_object.AddMember("offsetflag", (*pod_itor)->OffsetFlag, allocator5);
+		//create_info_object.AddMember("hedgeflag", (*pod_itor)->HedgeFlag, allocator5);
+		create_info_object.AddMember("price", (*pod_itor_trade)->Price, allocator5);
+		create_info_object.AddMember("tradingday", rapidjson::StringRef((*pod_itor_trade)->TradingDay), allocator5);
+		create_info_object.AddMember("tradingdayrecord", rapidjson::StringRef((*pod_itor_trade)->TradingDayRecord), allocator5);
+		create_info_object.AddMember("tradedate", rapidjson::StringRef((*pod_itor_trade)->TradeDate), allocator5);
+		create_info_object.AddMember("strategyid", rapidjson::StringRef((*pod_itor_trade)->StrategyID), allocator5);
+		create_info_object.AddMember("volume", (*pod_itor_trade)->Volume, allocator5);
+
+		create_info_array5.PushBack(create_info_object, allocator5);
+
+		bFind = true;
+	}
+
+	if (bFind) {
+		build_doc6.AddMember("MsgResult", 0, allocator5);
+		build_doc6.AddMember("MsgErrorReason", "", allocator5);
+	}
+	else {
+		build_doc6.AddMember("MsgResult", 0, allocator5);
+		build_doc6.AddMember("MsgErrorReason", "未找到该策略昨仓明细(trade)", allocator5);
+	}
+
+	build_doc6.AddMember("Info", create_info_array5, allocator5);
+	build_doc6.AddMember("MsgSrc", i_MsgSrc, allocator5);
+	build_doc6.Accept(writer6);
+	//rsp_msg = const_cast<char *>(buffer6.GetString());
+	//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
+	std::cout << "服务端响应数据 = " << buffer6.GetString() << std::endl;
+
+	if (write_msg(fd, const_cast<char *>(buffer6.GetString()), strlen(buffer6.GetString())) < 0) {
+		printf("先前客户端已断开!!!\n");
+		//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
+		if (errno == EPIPE) {
+			std::cout << "EPIPE" << std::endl;
+			//break;
+		}
+		perror("protocal error");
+	}
+}
+
 /// 处理客户端发来的消息
 void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 	//std::cout << "HandleMessage fd = " << fd << std::endl;
@@ -591,7 +1087,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 	std::cout << "CTP管理类地址 = " << ctp_m << std::endl;
 	static_dbm->setIs_Online(ctp_m->getDBManager()->getIs_Online());
 
-	const char *rsp_msg;
+	//const char *rsp_msg;
+	int global_msg_type = 0;
 
 	rapidjson::Document doc;
 	rapidjson::Document build_doc;
@@ -627,6 +1124,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 			rapidjson::Value& s = doc["MsgType"];
 
 			int msgtype = s.GetInt();
+			global_msg_type = msgtype;
 
 			std::cout << "msgtype = " << msgtype << std::endl;
 
@@ -660,6 +1158,24 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					build_doc.AddMember("MsgResult", 0, allocator);
 					build_doc.AddMember("MsgErrorReason", "", allocator);
 					build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
+
+					build_doc.Accept(writer);
+					//rsp_msg = const_cast<char *>(buffer.GetString());
+					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
+					std::cout << "服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
+						printf("先前客户端已断开!!!\n");
+						//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
+						if (errno == EPIPE) {
+							std::cout << "EPIPE" << std::endl;
+							//break;
+						}
+						perror("protocal error");
+					}
+
+					InitClientData(fd, ctp_m, s_TraderID, server_msg_ref, i_MsgSrc);
+
 				}
 				else {
 					std::cout << "交易员不存在..." << std::endl;
@@ -681,6 +1197,21 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					build_doc.AddMember("MsgResult", 1, allocator);
 					build_doc.AddMember("MsgErrorReason", "No Trader Find!", allocator);
 					build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
+
+					build_doc.Accept(writer);
+					//rsp_msg = const_cast<char *>(buffer.GetString());
+					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
+					std::cout << "服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
+						printf("先前客户端已断开!!!\n");
+						//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
+						if (errno == EPIPE) {
+							std::cout << "EPIPE" << std::endl;
+							//break;
+						}
+						perror("protocal error");
+					}
 				}
 			}
 			else if (msgtype == 2) { // UserInfo
@@ -2385,22 +2916,22 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 	}
 	
 	
+	if (global_msg_type != 1) {
+		build_doc.Accept(writer);
+		//rsp_msg = const_cast<char *>(buffer.GetString());
+		//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
+		std::cout << "服务端响应数据 = " << buffer.GetString() << std::endl;
 
-	build_doc.Accept(writer);
-	//rsp_msg = const_cast<char *>(buffer.GetString());
-	//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-	std::cout << "服务端响应数据 = " << buffer.GetString() << std::endl;
-
-	if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
-		printf("先前客户端已断开!!!\n");
-		//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
-		if (errno == EPIPE) {
-			std::cout << "EPIPE" << std::endl;
-			//break;
+		if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
+			printf("先前客户端已断开!!!\n");
+			//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
+			if (errno == EPIPE) {
+				std::cout << "EPIPE" << std::endl;
+				//break;
+			}
+			perror("protocal error");
 		}
-		perror("protocal error");
 	}
-	
 }
 
 #if 0
@@ -3053,7 +3584,6 @@ bool CTP_Manager::init(bool is_online) {
 
 	/// 查询投资者持仓
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
-
 		USER_PRINT((*user_itor)->getUserID());
 		sleep(1);
 		(*user_itor)->getUserTradeSPI()->QryInvestorPosition();

@@ -148,6 +148,9 @@ public:
 	/// 处理客户端发来的消息
 	static void HandleMessage(int fd, char *msg, CTP_Manager *ctp_m);
 
+	/// 初始化数据发送
+	static void InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, int i_MsgRef, int i_MsgSrc, string s_UserID = "", string s_StrategyID = "");
+
 	/// 设置交易日
 	void setTradingDay(string trading_day);
 
