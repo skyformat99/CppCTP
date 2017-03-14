@@ -3587,9 +3587,9 @@ bool CTP_Manager::init(bool is_online) {
 		USER_PRINT((*user_itor)->getUserID());
 		sleep(1);
 		(*user_itor)->getUserTradeSPI()->QryInvestorPosition();
-		sleep(1);
-		(*user_itor)->getUserTradeSPI()->QryInvestorPositionDetail();
 		sleep(2);
+		(*user_itor)->getUserTradeSPI()->QryInvestorPositionDetail();
+		//sleep(2);
 	}
 	
 	/// 进行仓位数据核对
