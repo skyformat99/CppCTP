@@ -267,7 +267,11 @@ public:
 	list<CThostFtdcTradeField *> *getL_query_trade();
 	list<CThostFtdcOrderField *> *getL_query_order();
 
+	void setCtpManager(CTP_Manager *ctp_m);
+	CTP_Manager *getCtpManager();
+
 private:
+	CTP_Manager *ctp_m;
     CThostFtdcTraderApi *tdapi;
     CThostFtdcReqUserLoginField *loginField;
     CThostFtdcReqAuthenticateField *authField;

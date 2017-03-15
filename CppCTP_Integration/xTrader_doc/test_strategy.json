@@ -98,5 +98,9 @@ msgtype = 17
 	成功无数据:{"MsgRef":0,"MsgSendFlag":1,"MsgType":15,"TraderID":"1601","UserID":"063802","MsgResult":0,"MsgErrorReason":"未找到该策略昨仓明细(trade)","Info":[],"MsgSrc":0}
 	
 msgtype = 18
-CTP断线通知(MsgResult(Integer):0正常 1断开连接)
-	主动推送:{"MsgRef":1,"MsgSendFlag":1,"MsgType":18,"TraderID":"1601","UserID":"058176","MsgSrc":1, "MsgResult":1,"MsgErrorReason":"CTP已断开连接"}
+CTP行情断线通知(MsgResult(Integer):0正常 1断开连接)
+	主动推送:{"MsgRef":1,"MsgSendFlag":1,"MsgType":18,"TraderID":"1601","UserID":"058176","MsgSrc":1, "MsgResult":1,"MsgErrorReason":"CTP行情已断开连接"}
+
+msgtype = 19
+CTP交易断线通知(MsgResult(Integer):0正常 1断开连接)
+	主动推送:{"MsgRef":1,"MsgSendFlag":1,"MsgType":19,"TraderID":"1601","UserID":"058176","MsgSrc":1, "MsgResult":1,"MsgErrorReason":"CTP交易已断开连接"}

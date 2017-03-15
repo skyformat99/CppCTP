@@ -71,6 +71,7 @@ User * CTP_Manager::CreateAccount(User *user, list<Strategy *> *l_strategys) {
 		TdSpi *tdspi = new TdSpi();
 
 		tdspi->setListStrategy(l_strategys); // 初始化策略给到位
+		tdspi->setCtpManager(this);			 // 设置CTP_Manager
 
 		//User *user = new User(td_frontAddress, td_broker, td_user, td_pass, td_user, TraderID);
 
@@ -3253,10 +3254,65 @@ void CTP_Manager::initPositionDetailDataFromLocalOrderAndTrade() {
 				(*user_itor)->addL_Position_Detail_From_Local_Trade((*position_trade_itor));
 			}
 		}
-	}
-	
+	}	
+}
 
-	
+/// 增加SOCKET FD
+void CTP_Manager::addSocketFD(string trader_id, int fd) {
+	//查找交易员
+	map<string, list<int> *>::iterator m_itor;
+	m_itor = this->m_socket_fds.find(trader_id);
+	if (m_itor == (this->m_socket_fds.end())) {
+		std::cout << "m_socket_fds 未找到 该交易员 = " << trader_id << std::endl;
+		// this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0));
+		// this->init_instrument_id_action_counter(string(pOrder->InstrumentID));
+		//return 0;
+	}
+	else {
+		bool is_find = false;
+		std::cout << "m_socket_fds 找到 该交易员 = " << trader_id << std::endl;
+		/// 遍历该交易员的list集合，如果存在该fd，直接跳过，不存在直接存入
+		list<int>::iterator int_itor;
+		for (int_itor = m_itor->second->begin(); int_itor != m_itor->second->end(); int_itor++)
+		{
+			if ((*int_itor) == fd) {
+				is_find = true;
+			}
+		}
+		if (!is_find)
+		{
+			m_itor->second->push_back(fd);
+		}
+	}
+}
+
+/// 删除SOCKET FD
+void CTP_Manager::delSocketFD(string trader_id, int fd) {
+	//查找交易员
+	map<string, list<int> *>::iterator m_itor;
+	m_itor = this->m_socket_fds.find(trader_id);
+	if (m_itor == (this->m_socket_fds.end())) {
+		std::cout << "m_socket_fds 未找到 该交易员 = " << trader_id << std::endl;
+		// this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0));
+		// this->init_instrument_id_action_counter(string(pOrder->InstrumentID));
+		//return 0;
+	}
+	else {
+		bool is_find = false;
+		std::cout << "m_socket_fds 找到 该交易员 = " << trader_id << std::endl;
+		/// 遍历该交易员的list集合，如果存在该fd，直接跳过，不存在直接存入
+		list<int>::iterator int_itor;
+		for (int_itor = m_itor->second->begin(); int_itor != m_itor->second->end(); int_itor++)
+		{
+			if ((*int_itor) == fd) {
+				is_find = true;
+			}
+		}
+		if (!is_find)
+		{
+			m_itor->second->push_back(fd);
+		}
+	}
 }
 
 ///// 初始化昨仓明细

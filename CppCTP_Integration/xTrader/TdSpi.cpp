@@ -156,6 +156,7 @@ void TdSpi::OnFrontDisconnected(int nReason) {
 	std::cout << "TdSpi::OnFrontDisconnected()" << std::endl;
 	std::cout << "\t断线原因 = " << nReason << std::endl;
 	//std::cout << "\t当前用户 = " << this-> << std::endl;
+
 }
 
 //登录
@@ -2572,6 +2573,14 @@ list<CThostFtdcTradeField *> * TdSpi::getL_query_trade() {
 
 list<CThostFtdcOrderField *> * TdSpi::getL_query_order() {
 	return this->l_query_order;
+}
+
+void TdSpi::setCtpManager(CTP_Manager *ctp_m) {
+	this->ctp_m = ctp_m;
+}
+
+CTP_Manager * TdSpi::getCtpManager() {
+	return this->ctp_m;
 }
 
 //释放api

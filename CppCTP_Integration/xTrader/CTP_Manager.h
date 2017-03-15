@@ -151,6 +151,12 @@ public:
 	/// 初始化数据发送
 	static void InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, int i_MsgRef, int i_MsgSrc, string s_UserID = "", string s_StrategyID = "");
 
+	/// 行情断线通知
+
+
+	/// 交易断线通知
+
+
 	/// 设置交易日
 	void setTradingDay(string trading_day);
 
@@ -163,6 +169,12 @@ public:
 	/// 统计本地order,trade持仓明细
 	void initPositionDetailDataFromLocalOrderAndTrade();
 
+	/// 增加SOCKET FD
+	void addSocketFD(string trader_id, int fd);
+
+	/// 删除SOCKET FD
+	void delSocketFD(string trader_id, int fd);
+
 	/// 初始化昨仓明细
 	//bool initYesterdayPositionDetail();
 
@@ -174,6 +186,7 @@ private:
 	list<User *> *l_user;
 	list<Trader *> *l_obj_trader;
 	map<string, list<User *> *> m_trader;
+	map<string, list<int> *> m_socket_fds;
 	DBManager *dbm;
 	list<Strategy *> *l_strategys;
 	list<Strategy *> *l_strategys_yesterday;
