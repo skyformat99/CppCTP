@@ -690,6 +690,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 		}
 
 		info_array1.PushBack(info_object, allocator1);
+		ctp_m->addSocketFD((*future_itor)->getUserID(), fd);
 	}
 
 	build_doc2.AddMember("Info", info_array1, allocator1);
@@ -2929,7 +2930,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 			printf("先前客户端已断开!!!\n");
 			//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
 			if (errno == EPIPE) {
-				std::cout << "EPIPE" << std::endl;
+				std::cout << "EPIPE信号" << std::endl;
 				//break;
 			}
 			
