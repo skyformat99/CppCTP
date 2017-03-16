@@ -170,10 +170,16 @@ public:
 	void initPositionDetailDataFromLocalOrderAndTrade();
 
 	/// 增加SOCKET FD
-	void addSocketFD(string trader_id, int fd);
+	void addSocketFD(string user_id, int fd);
 
 	/// 删除SOCKET FD
-	void delSocketFD(string trader_id, int fd);
+	void delSocketFD(string user_id, int fd);
+
+	/// 发送行情断线通知
+	void sendMarketOffLineMessage();
+
+	/// 发送交易断线通知
+	void sendTradeOffLineMessage(string user_id);
 
 	/// 初始化昨仓明细
 	//bool initYesterdayPositionDetail();

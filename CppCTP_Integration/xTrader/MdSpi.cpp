@@ -530,4 +530,5 @@ void MdSpi::OnFrontDisconnected(int nReason) {
 	USER_PRINT("MdSpi::OnFrontDisconnected");
 	USER_PRINT(nReason);
 	this->isFirstTimeLogged = false;
+	this->ctp_m->sendMarketOffLineMessage();
 }

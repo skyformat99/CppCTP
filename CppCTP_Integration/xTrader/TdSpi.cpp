@@ -156,7 +156,7 @@ void TdSpi::OnFrontDisconnected(int nReason) {
 	std::cout << "TdSpi::OnFrontDisconnected()" << std::endl;
 	std::cout << "\t断线原因 = " << nReason << std::endl;
 	//std::cout << "\t当前用户 = " << this-> << std::endl;
-
+	this->ctp_m->sendTradeOffLineMessage(this->current_user->getUserID());
 }
 
 //登录

@@ -14,12 +14,14 @@
 #include "ThostFtdcTraderApi.h"
 #include "ThostFtdcUserApiStruct.h"
 #include "Strategy.h"
+#include "CTP_Manager.h"
 
 using std::string;
 using std::list;
 
 class User;
 class Strategy;
+class CTP_Manager;
 
 
 #ifndef NULL

@@ -24,6 +24,7 @@ using std::map;
 using std::string;
 
 class CTP_Manager;
+class Strategy;
 
 class MdSpi :public CThostFtdcMdSpi{
 

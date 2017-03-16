@@ -1264,6 +1264,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					}
 
 					info_array.PushBack(info_object, allocator);
+
+					ctp_m->addSocketFD((*future_itor)->getUserID(), fd);
 				}
 
 				build_doc.AddMember("Info", info_array, allocator);
@@ -2930,6 +2932,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				std::cout << "EPIPE" << std::endl;
 				//break;
 			}
+			
 			perror("protocal error");
 		}
 	}
@@ -3258,19 +3261,19 @@ void CTP_Manager::initPositionDetailDataFromLocalOrderAndTrade() {
 }
 
 /// 增加SOCKET FD
-void CTP_Manager::addSocketFD(string trader_id, int fd) {
+void CTP_Manager::addSocketFD(string user_id, int fd) {
 	//查找交易员
 	map<string, list<int> *>::iterator m_itor;
-	m_itor = this->m_socket_fds.find(trader_id);
+	m_itor = this->m_socket_fds.find(user_id);
 	if (m_itor == (this->m_socket_fds.end())) {
-		std::cout << "m_socket_fds 未找到 该交易员 = " << trader_id << std::endl;
-		// this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0));
-		// this->init_instrument_id_action_counter(string(pOrder->InstrumentID));
-		//return 0;
+		std::cout << "m_socket_fds 未找到 该期货账户 = " << user_id << std::endl;
+		list<int> * l_fds = new list<int>();
+		l_fds->push_back(fd);
+		this->m_socket_fds.insert(pair<string, list<int> *>(user_id, l_fds));
 	}
 	else {
+		std::cout << "m_socket_fds 找到 该期货账户 = " << user_id << std::endl;
 		bool is_find = false;
-		std::cout << "m_socket_fds 找到 该交易员 = " << trader_id << std::endl;
 		/// 遍历该交易员的list集合，如果存在该fd，直接跳过，不存在直接存入
 		list<int>::iterator int_itor;
 		for (int_itor = m_itor->second->begin(); int_itor != m_itor->second->end(); int_itor++)
@@ -3287,30 +3290,122 @@ void CTP_Manager::addSocketFD(string trader_id, int fd) {
 }
 
 /// 删除SOCKET FD
-void CTP_Manager::delSocketFD(string trader_id, int fd) {
+void CTP_Manager::delSocketFD(string user_id, int fd) {
 	//查找交易员
 	map<string, list<int> *>::iterator m_itor;
-	m_itor = this->m_socket_fds.find(trader_id);
+	m_itor = this->m_socket_fds.find(user_id);
 	if (m_itor == (this->m_socket_fds.end())) {
-		std::cout << "m_socket_fds 未找到 该交易员 = " << trader_id << std::endl;
+		std::cout << "m_socket_fds 未找到 该期货账户 = " << user_id << std::endl;
 		// this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0));
 		// this->init_instrument_id_action_counter(string(pOrder->InstrumentID));
 		//return 0;
 	}
 	else {
-		bool is_find = false;
-		std::cout << "m_socket_fds 找到 该交易员 = " << trader_id << std::endl;
+		std::cout << "m_socket_fds 找到 该期货账户 = " << user_id << std::endl;
 		/// 遍历该交易员的list集合，如果存在该fd，直接跳过，不存在直接存入
 		list<int>::iterator int_itor;
 		for (int_itor = m_itor->second->begin(); int_itor != m_itor->second->end(); int_itor++)
 		{
 			if ((*int_itor) == fd) {
-				is_find = true;
+				int_itor = m_itor->second->erase(int_itor);
 			}
 		}
-		if (!is_find)
+	}
+}
+
+/// 发送行情断线通知
+void CTP_Manager::sendMarketOffLineMessage() {
+	
+
+	std::cout << "服务端发送发送行情断线通知" << std::endl;
+
+	/************************************************************************/
+	/*发送行情断线通知     msgtype == 18                                                       */
+	/************************************************************************/
+	
+	map<string, list<int> *>::iterator m_itor;
+	for (m_itor = this->m_socket_fds.begin(); m_itor != this->m_socket_fds.end(); m_itor++) {
+
+		rapidjson::Document build_doc;
+		rapidjson::StringBuffer buffer;
+		rapidjson::Writer<StringBuffer> writer(buffer);
+
+		/*构建MarketInfo的Json*/
+		build_doc.SetObject();
+		rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
+		build_doc.AddMember("MsgRef", server_msg_ref++, allocator);
+		build_doc.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator);
+		build_doc.AddMember("MsgType", 18, allocator);
+		build_doc.AddMember("MsgSrc", 1, allocator);
+		build_doc.AddMember("MsgResult", 1, allocator);
+		build_doc.AddMember("MsgErrorReason", "CTP行情已断开连接", allocator);
+		build_doc.Accept(writer);
+
+		list<int>::iterator int_itor;
+		for (int_itor = m_itor->second->begin(); int_itor != m_itor->second->end(); int_itor++)
 		{
-			m_itor->second->push_back(fd);
+			if (write_msg((*int_itor), const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
+				printf("先前客户端已断开!!!\n");
+				//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
+				if (errno == EPIPE) {
+					std::cout << "EPIPE" << std::endl;
+					//break;
+				}
+				perror("protocal error");
+			}
+		}
+	}
+}
+
+/// 发送交易断线通知
+void CTP_Manager::sendTradeOffLineMessage(string user_id) {
+
+	std::cout << "发送交易断线通知" << std::endl;
+
+	/************************************************************************/
+	/*发送交易断线通知     msgtype == 19                                       */
+	/************************************************************************/
+	//查找交易员
+	map<string, list<int> *>::iterator m_itor;
+	m_itor = this->m_socket_fds.find(user_id);
+	if (m_itor == (this->m_socket_fds.end())) {
+		std::cout << "m_socket_fds 未找到 该期货账户 = " << user_id << std::endl;
+	}
+	else {
+		std::cout << "m_socket_fds 找到 该期货账户 = " << user_id << std::endl;
+		/// 遍历该交易员的list集合，如果存在该fd，直接跳过，不存在直接存入
+		list<int>::iterator int_itor;
+		for (int_itor = m_itor->second->begin(); int_itor != m_itor->second->end(); int_itor++)
+		{
+			rapidjson::Document build_doc;
+			rapidjson::StringBuffer buffer;
+			rapidjson::Writer<StringBuffer> writer(buffer);
+
+			/*构建MarketInfo的Json*/
+			build_doc.SetObject();
+			rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
+			build_doc.AddMember("MsgRef", server_msg_ref++, allocator);
+			build_doc.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator);
+			build_doc.AddMember("MsgType", 19, allocator);
+			build_doc.AddMember("UserID", rapidjson::StringRef(user_id.c_str()), allocator);
+			build_doc.AddMember("MsgSrc", 1, allocator);
+			build_doc.AddMember("MsgResult", 1, allocator);
+			build_doc.AddMember("MsgErrorReason", "CTP交易已断开连接", allocator);
+			build_doc.Accept(writer);
+
+			list<int>::iterator int_itor;
+			for (int_itor = m_itor->second->begin(); int_itor != m_itor->second->end(); int_itor++)
+			{
+				if (write_msg((*int_itor), const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
+					printf("先前客户端已断开!!!\n");
+					//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
+					if (errno == EPIPE) {
+						std::cout << "EPIPE" << std::endl;
+						//break;
+					}
+					perror("protocal error");
+				}
+			}
 		}
 	}
 }
