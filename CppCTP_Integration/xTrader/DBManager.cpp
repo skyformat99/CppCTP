@@ -37,22 +37,38 @@ using std::unique_ptr;
 std::mutex update_futureaccount_mtx; // locks access to counter
 
 DBManager::DBManager() {
-	try
-	{
+	this->db_connect_status = true;
+	this->conn = NULL;
+	try {
 		this->conn = new mongo::DBClientConnection(false, 0, 5);
+	}
+	catch (const mongo::ConnectException &e) {
+		std::cout << "MongoDBæ— æ³•è®¿é—®!" << std::endl;
+		this->db_connect_status = false;
+	}
+	catch (const mongo::SocketException &e) {
+		std::cout << "MongoDBæ— æ³•è®¿é—®!" << std::endl;
+		this->db_connect_status = false;
+	}
+	catch (const mongo::DBException &e) {
+		std::cout << "MongoDBæ— æ³•è®¿é—®! é—®é¢˜:" << e.what() << std::endl;
+		this->db_connect_status = false;
+	}
+	try {
 		this->conn->connect("localhost");
-		USER_PRINT("Original DB Connection[DBManager::DBManager()]!");
-		USER_PRINT(conn);
 	}
-	catch (const mongo::SocketException& e)
-	{
-		std::cout << "MongoDBÎŞ·¨·ÃÎÊ!" << std::endl;
+	catch (const mongo::ConnectException &e) {
+		std::cout << "MongoDBæ— æ³•è®¿é—®!" << std::endl;
+		this->db_connect_status = false;
 	}
-	catch (const mongo::ConnectException& e) {
-		std::cout << "MongoDBÎŞ·¨·ÃÎÊ!" << std::endl;
+	catch (const mongo::SocketException &e) {
+		std::cout << "MongoDBæ— æ³•è®¿é—®!" << std::endl;
+		this->db_connect_status = false;
 	}
-	
-	//USER_PRINT(this->conn);
+	catch (const mongo::DBException &e) {
+		std::cout << "MongoDBæ— æ³•è®¿é—®! é—®é¢˜:" << e.what() << std::endl;
+		this->db_connect_status = false;
+	}
 }
 
 DBManager::~DBManager() {
@@ -74,17 +90,17 @@ mongo::DBClientConnection * DBManager::getDBConnection() {
 	}
 	catch (const mongo::SocketException& e)
 	{
-		std::cout << "MongoDBÎŞ·¨·ÃÎÊ!" << std::endl;
+		std::cout << "MongoDBæ— æ³•è®¿é—®!" << std::endl;
 		return NULL;
 	}
 	catch (const mongo::ConnectException& e) {
-		std::cout << "MongoDBÎŞ·¨·ÃÎÊ!" << std::endl;
+		std::cout << "MongoDBæ— æ³•è®¿é—®!" << std::endl;
 		return NULL;
 	}
 }
 
 /************************************************************************/
-/* ÉèÖÃ½»Ò×Ä£Ê½(simnow ÅÌÖĞ/ÀëÏß                                           */
+/* è®¾ç½®äº¤æ˜“æ¨¡å¼(simnow ç›˜ä¸­/ç¦»çº¿                                           */
 /************************************************************************/
 void DBManager::setIs_Online(bool is_online) {
 	this->is_online = is_online;
@@ -95,9 +111,9 @@ bool DBManager::getIs_Online() {
 }
 
 /************************************************************************/
-/* ²éÑ¯mongodbÊÇ·ñ´æÔÚ×ò³Ö²ÖÃ÷Ï¸(trade,order)¼¯ºÏ¡£
-Èç¹û´æÔÚËµÃ÷ÉÏ´Î³ÌĞòÕı³£¹Ø±Õ£»
-Èç¹û²»´æÔÚËµÃ÷³ÌĞò¹Ø±ÕÓĞÎó*/
+/* æŸ¥è¯¢mongodbæ˜¯å¦å­˜åœ¨æ˜¨æŒä»“æ˜ç»†(trade,order)é›†åˆã€‚
+å¦‚æœå­˜åœ¨è¯´æ˜ä¸Šæ¬¡ç¨‹åºæ­£å¸¸å…³é—­ï¼›
+å¦‚æœä¸å­˜åœ¨è¯´æ˜ç¨‹åºå…³é—­æœ‰è¯¯*/
 /************************************************************************/
 bool DBManager::CheckSystemStartFlag() {
 	std::cout << "DBManager::CheckSystemStartFlag()" << std::endl;
@@ -128,7 +144,7 @@ bool DBManager::CheckSystemStartFlag() {
 }
 
 
-// ´´½¨Trader
+// åˆ›å»ºTrader
 void DBManager::CreateTrader(Trader *op) {
 	
 	int count_number = 0;
@@ -262,7 +278,7 @@ bool DBManager::FindTraderByTraderIdAndPassword(string traderid, string password
 
 void DBManager::getAllTrader(list<string> *l_trader) {
 
-	/// ³õÊ¼»¯µÄÊ±ºò£¬±ØĞë±£Ö¤listÎª¿Õ
+	/// åˆå§‹åŒ–çš„æ—¶å€™ï¼Œå¿…é¡»ä¿è¯listä¸ºç©º
 	if (l_trader->size() > 0) {
 		list<string>::iterator Itor;
 		for (Itor = l_trader->begin(); Itor != l_trader->end();) {
@@ -294,7 +310,7 @@ void DBManager::getAllTrader(list<string> *l_trader) {
 }
 
 void DBManager::getAllObjTrader(list<Trader *> *l_trader) {
-	/// ³õÊ¼»¯µÄÊ±ºò£¬±ØĞë±£Ö¤listÎª¿Õ
+	/// åˆå§‹åŒ–çš„æ—¶å€™ï¼Œå¿…é¡»ä¿è¯listä¸ºç©º
 	if (l_trader->size() > 0) {
 		list<Trader *>::iterator Itor;
 		for (Itor = l_trader->begin(); Itor != l_trader->end();) {
@@ -366,14 +382,14 @@ void DBManager::CreateFutureAccount(Trader *op, FutureAccount *fa) {
 	if (op != NULL) {
 		trader_count_number = this->conn->count(DB_OPERATOR_COLLECTION,
 			BSON("traderid" << op->getTraderID()));
-		if (trader_count_number == 0) { //½»Ò×Ô±id²»´æÔÚ
+		if (trader_count_number == 0) { //äº¤æ˜“å‘˜idä¸å­˜åœ¨
 			cout << "Trader ID Not Exists!" << endl;
 		}
-		else { //½»Ò×Ô±´æÔÚ
+		else { //äº¤æ˜“å‘˜å­˜åœ¨
 			count_number = this->conn->count(DB_FUTUREACCOUNT_COLLECTION,
 				BSON("userid" << fa->getUserID()));
 
-			if (count_number > 0) { //ÆÚ»õÕË»§ÒÑ¾­´æÔÚ
+			if (count_number > 0) { //æœŸè´§è´¦æˆ·å·²ç»å­˜åœ¨
 				cout << "UserID Already Exists!" << endl;
 			}
 			else {
@@ -544,7 +560,7 @@ void DBManager::getAllFutureAccount(list<User *> *l_user) {
 		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount_panhou";
 	}
 
-	/// ³õÊ¼»¯µÄÊ±ºò£¬±ØĞë±£Ö¤listÎª¿Õ
+	/// åˆå§‹åŒ–çš„æ—¶å€™ï¼Œå¿…é¡»ä¿è¯listä¸ºç©º
 	if (l_user->size() > 0) {
 		list<User *>::iterator user_itor;
 		for (user_itor = l_user->begin(); user_itor != l_user->end();) {
@@ -590,7 +606,7 @@ int DBManager::CreateStrategy(Strategy *stg) {
 	}
 	else {
 		BSONObjBuilder b;
-		// Ôö¼ÓÊôĞÔ
+		// å¢åŠ å±æ€§
 		b.append("position_a_sell_today", stg->getStgPositionASellToday());
 		b.append("position_b_sell", stg->getStgPositionBSell());
 		b.append("spread_shift", stg->getStgSpreadShift());
@@ -621,7 +637,7 @@ int DBManager::CreateStrategy(Strategy *stg) {
 		b.append("sell_close_on_off", stg->getStgSellCloseOnOff());
 		b.append("buy_open_on_off", stg->getStgBuyOpenOnOff());
 
-		/*ĞÂÔö×Ö¶Î*/
+		/*æ–°å¢å­—æ®µ*/
 		b.append("trade_model", stg->getStgTradeModel());
 		b.append("hold_profit", stg->getStgHoldProfit());
 		b.append("close_profit", stg->getStgCloseProfit());
@@ -636,7 +652,7 @@ int DBManager::CreateStrategy(Strategy *stg) {
 		b.append("b_limit_price_shift", stg->getStgBLimitPriceShift());
 
 
-		// ´´½¨Ò»¸öÊı×é¶ÔÏó
+		// åˆ›å»ºä¸€ä¸ªæ•°ç»„å¯¹è±¡
 		BSONArrayBuilder bab;
 		bab.append(stg->getStgInstrumentIdA());
 		bab.append(stg->getStgInstrumentIdB());
@@ -800,7 +816,7 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 	}
 }
 void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, string userid) {
-	/// ³õÊ¼»¯µÄÊ±ºò£¬±ØĞë±£Ö¤listÎª¿Õ
+	/// åˆå§‹åŒ–çš„æ—¶å€™ï¼Œå¿…é¡»ä¿è¯listä¸ºç©º
 	if (l_strategys->size() > 0) {
 		list<Strategy *>::iterator Itor;
 		for (Itor = l_strategys->begin(); Itor != l_strategys->end();) {
@@ -811,9 +827,9 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 
 	unique_ptr<DBClientCursor> cursor;
 
-	if (traderid.compare("")) { //Èç¹ûtraderid²»Îª¿Õ
+	if (traderid.compare("")) { //å¦‚æœtraderidä¸ä¸ºç©º
 		
-		if (userid.compare("")) { //Èç¹ûuserid²»Îª¿Õ
+		if (userid.compare("")) { //å¦‚æœuseridä¸ä¸ºç©º
 			cursor = this->conn->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid << "is_active" << true));
 		}
 		else {
@@ -851,7 +867,7 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 		cout << "buy_open = " << p.getField("buy_open").Double() << ", ";
 		cout << "only_close = " << p.getIntField("only_close") << ", ";
 
-		/*ĞÂÔö×Ö¶Î*/
+		/*æ–°å¢å­—æ®µ*/
 
 		cout << "trade_model" << p.getStringField("trade_model") << ", ";
 		cout << "hold_profit" << p.getField("hold_profit").Double() << ", ";
@@ -892,7 +908,7 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 		stg->setStgSellCloseOnOff(p.getIntField("sell_close_on_off"));
 		stg->setStgBuyOpenOnOff(p.getIntField("buy_open_on_off"));
 
-		/*ĞÂÔö*/
+		/*æ–°å¢*/
 		stg->setStgTradeModel(p.getStringField("trade_model"));
 		stg->setStgOrderAlgorithm(p.getStringField("order_algorithm"));
 		stg->setStgHoldProfit(p.getField("hold_profit").Double());
@@ -958,7 +974,7 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<User *> *l_users, string traderid) {
 	USER_PRINT("getAllStrategyByActiveUser");
 	list<User *>::iterator user_itor;
-	/// ³õÊ¼»¯µÄÊ±ºò£¬±ØĞë±£Ö¤listÎª¿Õ
+	/// åˆå§‹åŒ–çš„æ—¶å€™ï¼Œå¿…é¡»ä¿è¯listä¸ºç©º
 	if (l_strategys->size() > 0) {
 		list<Strategy *>::iterator Itor;
 		for (Itor = l_strategys->begin(); Itor != l_strategys->end();) {
@@ -970,7 +986,7 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 	unique_ptr<DBClientCursor> cursor;
 
 	for (user_itor = l_users->begin(); user_itor != l_users->end(); user_itor++) {
-		if (traderid.compare("")) { //Èç¹ûtraderid²»Îª¿Õ
+		if (traderid.compare("")) { //å¦‚æœtraderidä¸ä¸ºç©º
 
 			cursor = this->conn->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << (*user_itor)->getUserID() << "is_active" << true));
 		}
@@ -1005,7 +1021,7 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 			cout << "buy_open = " << p.getField("buy_open").Double() << ", ";
 			cout << "only_close = " << p.getIntField("only_close") << ", ";
 
-			/*ĞÂÔö×Ö¶Î*/
+			/*æ–°å¢å­—æ®µ*/
 
 			cout << "trade_model" << p.getStringField("trade_model") << ", ";
 			cout << "hold_profit" << p.getField("hold_profit").Double() << ", ";
@@ -1050,7 +1066,7 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 			stg->setStgSellCloseOnOff(p.getIntField("sell_close_on_off"));
 			stg->setStgBuyOpenOnOff(p.getIntField("buy_open_on_off"));
 
-			/*ĞÂÔö*/
+			/*æ–°å¢*/
 			stg->setStgTradeModel(p.getStringField("trade_model"));
 			stg->setStgOrderAlgorithm(p.getStringField("order_algorithm"));
 			stg->setStgHoldProfit(p.getField("hold_profit").Double());
@@ -1115,10 +1131,10 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 
 
 /************************************************************************/
-/* ´´½¨²ßÂÔ(×ò²Ö)
-É¾³ı²ßÂÔ(×ò²Ö)
-¸üĞÂ²ßÂÔ(×ò²Ö)
-²éÕÒ²ßÂÔ(×ò²Ö)			                                                */
+/* åˆ›å»ºç­–ç•¥(æ˜¨ä»“)
+åˆ é™¤ç­–ç•¥(æ˜¨ä»“)
+æ›´æ–°ç­–ç•¥(æ˜¨ä»“)
+æŸ¥æ‰¾ç­–ç•¥(æ˜¨ä»“)			                                                */
 /************************************************************************/
 int DBManager::CreateStrategyYesterday(Strategy *stg) {
 	int count_number = 0;
@@ -1133,7 +1149,7 @@ int DBManager::CreateStrategyYesterday(Strategy *stg) {
 	}
 	else {
 		BSONObjBuilder b;
-		// Ôö¼ÓÊôĞÔ
+		// å¢åŠ å±æ€§
 		b.append("position_a_sell_today", stg->getStgPositionASellToday());
 		b.append("position_b_sell", stg->getStgPositionBSell());
 		b.append("spread_shift", stg->getStgSpreadShift());
@@ -1158,7 +1174,7 @@ int DBManager::CreateStrategyYesterday(Strategy *stg) {
 		b.append("buy_open", stg->getStgBuyOpen());
 		b.append("only_close", stg->isStgOnlyClose());
 
-		/*ĞÂÔö×Ö¶Î*/
+		/*æ–°å¢å­—æ®µ*/
 		b.append("trade_model", stg->getStgTradeModel());
 		b.append("hold_profit", stg->getStgHoldProfit());
 		b.append("close_profit", stg->getStgCloseProfit());
@@ -1173,7 +1189,7 @@ int DBManager::CreateStrategyYesterday(Strategy *stg) {
 		b.append("b_limit_price_shift", stg->getStgBLimitPriceShift());
 
 
-		// ´´½¨Ò»¸öÊı×é¶ÔÏó
+		// åˆ›å»ºä¸€ä¸ªæ•°ç»„å¯¹è±¡
 		BSONArrayBuilder bab;
 		bab.append(stg->getStgInstrumentIdA());
 		bab.append(stg->getStgInstrumentIdB());
@@ -1286,7 +1302,7 @@ void DBManager::UpdateStrategyYesterday(Strategy *stg) {
 }
 
 void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string traderid, string userid) {
-	/// ³õÊ¼»¯µÄÊ±ºò£¬±ØĞë±£Ö¤listÎª¿Õ
+	/// åˆå§‹åŒ–çš„æ—¶å€™ï¼Œå¿…é¡»ä¿è¯listä¸ºç©º
 	if (l_strategys->size() > 0) {
 		list<Strategy *>::iterator Itor;
 		for (Itor = l_strategys->begin(); Itor != l_strategys->end();) {
@@ -1297,9 +1313,9 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 
 	unique_ptr<DBClientCursor> cursor;
 
-	if (traderid.compare("")) { //Èç¹ûtraderid²»Îª¿Õ
+	if (traderid.compare("")) { //å¦‚æœtraderidä¸ä¸ºç©º
 
-		if (userid.compare("")) { //Èç¹ûuserid²»Îª¿Õ
+		if (userid.compare("")) { //å¦‚æœuseridä¸ä¸ºç©º
 			cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid << "is_active" << true));
 		}
 		else {
@@ -1337,7 +1353,7 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 		cout << "buy_open = " << p.getField("buy_open").Double() << ", ";
 		cout << "only_close = " << p.getIntField("only_close") << ", ";
 
-		/*ĞÂÔö×Ö¶Î*/
+		/*æ–°å¢å­—æ®µ*/
 
 		cout << "trade_model" << p.getStringField("trade_model") << ", ";
 		cout << "hold_profit" << p.getField("hold_profit").Double() << ", ";
@@ -1377,7 +1393,7 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 		stg->setStgSellCloseOnOff(p.getIntField("sell_close_on_off"));
 		stg->setStgBuyOpenOnOff(p.getIntField("buy_open_on_off"));
 
-		/*ĞÂÔö*/
+		/*æ–°å¢*/
 		stg->setStgTradeModel(p.getStringField("trade_model"));
 		stg->setStgOrderAlgorithm(p.getStringField("order_algorithm"));
 		stg->setStgHoldProfit(p.getField("hold_profit").Double());
@@ -1441,7 +1457,7 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 }
 
 void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Strategy *> *l_strategys, string traderid, string userid, string strategyid) {
-	/// ³õÊ¼»¯µÄÊ±ºò£¬±ØĞë±£Ö¤listÎª¿Õ
+	/// åˆå§‹åŒ–çš„æ—¶å€™ï¼Œå¿…é¡»ä¿è¯listä¸ºç©º
 	if (l_strategys->size() > 0) {
 		list<Strategy *>::iterator Itor;
 		for (Itor = l_strategys->begin(); Itor != l_strategys->end();) {
@@ -1452,11 +1468,11 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 
 	unique_ptr<DBClientCursor> cursor;
 
-	if (traderid.compare("")) { //Èç¹ûtraderid²»Îª¿Õ
+	if (traderid.compare("")) { //å¦‚æœtraderidä¸ä¸ºç©º
 
-		if (userid.compare("")) { //Èç¹ûuserid²»Îª¿Õ
+		if (userid.compare("")) { //å¦‚æœuseridä¸ä¸ºç©º
 
-			if (strategyid.compare("")) { //Èç¹ûstrategyid²»Îª¿Õ
+			if (strategyid.compare("")) { //å¦‚æœstrategyidä¸ä¸ºç©º
 				cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid << "strategy_id" << strategyid << "is_active" << true));
 			}
 			else {
@@ -1500,7 +1516,7 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 		cout << "only_close = " << p.getIntField("only_close") << ", ";
 
 
-		/*ĞÂÔö×Ö¶Î*/
+		/*æ–°å¢å­—æ®µ*/
 
 		cout << "trade_model" << p.getStringField("trade_model") << ", ";
 		cout << "hold_profit" << p.getField("hold_profit").Double() << ", ";
@@ -1538,7 +1554,7 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 
 
 
-		/*ĞÂÔö*/
+		/*æ–°å¢*/
 		stg->setStgTradeModel(p.getStringField("trade_model"));
 		stg->setStgOrderAlgorithm(p.getStringField("order_algorithm"));
 		stg->setStgHoldProfit(p.getField("hold_profit").Double());
@@ -1602,7 +1618,7 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 void DBManager::getAllStrategyYesterdayByActiveUser(list<Strategy *> *l_strategys, list<User *> *l_users, string traderid) {
 	USER_PRINT("getAllStrategyYesterdayByActiveUser");
 	list<User *>::iterator user_itor;
-	/// ³õÊ¼»¯µÄÊ±ºò£¬±ØĞë±£Ö¤listÎª¿Õ
+	/// åˆå§‹åŒ–çš„æ—¶å€™ï¼Œå¿…é¡»ä¿è¯listä¸ºç©º
 	if (l_strategys->size() > 0) {
 		list<Strategy *>::iterator Itor;
 		for (Itor = l_strategys->begin(); Itor != l_strategys->end();) {
@@ -1614,7 +1630,7 @@ void DBManager::getAllStrategyYesterdayByActiveUser(list<Strategy *> *l_strategy
 	unique_ptr<DBClientCursor> cursor;
 
 	for (user_itor = l_users->begin(); user_itor != l_users->end(); user_itor++) {
-		if (traderid.compare("")) { //Èç¹ûtraderid²»Îª¿Õ
+		if (traderid.compare("")) { //å¦‚æœtraderidä¸ä¸ºç©º
 
 			cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << (*user_itor)->getUserID() << "is_active" << true));
 		}
@@ -1649,7 +1665,7 @@ void DBManager::getAllStrategyYesterdayByActiveUser(list<Strategy *> *l_strategy
 			cout << "buy_open = " << p.getField("buy_open").Double() << ", ";
 			cout << "only_close = " << p.getIntField("only_close") << ", ";
 
-			/*ĞÂÔö×Ö¶Î*/
+			/*æ–°å¢å­—æ®µ*/
 
 			cout << "trade_model" << p.getStringField("trade_model") << ", ";
 			cout << "hold_profit" << p.getField("hold_profit").Double() << ", ";
@@ -1689,7 +1705,7 @@ void DBManager::getAllStrategyYesterdayByActiveUser(list<Strategy *> *l_strategy
 			stg->setStgSellCloseOnOff(p.getIntField("sell_close_on_off"));
 			stg->setStgBuyOpenOnOff(p.getIntField("buy_open_on_off"));
 
-			/*ĞÂÔö*/
+			/*æ–°å¢*/
 			stg->setStgTradeModel(p.getStringField("trade_model"));
 			stg->setStgOrderAlgorithm(p.getStringField("order_algorithm"));
 			stg->setStgHoldProfit(p.getField("hold_profit").Double());
@@ -1753,11 +1769,11 @@ void DBManager::getAllStrategyYesterdayByActiveUser(list<Strategy *> *l_strategy
 }
 
 /************************************************************************/
-/* ´´½¨MDÅäÖÃ
-É¾³ıMDÅäÖÃ
-¸üĞÂMDÅäÖÃ
-»ñÈ¡ËùÓĞMDÅäÖÃ
-»ñÈ¡Ò»ÌõMD¼ÇÂ¼															*/
+/* åˆ›å»ºMDé…ç½®
+åˆ é™¤MDé…ç½®
+æ›´æ–°MDé…ç½®
+è·å–æ‰€æœ‰MDé…ç½®
+è·å–ä¸€æ¡MDè®°å½•															*/
 /************************************************************************/
 void DBManager::CreateMarketConfig(MarketConfig *mc) {
 	string DB_MARKETCONFIG_COLLECTION;
@@ -1854,7 +1870,7 @@ void DBManager::getAllMarketConfig(list<MarketConfig *> *l_marketconfig) {
 	{
 		DB_MARKETCONFIG_COLLECTION = "CTP.marketconfig_panhou";
 	}
-	/// ³õÊ¼»¯µÄÊ±ºò£¬±ØĞë±£Ö¤listÎª¿Õ
+	/// åˆå§‹åŒ–çš„æ—¶å€™ï¼Œå¿…é¡»ä¿è¯listä¸ºç©º
 	if (l_marketconfig->size() > 0) {
 		list<MarketConfig *>::iterator market_itor;
 		for (market_itor = l_marketconfig->begin(); market_itor != l_marketconfig->end();) {
@@ -1928,10 +1944,10 @@ MarketConfig * DBManager::getOneMarketConfig() {
 }
 
 /************************************************************************/
-/*  ´´½¨Ëã·¨
-É¾³ıËã·¨
-¸üĞÂËã·¨
-»ñÈ¡Ëã·¨															*/
+/*  åˆ›å»ºç®—æ³•
+åˆ é™¤ç®—æ³•
+æ›´æ–°ç®—æ³•
+è·å–ç®—æ³•															*/
 /************************************************************************/
 void DBManager::CreateAlgorithm(Algorithm *alg) {
 	int count_number = 0;
@@ -1984,7 +2000,7 @@ void DBManager::UpdateAlgorithm(Algorithm *alg) {
 
 }
 void DBManager::getAllAlgorithm(list<Algorithm *> *l_alg) {
-	/// ³õÊ¼»¯µÄÊ±ºò£¬±ØĞë±£Ö¤listÎª¿Õ
+	/// åˆå§‹åŒ–çš„æ—¶å€™ï¼Œå¿…é¡»ä¿è¯listä¸ºç©º
 	if (l_alg->size() > 0) {
 		list<Algorithm *>::iterator alg_itor;
 		for (alg_itor = l_alg->begin(); alg_itor != l_alg->end();) {
@@ -2015,9 +2031,9 @@ void DBManager::getAllAlgorithm(list<Algorithm *> *l_alg) {
 
 #if 0
 /************************************************************************/
-/* ´´½¨sessionid
-É¾³ısessionid
-»ñÈ¡sessionid*/
+/* åˆ›å»ºsessionid
+åˆ é™¤sessionid
+è·å–sessionid*/
 /************************************************************************/
 void DBManager::CreateSession(Session *sid) {
 
@@ -2026,11 +2042,11 @@ void DBManager::CreateSession(Session *sid) {
 	if (sid != NULL) {
 		session_id_count_number = this->conn->count(DB_SESSIONS_COLLECTION,
 			BSON("sessionid" << sid->getSessionID()));
-		if (session_id_count_number != 0) { //session_id´æÔÚ
-			std::cout << "Session ID ÒÑ¾­´æÔÚÁË!" << std::endl;
+		if (session_id_count_number != 0) { //session_idå­˜åœ¨
+			std::cout << "Session ID å·²ç»å­˜åœ¨äº†!" << std::endl;
 			return;
 		}
-		else { //SessionID²»´æÔÚ
+		else { //SessionIDä¸å­˜åœ¨
 			BSONObjBuilder b;
 
 			b.append("userid", sid->getUserID());
@@ -2057,7 +2073,7 @@ void DBManager::DeleteSession(Session *sid) {
 
 
 void DBManager::getAllSession(list<Session *> *l_sessions) {
-	/// ³õÊ¼»¯µÄÊ±ºò£¬±ØĞë±£Ö¤listÎª¿Õ
+	/// åˆå§‹åŒ–çš„æ—¶å€™ï¼Œå¿…é¡»ä¿è¯listä¸ºç©º
 	if (l_sessions->size() > 0) {
 		list<Session *>::iterator Itor;
 		for (Itor = l_sessions->begin(); Itor != l_sessions->end();) {
@@ -2091,9 +2107,9 @@ void DBManager::getAllSession(list<Session *> *l_sessions) {
 
 /************************************************************************/
 /*
-´´½¨³Ö²ÖÃ÷Ï¸
-É¾³ı³Ö²ÖÃ÷Ï¸
-¸üĞÂ³Ö²ÖÃ÷Ï¸*/
+åˆ›å»ºæŒä»“æ˜ç»†
+åˆ é™¤æŒä»“æ˜ç»†
+æ›´æ–°æŒä»“æ˜ç»†*/
 /************************************************************************/
 void DBManager::CreatePositionDetail(PositionDetail *posd) {
 	USER_PRINT("DBManager::CreatePositionDetail");
@@ -2103,11 +2119,11 @@ void DBManager::CreatePositionDetail(PositionDetail *posd) {
 	if (posd != NULL) {
 		posd_count_num = this->conn->count(DB_POSITIONDETAIL_COLLECTION,
 			BSON("userid" << posd->getUserID() << "strategyid" << posd->getStrategyID() << "tradingday" << posd->getTradingDay() << "is_active" << ISACTIVE));
-		if (posd_count_num != 0) { //session_id´æÔÚ
-			std::cout << "³Ö²ÖÃ÷Ï¸ÒÑ¾­´æÔÚÁË!" << std::endl;
+		if (posd_count_num != 0) { //session_idå­˜åœ¨
+			std::cout << "æŒä»“æ˜ç»†å·²ç»å­˜åœ¨äº†!" << std::endl;
 			return;
 		}
-		else { //posd ²»´æÔÚ
+		else { //posd ä¸å­˜åœ¨
 			BSONObjBuilder b;
 
 			b.append("instrumentid", posd->getInstrumentID());
@@ -2143,11 +2159,11 @@ void DBManager::CreatePositionDetail(USER_CThostFtdcOrderField *posd) {
 	if (posd != NULL) {
 		posd_count_num = this->conn->count(DB_POSITIONDETAIL_COLLECTION,
 			BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "is_active" << ISACTIVE));
-		if (posd_count_num != 0) { //session_id´æÔÚ
-			std::cout << "³Ö²ÖÃ÷Ï¸ÒÑ¾­´æÔÚÁË!" << std::endl;
+		if (posd_count_num != 0) { //session_idå­˜åœ¨
+			std::cout << "æŒä»“æ˜ç»†å·²ç»å­˜åœ¨äº†!" << std::endl;
 			return;
 		}
-		else { //posd ²»´æÔÚ
+		else { //posd ä¸å­˜åœ¨
 			BSONObjBuilder b;
 
 			b.append("instrumentid", posd->InstrumentID);
@@ -2223,7 +2239,7 @@ void DBManager::UpdatePositionDetail(USER_CThostFtdcOrderField *posd) {
 		USER_PRINT("DBManager::UpdatePositionDetail ok");
 	}
 	else {
-		cout << "¸üĞÂ½ñ³Ö²ÖÃ÷Ï¸,²»´æÔÚ!" << endl;
+		cout << "æ›´æ–°ä»ŠæŒä»“æ˜ç»†,ä¸å­˜åœ¨!" << endl;
 	}
 
 	USER_PRINT("DBManager::UpdatePositionDetail OK");
@@ -2234,7 +2250,7 @@ void DBManager::UpdatePositionDetail(USER_CThostFtdcOrderField *posd) {
 void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, string traderid, string userid) {
 	USER_PRINT("DBManager::getAllPositionDetail");
 	
-	/// ³õÊ¼»¯µÄÊ±ºò£¬±ØĞë±£Ö¤listÎª¿Õ
+	/// åˆå§‹åŒ–çš„æ—¶å€™ï¼Œå¿…é¡»ä¿è¯listä¸ºç©º
 	if (l_posd->size() > 0) {
 		list<USER_CThostFtdcOrderField *>::iterator itor;
 		for (itor = l_posd->begin(); itor != l_posd->end();) {
@@ -2245,9 +2261,9 @@ void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, 
 
 	unique_ptr<DBClientCursor> cursor;
 
-	if (traderid.compare("")) { //Èç¹ûtraderid²»Îª¿Õ
+	if (traderid.compare("")) { //å¦‚æœtraderidä¸ä¸ºç©º
 
-		if (userid.compare("")) { //Èç¹ûuserid²»Îª¿Õ
+		if (userid.compare("")) { //å¦‚æœuseridä¸ä¸ºç©º
 			cursor = this->conn->query(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("userid" << userid << "is_active" << ISACTIVE));
 		}
 		else {
@@ -2326,11 +2342,11 @@ void DBManager::CreatePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
 	if (posd != NULL) {
 		posd_count_num = this->conn->count(DB_POSITIONDETAIL_YESTERDAY_COLLECTION,
 			BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
-		if (posd_count_num != 0) { //session_id´æÔÚ
-			std::cout << "³Ö²ÖÃ÷Ï¸ÒÑ¾­´æÔÚÁË!" << std::endl;
+		if (posd_count_num != 0) { //session_idå­˜åœ¨
+			std::cout << "æŒä»“æ˜ç»†å·²ç»å­˜åœ¨äº†!" << std::endl;
 			return;
 		}
-		else { //posd ²»´æÔÚ
+		else { //posd ä¸å­˜åœ¨
 			BSONObjBuilder b;
 
 			b.append("instrumentid", posd->InstrumentID);
@@ -2371,7 +2387,7 @@ void DBManager::DeletePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
 		USER_PRINT("DBManager::DeletePositionDetail ok");
 	}
 	else {
-		cout << "É¾³ı×ò³Ö²ÖÃ÷Ï¸,³Ö²ÖÃ÷Ï¸²»´æÔÚ!" << endl;
+		cout << "åˆ é™¤æ˜¨æŒä»“æ˜ç»†,æŒä»“æ˜ç»†ä¸å­˜åœ¨!" << endl;
 	}
 	USER_PRINT("DBManager::DeletePositionDetailYesterday OK");
 }
@@ -2405,7 +2421,7 @@ void DBManager::UpdatePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
 		USER_PRINT("DBManager::UpdatePositionDetailYesterday ok");
 	}
 	else {
-		cout << "¸üĞÂ×ò³Ö²ÖÃ÷Ï¸,³Ö²ÖÃ÷Ï¸Î´ÕÒµ½!" << endl;
+		cout << "æ›´æ–°æ˜¨æŒä»“æ˜ç»†,æŒä»“æ˜ç»†æœªæ‰¾åˆ°!" << endl;
 	}
 	USER_PRINT("DBManager::UpdatePositionDetailYesterday OK");
 }
@@ -2414,7 +2430,7 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 	string traderid, string userid) {
 	USER_PRINT("DBManager::getAllPositionDetailYesterday");
 
-	/// ³õÊ¼»¯µÄÊ±ºò£¬±ØĞë±£Ö¤listÎª¿Õ
+	/// åˆå§‹åŒ–çš„æ—¶å€™ï¼Œå¿…é¡»ä¿è¯listä¸ºç©º
 	if (l_posd->size() > 0) {
 		list<USER_CThostFtdcOrderField *>::iterator itor;
 		for (itor = l_posd->begin(); itor != l_posd->end();) {
@@ -2425,21 +2441,21 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 
 	unique_ptr<DBClientCursor> cursor;
 
-	if (traderid.compare("")) { //Èç¹ûtraderid²»Îª¿Õ
+	if (traderid.compare("")) { //å¦‚æœtraderidä¸ä¸ºç©º
 
-		USER_PRINT("Èç¹ûtraderid²»Îª¿Õ");
+		USER_PRINT("å¦‚æœtraderidä¸ä¸ºç©º");
 
-		if (userid.compare("")) { //Èç¹ûuserid²»Îª¿Õ
-			USER_PRINT("Èç¹ûuserid²»Îª¿Õ");
+		if (userid.compare("")) { //å¦‚æœuseridä¸ä¸ºç©º
+			USER_PRINT("å¦‚æœuseridä¸ä¸ºç©º");
 			cursor = this->conn->query(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, MONGO_QUERY("userid" << userid << "is_active" << ISACTIVE));
 		}
 		else {
-			USER_PRINT("Èç¹ûuseridÎª¿Õ");
+			USER_PRINT("å¦‚æœuseridä¸ºç©º");
 			cursor = this->conn->query(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 		}
 	}
 	else {
-		USER_PRINT("Èç¹ûtraderidÎª¿Õ");
+		USER_PRINT("å¦‚æœtraderidä¸ºç©º");
 		cursor = this->conn->query(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 	}
 
@@ -2521,7 +2537,7 @@ void DBManager::UpdatePositionDetailTrade(USER_CThostFtdcTradeField *posd) {
 		USER_PRINT("DBManager::UpdatePositionDetail ok");
 	}
 	else {
-		cout << "¸üĞÂ½ñ³Ö²ÖÃ÷Ï¸trade,²»´æÔÚ!" << endl;
+		cout << "æ›´æ–°ä»ŠæŒä»“æ˜ç»†trade,ä¸å­˜åœ¨!" << endl;
 	}
 
 	USER_PRINT("DBManager::UpdatePositionDetailTrade OK");
@@ -2530,7 +2546,7 @@ void DBManager::UpdatePositionDetailTrade(USER_CThostFtdcTradeField *posd) {
 void DBManager::getAllPositionDetailTrade(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id, string userid) {
 	USER_PRINT("DBManager::getAllPositionDetailTrade");
 
-	/// ³õÊ¼»¯µÄÊ±ºò£¬±ØĞë±£Ö¤listÎª¿Õ
+	/// åˆå§‹åŒ–çš„æ—¶å€™ï¼Œå¿…é¡»ä¿è¯listä¸ºç©º
 	if (l_posd->size() > 0) {
 		list<USER_CThostFtdcTradeField *>::iterator itor;
 		for (itor = l_posd->begin(); itor != l_posd->end();) {
@@ -2541,9 +2557,9 @@ void DBManager::getAllPositionDetailTrade(list<USER_CThostFtdcTradeField *> *l_p
 
 	unique_ptr<DBClientCursor> cursor;
 
-	if (trader_id.compare("")) { //Èç¹ûtraderid²»Îª¿Õ
+	if (trader_id.compare("")) { //å¦‚æœtraderidä¸ä¸ºç©º
 
-		if (userid.compare("")) { //Èç¹ûuserid²»Îª¿Õ
+		if (userid.compare("")) { //å¦‚æœuseridä¸ä¸ºç©º
 			cursor = this->conn->query(DB_POSITIONDETAIL_TRADE_COLLECTION, MONGO_QUERY("userid" << userid << "is_active" << ISACTIVE));
 		}
 		else {
@@ -2610,11 +2626,11 @@ void DBManager::CreatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *po
 	if (posd != NULL) {
 		posd_count_num = this->conn->count(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION,
 			BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
-		if (posd_count_num != 0) { //session_id´æÔÚ
-			std::cout << "³Ö²ÖÃ÷Ï¸tradeÒÑ¾­´æÔÚÁË!" << std::endl;
+		if (posd_count_num != 0) { //session_idå­˜åœ¨
+			std::cout << "æŒä»“æ˜ç»†tradeå·²ç»å­˜åœ¨äº†!" << std::endl;
 			return;
 		}
-		else { //posd ²»´æÔÚ
+		else { //posd ä¸å­˜åœ¨
 			BSONObjBuilder b;
 
 			b.append("instrumentid", posd->InstrumentID);
@@ -2651,7 +2667,7 @@ void DBManager::DeletePositionDetailTradeYesterday(USER_CThostFtdcTradeField *po
 		USER_PRINT("DBManager::DeletePositionDetailTradeYesterday ok");
 	}
 	else {
-		cout << "É¾³ı×ò³Ö²ÖÃ÷Ï¸,³Ö²ÖÃ÷Ï¸²»´æÔÚ!" << endl;
+		cout << "åˆ é™¤æ˜¨æŒä»“æ˜ç»†,æŒä»“æ˜ç»†ä¸å­˜åœ¨!" << endl;
 	}
 	USER_PRINT("DBManager::DeletePositionDetailTradeYesterday OK");
 }
@@ -2680,7 +2696,7 @@ void DBManager::UpdatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *po
 		USER_PRINT("DBManager::UpdatePositionDetailTradeYesterday ok");
 	}
 	else {
-		cout << "¸üĞÂ×ò³Ö²ÖÃ÷Ï¸,³Ö²ÖÃ÷Ï¸Î´ÕÒµ½!" << endl;
+		cout << "æ›´æ–°æ˜¨æŒä»“æ˜ç»†,æŒä»“æ˜ç»†æœªæ‰¾åˆ°!" << endl;
 	}
 	USER_PRINT("DBManager::UpdatePositionDetailTradeYesterday OK");
 }
@@ -2688,7 +2704,7 @@ void DBManager::UpdatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *po
 void DBManager::getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id, string userid) {
 	USER_PRINT("DBManager::getAllPositionDetailYesterday");
 
-	/// ³õÊ¼»¯µÄÊ±ºò£¬±ØĞë±£Ö¤listÎª¿Õ
+	/// åˆå§‹åŒ–çš„æ—¶å€™ï¼Œå¿…é¡»ä¿è¯listä¸ºç©º
 	if (l_posd->size() > 0) {
 		list<USER_CThostFtdcTradeField *>::iterator itor;
 		for (itor = l_posd->begin(); itor != l_posd->end();) {
@@ -2699,21 +2715,21 @@ void DBManager::getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeFiel
 
 	unique_ptr<DBClientCursor> cursor;
 
-	if (trader_id.compare("")) { //Èç¹ûtraderid²»Îª¿Õ
+	if (trader_id.compare("")) { //å¦‚æœtraderidä¸ä¸ºç©º
 
-		USER_PRINT("Èç¹ûtraderid²»Îª¿Õ");
+		USER_PRINT("å¦‚æœtraderidä¸ä¸ºç©º");
 
-		if (userid.compare("")) { //Èç¹ûuserid²»Îª¿Õ
-			USER_PRINT("Èç¹ûuserid²»Îª¿Õ");
+		if (userid.compare("")) { //å¦‚æœuseridä¸ä¸ºç©º
+			USER_PRINT("å¦‚æœuseridä¸ä¸ºç©º");
 			cursor = this->conn->query(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION, MONGO_QUERY("userid" << userid << "is_active" << ISACTIVE));
 		}
 		else {
-			USER_PRINT("Èç¹ûuseridÎª¿Õ");
+			USER_PRINT("å¦‚æœuseridä¸ºç©º");
 			cursor = this->conn->query(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 		}
 	}
 	else {
-		USER_PRINT("Èç¹ûtraderidÎª¿Õ");
+		USER_PRINT("å¦‚æœtraderidä¸ºç©º");
 		cursor = this->conn->query(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 	}
 
@@ -2772,7 +2788,7 @@ void DBManager::UpdateSystemRunningStatus(string value) {
 		this->conn->update(DB_SYSTEM_RUNNING_STATUS_COLLECTION, MONGO_QUERY("key" << DB_RUNNING_KEY), BSON("$set" << BSON("status" << value)));
 	}
 	else {
-		std::cout << "\t²éÕÒÊıÁ¿Îª0£¡" << std::endl;
+		std::cout << "\tæŸ¥æ‰¾æ•°é‡ä¸º0ï¼" << std::endl;
 	}
 	
 	USER_PRINT("DBManager::UpdateSystemRunningStatus ok");
@@ -2801,4 +2817,12 @@ void DBManager::setConn(mongo::DBClientConnection *conn) {
 
 mongo::DBClientConnection * DBManager::getConn() {
 	return this->conn;
+}
+
+void DBManager::setDB_Connect_Status(bool db_connect_status) {
+	this->db_connect_status = db_connect_status;
+}
+
+bool DBManager::getDB_Connect_Status() {
+	return this->db_connect_status;
 }

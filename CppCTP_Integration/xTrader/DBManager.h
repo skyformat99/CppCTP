@@ -198,9 +198,13 @@ public:
 	void setConn(mongo::DBClientConnection *conn);
 	mongo::DBClientConnection *getConn();
 
+	void setDB_Connect_Status(bool db_connect_status);
+	bool getDB_Connect_Status();
+
 private:
 	mongo::DBClientConnection *conn;
 	bool is_online;
+	bool db_connect_status;
 };
 
 #endif

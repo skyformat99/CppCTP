@@ -3530,6 +3530,11 @@ bool CTP_Manager::init(bool is_online) {
 
 	this->dbm->setIs_Online(is_online);
 	std::cout << "\t初始化网络环境完成..." << std::endl;
+	if (!this->dbm->getDBConnection()) {
+		std::cout << "\tMongoDB数据库连接有问题..." << std::endl;
+		init_flag = false;
+		return init_flag;
+	}
 
 	/// 数据库查询所有的Trader
 	this->dbm->getAllTrader(this->l_trader);
