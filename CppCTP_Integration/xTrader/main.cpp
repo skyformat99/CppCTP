@@ -19,8 +19,6 @@
 
 #include "ThostFtdcTraderApi.h"
 #include "TdSpi.h"
-#include "ThostFtdcMdApi.h"
-#include "MdSpi.h"
 #include "CTP_Manager.h"
 #include "Utils.h"
 #include "Debug.h"

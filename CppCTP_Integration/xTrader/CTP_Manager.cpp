@@ -1522,10 +1522,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								(*stg_itor)->setStgLots(object["lots"].GetInt());
 								(*stg_itor)->setStgLotsBatch(object["lots_batch"].GetInt());
 								(*stg_itor)->setStgStopLoss(object["stop_loss"].GetDouble());
-								(*stg_itor)->setOn_Off(object["on_off"].GetInt());
+								//(*stg_itor)->setOn_Off(object["on_off"].GetInt());
 								(*stg_itor)->setStgSpreadShift(object["spread_shift"].GetDouble());
-								(*stg_itor)->setStgInstrumentIdA(object["a_instrument_id"].GetString());
-								(*stg_itor)->setStgInstrumentIdB(object["b_instrument_id"].GetString());
+								//(*stg_itor)->setStgInstrumentIdA(object["a_instrument_id"].GetString());
+								//(*stg_itor)->setStgInstrumentIdB(object["b_instrument_id"].GetString());
 								(*stg_itor)->setStgALimitPriceShift(object["a_limit_price_shift"].GetInt());
 								(*stg_itor)->setStgBLimitPriceShift(object["b_limit_price_shift"].GetInt());
 								(*stg_itor)->setStgAWaitPriceTick(object["a_wait_price_tick"].GetDouble());
