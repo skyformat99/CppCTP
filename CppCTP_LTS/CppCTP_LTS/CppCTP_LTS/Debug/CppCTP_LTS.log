@@ -1,4 +1,4 @@
-﻿生成启动时间为 2017/3/25 13:20:58。
+﻿生成启动时间为 2017/3/27 9:31:59。
      1>项目“D:\CTP\CppCTP\CppCTP_LTS\CppCTP_LTS\CppCTP_LTS\CppCTP_LTS.vcxproj”在节点 2 上(Rebuild 个目标)。
      1>ClCompile:
          D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp MdClass.cpp
@@ -13,9 +13,9 @@
      1>d:\ctp\cppctp\cppctp_lts\cppctp_lts\cppctp_lts\include\securityftdcuserapidatatype.h(2078): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
      1>d:\ctp\cppctp\cppctp_lts\cppctp_lts\cppctp_lts\include\securityftdcuserapistruct.h(1020): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
      1>d:\ctp\cppctp\cppctp_lts\cppctp_lts\cppctp_lts\include\securityftdcuserapistruct.h(2074): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
-     1>d:\ctp\cppctp\cppctp_lts\cppctp_lts\cppctp_lts\mdclass.cpp(68): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>d:\ctp\cppctp\cppctp_lts\cppctp_lts\cppctp_lts\mdclass.cpp(70): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\program files (x86)\microsoft visual studio 12.0\vc\include\string.h(112) : 参见“strcpy”的声明
-     1>d:\ctp\cppctp\cppctp_lts\cppctp_lts\cppctp_lts\mdclass.cpp(84): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>d:\ctp\cppctp\cppctp_lts\cppctp_lts\cppctp_lts\mdclass.cpp(86): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  d:\program files (x86)\microsoft visual studio 12.0\vc\include\string.h(112) : 参见“strcpy”的声明
          main.cpp
      1>d:\ctp\cppctp\cppctp_lts\cppctp_lts\cppctp_lts\include\mdclass.h : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
@@ -36,4 +36,4 @@
 
 生成成功。
 
-已用时间 00:00:01.23
+已用时间 00:00:01.35

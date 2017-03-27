@@ -8,6 +8,8 @@ using std::endl;
 
 MdClass::MdClass(char *front_address, char *broker_id, char *user_id, char *password, const char *pszFlowPath)
 {
+	std::cout << "MdClass::MdClass()" << std::endl;
+
 	//行情API初始化
 	pMD = CSecurityFtdcMdApi::CreateFtdcMdApi(pszFlowPath);
 

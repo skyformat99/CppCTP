@@ -8,8 +8,8 @@ class MdClass;
 
 int main(char *, char *argv[]) {
 	int choice;
-	std::cout << "hello, world" << std::endl;
-	MdClass *md = new MdClass("tcp://211.144.195.163:54513", "2011", "010000040178", "", "conn/md");
+	//Level1ÐÐÇéµØÖ·
+	MdClass *md = new MdClass("tcp://180.166.216.228:24513", "2011", "010000040178", "7174516", "conn/md");
 	while (true)
 	{
 		std::cin >> choice;
