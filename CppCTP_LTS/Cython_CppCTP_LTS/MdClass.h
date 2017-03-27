@@ -58,8 +58,7 @@ public:
 	 bool IsErrorRspInfo(CSecurityFtdcRspInfoField *pRspInfo);
 
 	 ~MdClass();
-	   
-private:
-		CSecurityFtdcMdApi* pMD;
-		CSecurityFtdcReqUserLoginField LoginInfo;
+
+    CSecurityFtdcMdApi* pMD;
+    CSecurityFtdcReqUserLoginField LoginInfo;
 };

@@ -1898,7 +1898,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							create_info_object.AddMember("amount", new_stg->getStgAmount(), allocator);
 							create_info_object.AddMember("average_shift", new_stg->getStgAverageShift(), allocator);
 
-							rapidjson::Value instrument_array(rapidjson::kArrayType);
+							create_info_object.AddMember("a_instrument_id", rapidjson::StringRef(new_stg->getStgInstrumentIdA().c_str()), allocator);
+							create_info_object.AddMember("b_instrument_id", rapidjson::StringRef(new_stg->getStgInstrumentIdB().c_str()), allocator);
+
+							/*rapidjson::Value instrument_array(rapidjson::kArrayType);
 							for (int j = 0; j < 2; j++) {
 								rapidjson::Value instrument_object(rapidjson::kObjectType);
 								instrument_object.SetObject();
@@ -1911,7 +1914,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 								instrument_array.PushBack(instrument_object, allocator);
 							}
-							create_info_object.AddMember("list_instrument_id", instrument_array, allocator);
+							create_info_object.AddMember("list_instrument_id", instrument_array, allocator);*/
 							create_info_object.AddMember("position_a_buy_yesterday", new_stg->getStgPositionABuyYesterday(), allocator);
 							create_info_object.AddMember("user_id", rapidjson::StringRef(new_stg->getStgUserId().c_str()), allocator);
 							create_info_object.AddMember("position_a_buy_today", new_stg->getStgPositionABuyToday(), allocator);
