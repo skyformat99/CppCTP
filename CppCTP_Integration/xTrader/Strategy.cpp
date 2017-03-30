@@ -32,6 +32,12 @@ Strategy::Strategy(User *stg_user) {
 	this->buy_close_on_off = 1;				//买平-开关
 	this->buy_open_on_off = 1;				//买开-开关
 	this->sell_close_on_off = 1;			//卖平-开关
+
+	this->stg_position_a_sell = 0;			//持仓A卖
+	this->stg_position_b_buy = 0;			//持仓B买
+	this->stg_position_a_buy = 0;			//持仓A买
+	this->stg_position_b_sell = 0;			//持仓B卖
+
 	this->stg_a_limit_price_shift = 0;
 	this->stg_b_limit_price_shift = 0;
 	this->stg_is_active = true;				//默认策略均为激活状态
@@ -1972,10 +1978,10 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 		// 有撇腿
 		std::cout << "Strategy::Select_Order_Algorithm():" << std::endl;
 		std::cout << "\t(有撇腿)" << std::endl;
-		std::cout << "\t撇腿判断1" << this->stg_position_a_sell << std::endl;
-		std::cout << "\t撇腿判断2" << this->stg_position_b_buy << std::endl;
-		std::cout << "\t撇腿判断3" << this->stg_position_a_buy << std::endl;
-		std::cout << "\t撇腿判断4" << this->stg_position_b_sell << std::endl;
+		std::cout << "\t当前持仓情况(A卖,B买)(A买,B卖) = (" << this->stg_position_a_sell << ", " <<
+			this->stg_position_b_buy << ")(" <<
+			this->stg_position_a_buy << ", " <<
+			this->stg_position_b_sell << ")" << std::endl;
 		this->setStgSelectOrderAlgorithmFlag("Strategy::OnRtnDepthMarketData()_2", false); // 关闭下单锁
 		return;
 	}
