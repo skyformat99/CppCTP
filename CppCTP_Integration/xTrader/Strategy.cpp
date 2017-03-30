@@ -1972,6 +1972,10 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 		// 有撇腿
 		std::cout << "Strategy::Select_Order_Algorithm():" << std::endl;
 		std::cout << "\t(有撇腿)" << std::endl;
+		std::cout << "\t撇腿判断1" << this->stg_position_a_sell << std::endl;
+		std::cout << "\t撇腿判断2" << this->stg_position_b_buy << std::endl;
+		std::cout << "\t撇腿判断3" << this->stg_position_a_buy << std::endl;
+		std::cout << "\t撇腿判断4" << this->stg_position_b_sell << std::endl;
 		this->setStgSelectOrderAlgorithmFlag("Strategy::OnRtnDepthMarketData()_2", false); // 关闭下单锁
 		return;
 	}

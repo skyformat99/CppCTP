@@ -1,3 +1,4 @@
+# distutils: language=c++
 from SecurityFtdcUserApiDataType cimport *
 cdef extern from "SecurityFtdcUserApiStruct.h":
     #########################################################################

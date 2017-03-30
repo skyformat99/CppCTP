@@ -1,3 +1,4 @@
+# distutils: language=c++
 cdef extern from "SecurityFtdcUserApiDataType.h":
     # SSE[上交所] SZE[深交所] HGE[沪港通] SGE[深港通]
     cdef enum SECURITY_TE_RESUME_TYPE:
