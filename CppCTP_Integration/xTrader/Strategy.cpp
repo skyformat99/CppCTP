@@ -37,9 +37,43 @@ Strategy::Strategy(User *stg_user) {
 	this->stg_position_b_buy = 0;			//持仓B买
 	this->stg_position_a_buy = 0;			//持仓A买
 	this->stg_position_b_sell = 0;			//持仓B卖
+	this->stg_lots = 0;						//总手
+	this->stg_position_a_sell_yesterday = 0;//
+	this->stg_position_a_buy_yesterday = 0; //
+	this->stg_position_a_sell_today = 0;	//
+	this->stg_position_a_buy_today = 0;		//
 
-	this->stg_a_limit_price_shift = 0;
-	this->stg_b_limit_price_shift = 0;
+	this->stg_position_b_sell_yesterday = 0;//
+	this->stg_position_b_buy_yesterday = 0; //
+	this->stg_position_b_sell_today = 0;	//
+	this->stg_position_b_buy_today = 0;		//
+
+	this->stg_buy_close = 0;				//
+	this->stg_sell_open = 0;				//
+	this->stg_buy_open = 0;					//
+	this->stg_sell_close = 0;				//
+
+	this->stg_position_buy = 0;				//
+	this->stg_position_sell = 0;			//
+	this->stg_trade_volume = 0;				//成交量
+	this->stg_amount = 0;					//成交金额
+	this->stg_average_shift = 0;			//
+	this->stg_position = 0;					//总持仓
+	this->stg_spread_shift = 0;
+	this->stg_stop_loss = 0;
+	this->stg_lots_batch = 0;
+	this->stg_order_algorithm = "";
+	this->stg_a_order_action_tires_limit = 0;
+	this->stg_b_order_action_tires_limit = 0;
+	this->stg_trade_model = "";
+	this->stg_hold_profit = 0;				// 持仓盈亏
+	this->stg_close_profit = 0;				// 平仓盈亏
+	this->stg_commission = 0;				// 手续费
+
+	this->stg_a_wait_price_tick = 0;		// A合约挂单等待最小跳数
+	this->stg_b_wait_price_tick = 0;		// B合约挂单等待最小跳数
+	this->stg_a_limit_price_shift = 0;		// A合约报单偏移
+	this->stg_b_limit_price_shift = 0;		// B合约报单偏移
 	this->stg_is_active = true;				//默认策略均为激活状态
 	this->stg_trading_day = "";
 	this->stg_pending_a_open = 0;			//A开仓挂单
