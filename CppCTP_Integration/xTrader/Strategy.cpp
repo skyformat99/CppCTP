@@ -2126,10 +2126,10 @@ void Strategy::Order_Algorithm_One() {
 		(this->stg_user->GetTrader()->getOn_Off()) && 
 		(this->stg_user->getCTP_Manager()->getOn_Off()))) {
 		USER_PRINT("请检查开关状态!");
-		//this->printStrategyInfo("请检查开关状态!");
-		/*std::cout << "策略开关 = " << this->getOn_Off() << std::endl;
+		this->printStrategyInfo("请检查开关状态!");
+		std::cout << "策略开关 = " << this->getOn_Off() << std::endl;
 		std::cout << "期货账户开关 = " << this->stg_user->getOn_Off() << std::endl;
-		std::cout << "总开关 = " << this->stg_user->GetTrader()->getOn_Off() << std::endl;*/
+		std::cout << "总开关 = " << this->stg_user->GetTrader()->getOn_Off() << std::endl;
 		//this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One()_2", false);
 		return;
 	}
