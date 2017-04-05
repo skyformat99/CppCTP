@@ -3085,7 +3085,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 		
 		is_equal = Utils::compareTradingDay((*stg_itor)->getStgTradingDay().c_str(), this->getTradingDay().c_str());
 
-		std::cout << "\t对比结果 = " << flag << std::endl;
+		std::cout << "\t对比结果 = " << is_equal << std::endl;
 		std::cout << "\t今仓 userid = " << (*stg_itor)->getStgUserId() << std::endl;
 		std::cout << "\t今仓 strategy_id = " << (*stg_itor)->getStgStrategyId() << std::endl;
 
@@ -3121,7 +3121,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 			// 更新对应期货账户报单引用
 			this->dbm->UpdateFutureAccountOrderRef(this->dbm->getConn(), (*stg_itor)->getStgUser(), "1000000001");
 
-		} else { // 如果时间等于最新交易日,说明今天已经更新过策略，本次启动仓位即是上次服务端关闭时保存的持仓明细
+		} else { // 如果时间等于最新交易日,说明今天已经更新过策略
 			std::cout << "\t策略时间等于最新交易日,无需初始化" << std::endl;
 		}
 	}
@@ -3145,7 +3145,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 					// 记录更新时间为本交易日
 					strcpy((*position_itor)->TradingDayRecord, this->getTradingDay().c_str());
 					this->dbm->CreatePositionDetailYesterday((*position_itor));
-					//this->dbm->UpdatePositionDetail((*position_itor));
+					this->dbm->UpdatePositionDetail((*position_itor));
 				}
 			}
 		}
@@ -3194,7 +3194,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 					// 记录更新时间为本交易日
 					strcpy((*position_trade_itor)->TradingDayRecord, this->getTradingDay().c_str());
 					this->dbm->CreatePositionDetailTradeYesterday((*position_trade_itor));
-					//this->dbm->UpdatePositionDetailTrade((*position_trade_itor));
+					this->dbm->UpdatePositionDetailTrade((*position_trade_itor));
 				}
 			}
 

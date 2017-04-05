@@ -109,8 +109,8 @@ cdef extern int MdSpi_OnHeartBeatWarning(self, int nTimeLapse) except -1:
     return 0
 
 cdef extern int MdSpi_OnRspError(self, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
-    cdef CSecurityFtdcRspInfoField pypRspInfo
-    self.OnRspError(pRspInfo, nRequestID, bIsLast)
+    cdef CSecurityFtdcRspInfoField *pypRspInfo = pRspInfo
+    self.OnRspError(pypRspInfo, nRequestID, bIsLast)
     return 0
 
 cdef extern int MdSpi_OnRspUserLogin(self, CSecurityFtdcRspUserLoginField *pRspUserLogin, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
