@@ -900,6 +900,9 @@ void Strategy::CopyNewOrderData(USER_CThostFtdcOrderField *dst, USER_CThostFtdcO
 	///交易日
 	strcpy(dst->TradingDay, src->TradingDay);
 
+	///持仓明细
+	strcpy(dst->TradingDayRecord, src->TradingDay);
+
 	///结算编号
 	dst->SettlementID = src->SettlementID;
 
@@ -1237,7 +1240,7 @@ void Strategy::Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
 
 	if (count_number > 0) {
 		std::cout << "Strategy::Update_Position_Detail_To_DB()" << std::endl;
-		std::cout << "\t收盘保存昨持仓明细 找到!" << std::endl;
+		std::cout << "\t收盘保存昨持仓明细 找到(Order)!" << std::endl;
 		this->stg_save_strategy_conn->update(DB_POSITIONDETAIL_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON(
 			"instrumentid" << posd->InstrumentID 
 			<< "orderref" << posd->OrderRef
@@ -1265,8 +1268,8 @@ void Strategy::Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
 	}
 	else {
 		std::cout << "Strategy::Update_Position_Detail_To_DB()" << std::endl;
-		std::cout << "\t收盘保存昨持仓明细 未 找到!" << std::endl;
-		std::cout << "\t开始新建今持仓明细!" << std::endl;
+		std::cout << "\t收盘保存昨持仓明细 未 找到(Order)!" << std::endl;
+		std::cout << "\t开始新建今持仓明细(Order)!" << std::endl;
 		
 		BSONObjBuilder b;
 

@@ -2211,6 +2211,7 @@ void DBManager::DeletePositionDetail(PositionDetail *posd) {
 
 void DBManager::UpdatePositionDetail(USER_CThostFtdcOrderField *posd) {
 	USER_PRINT("DBManager::UpdatePositionDetail");
+	std::cout << "DBManager::UpdatePositionDetail()" << std::endl;
 	
 	int count_number = 0;
 
@@ -2218,6 +2219,8 @@ void DBManager::UpdatePositionDetail(USER_CThostFtdcOrderField *posd) {
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
+		
+		std::cout << "\tposd->TradingDayRecord = " << posd->TradingDayRecord << std::endl;
 		this->conn->update(DB_POSITIONDETAIL_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("instrumentid" << posd->InstrumentID
 			<< "orderref" << posd->OrderRef
 			<< "userid" << posd->UserID
@@ -2239,7 +2242,7 @@ void DBManager::UpdatePositionDetail(USER_CThostFtdcOrderField *posd) {
 		USER_PRINT("DBManager::UpdatePositionDetail ok");
 	}
 	else {
-		cout << "更新今持仓明细,不存在!" << endl;
+		std::cout << "更新今持仓明细,不存在!" << std::endl;
 	}
 
 	USER_PRINT("DBManager::UpdatePositionDetail OK");

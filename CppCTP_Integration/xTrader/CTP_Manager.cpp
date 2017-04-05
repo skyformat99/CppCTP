@@ -3133,6 +3133,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 	/************************************************************************/
 
 	if (this->l_posdetail->size() > 0) { // 如果今持仓明细有记录
+		std::cout << "\tCTP_Manager::initStrategyAndFutureAccount() 今持仓明细有记录(order)" << std::endl;
 		if (strcmp(this->l_posdetail->front()->TradingDayRecord, this->getTradingDay().c_str())) { //当今持仓明细第一条数据记录时间与CTP TradingDay时间不相等，清空操作昨持仓明细集合
 			this->dbm->DropPositionDetailYesterday();
 
