@@ -109,25 +109,26 @@ cdef extern int MdSpi_OnHeartBeatWarning(self, int nTimeLapse) except -1:
     return 0
 
 cdef extern int MdSpi_OnRspError(self, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
+    cdef CSecurityFtdcRspInfoField pypRspInfo
     self.OnRspError(pRspInfo, nRequestID, bIsLast)
     return 0
 
 cdef extern int MdSpi_OnRspUserLogin(self, CSecurityFtdcRspUserLoginField *pRspUserLogin, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
-    self.OnRspUserLogin(pRspUserLogin, pRspInfo, nRequestID, bIsLast)
+    # self.OnRspUserLogin(pRspUserLogin, pRspInfo, nRequestID, bIsLast)
     return 0
 
 cdef extern int MdSpi_OnRspUserLogout(self, CSecurityFtdcUserLogoutField *pUserLogout, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
-    self.OnRspUserLogout(pUserLogout, pRspInfo, nRequestID, bIsLast)
+    # self.OnRspUserLogout(pUserLogout, pRspInfo, nRequestID, bIsLast)
     return 0
 
 cdef extern int MdSpi_OnRspSubMarketData(self, CSecurityFtdcSpecificInstrumentField *pSpecificInstrument, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
-    self.OnRspSubMarketData(pSpecificInstrument, pRspInfo, nRequestID, bIsLast)
+    # self.OnRspSubMarketData(pSpecificInstrument, pRspInfo, nRequestID, bIsLast)
     return 0
 
 cdef extern int MdSpi_OnRspUnSubMarketData(self, CSecurityFtdcSpecificInstrumentField *pSpecificInstrument, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
-    self.OnRspUnSubMarketData(pSpecificInstrument, pRspInfo, nRequestID, bIsLast)
+    # self.OnRspUnSubMarketData(pSpecificInstrument, pRspInfo, nRequestID, bIsLast)
     return 0
 
 cdef extern int MdSpi_OnRtnDepthMarketData(self, CSecurityFtdcDepthMarketDataField *pDepthMarketData) except -1:
-    self.OnRtnDepthMarketData(pDepthMarketData)
+    # self.OnRtnDepthMarketData(pDepthMarketData)
     return 0

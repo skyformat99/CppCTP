@@ -62,7 +62,7 @@ cdef extern from "SecurityFtdcMdApi.h" namespace "CSecurityFtdcMdApi":
     CMdApi *CreateFtdcMdApi(const char *pszFlowPath)  nogil except +
 
 cdef extern from "SecurityFtdcMdApiImpl.h":
-    cdef cppclass CMdSpi "CSecurityFtdcMdSpi":
+    cdef cppclass CMdSpi:
         CMdSpi(PyObject *obj)
         long tid
     void ReleaseMdApi(CMdApi *api, CMdSpi *spi)

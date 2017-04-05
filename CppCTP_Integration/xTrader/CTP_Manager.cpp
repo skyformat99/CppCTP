@@ -3137,22 +3137,17 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 			this->dbm->DropPositionDetailYesterday();
 
 			for (position_itor = this->l_posdetail->begin(); position_itor != this->l_posdetail->end(); position_itor++) { // 遍历今持仓明细列表
-
-				if (!strcmp((*position_itor)->TradingDayRecord, this->getTradingDay().c_str())) // 日期相等
-				{
-					;
-				}
-				else { //日期不等
+				//日期不等
+				if (strcmp((*position_itor)->TradingDayRecord, this->getTradingDay().c_str())) {
 					// 删除昨持仓明细对象,如果存在就删除,没有跳出
 					// this->dbm->DeletePositionDetailYesterday((*position_itor));
 					// 创建新的策略昨仓
 					// 记录更新时间为本交易日
 					strcpy((*position_itor)->TradingDayRecord, this->getTradingDay().c_str());
 					this->dbm->CreatePositionDetailYesterday((*position_itor));
-					this->dbm->UpdatePositionDetail((*position_itor));
+					//this->dbm->UpdatePositionDetail((*position_itor));
 				}
 			}
-
 		}
 	}
 
@@ -3173,7 +3168,6 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 				(*stg_itor)->getStg_List_Position_Detail_From_Order()->push_back((*position_itor));
 
 			}
-
 		}
 	}
 
@@ -3200,7 +3194,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 					// 记录更新时间为本交易日
 					strcpy((*position_trade_itor)->TradingDayRecord, this->getTradingDay().c_str());
 					this->dbm->CreatePositionDetailTradeYesterday((*position_trade_itor));
-					this->dbm->UpdatePositionDetailTrade((*position_trade_itor));
+					//this->dbm->UpdatePositionDetailTrade((*position_trade_itor));
 				}
 			}
 
