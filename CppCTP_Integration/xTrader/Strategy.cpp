@@ -1236,6 +1236,8 @@ void Strategy::Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
+		std::cout << "Strategy::Update_Position_Detail_To_DB()" << std::endl;
+		std::cout << "\t收盘保存昨持仓明细 找到!" << std::endl;
 		this->stg_save_strategy_conn->update(DB_POSITIONDETAIL_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON(
 			"instrumentid" << posd->InstrumentID 
 			<< "orderref" << posd->OrderRef
@@ -1263,7 +1265,41 @@ void Strategy::Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
 	}
 	else {
 		std::cout << "Strategy::Update_Position_Detail_To_DB()" << std::endl;
-		std::cout << "\t收盘保存昨持仓明细未找到!" << std::endl;
+		std::cout << "\t收盘保存昨持仓明细 未 找到!" << std::endl;
+		std::cout << "\t开始新建今持仓明细!" << std::endl;
+		
+		BSONObjBuilder b;
+
+		b.append("userid", posd->UserID);
+		b.append("strategyid", posd->StrategyID);
+		b.append("tradingday", posd->TradingDay);
+		b.append("orderref", posd->OrderRef);
+		b.append("is_active", ISACTIVE);
+		b.append("instrumentid", posd->InstrumentID);
+		b.append("orderref", posd->OrderRef);
+		b.append("userid", posd->UserID);
+		b.append("direction", posd->Direction);
+		b.append("comboffsetflag", posd->CombOffsetFlag);
+		b.append("combhedgeflag", posd->CombHedgeFlag);
+		b.append("comboffsetflag", posd->CombOffsetFlag);
+		b.append("combhedgeflag", posd->CombHedgeFlag);
+		b.append("limitprice", posd->LimitPrice);
+		b.append("volumetotaloriginal", posd->VolumeTotalOriginal);
+		b.append("tradingday", posd->TradingDay);
+		b.append("tradingdayrecord", posd->TradingDayRecord);
+		b.append("orderstatus", posd->OrderStatus);
+		b.append("volumetraded", posd->VolumeTraded);
+		b.append("volumetotal", posd->VolumeTotal);
+		b.append("insertdate", posd->InsertDate);
+		b.append("inserttime", posd->InsertTime);
+		b.append("strategyid", posd->StrategyID);
+		b.append("volumetradedbatch", posd->VolumeTradedBatch);
+
+		BSONObj p = b.obj();
+		create_position_detail_mtx.lock();
+		this->stg_save_strategy_conn->insert(DB_POSITIONDETAIL_COLLECTION, p);
+		create_position_detail_mtx.unlock();
+		USER_PRINT("DBManager::CreatePositionTradeDetail ok");
 	}
 
 	USER_PRINT("Strategy::Update_Position_Detail_To_DB OK");
@@ -1315,7 +1351,7 @@ void Strategy::CreatePositionTradeDetail(USER_CThostFtdcTradeField *posd) {
 	USER_PRINT("Strategy::CreatePositionTradeDetail OK");
 }
 
-/// 数据库更新策略持仓明细
+/// 数据库更新策略持仓明细(Trade)
 void Strategy::Update_Position_Trade_Detail_To_DB(USER_CThostFtdcTradeField *posd) {
 	USER_PRINT("Strategy::Update_Position_Trade_Detail_To_DB");
 
@@ -1325,6 +1361,8 @@ void Strategy::Update_Position_Trade_Detail_To_DB(USER_CThostFtdcTradeField *pos
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
+		std::cout << "Strategy::Update_Position_Trade_Detail_To_DB()" << std::endl;
+		std::cout << "\t收盘保存昨持仓明细 已 找到(Trade)!" << std::endl;
 		this->stg_save_strategy_conn->update(DB_POSITIONDETAIL_TRADE_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON(
 			"instrumentid" << posd->InstrumentID
 			<< "orderref" << posd->OrderRef
@@ -1345,7 +1383,33 @@ void Strategy::Update_Position_Trade_Detail_To_DB(USER_CThostFtdcTradeField *pos
 	}
 	else {
 		std::cout << "Strategy::Update_Position_Trade_Detail_To_DB()" << std::endl;
-		std::cout << "\t收盘保存昨持仓明细未找到!" << std::endl;
+		std::cout << "\t收盘保存昨持仓明细 未 找到(Trade)!" << std::endl;
+		std::cout << "\t开始新建今持仓明细(Trade)!" << std::endl;
+
+		BSONObjBuilder b;
+
+		b.append("userid", posd->UserID);
+		b.append("strategyid", posd->StrategyID);
+		b.append("tradingday", posd->TradingDay);
+		b.append("orderref", posd->OrderRef);
+		b.append("is_active", ISACTIVE);
+		b.append("instrumentid", posd->InstrumentID);
+		b.append("orderref", posd->OrderRef);
+		b.append("userid", posd->UserID);
+		b.append("direction", posd->Direction);
+		b.append("offsetflag", posd->OffsetFlag);
+		b.append("hedgeflag", posd->HedgeFlag);
+		b.append("price", posd->Price);
+		b.append("tradingday", posd->TradingDay);
+		b.append("tradingdayrecord", posd->TradingDayRecord);
+		b.append("tradedate", posd->TradeDate);
+		b.append("strategyid", posd->StrategyID);
+		b.append("volume", posd->Volume);
+
+		BSONObj p = b.obj();
+		create_position_detail_mtx.lock();
+		this->stg_save_strategy_conn->insert(DB_POSITIONDETAIL_TRADE_COLLECTION, p);
+		create_position_detail_mtx.unlock();
 	}
 
 	USER_PRINT("Strategy::Update_Position_Trade_Detail_To_DB OK");

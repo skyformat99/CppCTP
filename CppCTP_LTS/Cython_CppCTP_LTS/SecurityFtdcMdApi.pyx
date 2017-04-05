@@ -2,108 +2,132 @@
 from libc cimport stdlib
 from SecurityFtdcMdApi cimport *
 
-cdef class pyMdApi:
-    cdef CMDApi *basePtr
-    cdef CMDSpi *spiPtr
-    def __cinit__(self, char *pszFlowPath = ""):
-        self.basePtr = CreateFtdcMdApi(pszFlowPath)
-        self.spiPtr = new CMDSpi()
-        pass
-    ###创建MdApi
-    ###@param pszFlowPath 存贮订阅信息文件的目录，默认为当前目录
-    ###@return 创建出的UserApi
-    ###modify for udp marketdata
-    # def CreateFtdcMdApi(self):
-    #     return self.basePtr
+cdef void MdApi_Release(MdApi self):
+    ReleaseMdApi(self.api, self.spi)
+    self.api = self.spi = NULL
 
-    ###删除接口对象本身
-    ###@remark 不再使用本接口对象时,调用该函数删除接口对象
+cdef class MdApi:
+    cdef CMdApi *api
+    cdef CMdSpi *spi
+
+    def __dealloc__(self):
+        MdApi_Release(self)
+
+    def Alive(self):
+        if self.spi is not NULL: return self.spi.tid
+        if self.api is not NULL: return False
+
+    def Create(self, const_char *pszFlowPath=""):
+        if self.api is not NULL: return
+        self.api = CreateFtdcMdApi(pszFlowPath)
+        CheckMemory(self.api)
+
     def Release(self):
-        self.basePtr.Release()
+        MdApi_Release(self)
 
-    ###初始化
-    ###@remark 初始化运行环境,只有调用后,接口才开始工作
     def Init(self):
-        self.basePtr.Init()
-        pass
+        if self.api is NULL or self.spi is not NULL: return
+        self.spi = new CMdSpi(<PyObject *>self)
+        CheckMemory(self.spi)
+        self.api.RegisterSpi(self.spi)
+        self.api.Init()
 
-    ###等待接口线程结束运行
-    ###@return 线程退出代码
     def Join(self):
-        self.basePtr.Join()
+        cdef int ret
+        if self.spi is NULL: return
+        with nogil: ret = self.api.Join()
+        return ret
 
-    ###获取当前交易日
-    ###@retrun 获取到的交易日
-    ###@remark 只有登录成功后,才能得到正确的交易日
     def GetTradingDay(self):
-        return self.basePtr.GetTradingDay()
-        pass
+        cdef const_char *ret
+        if self.spi is NULL: return
+        with nogil: ret = self.api.GetTradingDay()
+        return ret
 
-    ###注册前置机网络地址
-    ###@param pszFrontAddress：前置机网络地址。
-    ###@remark 网络地址的格式为：“protocol://ipaddress:port”，如：”tcp://127.0.0.1:17001”。
-    ###@remark “tcp”代表传输协议，“127.0.0.1”代表服务器地址。”17001”代表服务器端口号。
     def RegisterFront(self, char *pszFrontAddress):
-        return self.basePtr.RegisterFront(pszFrontAddress)
-        pass
+        if self.api is NULL: return
+        self.api.RegisterFront(pszFrontAddress)
 
-    ###注册回调接口
-    ###@param pSpi 派生自回调接口类的实例
-    def RegisterSpi(self):
-        self.basePtr.RegisterSpi(self.spiPtr)
-        pass
-
-    ###订阅行情。
-    ###@param ppInstrumentID 合约ID
-    ###@param nCount 要订阅/退订行情的合约个数
-    ###@remark
-    def SubscribeMarketData(self, pInstrumentIDs, char* pExchageID):
+    def SubscribeMarketData(self, pInstrumentIDs, char *pExchageID):
         cdef int nCount
         cdef char **ppInstrumentID
+        if self.spi is NULL: return
         nCount = len(pInstrumentIDs)
         ppInstrumentID = <char **>stdlib.malloc(sizeof(char *) * nCount)
+        CheckMemory(ppInstrumentID)
         try:
             for i from 0 <= i < nCount:
                 ppInstrumentID[i] = pInstrumentIDs[i]
-            nCount = self.basePtr.SubscribeMarketData(ppInstrumentID, nCount, pExchageID)
+            with nogil: nCount = self.api.SubscribeMarketData(ppInstrumentID, nCount, pExchageID)
         finally:
             stdlib.free(ppInstrumentID)
         return nCount
 
-    ###退订行情。
-    ###@param ppInstrumentID 合约ID
-    ###@param nCount 要订阅/退订行情的合约个数
-    ###@remark
-    def UnSubscribeMarketData(self, pInstrumentIDs, char* pExchageID):
+    def UnSubscribeMarketData(self, pInstrumentIDs, char *pExchageID):
         cdef int nCount
         cdef char **ppInstrumentID
+        if self.spi is NULL: return
         nCount = len(pInstrumentIDs)
         ppInstrumentID = <char **>stdlib.malloc(sizeof(char *) * nCount)
+        CheckMemory(ppInstrumentID)
         try:
             for i from 0 <= i < nCount:
                 ppInstrumentID[i] = pInstrumentIDs[i]
-            nCount = self.basePtr.UnSubscribeMarketData(ppInstrumentID, nCount, pExchageID)
+            with nogil: nCount = self.api.UnSubscribeMarketData(ppInstrumentID, nCount, pExchageID)
         finally:
             stdlib.free(ppInstrumentID)
         return nCount
 
-    ###用户登录请求
-    def ReqUserLogin(self, loginField, int nRequestID):
-        cdef CSecurityFtdcReqUserLoginField *loginFieldPtr
-        loginFieldPtr = <CSecurityFtdcReqUserLoginField *>stdlib.malloc(sizeof(CSecurityFtdcReqUserLoginField))
-        loginFieldPtr.BrokerID = loginField["BrokerID"]
-        loginFieldPtr.UserID = loginField["UserID"]
-        loginFieldPtr.Password = loginField["Password"]
-        self.basePtr.ReqUserLogin(loginFieldPtr, nRequestID)
-        stdlib.free(loginFieldPtr)
-        pass
+    def ReqUserLogin(self, pReqUserLogin, int nRequestID):
+        if self.spi is NULL: return
+        cdef CSecurityFtdcReqUserLoginField loginField
+        loginField.BrokerID = pReqUserLogin['BrokerID']
+        loginField.UserID = pReqUserLogin['UserID']
+        loginField.Password = pReqUserLogin['Password']
+        with nogil: nRequestID = self.api.ReqUserLogin(&loginField, nRequestID)
+        return nRequestID
 
-    ###登出请求
-    def ReqUserLogout(self, logoutField, int nRequestID):
-        cdef CSecurityFtdcUserLogoutField *logoutFieldPtr
-        logoutFieldPtr = <CSecurityFtdcUserLogoutField *>stdlib.malloc(sizeof(CSecurityFtdcUserLogoutField))
-        logoutFieldPtr.UserID = logoutField["UserID"]
-        logoutFieldPtr.BrokerID = logoutField["BrokerID"]
-        self.basePtr.ReqUserLogout(logoutFieldPtr, nRequestID)
-        stdlib.free(logoutFieldPtr)
-        pass
+    def ReqUserLogout(self, pUserLogout, int nRequestID):
+        if self.spi is NULL: return
+        cdef CSecurityFtdcUserLogoutField logoutField
+        logoutField.UserID = pUserLogout['UserID']
+        logoutField.BrokerID = pUserLogout['BrokerID']
+        with nogil: nRequestID = self.api.ReqUserLogout(&logoutField, nRequestID)
+        return nRequestID
+
+
+cdef extern int MdSpi_OnFrontConnected(self) except -1:
+    self.OnFrontConnected()
+    return 0
+
+cdef extern int MdSpi_OnFrontDisconnected(self, int nReason) except -1:
+    self.OnFrontDisconnected(nReason)
+    return 0
+
+cdef extern int MdSpi_OnHeartBeatWarning(self, int nTimeLapse) except -1:
+    self.OnHeartBeatWarning(nTimeLapse)
+    return 0
+
+cdef extern int MdSpi_OnRspError(self, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
+    self.OnRspError(pRspInfo, nRequestID, bIsLast)
+    return 0
+
+cdef extern int MdSpi_OnRspUserLogin(self, CSecurityFtdcRspUserLoginField *pRspUserLogin, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
+    self.OnRspUserLogin(pRspUserLogin, pRspInfo, nRequestID, bIsLast)
+    return 0
+
+cdef extern int MdSpi_OnRspUserLogout(self, CSecurityFtdcUserLogoutField *pUserLogout, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
+    self.OnRspUserLogout(pUserLogout, pRspInfo, nRequestID, bIsLast)
+    return 0
+
+cdef extern int MdSpi_OnRspSubMarketData(self, CSecurityFtdcSpecificInstrumentField *pSpecificInstrument, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
+    self.OnRspSubMarketData(pSpecificInstrument, pRspInfo, nRequestID, bIsLast)
+    return 0
+
+cdef extern int MdSpi_OnRspUnSubMarketData(self, CSecurityFtdcSpecificInstrumentField *pSpecificInstrument, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
+    self.OnRspUnSubMarketData(pSpecificInstrument, pRspInfo, nRequestID, bIsLast)
+    return 0
+
+cdef extern int MdSpi_OnRtnDepthMarketData(self, CSecurityFtdcDepthMarketDataField *pDepthMarketData) except -1:
+    self.OnRtnDepthMarketData(pDepthMarketData)
+    return 0

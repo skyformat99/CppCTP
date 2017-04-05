@@ -1,45 +1,14 @@
 # distutils: language=c++
 from SecurityFtdcMdApi cimport *
 from SecurityFtdcUserApiStruct cimport *
+from libc.string cimport const_char
+from libcpp cimport bool as cbool
+
+cdef extern from "Python.h":
+    ctypedef struct PyObject
 
 cdef extern from "SecurityFtdcMdApi.h":
-    cdef cppclass CMDSpi "CSecurityFtdcMdSpi":
-        ###当客户端与交易后台建立起通信连接时（还未登录前），该方法被调用。
-        void OnFrontConnected()
-
-        ###当客户端与交易后台通信连接断开时，该方法被调用。当发生这个情况后，API会自动重新连接，客户端可不做处理。
-        ###@param nReason 错误原因
-        ###        0x1001 网络读失败
-        ###        0x1002 网络写失败
-        ###        0x2001 接收心跳超时
-        ###        0x2002 发送心跳失败
-        ###        0x2003 收到错误报文
-        void OnFrontDisconnected(int nReason)
-
-        ###心跳超时警告。当长时间未收到报文时，该方法被调用。
-        ###@param nTimeLapse 距离上次接收报文的时间
-        void OnHeartBeatWarning(int nTimeLapse)
-
-        ###错误应答
-        void OnRspError(CSecurityFtdcRspInfoField *pRspInfo, int nRequestID,  bint bIsLast)
-
-        ###登录请求响应
-        void OnRspUserLogin(CSecurityFtdcRspUserLoginField *pRspUserLogin, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bint bIsLast)
-
-        ###登出请求响应
-        void OnRspUserLogout(CSecurityFtdcUserLogoutField *pUserLogout, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bint bIsLast)
-
-        ###订阅行情应答
-        void OnRspSubMarketData(CSecurityFtdcSpecificInstrumentField *pSpecificInstrument, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bint bIsLast)
-
-        ###取消订阅行情应答
-        void OnRspUnSubMarketData(CSecurityFtdcSpecificInstrumentField *pSpecificInstrument, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bint bIsLast)
-
-        ###深度行情通知
-        void OnRtnDepthMarketData(CSecurityFtdcDepthMarketDataField *pDepthMarketData)
-
-cdef extern from "SecurityFtdcMdApi.h":
-    cdef cppclass CMDApi "CSecurityFtdcMdApi":
+    cdef cppclass CMdApi "CSecurityFtdcMdApi":
         ###删除接口对象本身
         ###@remark 不再使用本接口对象时,调用该函数删除接口对象
         void Release() nogil
@@ -65,7 +34,7 @@ cdef extern from "SecurityFtdcMdApi.h":
 
         ###注册回调接口
         ###@param pSpi 派生自回调接口类的实例
-        void RegisterSpi(CMDSpi *pSpi) nogil
+        void RegisterSpi(CMdSpi *pSpi) nogil
 
         ###订阅行情。
         ###@param ppInstrumentID 合约ID
@@ -90,4 +59,12 @@ cdef extern from "SecurityFtdcMdApi.h" namespace "CSecurityFtdcMdApi":
     ###@param pszFlowPath 存贮订阅信息文件的目录，默认为当前目录
     ###@return 创建出的UserApi
     ###modify for udp marketdata
-    CMDApi *CreateFtdcMdApi(const char *pszFlowPath)  nogil except +
+    CMdApi *CreateFtdcMdApi(const char *pszFlowPath)  nogil except +
+
+cdef extern from "SecurityFtdcMdApiImpl.h":
+    cdef cppclass CMdSpi "CSecurityFtdcMdSpi":
+        CMdSpi(PyObject *obj)
+        long tid
+    void ReleaseMdApi(CMdApi *api, CMdSpi *spi)
+    int CheckMemory(void *) except 0
+
