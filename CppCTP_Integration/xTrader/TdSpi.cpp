@@ -1206,7 +1206,7 @@ void TdSpi::QryInvestorPositionDetail() {
 
 ///请求查询投资者持仓明细响应
 void TdSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-	std::cout << "bIsLast = " << bIsLast << ", 当前期货账户 = " << this->current_user->getUserID() << " 查询投资者持仓明细 In Thread = " << std::this_thread::get_id() << std::endl;
+	std::cout << "TdSpi::OnRspQryInvestorPositionDetail() bIsLast = " << bIsLast << ", 当前期货账户 = " << this->current_user->getUserID() << " 查询投资者持仓明细 In Thread = " << std::this_thread::get_id() << std::endl;
 	USER_PRINT("TdSpi::OnRspQryInvestorPositionDetail");
 	if (!this->IsErrorRspInfo(pRspInfo)) {
 		if (pInvestorPositionDetail) {
@@ -1281,7 +1281,7 @@ void TdSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField
 //请求查询投资者持仓响应
 void TdSpi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition,
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-	std::cout << "bIsLast = " << bIsLast << ", 当前期货账户 = " << this->current_user->getUserID() << " 查询投资者持仓 In Thread = " << std::this_thread::get_id() << std::endl;
+	std::cout << "TdSpi::OnRspQryInvestorPosition() bIsLast = " << bIsLast << ", 当前期货账户 = " << this->current_user->getUserID() << " 查询投资者持仓 In Thread = " << std::this_thread::get_id() << std::endl;
 	USER_PRINT("TdSpi::OnRspQryInvestorPosition");
 	if (!this->IsErrorRspInfo(pRspInfo)) {
 		if (pInvestorPosition) {

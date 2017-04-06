@@ -392,7 +392,7 @@ void User::addL_Position_Detail_From_CTP(CThostFtdcInvestorPositionDetailField *
 			// 找到标志位赋值
 			isFind = true;
 
-			if ((!strcmp(this->getTradingDay().c_str(), pInvestorPositionDetail->TradingDay))) //今天的持仓
+			if ((!strcmp(this->getTradingDay().c_str(), pInvestorPositionDetail->OpenDate))) //今天的持仓
 			{
 				if (pInvestorPositionDetail->Direction == '0') { // 今买
 					(*itor)->Buy_Today += pInvestorPositionDetail->Volume;

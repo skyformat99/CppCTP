@@ -90,9 +90,16 @@ cdef class MdApi:
         if self.spi is NULL: return
         print(">>> SecurityFtdcMdApi.pyx ReqUserLogin", pReqUserLogin, pReqUserLogin['BrokerID'])
         cdef CSecurityFtdcReqUserLoginField loginField
-        loginField.BrokerID = pReqUserLogin['BrokerID']
-        loginField.UserID = pReqUserLogin['UserID']
-        loginField.Password = pReqUserLogin['Password']
+        memset(loginField.UserID, 0, sizeof(loginField.UserID))
+        memset(loginField.BrokerID, 0, sizeof(loginField.BrokerID))
+        memset(loginField.Password, 0, sizeof(loginField.Password))
+        # loginField.BrokerID = pReqUserLogin['BrokerID']
+        # loginField.UserID = pReqUserLogin['UserID']
+        # loginField.Password = pReqUserLogin['Password']
+        strcpy(loginField.BrokerID, pReqUserLogin['BrokerID'])
+        strcpy(loginField.UserID, pReqUserLogin['UserID'])
+        strcpy(loginField.Password, pReqUserLogin['Password'])
+
         with nogil: nRequestID = self.api.ReqUserLogin(&loginField, nRequestID)
         return nRequestID
 

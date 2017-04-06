@@ -8,9 +8,9 @@ class MyMdApi(MdApi):
     def OnFrontConnected(self):
         print('OnFrontConnected: Login...')
         pReqUserLogin = {}
-        pReqUserLogin['BrokerID'] = b'00000002011'
-        pReqUserLogin['UserID'] = b'0000010000040178'
-        pReqUserLogin['Password'] = b'00000000000000000000000000000000007174516'
+        pReqUserLogin['BrokerID'] = b'2011'
+        pReqUserLogin['UserID'] = b'010000040178'
+        pReqUserLogin['Password'] = b'7174516'
 
         # pReqUserLogin = {}
         # pReqUserLogin['BrokerID'] = '2011'
