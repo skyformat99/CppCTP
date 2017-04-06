@@ -1663,6 +1663,10 @@ bool User::ComparePositionTotal() {
 	std::cout << "User::ComparePositionTotal()" << std::endl;
 	bool is_same_flag = true;
 
+	std::cout << "\tthis->l_position_detail_from_ctp->size() = " << this->l_position_detail_from_ctp->size() << std::endl;
+	std::cout << "\tthis->l_position_detail_from_local_order->size() = " << this->l_position_detail_from_local_order->size() << std::endl;
+	std::cout << "\tthis->l_position_detail_from_local_trade->size() = " << this->l_position_detail_from_local_trade->size() << std::endl;
+
 	//判断比较的长度,有其中一组长度不相等,即存在错误仓位
 	if ((this->l_position_detail_from_ctp->size() != this->l_position_detail_from_local_order->size()) ||
 		(this->l_position_detail_from_local_order->size() != this->l_position_detail_from_local_trade->size())) {

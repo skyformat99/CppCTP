@@ -109,17 +109,30 @@ cdef extern int MdSpi_OnHeartBeatWarning(self, int nTimeLapse) except -1:
     return 0
 
 cdef extern int MdSpi_OnRspError(self, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
-    # cdef CSecurityFtdcRspInfoField pypRspInfo
-    # pypRspInfo.ErrorID = pRspInfo.ErrorID
-    # pypRspInfo.ErrorMsg = pRspInfo.ErrorMsg
-    # self.OnRspError(pypRspInfo, nRequestID, bIsLast)
+    dict_pRspInfo = {}
+    dict_pRspInfo['ErrorMsg'] = pRspInfo.ErrorMsg
+    dict_pRspInfo['ErrorID'] = pRspInfo.ErrorID
+    self.OnRspError(dict_pRspInfo, nRequestID, bIsLast)
     return 0
 
 cdef extern int MdSpi_OnRspUserLogin(self, CSecurityFtdcRspUserLoginField *pRspUserLogin, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
-    # self.OnRspUserLogin(pRspUserLogin, pRspInfo, nRequestID, bIsLast)
+    dict_pRspUserLogin = {}
+    dict_pRspUserLogin['BrokerID'] = pRspUserLogin.BrokerID
+    dict_pRspUserLogin['UserID'] = pRspUserLogin.UserID
+    dict_pRspUserLogin['FrontID'] = pRspUserLogin.FrontID
+    dict_pRspUserLogin['LoginTime'] = pRspUserLogin.LoginTime
+    dict_pRspUserLogin['MaxOrderRef'] = pRspUserLogin.MaxOrderRef
+    dict_pRspUserLogin['SessionID'] = pRspUserLogin.SessionID
+
+    dict_pRspInfo = {}
+    dict_pRspInfo['ErrorID'] = pRspInfo.ErrorID
+    dict_pRspInfo['ErrorMsg'] = pRspInfo.ErrorMsg
+
+    self.OnRspUserLogin(dict_pRspUserLogin, dict_pRspInfo, nRequestID, bIsLast)
     return 0
 
 cdef extern int MdSpi_OnRspUserLogout(self, CSecurityFtdcUserLogoutField *pUserLogout, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
+
     # self.OnRspUserLogout(pUserLogout, pRspInfo, nRequestID, bIsLast)
     return 0
 
