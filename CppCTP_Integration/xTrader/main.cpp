@@ -306,7 +306,8 @@ void timer_handler() {
 							std::cout << "\t保存最后策略参数,更新运行状态正常收盘，停止计时器." << std::endl;
 
 							// 保存最后策略参数,更新运行状态正常收盘
-							ctp_m->saveStrategy();
+							//ctp_m->saveStrategy();
+							ctp_m->saveStrategyPositionDetail();
 							ctp_m->updateSystemFlag();
 
 							// 保存策略参数,关闭定时器
