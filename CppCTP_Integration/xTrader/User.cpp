@@ -1721,6 +1721,8 @@ bool User::ComparePositionTotal() {
 	// 对比order 与 trade后检查标志位
 	for (order_itor = this->l_position_detail_from_local_order->begin(); order_itor != this->l_position_detail_from_local_order->end(); order_itor++)
 	{
+		std::cout << "\t检查local_order = " << (*order_itor)->InstrumentID << std::endl;
+		std::cout << "\t检查local_order的标志位 = " << (*order_itor)->Is_Same << std::endl;
 		if (!(*order_itor)->Is_Same)
 		{
 			is_same_flag = false;
@@ -1728,6 +1730,8 @@ bool User::ComparePositionTotal() {
 	}
 	for (trade_itor = this->l_position_detail_from_local_trade->begin(); trade_itor != this->l_position_detail_from_local_trade->end(); trade_itor++)
 	{
+		std::cout << "\t检查local_trade = " << (*trade_itor)->InstrumentID << std::endl;
+		std::cout << "\t检查local_trade的标志位 = " << (*trade_itor)->Is_Same << std::endl;
 		if (!(*trade_itor)->Is_Same)
 		{
 			is_same_flag = false;
@@ -1762,9 +1766,13 @@ bool User::ComparePositionTotal() {
 		}
 	}
 
-	// 对比order 与 trade后检查标志位
+	std::cout << "\t====================================================" << std::endl;
+
+	// 对比ctp 与 trade后检查标志位
 	for (order_itor = this->l_position_detail_from_local_order->begin(); order_itor != this->l_position_detail_from_local_order->end(); order_itor++)
 	{
+		std::cout << "\t检查local_order = " << (*order_itor)->InstrumentID << std::endl;
+		std::cout << "\t检查local_order的标志位 = " << (*order_itor)->Is_Same << std::endl;
 		if (!(*order_itor)->Is_Same)
 		{
 			is_same_flag = false;
@@ -1773,6 +1781,8 @@ bool User::ComparePositionTotal() {
 	
 	for (ctp_itor = this->l_position_detail_from_ctp->begin(); ctp_itor != this->l_position_detail_from_ctp->end(); ctp_itor++)
 	{
+		std::cout << "\t检查CTP = " << (*ctp_itor)->InstrumentID << std::endl;
+		std::cout << "\t检查CTP的标志位 = " << (*ctp_itor)->Is_Same << std::endl;
 		if (!(*ctp_itor)->Is_Same)
 		{
 			is_same_flag = false;
@@ -1781,7 +1791,7 @@ bool User::ComparePositionTotal() {
 
 	if (!is_same_flag) {
 		std::cout << "\t期货账户 = " << this->getUserID() << std::endl;
-		std::cout << "\tOrder与Trade维护持仓明细不一致!请重新初始化或检查数据!" << std::endl;
+		std::cout << "\tCTP与Order维护持仓明细不一致!请重新初始化或检查数据!" << std::endl;
 		this->setIsPositionRight(is_same_flag);
 		return is_same_flag;
 	}
