@@ -1,6 +1,6 @@
 #ifndef CMDAPI_H
 #define CMDAPI_H
-
+#include "stdio.h"
 #include "Python.h"
 #include "pythread.h"
 #include "SecurityFtdcMdApi.h"
@@ -17,7 +17,7 @@ static inline int MdSpi_OnRtnDepthMarketData(PyObject *, CSecurityFtdcDepthMarke
 
 #define X_CALL(op) \
 	do { \
-		PyGILState_STATE gilstate = PyGILState_Ensure(); \
+	    PyGILState_STATE gilstate = PyGILState_Ensure(); \
 		tid = PyThread_get_thread_ident(); \
 		if ((op) == -1) PyErr_Print(); \
 		PyGILState_Release(gilstate); \
@@ -29,6 +29,10 @@ public:
 
 	CMdSpi(PyObject *obj):tid(0),self(obj) {}
 	virtual ~CMdSpi() {}
+
+    virtual void InitPyThread() {
+        PyEval_InitThreads();
+    }
 
 	virtual void OnFrontConnected() {
 		X_CALL(MdSpi_OnFrontConnected(self));

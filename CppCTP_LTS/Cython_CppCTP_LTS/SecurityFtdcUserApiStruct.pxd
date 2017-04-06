@@ -2260,7 +2260,7 @@ cdef extern from "SecurityFtdcUserApiStruct.h":
 
 
     ###用户登录请求
-    cdef struct CSecurityFtdcReqUserLoginField:
+    cdef cppclass CSecurityFtdcReqUserLoginField:
 
         ###交易日
         TSecurityFtdcDateType	TradingDay

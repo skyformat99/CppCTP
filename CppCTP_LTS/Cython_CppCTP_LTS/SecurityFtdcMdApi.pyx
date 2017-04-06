@@ -1,5 +1,7 @@
 # distutils: language=c++
 from libc cimport stdlib
+from libcpp.string cimport string
+from libc.string cimport strcpy, memset
 from SecurityFtdcMdApi cimport *
 
 cdef void MdApi_Release(MdApi self):
@@ -26,11 +28,17 @@ cdef class MdApi:
         MdApi_Release(self)
 
     def Init(self):
+        print(">>> SecurityFtdcMdApi.pyx Init() begin")
         if self.api is NULL or self.spi is not NULL: return
         self.spi = new CMdSpi(<PyObject *>self)
+        print(">>> SecurityFtdcMdApi.pyx Init() after create self.spi")
+        self.spi.InitPyThread()
+        print(">>> SecurityFtdcMdApi.pyx Init() after InitPyThread")
         CheckMemory(self.spi)
         self.api.RegisterSpi(self.spi)
+        print(">>> SecurityFtdcMdApi.pyx Init() after RegisterSpi")
         self.api.Init()
+        print(">>> SecurityFtdcMdApi.pyx Init() after api Init")
 
     def Join(self):
         cdef int ret
@@ -80,6 +88,7 @@ cdef class MdApi:
 
     def ReqUserLogin(self, pReqUserLogin, int nRequestID):
         if self.spi is NULL: return
+        print(">>> SecurityFtdcMdApi.pyx ReqUserLogin", pReqUserLogin, pReqUserLogin['BrokerID'])
         cdef CSecurityFtdcReqUserLoginField loginField
         loginField.BrokerID = pReqUserLogin['BrokerID']
         loginField.UserID = pReqUserLogin['UserID']

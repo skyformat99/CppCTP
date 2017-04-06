@@ -65,6 +65,7 @@ cdef extern from "SecurityFtdcMdApiImpl.h":
     cdef cppclass CMdSpi:
         CMdSpi(PyObject *obj)
         long tid
+        void InitPyThread()
     void ReleaseMdApi(CMdApi *api, CMdSpi *spi)
     int CheckMemory(void *) except 0
 
