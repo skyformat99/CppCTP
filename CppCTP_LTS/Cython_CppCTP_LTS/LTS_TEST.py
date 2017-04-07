@@ -52,6 +52,7 @@ class MyMdApi(MdApi):
         print('OnRtnDepthMarketData:', pDepthMarketData)
 
 if __name__ == '__main__':
+	#测试从此处开始
     mdapi = MyMdApi()
     mdapi.Create(b'conn/md')
     mdapi.RegisterFront(b'tcp://180.166.216.228:24513')
