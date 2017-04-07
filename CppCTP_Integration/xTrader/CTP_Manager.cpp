@@ -3144,9 +3144,9 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 					// this->dbm->DeletePositionDetailYesterday((*position_itor));
 					// 创建新的策略昨仓
 					// 记录更新时间为本交易日
-					strcpy((*position_itor)->TradingDayRecord, this->getTradingDay().c_str());
 					this->dbm->CreatePositionDetailYesterday((*position_itor));
-					this->dbm->UpdatePositionDetail((*position_itor));
+					/*strcpy((*position_itor)->TradingDayRecord, this->getTradingDay().c_str());
+					this->dbm->UpdatePositionDetail((*position_itor));*/
 				}
 			}
 		}
@@ -3155,12 +3155,12 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 	// 获取昨持仓明细
 	this->dbm->getAllPositionDetailYesterday(this->l_posdetail_yesterday);
 
-	// 将昨持仓明细添加到策略的持仓明细里
+	// 将昨持仓明细添加到策略的持仓明细里(order)
 	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
 		USER_PRINT("1111111");
 		for (position_itor = this->l_posdetail_yesterday->begin(); position_itor != this->l_posdetail_yesterday->end(); position_itor++) {
 
-			USER_PRINT("2222222");
+			USER_PRINT("将昨持仓明细添加到策略的持仓明细里(order)");
 			
 			if ((!strcmp((*stg_itor)->getStgStrategyId().c_str(), (*position_itor)->StrategyID)) &&
 				(!strcmp((*stg_itor)->getStgUserId().c_str(), (*position_itor)->UserID))) { //策略id相同 && 用户ID相同
@@ -3184,18 +3184,15 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 
 			for (position_trade_itor = this->l_posdetail_trade->begin(); position_trade_itor != this->l_posdetail_trade->end(); position_trade_itor++) { // 遍历今持仓明细列表
 
-				if (!strcmp((*position_trade_itor)->TradingDayRecord, this->getTradingDay().c_str())) // 日期相等
+				if (strcmp((*position_trade_itor)->TradingDayRecord, this->getTradingDay().c_str())) //日期不等
 				{
-					;
-				}
-				else { //日期不等
 					// 删除昨持仓明细对象,如果存在就删除,没有跳出
 					// this->dbm->DeletePositionDetailYesterday((*position_itor));
 					// 创建新的策略昨仓
 					// 记录更新时间为本交易日
-					strcpy((*position_trade_itor)->TradingDayRecord, this->getTradingDay().c_str());
 					this->dbm->CreatePositionDetailTradeYesterday((*position_trade_itor));
-					this->dbm->UpdatePositionDetailTrade((*position_trade_itor));
+					/*strcpy((*position_trade_itor)->TradingDayRecord, this->getTradingDay().c_str());
+					this->dbm->UpdatePositionDetailTrade((*position_trade_itor));*/
 				}
 			}
 
@@ -3205,12 +3202,12 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 	// 获取昨持仓明细
 	this->dbm->getAllPositionDetailTradeYesterday(this->l_posdetail_trade_yesterday);
 
-	// 将昨持仓明细添加到策略的持仓明细里
+	// 将昨持仓明细添加到策略的持仓明细里(trade)
 	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
 		USER_PRINT("1111111");
 		for (position_trade_itor = this->l_posdetail_trade_yesterday->begin(); position_trade_itor != this->l_posdetail_trade_yesterday->end(); position_trade_itor++) {
 
-			USER_PRINT("2222222");
+			USER_PRINT("将昨持仓明细添加到策略的持仓明细里(trade)");
 
 			if ((!strcmp((*stg_itor)->getStgStrategyId().c_str(), (*position_trade_itor)->StrategyID)) &&
 				(!strcmp((*stg_itor)->getStgUserId().c_str(), (*position_trade_itor)->UserID))) { //策略id相同 && 用户ID相同

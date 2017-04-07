@@ -458,6 +458,7 @@ list<USER_INSTRUMENT_POSITION *> * User::getL_Position_Detail_From_Local_Order()
 }
 
 void User::addL_Position_Detail_From_Local_Order(USER_CThostFtdcOrderField *order) {
+	std::cout << "User::addL_Position_Detail_From_Local_Order" << std::endl;
 	list<USER_INSTRUMENT_POSITION *>::iterator itor;
 	bool isFind = false;
 
@@ -469,7 +470,10 @@ void User::addL_Position_Detail_From_Local_Order(USER_CThostFtdcOrderField *orde
 			// 找到标志位赋值
 			isFind = true;
 
-			if ((!strcmp(this->getTradingDay().c_str(), order->InsertDate))) //今天的持仓
+			std::cout << "\torder->InsertDate = " << order->TradingDayRecord << std::endl;
+			std::cout << "\tthis->getTradingDay = " << this->getTradingDay() << std::endl;
+
+			if ((!strcmp(this->getTradingDay().c_str(), order->TradingDayRecord))) //今天的持仓
 			{
 				if (order->Direction == '0') { // 今买
 					(*itor)->Buy_Today += order->VolumeTradedBatch;
@@ -501,7 +505,7 @@ void User::addL_Position_Detail_From_Local_Order(USER_CThostFtdcOrderField *orde
 		strcpy(new_position_from_local_order->InstrumentID, order->InstrumentID);
 		new_position_from_local_order->Is_Same = false;
 
-		if ((!strcmp(this->getTradingDay().c_str(), order->InsertDate))) //今天的持仓
+		if ((!strcmp(this->getTradingDay().c_str(), order->TradingDayRecord))) //今天的持仓
 		{
 			if (order->Direction == '0') { // 今买
 				new_position_from_local_order->Buy_Today += order->VolumeTradedBatch;
@@ -535,6 +539,7 @@ list<USER_INSTRUMENT_POSITION *> * User::getL_Position_Detail_From_Local_Trade()
 }
 
 void User::addL_Position_Detail_From_Local_Trade(USER_CThostFtdcTradeField *trade) {
+	std::cout << "User::addL_Position_Detail_From_Local_Trade()" << std::endl;
 	list<USER_INSTRUMENT_POSITION *>::iterator itor;
 	bool isFind = false;
 
@@ -546,7 +551,10 @@ void User::addL_Position_Detail_From_Local_Trade(USER_CThostFtdcTradeField *trad
 			// 找到标志位赋值
 			isFind = true;
 
-			if ((!strcmp(this->getTradingDay().c_str(), trade->TradeDate))) //今天的持仓
+			std::cout << "\ttrade->TradeDate = " << trade->TradingDayRecord << std::endl;
+			std::cout << "\tthis->getTradingDay = " << this->getTradingDay() << std::endl;
+
+			if ((!strcmp(this->getTradingDay().c_str(), trade->TradingDayRecord))) //今天的持仓
 			{
 				if (trade->Direction == '0') { // 今买
 					(*itor)->Buy_Today += trade->Volume;
@@ -578,7 +586,7 @@ void User::addL_Position_Detail_From_Local_Trade(USER_CThostFtdcTradeField *trad
 		strcpy(new_position_from_local_trade->InstrumentID, trade->InstrumentID);
 		new_position_from_local_trade->Is_Same = false;
 
-		if ((!strcmp(this->getTradingDay().c_str(), trade->TradeDate))) //今天的持仓
+		if ((!strcmp(this->getTradingDay().c_str(), trade->TradingDayRecord))) //今天的持仓
 		{
 			if (trade->Direction == '0') { // 今买
 				new_position_from_local_trade->Buy_Today += trade->Volume;
