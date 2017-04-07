@@ -2432,7 +2432,7 @@ void DBManager::UpdatePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
 void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> *l_posd,
 	string traderid, string userid) {
 	USER_PRINT("DBManager::getAllPositionDetailYesterday");
-
+	std::cout << "DBManager::getAllPositionDetailYesterday()" << std::endl;
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
 		list<USER_CThostFtdcOrderField *>::iterator itor;
@@ -2467,23 +2467,23 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 
 		USER_CThostFtdcOrderField *new_pos = new USER_CThostFtdcOrderField();
 
-		cout << "instrumentid = " << p.getStringField("instrumentid") << ", ";
-		cout << "orderref = " << p.getStringField("orderref") << ", ";
-		cout << "userid = " << p.getStringField("userid") << ", ";
-		cout << "direction = " << p.getIntField("direction") << ", ";
-		cout << "comboffsetflag = " << p.getStringField("comboffsetflag") << ", ";
-		cout << "combhedgeflag = " << p.getStringField("combhedgeflag") << ", ";
-		cout << "limitprice = " << p.getField("limitprice").Double() << ", ";
-		cout << "volumetotaloriginal = " << p.getIntField("volumetotaloriginal") << ", ";
-		cout << "tradingday = " << p.getStringField("tradingday") << ", ";
-		cout << "tradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
-		cout << "orderstatus = " << p.getIntField("orderstatus") << ", ";
-		cout << "volumetraded = " << p.getIntField("volumetraded") << ", ";
-		cout << "volumetotal = " << p.getIntField("volumetotal") << ", ";
-		cout << "insertdate = " << p.getStringField("insertdate") << ", ";
-		cout << "inserttime = " << p.getStringField("inserttime") << ", ";
-		cout << "strategyid = " << p.getStringField("strategyid") << ", ";
-		cout << "volumetradedbatch = " << p.getIntField("volumetradedbatch") << std::endl;
+		cout << "\tinstrumentid = " << p.getStringField("instrumentid") << ", ";
+		cout << "\torderref = " << p.getStringField("orderref") << ", ";
+		cout << "\tuserid = " << p.getStringField("userid") << ", ";
+		cout << "\tdirection = " << p.getIntField("direction") << ", ";
+		cout << "\tcomboffsetflag = " << p.getStringField("comboffsetflag") << ", ";
+		cout << "\tcombhedgeflag = " << p.getStringField("combhedgeflag") << ", ";
+		cout << "\tlimitprice = " << p.getField("limitprice").Double() << ", ";
+		cout << "\tvolumetotaloriginal = " << p.getIntField("volumetotaloriginal") << ", ";
+		cout << "\ttradingday = " << p.getStringField("tradingday") << ", ";
+		cout << "\ttradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
+		cout << "\torderstatus = " << p.getIntField("orderstatus") << ", ";
+		cout << "\tvolumetraded = " << p.getIntField("volumetraded") << ", ";
+		cout << "\tvolumetotal = " << p.getIntField("volumetotal") << ", ";
+		cout << "\tinsertdate = " << p.getStringField("insertdate") << ", ";
+		cout << "\tinserttime = " << p.getStringField("inserttime") << ", ";
+		cout << "\tstrategyid = " << p.getStringField("strategyid") << ", ";
+		cout << "\tvolumetradedbatch = " << p.getIntField("volumetradedbatch") << std::endl;
 
 		strcpy(new_pos->InstrumentID, p.getStringField("instrumentid"));
 		strcpy(new_pos->OrderRef, p.getStringField("orderref"));
@@ -2627,6 +2627,7 @@ void DBManager::CreatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *po
 	int posd_count_num = 0;
 
 	if (posd != NULL) {
+		
 		posd_count_num = this->conn->count(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION,
 			BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 		if (posd_count_num != 0) { //session_id存在
@@ -2706,7 +2707,7 @@ void DBManager::UpdatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *po
 
 void DBManager::getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id, string userid) {
 	USER_PRINT("DBManager::getAllPositionDetailYesterday");
-
+	std::cout << "DBManager::getAllPositionDetailTradeYesterday()" << std::endl;
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
 		list<USER_CThostFtdcTradeField *>::iterator itor;
@@ -2741,18 +2742,18 @@ void DBManager::getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeFiel
 
 		USER_CThostFtdcTradeField *new_pos = new USER_CThostFtdcTradeField();
 
-		cout << "instrumentid = " << p.getStringField("instrumentid") << ", ";
-		cout << "orderref = " << p.getStringField("orderref") << ", ";
-		cout << "userid = " << p.getStringField("userid") << ", ";
-		cout << "direction = " << p.getIntField("direction") << ", ";
-		cout << "offsetflag = " << p.getStringField("comboffsetflag") << ", ";
-		cout << "hedgeflag = " << p.getStringField("combhedgeflag") << ", ";
-		cout << "price = " << p.getField("limitprice").Double() << ", ";
-		cout << "tradingday = " << p.getStringField("tradingday") << ", ";
-		cout << "tradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
-		cout << "tradedate = " << p.getIntField("tradedate") << ", ";
-		cout << "strategyid = " << p.getStringField("strategyid") << ", ";
-		cout << "volume = " << p.getIntField("volume") << std::endl;
+		cout << "\tinstrumentid = " << p.getStringField("instrumentid") << ", ";
+		cout << "\torderref = " << p.getStringField("orderref") << ", ";
+		cout << "\tuserid = " << p.getStringField("userid") << ", ";
+		cout << "\tdirection = " << p.getIntField("direction") << ", ";
+		cout << "\toffsetflag = " << p.getStringField("offsetflag") << ", ";
+		cout << "\thedgeflag = " << p.getStringField("hedgeflag") << ", ";
+		cout << "\tprice = " << p.getField("price").Double() << ", ";
+		cout << "\ttradingday = " << p.getStringField("tradingday") << ", ";
+		cout << "\ttradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
+		cout << "\ttradedate = " << p.getIntField("tradedate") << ", ";
+		cout << "\tstrategyid = " << p.getStringField("strategyid") << ", ";
+		cout << "\tvolume = " << p.getIntField("volume") << std::endl;
 
 		strcpy(new_pos->InstrumentID, p.getStringField("instrumentid"));
 		strcpy(new_pos->OrderRef, p.getStringField("orderref"));
