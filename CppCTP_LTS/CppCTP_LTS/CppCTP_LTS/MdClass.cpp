@@ -10,21 +10,21 @@ MdClass::MdClass(char *front_address, char *broker_id, char *user_id, char *pass
 {
 	std::cout << "MdClass::MdClass()" << std::endl;
 
-	//è¡Œæƒ…APIåˆå§‹åŒ–
+	//ĞĞÇéAPI³õÊ¼»¯
 	pMD = CSecurityFtdcMdApi::CreateFtdcMdApi(pszFlowPath);
 
-	//åˆ›å»ºè¡Œæƒ…api
+	//´´½¨ĞĞÇéapi
 	pMD->RegisterSpi(this);
 
-	//æ³¨å†Œè¡Œæƒ…æ¥å£
+	//×¢²áĞĞÇé½Ó¿Ú
 	pMD->RegisterFront(front_address);
 
-	//æ‹·è´ç™»é™†ä¿¡æ¯
+	//¿½±´µÇÂ½ĞÅÏ¢
 	strcpy_s(LoginInfo.BrokerID, broker_id);
 	strcpy_s(LoginInfo.UserID, user_id);
 	strcpy_s(LoginInfo.Password, password);
 
-	//cout<<"æ³¨å†Œè¡Œæƒ…å‰ç½®æœºåœ°å€:"<<FRONT_ADDR_MD<<endl;
+	//cout<<"×¢²áĞĞÇéÇ°ÖÃ»úµØÖ·:"<<FRONT_ADDR_MD<<endl;
 	pMD->Init();
 }
 
@@ -40,23 +40,23 @@ void MdClass::OnFrontDisconnected(int nReason)
 	std::cout << "MdClass::OnFrontDisconnected()" << endl;
 }
 
-//ç™»é™†
+//µÇÂ½
 void MdClass::Login() {
 	std::cout << "MdClass::Login()" << std::endl;
 	int ReqCode = 0;
 	ReqCode = pMD->ReqUserLogin(&LoginInfo, 1);
-	// è¯·æ±‚å‡ºé”™
+	// ÇëÇó³ö´í
 	if (ReqCode != 0) {
 		std::cout << "\tMdClass::Login() ReqUserLogin Failed!" << std::endl;
 	}
 }
 
-//å¿ƒè·³
+//ĞÄÌø
 void MdClass::OnHeartBeatWarning(int nTimeLapse) {
 
 }
 
-//è®¢é˜…è¡Œæƒ…
+//¶©ÔÄĞĞÇé
 void MdClass::SubMarketData(list<string> list_instrumentid, char* pExchageID) {
 	std::cout << "MdClass::SubMarketData()" << std::endl;
 	list<string>::iterator itor;
@@ -68,11 +68,14 @@ void MdClass::SubMarketData(list<string> list_instrumentid, char* pExchageID) {
 		charResult = (*itor).c_str();
 		instrumentID[i] = new char[strlen(charResult) + 1];
 		strcpy(instrumentID[i], charResult);
+		std::cout << "\tinstrumentID[i] = " << instrumentID[i] << std::endl;
 	}
+	std::cout << "\tsize = " << size << std::endl;
+	std::cout << "\tpExchageID = " << pExchageID << std::endl;
 	this->pMD->SubscribeMarketData(instrumentID, size, pExchageID);
 }
 
-//å–æ¶ˆè®¢é˜…è¡Œæƒ…
+//È¡Ïû¶©ÔÄĞĞÇé
 void MdClass::UnSubMarketData(list<string> list_instrumentid, char* pExchageID) {
 	std::cout << "MdClass::UnSubMarketData()" << std::endl;
 	list<string>::iterator itor;
@@ -93,12 +96,17 @@ void MdClass::OnRspError(CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bo
 	std::cout << "MdClass::OnRspError()" << std::endl;
 }
 
-// ç™»é™†å›è°ƒ
+// µÇÂ½»Øµ÷
 void MdClass::OnRspUserLogin(CSecurityFtdcRspUserLoginField *pRspUserLogin, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	std::cout << "MdClass::OnRspUserLogin()" << std::endl;
 	if (!IsErrorRspInfo(pRspInfo) && pRspUserLogin) {
 		std::cout << "\tMdClass::OnRspUserLogin() Success!" << std::endl;
+		list<string> list_instrumentid;
+		string instrument_id = "000001";
+		list_instrumentid.push_back(instrument_id);
+		char* pExchageID = "SSE";
+		this->SubMarketData(list_instrumentid, pExchageID);
 	}
 	else {
 		std::cout << "\tMdClass::OnRspUserLogin() Failed!" << std::endl;
@@ -115,7 +123,8 @@ void MdClass::OnRspSubMarketData(CSecurityFtdcSpecificInstrumentField *pSpecific
 {
 	std::cout << "MdClass::OnRspSubMarketData()" << std::endl;
 	if (!IsErrorRspInfo(pRspInfo) && pSpecificInstrument) {
-		std::cout << "\t[" << pSpecificInstrument->InstrumentID << "] è®¢é˜… æˆåŠŸ!" << std::endl;
+		std::cout << "\t[" << pSpecificInstrument->InstrumentID << "]" << std::endl;
+		std::cout << "\t[" << pSpecificInstrument->ExchangeID << "] ¶©ÔÄ ³É¹¦!" << std::endl;
 	}
 }
 
@@ -123,7 +132,7 @@ void MdClass::OnRspUnSubMarketData(CSecurityFtdcSpecificInstrumentField *pSpecif
 {
 	std::cout << "MdClass::OnRspUnSubMarketData()" << std::endl;
 	if (!IsErrorRspInfo(pRspInfo) && pSpecificInstrument) {
-		std::cout << "\t[" << pSpecificInstrument->InstrumentID << "] å–æ¶ˆè®¢é˜… æˆåŠŸ!" << std::endl;
+		std::cout << "\t[" << pSpecificInstrument->InstrumentID << "] È¡Ïû¶©ÔÄ ³É¹¦!" << std::endl;
 	}
 }
 
@@ -132,28 +141,28 @@ void MdClass::OnRspUnSubMarketData(CSecurityFtdcSpecificInstrumentField *pSpecif
 
 void MdClass::OnRtnDepthMarketData(CSecurityFtdcDepthMarketDataField *pDepthMarketData)
 {
-	std::cout << "è¡Œæƒ…ä¿¡æ¯:" << std::endl;
+	std::cout << "ĞĞÇéĞÅÏ¢:" << std::endl;
 	if (pDepthMarketData != NULL) {
-		///äº¤æ˜“æ—¥
-		std::cout << "\täº¤æ˜“æ—¥ = " << pDepthMarketData->TradingDay << std::endl;
-		///åˆçº¦ä»£ç 
-		std::cout << "\tåˆçº¦ä»£ç  = " << pDepthMarketData->InstrumentID << std::endl;
-		///äº¤æ˜“æ‰€ä»£ç 
-		std::cout << "\täº¤æ˜“æ‰€ä»£ç  = " << pDepthMarketData->ExchangeID << std::endl;
-		///åˆçº¦åœ¨äº¤æ˜“æ‰€çš„ä»£ç 
-		std::cout << "\tåˆçº¦åœ¨äº¤æ˜“æ‰€çš„ä»£ç  = " << pDepthMarketData->ExchangeInstID << std::endl;
-		///æœ€æ–°ä»·
-		std::cout << "\tæœ€æ–°ä»· = " << pDepthMarketData->LastPrice << std::endl;
-		//æœ€åä¿®æ”¹æ—¶é—´
-		std::cout << "\tæœ€åä¿®æ”¹æ—¶é—´ = " << pDepthMarketData->UpdateTime << std::endl;
-		///æœ€åä¿®æ”¹æ¯«ç§’
-		std::cout << "\tæœ€åä¿®æ”¹æ¯«ç§’ = " << pDepthMarketData->UpdateMillisec << std::endl;
+		///½»Ò×ÈÕ
+		std::cout << "\t½»Ò×ÈÕ = " << pDepthMarketData->TradingDay << std::endl;
+		///ºÏÔ¼´úÂë
+		std::cout << "\tºÏÔ¼´úÂë = " << pDepthMarketData->InstrumentID << std::endl;
+		///½»Ò×Ëù´úÂë
+		std::cout << "\t½»Ò×Ëù´úÂë = " << pDepthMarketData->ExchangeID << std::endl;
+		///ºÏÔ¼ÔÚ½»Ò×ËùµÄ´úÂë
+		std::cout << "\tºÏÔ¼ÔÚ½»Ò×ËùµÄ´úÂë = " << pDepthMarketData->ExchangeInstID << std::endl;
+		///×îĞÂ¼Û
+		std::cout << "\t×îĞÂ¼Û = " << pDepthMarketData->LastPrice << std::endl;
+		//×îºóĞŞ¸ÄÊ±¼ä
+		std::cout << "\t×îºóĞŞ¸ÄÊ±¼ä = " << pDepthMarketData->UpdateTime << std::endl;
+		///×îºóĞŞ¸ÄºÁÃë
+		std::cout << "\t×îºóĞŞ¸ÄºÁÃë = " << pDepthMarketData->UpdateMillisec << std::endl;
 	}
 }
 
-//è¿”å›æ•°æ®æ˜¯å¦æŠ¥é”™
+//·µ»ØÊı¾İÊÇ·ñ±¨´í
 bool MdClass::IsErrorRspInfo(CSecurityFtdcRspInfoField *pRspInfo) {
-	// å¦‚æœErrorID != 0, è¯´æ˜æ”¶åˆ°äº†é”™è¯¯çš„å“åº”
+	// Èç¹ûErrorID != 0, ËµÃ÷ÊÕµ½ÁË´íÎóµÄÏìÓ¦
 	bool bResult = ((pRspInfo) && (pRspInfo->ErrorID != 0));
 	if (bResult) {
 		cerr << "\t--->>> ErrorID = " << pRspInfo->ErrorID << ", ErrorMsg = " << pRspInfo->ErrorMsg << endl;

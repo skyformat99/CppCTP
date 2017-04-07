@@ -29,11 +29,14 @@ class MyMdApi(MdApi):
         print('OnRspUserLogin:', pRspInfo)
         if pRspInfo['ErrorID'] == 0: # Success
             print('GetTradingDay:', self.GetTradingDay())
-            # self.SubscribeMarketData(self.instrumentIDs)
+            instrumentIDs = [b'000001']
+            pExchangeID = 'SSE'
+            self.SubscribeMarketData(instrumentIDs, pExchangeID)
         else:
             print('>>> MyMdApi OnRspUserLogin() ErrorID = ', pRspInfo['ErrorID'])
 
     def OnRspSubMarketData(self, pSpecificInstrument, pRspInfo, nRequestID, bIsLast):
+        print('OnRspSubMarketData:', pSpecificInstrument)
         print('OnRspSubMarketData:', pRspInfo)
 
     def OnRspUnSubMarketData(self, pSpecificInstrument, pRspInfo, nRequestID, bIsLast):
@@ -56,7 +59,7 @@ if __name__ == '__main__':
 
     try:
         while 1:
-            print("in while...")
+            # print("in while...")
             time.sleep(2)
     except KeyboardInterrupt:
         pass
