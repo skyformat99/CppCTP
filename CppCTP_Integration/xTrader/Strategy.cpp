@@ -2164,7 +2164,7 @@ void Strategy::Order_Algorithm_One() {
 	else
 	{
 		//this->printStrategyInfo("策略跳过异常行情");
-		this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One()_1", false);
+		//this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One()_1", false);
 		return;
 	}
 
