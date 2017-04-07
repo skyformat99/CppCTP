@@ -52,19 +52,19 @@ string stopsave_time = "15:01:00";
 void sig_handler(int signo) {
 	if (signo == SIGINT) {
 		printf("main.cpp sig_handler()");
-		printf("\t服务端关闭，开始保存策略持仓明细");
+		printf("\t\033[32m服务端关闭，开始保存策略持仓明细.\033[0m\n");
 
 		if (ctp_m) {
 			ctp_m->saveStrategyPositionDetail();
 			ctp_m->updateSystemFlag();
 		}
 		else {
-			printf("\t服务端 未 正常关闭!!!\n");
+			printf("\t\033[31m服务端 未 正常关闭!!!\033[0m\n");
 			exit(1);
 		}
 		
 		close(sockfd);
-		printf("\t服务端正常关闭\n");
+		printf("\t\033[32m服务端正常关闭.\033[0m\n");
 		exit(1);
 	}
 }
@@ -303,7 +303,7 @@ void timer_handler() {
 							ctp_m->getCalTimer()->stop();
 						}
 						else { // 时间大于15:00:00小于15:01:00
-							std::cout << "\t保存最后策略参数,更新运行状态正常收盘，停止计时器." << std::endl;
+							std::cout << "\t\033[32m收盘工作:保存策略参数,更新运行状态,停止计时器.\033[0m" << std::endl;
 
 							// 保存最后策略参数,更新运行状态正常收盘
 							//ctp_m->saveStrategy();
@@ -312,6 +312,7 @@ void timer_handler() {
 
 							// 保存策略参数,关闭定时器
 							ctp_m->getCalTimer()->stop();
+							std::cout << "\t\033[32m系统收盘工作正常结束.\033[0m" << std::endl;
 						}
 					}
 
@@ -319,7 +320,7 @@ void timer_handler() {
 				else { // 时间大于14:58:00小于时间小于14:59:55，按照一秒一次计时
 
 					if (!ctp_m->getOneSecondFlag()) {
-						std::cout << "\t开始进行1秒计时" << std::endl;
+						std::cout << "\t\033[32m开始进行1秒计时\033[0m" << std::endl;
 						ctp_m->getCalTimer()->stop();
 						ctp_m->getCalTimer()->setSingleShot(false);
 						ctp_m->getCalTimer()->setInterval(Timer::Interval(1000));
@@ -333,7 +334,7 @@ void timer_handler() {
 			else { // 时间小于14:58:00,按照1分钟进行一次计时
 				if (!ctp_m->getOneMinFlag())
 				{
-					std::cout << "\t开始进行1分钟计时" << std::endl;
+					std::cout << "\t\033[32m开始进行1分钟计时\033[0m" << std::endl;
 					ctp_m->getCalTimer()->stop();
 					ctp_m->getCalTimer()->setSingleShot(false);
 					ctp_m->getCalTimer()->setInterval(Timer::Interval(1000 * 60));
@@ -345,7 +346,7 @@ void timer_handler() {
 		}
 		else { // 时间小于14:50:00,按照10分钟进行一次计时
 			if (!ctp_m->getTenMinFlag()) {
-				std::cout << "\t开始进行10分钟计时" << std::endl;
+				std::cout << "\t\033[32m开始进行10分钟计时\033[0m" << std::endl;
 				ctp_m->getCalTimer()->stop();
 				ctp_m->getCalTimer()->setSingleShot(false);
 				ctp_m->getCalTimer()->setInterval(Timer::Interval(1000 * 60 * 10));

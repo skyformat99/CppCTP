@@ -3756,11 +3756,11 @@ bool CTP_Manager::init(bool is_online) {
 	/// 打印输出各自结果
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
 		std::cout << "\t=====================================================" << std::endl;
-		std::cout << "\t=从CTP API查询统计结果" << std::endl;
+		std::cout << "\t=\033[32m从CTP API查询统计结果\033[0m" << std::endl;
 		(*user_itor)->getL_Position_Detail_Data((*user_itor)->getL_Position_Detail_From_CTP());
-		std::cout << "\t=从本地Order查询统计结果" << std::endl;
+		std::cout << "\t=\033[32m从本地Order查询统计结果\033[0m" << std::endl;
 		(*user_itor)->getL_Position_Detail_Data((*user_itor)->getL_Position_Detail_From_Local_Order());
-		std::cout << "\t=从本地Trade查询统计结果" << std::endl;
+		std::cout << "\t=\033[32m从本地Trade查询统计结果\033[0m" << std::endl;
 		(*user_itor)->getL_Position_Detail_Data((*user_itor)->getL_Position_Detail_From_Local_Trade());
 		std::cout << "\t=====================================================" << std::endl;
 	}

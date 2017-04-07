@@ -1679,7 +1679,7 @@ bool User::ComparePositionTotal() {
 	if ((this->l_position_detail_from_ctp->size() != this->l_position_detail_from_local_order->size()) ||
 		(this->l_position_detail_from_local_order->size() != this->l_position_detail_from_local_trade->size())) {
 		std::cout << "\t期货账户 = " << this->getUserID() << std::endl;
-		std::cout << "\t持仓明细列表数目总数不正确!" << std::endl;
+		std::cout << "\t\033[31m持仓明细列表数目总数不正确!\033[0m" << std::endl;
 		is_same_flag = false;
 		this->setIsPositionRight(is_same_flag);
 		return is_same_flag;
@@ -1692,7 +1692,7 @@ bool User::ComparePositionTotal() {
 		)
 	{
 		std::cout << "\t期货账户 = " << this->getUserID() << std::endl;
-		std::cout << "\t持仓明细均为空!" << std::endl;
+		std::cout << "\t\033[32m持仓明细均为空!\033[0m" << std::endl;
 		return is_same_flag;
 	}
 
@@ -1749,7 +1749,7 @@ bool User::ComparePositionTotal() {
 
 	if (!is_same_flag) {
 		std::cout << "\t期货账户 = " << this->getUserID() << std::endl;
-		std::cout << "\tOrder与Trade维护持仓明细不一致!请重新初始化或检查数据!" << std::endl;
+		std::cout << "\t\033[31mOrder与Trade维护持仓明细不一致!请重新初始化或检查数据!\033[0m" << std::endl;
 		this->setIsPositionRight(is_same_flag);
 		return is_same_flag;
 	}
@@ -1799,7 +1799,7 @@ bool User::ComparePositionTotal() {
 
 	if (!is_same_flag) {
 		std::cout << "\t期货账户 = " << this->getUserID() << std::endl;
-		std::cout << "\tCTP与Order维护持仓明细不一致!请重新初始化或检查数据!" << std::endl;
+		std::cout << "\t\033[31mCTP与Order维护持仓明细不一致!请重新初始化或检查数据!\033[0m" << std::endl;
 		this->setIsPositionRight(is_same_flag);
 		return is_same_flag;
 	}
