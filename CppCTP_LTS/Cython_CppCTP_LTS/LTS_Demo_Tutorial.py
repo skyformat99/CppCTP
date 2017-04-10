@@ -7,16 +7,11 @@ class MyMdApi(MdApi):
 
     def OnFrontConnected(self):
         print('OnFrontConnected: Login...')
+        # 登陆参数设置
         pReqUserLogin = {}
         pReqUserLogin['BrokerID'] = b'2011'
         pReqUserLogin['UserID'] = b'010000040178'
         pReqUserLogin['Password'] = b'7174516'
-
-        # pReqUserLogin = {}
-        # pReqUserLogin['BrokerID'] = '2011'
-        # pReqUserLogin['UserID'] = '010000040178'
-        # pReqUserLogin['Password'] = '7174516'
-
         self.ReqUserLogin(pReqUserLogin, 1)
 
     def OnFrontDisconnected(self, nReason):
@@ -29,11 +24,12 @@ class MyMdApi(MdApi):
         print('OnRspUserLogin:', pRspInfo)
         if pRspInfo['ErrorID'] == 0: # Success
             print('GetTradingDay:', self.GetTradingDay())
+            # 订阅行情参数配置
             instrumentIDs = [b'000001']
-            pExchangeID = 'SSE'
+            pExchangeID = b'SSE'
             self.SubscribeMarketData(instrumentIDs, pExchangeID)
         else:
-            print('>>> MyMdApi OnRspUserLogin() ErrorID = ', pRspInfo['ErrorID'])
+            print('>>> OnRspUserLogin() ErrorID = ', pRspInfo['ErrorID'])
 
     def OnRspSubMarketData(self, pSpecificInstrument, pRspInfo, nRequestID, bIsLast):
         print('OnRspSubMarketData:', pSpecificInstrument)
@@ -52,7 +48,7 @@ class MyMdApi(MdApi):
         print('OnRtnDepthMarketData:', pDepthMarketData)
 
 if __name__ == '__main__':
-	#测试从此处开始
+    #测试从此处开始
     mdapi = MyMdApi()
     mdapi.Create(b'conn/md')
     mdapi.RegisterFront(b'tcp://180.166.216.228:24513')
@@ -61,6 +57,6 @@ if __name__ == '__main__':
     try:
         while 1:
             # print("in while...")
-            time.sleep(2)
+            time.sleep(1)
     except KeyboardInterrupt:
         pass

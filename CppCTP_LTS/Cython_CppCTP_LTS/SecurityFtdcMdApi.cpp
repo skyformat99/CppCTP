@@ -770,13 +770,6 @@ static int __Pyx_ParseOptionalKeywords(PyObject *kwds, PyObject **argnames[],\
 static void __Pyx_RaiseArgtupleInvalid(const char* func_name, int exact,
     Py_ssize_t num_min, Py_ssize_t num_max, Py_ssize_t num_found);
 
-/* PyObjectCall.proto */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw);
-#else
-#define __Pyx_PyObject_Call(func, arg, kw) PyObject_Call(func, arg, kw)
-#endif
-
 /* GetItemInt.proto */
 #define __Pyx_GetItemInt(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
     (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
@@ -887,6 +880,13 @@ static PyObject *__Pyx_PyFunction_FastCallDict(PyObject *func, PyObject **args, 
 #endif
 #endif
 
+/* PyObjectCall.proto */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw);
+#else
+#define __Pyx_PyObject_Call(func, arg, kw) PyObject_Call(func, arg, kw)
+#endif
+
 /* PyObjectCallMethO.proto */
 #if CYTHON_COMPILING_IN_CPYTHON
 static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg);
@@ -977,13 +977,6 @@ static void __Pyx_CppExn2PyErr() {
 }
 #endif
 
-/* Print.proto */
-static int __Pyx_Print(PyObject*, PyObject *, int);
-#if CYTHON_COMPILING_IN_PYPY || PY_MAJOR_VERSION >= 3
-static PyObject* __pyx_print = 0;
-static PyObject* __pyx_print_kwargs = 0;
-#endif
-
 /* ForceInitThreads.proto */
 #ifndef __PYX_FORCE_INIT_THREADS
   #define __PYX_FORCE_INIT_THREADS 0
@@ -1000,6 +993,13 @@ static CYTHON_INLINE PyObject* __Pyx_PyInt_From_TSecurityFtdcFrontIDType(TSecuri
 
 /* CIntToPy.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyInt_From_TSecurityFtdcSessionIDType(TSecurityFtdcSessionIDType value);
+
+/* Print.proto */
+static int __Pyx_Print(PyObject*, PyObject *, int);
+#if CYTHON_COMPILING_IN_PYPY || PY_MAJOR_VERSION >= 3
+static PyObject* __pyx_print = 0;
+static PyObject* __pyx_print_kwargs = 0;
+#endif
 
 /* CIntToPy.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyInt_From_TSecurityFtdcMillisecType(TSecurityFtdcMillisecType value);
@@ -1056,7 +1056,6 @@ static PyObject *__pyx_builtin_OverflowError;
 static PyObject *__pyx_builtin_enumerate;
 static PyObject *__pyx_builtin_IndexError;
 static const char __pyx_k_end[] = "end";
-static const char __pyx_k_gbk[] = "gbk";
 static const char __pyx_k_IOPV[] = "IOPV";
 static const char __pyx_k_file[] = "file";
 static const char __pyx_k_main[] = "__main__";
@@ -1119,6 +1118,7 @@ static const char __pyx_k_HighestPrice[] = "HighestPrice";
 static const char __pyx_k_InstrumentID[] = "InstrumentID";
 static const char __pyx_k_OpenInterest[] = "OpenInterest";
 static const char __pyx_k_TradingPhase[] = "TradingPhase";
+static const char __pyx_k_InstrumentIDs[] = "InstrumentIDs";
 static const char __pyx_k_OverflowError[] = "OverflowError";
 static const char __pyx_k_PreClosePrice[] = "PreClosePrice";
 static const char __pyx_k_pReqUserLogin[] = "pReqUserLogin";
@@ -1132,21 +1132,12 @@ static const char __pyx_k_PreOpenInterest[] = "PreOpenInterest";
 static const char __pyx_k_SettlementPrice[] = "SettlementPrice";
 static const char __pyx_k_UpperLimitPrice[] = "UpperLimitPrice";
 static const char __pyx_k_OnFrontConnected[] = "OnFrontConnected";
-static const char __pyx_k_ppInstrumentID_i[] = "ppInstrumentID[i] = ";
 static const char __pyx_k_OnHeartBeatWarning[] = "OnHeartBeatWarning";
 static const char __pyx_k_OnRspSubMarketData[] = "OnRspSubMarketData";
 static const char __pyx_k_PreSettlementPrice[] = "PreSettlementPrice";
 static const char __pyx_k_OnFrontDisconnected[] = "OnFrontDisconnected";
 static const char __pyx_k_OnRtnDepthMarketData[] = "OnRtnDepthMarketData";
 static const char __pyx_k_MdSpi_OnRspSubMarketData[] = "MdSpi_OnRspSubMarketData() >>>";
-static const char __pyx_k_MdSpi_OnRtnDepthMarketData[] = ">>> MdSpi_OnRtnDepthMarketData()...";
-static const char __pyx_k_SecurityFtdcMdApi_pyx_Init_afte[] = ">>> SecurityFtdcMdApi.pyx Init() after create self.spi";
-static const char __pyx_k_SecurityFtdcMdApi_pyx_Init_begi[] = ">>> SecurityFtdcMdApi.pyx Init() begin";
-static const char __pyx_k_SecurityFtdcMdApi_pyx_ReqUserLo[] = ">>> SecurityFtdcMdApi.pyx ReqUserLogin";
-static const char __pyx_k_SubscribeMarketData_cExchangeID[] = ">>> SubscribeMarketData() cExchangeID = ";
-static const char __pyx_k_SecurityFtdcMdApi_pyx_Init_afte_2[] = ">>> SecurityFtdcMdApi.pyx Init() after InitPyThread";
-static const char __pyx_k_SecurityFtdcMdApi_pyx_Init_afte_3[] = ">>> SecurityFtdcMdApi.pyx Init() after RegisterSpi";
-static const char __pyx_k_SecurityFtdcMdApi_pyx_Init_afte_4[] = ">>> SecurityFtdcMdApi.pyx Init() after api Init";
 static PyObject *__pyx_n_s_ActionDay;
 static PyObject *__pyx_n_s_AskPrice1;
 static PyObject *__pyx_n_s_AskPrice2;
@@ -1183,13 +1174,13 @@ static PyObject *__pyx_n_s_HighestPrice;
 static PyObject *__pyx_n_s_IOPV;
 static PyObject *__pyx_n_s_IndexError;
 static PyObject *__pyx_n_s_InstrumentID;
+static PyObject *__pyx_n_s_InstrumentIDs;
 static PyObject *__pyx_n_s_LastPrice;
 static PyObject *__pyx_n_s_LoginTime;
 static PyObject *__pyx_n_s_LowerLimitPrice;
 static PyObject *__pyx_n_s_LowestPrice;
 static PyObject *__pyx_n_s_MaxOrderRef;
 static PyObject *__pyx_kp_s_MdSpi_OnRspSubMarketData;
-static PyObject *__pyx_kp_s_MdSpi_OnRtnDepthMarketData;
 static PyObject *__pyx_n_s_OnFrontConnected;
 static PyObject *__pyx_n_s_OnFrontDisconnected;
 static PyObject *__pyx_n_s_OnHeartBeatWarning;
@@ -1207,15 +1198,8 @@ static PyObject *__pyx_n_s_PreDelta;
 static PyObject *__pyx_n_s_PreIOPV;
 static PyObject *__pyx_n_s_PreOpenInterest;
 static PyObject *__pyx_n_s_PreSettlementPrice;
-static PyObject *__pyx_kp_s_SecurityFtdcMdApi_pyx_Init_afte;
-static PyObject *__pyx_kp_s_SecurityFtdcMdApi_pyx_Init_afte_2;
-static PyObject *__pyx_kp_s_SecurityFtdcMdApi_pyx_Init_afte_3;
-static PyObject *__pyx_kp_s_SecurityFtdcMdApi_pyx_Init_afte_4;
-static PyObject *__pyx_kp_s_SecurityFtdcMdApi_pyx_Init_begi;
-static PyObject *__pyx_kp_s_SecurityFtdcMdApi_pyx_ReqUserLo;
 static PyObject *__pyx_n_s_SessionID;
 static PyObject *__pyx_n_s_SettlementPrice;
-static PyObject *__pyx_kp_s_SubscribeMarketData_cExchangeID;
 static PyObject *__pyx_n_s_TradingDay;
 static PyObject *__pyx_n_s_TradingPhase;
 static PyObject *__pyx_n_s_Turnover;
@@ -1228,14 +1212,12 @@ static PyObject *__pyx_n_s_Volume;
 static PyObject *__pyx_n_s_end;
 static PyObject *__pyx_n_s_enumerate;
 static PyObject *__pyx_n_s_file;
-static PyObject *__pyx_n_s_gbk;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_nRequestID;
 static PyObject *__pyx_n_s_pExchageID;
 static PyObject *__pyx_n_s_pInstrumentIDs;
 static PyObject *__pyx_n_s_pReqUserLogin;
 static PyObject *__pyx_n_s_pUserLogout;
-static PyObject *__pyx_kp_s_ppInstrumentID_i;
 static PyObject *__pyx_n_s_print;
 static PyObject *__pyx_n_s_pszFlowPath;
 static PyObject *__pyx_n_s_test;
@@ -1246,8 +1228,8 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_6Release(struct __pyx_obj_1
 static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_8Init(struct __pyx_obj_17SecurityFtdcMdApi_MdApi *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_10Join(struct __pyx_obj_17SecurityFtdcMdApi_MdApi *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_12GetTradingDay(struct __pyx_obj_17SecurityFtdcMdApi_MdApi *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_14RegisterFront(struct __pyx_obj_17SecurityFtdcMdApi_MdApi *__pyx_v_self, char *__pyx_v_pszFrontAddress); /* proto */
-static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_16SubscribeMarketData(struct __pyx_obj_17SecurityFtdcMdApi_MdApi *__pyx_v_self, PyObject *__pyx_v_pInstrumentIDs, PyObject *__pyx_v_ExchageID); /* proto */
+static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_14RegisterFront(struct __pyx_obj_17SecurityFtdcMdApi_MdApi *__pyx_v_self, const char *__pyx_v_pszFrontAddress); /* proto */
+static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_16SubscribeMarketData(struct __pyx_obj_17SecurityFtdcMdApi_MdApi *__pyx_v_self, PyObject *__pyx_v_InstrumentIDs, PyObject *__pyx_v_ExchageID); /* proto */
 static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_18UnSubscribeMarketData(struct __pyx_obj_17SecurityFtdcMdApi_MdApi *__pyx_v_self, PyObject *__pyx_v_pInstrumentIDs, char *__pyx_v_pExchageID); /* proto */
 static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_20ReqUserLogin(struct __pyx_obj_17SecurityFtdcMdApi_MdApi *__pyx_v_self, PyObject *__pyx_v_pReqUserLogin, int __pyx_v_nRequestID); /* proto */
 static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_22ReqUserLogout(struct __pyx_obj_17SecurityFtdcMdApi_MdApi *__pyx_v_self, PyObject *__pyx_v_pUserLogout, int __pyx_v_nRequestID); /* proto */
@@ -1606,7 +1588,7 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_6Release(struct __pyx_obj_1
  *         MdApi_Release(self)
  * 
  *     def Init(self):             # <<<<<<<<<<<<<<
- *         print(">>> SecurityFtdcMdApi.pyx Init() begin")
+ *         # print(">>> SecurityFtdcMdApi.pyx Init() begin")
  *         if self.api is NULL or self.spi is not NULL: return
  */
 
@@ -1631,21 +1613,12 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_8Init(struct __pyx_obj_17Se
   int __pyx_t_3;
   __Pyx_RefNannySetupContext("Init", 0);
 
-  /* "SecurityFtdcMdApi.pyx":31
- * 
- *     def Init(self):
- *         print(">>> SecurityFtdcMdApi.pyx Init() begin")             # <<<<<<<<<<<<<<
- *         if self.api is NULL or self.spi is not NULL: return
- *         self.spi = new CMdSpi(<PyObject *>self)
- */
-  if (__Pyx_PrintOne(0, __pyx_kp_s_SecurityFtdcMdApi_pyx_Init_begi) < 0) __PYX_ERR(0, 31, __pyx_L1_error)
-
   /* "SecurityFtdcMdApi.pyx":32
  *     def Init(self):
- *         print(">>> SecurityFtdcMdApi.pyx Init() begin")
+ *         # print(">>> SecurityFtdcMdApi.pyx Init() begin")
  *         if self.api is NULL or self.spi is not NULL: return             # <<<<<<<<<<<<<<
  *         self.spi = new CMdSpi(<PyObject *>self)
- *         print(">>> SecurityFtdcMdApi.pyx Init() after create self.spi")
+ *         self.spi.InitPyThread()
  */
   __pyx_t_2 = ((__pyx_v_self->api == NULL) != 0);
   if (!__pyx_t_2) {
@@ -1663,91 +1636,55 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_8Init(struct __pyx_obj_17Se
   }
 
   /* "SecurityFtdcMdApi.pyx":33
- *         print(">>> SecurityFtdcMdApi.pyx Init() begin")
+ *         # print(">>> SecurityFtdcMdApi.pyx Init() begin")
  *         if self.api is NULL or self.spi is not NULL: return
  *         self.spi = new CMdSpi(<PyObject *>self)             # <<<<<<<<<<<<<<
- *         print(">>> SecurityFtdcMdApi.pyx Init() after create self.spi")
  *         self.spi.InitPyThread()
+ *         CheckMemory(self.spi)
  */
   __pyx_v_self->spi = new CMdSpi(((PyObject *)__pyx_v_self));
 
   /* "SecurityFtdcMdApi.pyx":34
  *         if self.api is NULL or self.spi is not NULL: return
  *         self.spi = new CMdSpi(<PyObject *>self)
- *         print(">>> SecurityFtdcMdApi.pyx Init() after create self.spi")             # <<<<<<<<<<<<<<
- *         self.spi.InitPyThread()
- *         print(">>> SecurityFtdcMdApi.pyx Init() after InitPyThread")
- */
-  if (__Pyx_PrintOne(0, __pyx_kp_s_SecurityFtdcMdApi_pyx_Init_afte) < 0) __PYX_ERR(0, 34, __pyx_L1_error)
-
-  /* "SecurityFtdcMdApi.pyx":35
- *         self.spi = new CMdSpi(<PyObject *>self)
- *         print(">>> SecurityFtdcMdApi.pyx Init() after create self.spi")
  *         self.spi.InitPyThread()             # <<<<<<<<<<<<<<
- *         print(">>> SecurityFtdcMdApi.pyx Init() after InitPyThread")
  *         CheckMemory(self.spi)
+ *         self.api.RegisterSpi(self.spi)
  */
   __pyx_v_self->spi->InitPyThread();
 
-  /* "SecurityFtdcMdApi.pyx":36
- *         print(">>> SecurityFtdcMdApi.pyx Init() after create self.spi")
+  /* "SecurityFtdcMdApi.pyx":35
+ *         self.spi = new CMdSpi(<PyObject *>self)
  *         self.spi.InitPyThread()
- *         print(">>> SecurityFtdcMdApi.pyx Init() after InitPyThread")             # <<<<<<<<<<<<<<
- *         CheckMemory(self.spi)
- *         self.api.RegisterSpi(self.spi)
- */
-  if (__Pyx_PrintOne(0, __pyx_kp_s_SecurityFtdcMdApi_pyx_Init_afte_2) < 0) __PYX_ERR(0, 36, __pyx_L1_error)
-
-  /* "SecurityFtdcMdApi.pyx":37
- *         self.spi.InitPyThread()
- *         print(">>> SecurityFtdcMdApi.pyx Init() after InitPyThread")
  *         CheckMemory(self.spi)             # <<<<<<<<<<<<<<
  *         self.api.RegisterSpi(self.spi)
- *         print(">>> SecurityFtdcMdApi.pyx Init() after RegisterSpi")
+ *         self.api.Init()
  */
-  __pyx_t_3 = CheckMemory(__pyx_v_self->spi); if (unlikely(__pyx_t_3 == 0)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __pyx_t_3 = CheckMemory(__pyx_v_self->spi); if (unlikely(__pyx_t_3 == 0)) __PYX_ERR(0, 35, __pyx_L1_error)
 
-  /* "SecurityFtdcMdApi.pyx":38
- *         print(">>> SecurityFtdcMdApi.pyx Init() after InitPyThread")
+  /* "SecurityFtdcMdApi.pyx":36
+ *         self.spi.InitPyThread()
  *         CheckMemory(self.spi)
  *         self.api.RegisterSpi(self.spi)             # <<<<<<<<<<<<<<
- *         print(">>> SecurityFtdcMdApi.pyx Init() after RegisterSpi")
  *         self.api.Init()
+ * 
  */
   __pyx_v_self->api->RegisterSpi(__pyx_v_self->spi);
 
-  /* "SecurityFtdcMdApi.pyx":39
+  /* "SecurityFtdcMdApi.pyx":37
  *         CheckMemory(self.spi)
  *         self.api.RegisterSpi(self.spi)
- *         print(">>> SecurityFtdcMdApi.pyx Init() after RegisterSpi")             # <<<<<<<<<<<<<<
- *         self.api.Init()
- *         print(">>> SecurityFtdcMdApi.pyx Init() after api Init")
- */
-  if (__Pyx_PrintOne(0, __pyx_kp_s_SecurityFtdcMdApi_pyx_Init_afte_3) < 0) __PYX_ERR(0, 39, __pyx_L1_error)
-
-  /* "SecurityFtdcMdApi.pyx":40
- *         self.api.RegisterSpi(self.spi)
- *         print(">>> SecurityFtdcMdApi.pyx Init() after RegisterSpi")
  *         self.api.Init()             # <<<<<<<<<<<<<<
- *         print(">>> SecurityFtdcMdApi.pyx Init() after api Init")
- * 
- */
-  __pyx_v_self->api->Init();
-
-  /* "SecurityFtdcMdApi.pyx":41
- *         print(">>> SecurityFtdcMdApi.pyx Init() after RegisterSpi")
- *         self.api.Init()
- *         print(">>> SecurityFtdcMdApi.pyx Init() after api Init")             # <<<<<<<<<<<<<<
  * 
  *     def Join(self):
  */
-  if (__Pyx_PrintOne(0, __pyx_kp_s_SecurityFtdcMdApi_pyx_Init_afte_4) < 0) __PYX_ERR(0, 41, __pyx_L1_error)
+  __pyx_v_self->api->Init();
 
   /* "SecurityFtdcMdApi.pyx":30
  *         MdApi_Release(self)
  * 
  *     def Init(self):             # <<<<<<<<<<<<<<
- *         print(">>> SecurityFtdcMdApi.pyx Init() begin")
+ *         # print(">>> SecurityFtdcMdApi.pyx Init() begin")
  *         if self.api is NULL or self.spi is not NULL: return
  */
 
@@ -1763,8 +1700,8 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_8Init(struct __pyx_obj_17Se
   return __pyx_r;
 }
 
-/* "SecurityFtdcMdApi.pyx":43
- *         print(">>> SecurityFtdcMdApi.pyx Init() after api Init")
+/* "SecurityFtdcMdApi.pyx":39
+ *         self.api.Init()
  * 
  *     def Join(self):             # <<<<<<<<<<<<<<
  *         cdef int ret
@@ -1792,7 +1729,7 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_10Join(struct __pyx_obj_17S
   PyObject *__pyx_t_2 = NULL;
   __Pyx_RefNannySetupContext("Join", 0);
 
-  /* "SecurityFtdcMdApi.pyx":45
+  /* "SecurityFtdcMdApi.pyx":41
  *     def Join(self):
  *         cdef int ret
  *         if self.spi is NULL: return             # <<<<<<<<<<<<<<
@@ -1806,7 +1743,7 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_10Join(struct __pyx_obj_17S
     goto __pyx_L0;
   }
 
-  /* "SecurityFtdcMdApi.pyx":46
+  /* "SecurityFtdcMdApi.pyx":42
  *         cdef int ret
  *         if self.spi is NULL: return
  *         with nogil: ret = self.api.Join()             # <<<<<<<<<<<<<<
@@ -1832,7 +1769,7 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_10Join(struct __pyx_obj_17S
       }
   }
 
-  /* "SecurityFtdcMdApi.pyx":47
+  /* "SecurityFtdcMdApi.pyx":43
  *         if self.spi is NULL: return
  *         with nogil: ret = self.api.Join()
  *         return ret             # <<<<<<<<<<<<<<
@@ -1840,14 +1777,14 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_10Join(struct __pyx_obj_17S
  *     def GetTradingDay(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_ret); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 47, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_ret); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 43, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "SecurityFtdcMdApi.pyx":43
- *         print(">>> SecurityFtdcMdApi.pyx Init() after api Init")
+  /* "SecurityFtdcMdApi.pyx":39
+ *         self.api.Init()
  * 
  *     def Join(self):             # <<<<<<<<<<<<<<
  *         cdef int ret
@@ -1865,7 +1802,7 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_10Join(struct __pyx_obj_17S
   return __pyx_r;
 }
 
-/* "SecurityFtdcMdApi.pyx":49
+/* "SecurityFtdcMdApi.pyx":45
  *         return ret
  * 
  *     def GetTradingDay(self):             # <<<<<<<<<<<<<<
@@ -1894,7 +1831,7 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_12GetTradingDay(struct __py
   PyObject *__pyx_t_2 = NULL;
   __Pyx_RefNannySetupContext("GetTradingDay", 0);
 
-  /* "SecurityFtdcMdApi.pyx":51
+  /* "SecurityFtdcMdApi.pyx":47
  *     def GetTradingDay(self):
  *         cdef const_char *ret
  *         if self.spi is NULL: return             # <<<<<<<<<<<<<<
@@ -1908,7 +1845,7 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_12GetTradingDay(struct __py
     goto __pyx_L0;
   }
 
-  /* "SecurityFtdcMdApi.pyx":52
+  /* "SecurityFtdcMdApi.pyx":48
  *         cdef const_char *ret
  *         if self.spi is NULL: return
  *         with nogil: ret = self.api.GetTradingDay()             # <<<<<<<<<<<<<<
@@ -1934,21 +1871,21 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_12GetTradingDay(struct __py
       }
   }
 
-  /* "SecurityFtdcMdApi.pyx":53
+  /* "SecurityFtdcMdApi.pyx":49
  *         if self.spi is NULL: return
  *         with nogil: ret = self.api.GetTradingDay()
  *         return ret             # <<<<<<<<<<<<<<
  * 
- *     def RegisterFront(self, char *pszFrontAddress):
+ *     def RegisterFront(self, const_char *pszFrontAddress):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __Pyx_PyBytes_FromString(__pyx_v_ret); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyBytes_FromString(__pyx_v_ret); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 49, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "SecurityFtdcMdApi.pyx":49
+  /* "SecurityFtdcMdApi.pyx":45
  *         return ret
  * 
  *     def GetTradingDay(self):             # <<<<<<<<<<<<<<
@@ -1967,23 +1904,23 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_12GetTradingDay(struct __py
   return __pyx_r;
 }
 
-/* "SecurityFtdcMdApi.pyx":55
+/* "SecurityFtdcMdApi.pyx":51
  *         return ret
  * 
- *     def RegisterFront(self, char *pszFrontAddress):             # <<<<<<<<<<<<<<
+ *     def RegisterFront(self, const_char *pszFrontAddress):             # <<<<<<<<<<<<<<
  *         if self.api is NULL: return
- *         self.api.RegisterFront(pszFrontAddress)
+ *         cdef char *c_pszFrontAddress
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_17SecurityFtdcMdApi_5MdApi_15RegisterFront(PyObject *__pyx_v_self, PyObject *__pyx_arg_pszFrontAddress); /*proto*/
 static PyObject *__pyx_pw_17SecurityFtdcMdApi_5MdApi_15RegisterFront(PyObject *__pyx_v_self, PyObject *__pyx_arg_pszFrontAddress) {
-  char *__pyx_v_pszFrontAddress;
+  const char *__pyx_v_pszFrontAddress;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("RegisterFront (wrapper)", 0);
   assert(__pyx_arg_pszFrontAddress); {
-    __pyx_v_pszFrontAddress = __Pyx_PyObject_AsString(__pyx_arg_pszFrontAddress); if (unlikely((!__pyx_v_pszFrontAddress) && PyErr_Occurred())) __PYX_ERR(0, 55, __pyx_L3_error)
+    __pyx_v_pszFrontAddress = __Pyx_PyObject_AsString(__pyx_arg_pszFrontAddress); if (unlikely((!__pyx_v_pszFrontAddress) && PyErr_Occurred())) __PYX_ERR(0, 51, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -1991,25 +1928,26 @@ static PyObject *__pyx_pw_17SecurityFtdcMdApi_5MdApi_15RegisterFront(PyObject *_
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_17SecurityFtdcMdApi_5MdApi_14RegisterFront(((struct __pyx_obj_17SecurityFtdcMdApi_MdApi *)__pyx_v_self), ((char *)__pyx_v_pszFrontAddress));
+  __pyx_r = __pyx_pf_17SecurityFtdcMdApi_5MdApi_14RegisterFront(((struct __pyx_obj_17SecurityFtdcMdApi_MdApi *)__pyx_v_self), ((const char *)__pyx_v_pszFrontAddress));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_14RegisterFront(struct __pyx_obj_17SecurityFtdcMdApi_MdApi *__pyx_v_self, char *__pyx_v_pszFrontAddress) {
+static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_14RegisterFront(struct __pyx_obj_17SecurityFtdcMdApi_MdApi *__pyx_v_self, const char *__pyx_v_pszFrontAddress) {
+  char *__pyx_v_c_pszFrontAddress;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("RegisterFront", 0);
 
-  /* "SecurityFtdcMdApi.pyx":56
+  /* "SecurityFtdcMdApi.pyx":52
  * 
- *     def RegisterFront(self, char *pszFrontAddress):
+ *     def RegisterFront(self, const_char *pszFrontAddress):
  *         if self.api is NULL: return             # <<<<<<<<<<<<<<
- *         self.api.RegisterFront(pszFrontAddress)
- * 
+ *         cdef char *c_pszFrontAddress
+ *         strcpy(c_pszFrontAddress, pszFrontAddress)
  */
   __pyx_t_1 = ((__pyx_v_self->api == NULL) != 0);
   if (__pyx_t_1) {
@@ -2018,21 +1956,30 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_14RegisterFront(struct __py
     goto __pyx_L0;
   }
 
-  /* "SecurityFtdcMdApi.pyx":57
- *     def RegisterFront(self, char *pszFrontAddress):
+  /* "SecurityFtdcMdApi.pyx":54
  *         if self.api is NULL: return
- *         self.api.RegisterFront(pszFrontAddress)             # <<<<<<<<<<<<<<
+ *         cdef char *c_pszFrontAddress
+ *         strcpy(c_pszFrontAddress, pszFrontAddress)             # <<<<<<<<<<<<<<
+ *         self.api.RegisterFront(c_pszFrontAddress)
  * 
- *     def SubscribeMarketData(self, pInstrumentIDs, ExchageID):
  */
-  __pyx_v_self->api->RegisterFront(__pyx_v_pszFrontAddress);
+  strcpy(__pyx_v_c_pszFrontAddress, __pyx_v_pszFrontAddress);
 
   /* "SecurityFtdcMdApi.pyx":55
+ *         cdef char *c_pszFrontAddress
+ *         strcpy(c_pszFrontAddress, pszFrontAddress)
+ *         self.api.RegisterFront(c_pszFrontAddress)             # <<<<<<<<<<<<<<
+ * 
+ *     def SubscribeMarketData(self, InstrumentIDs, ExchageID):
+ */
+  __pyx_v_self->api->RegisterFront(__pyx_v_c_pszFrontAddress);
+
+  /* "SecurityFtdcMdApi.pyx":51
  *         return ret
  * 
- *     def RegisterFront(self, char *pszFrontAddress):             # <<<<<<<<<<<<<<
+ *     def RegisterFront(self, const_char *pszFrontAddress):             # <<<<<<<<<<<<<<
  *         if self.api is NULL: return
- *         self.api.RegisterFront(pszFrontAddress)
+ *         cdef char *c_pszFrontAddress
  */
 
   /* function exit code */
@@ -2043,24 +1990,24 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_14RegisterFront(struct __py
   return __pyx_r;
 }
 
-/* "SecurityFtdcMdApi.pyx":59
- *         self.api.RegisterFront(pszFrontAddress)
+/* "SecurityFtdcMdApi.pyx":57
+ *         self.api.RegisterFront(c_pszFrontAddress)
  * 
- *     def SubscribeMarketData(self, pInstrumentIDs, ExchageID):             # <<<<<<<<<<<<<<
- *         pExchageID = bytes(ExchageID, 'gbk')
- *         cdef int nCount
+ *     def SubscribeMarketData(self, InstrumentIDs, ExchageID):             # <<<<<<<<<<<<<<
+ *         # pExchageID = bytes(ExchageID, 'gbk')
+ *         # pExchageID = ExchageID.decode('utf-8').encode('gbk')
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_17SecurityFtdcMdApi_5MdApi_17SubscribeMarketData(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static PyObject *__pyx_pw_17SecurityFtdcMdApi_5MdApi_17SubscribeMarketData(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  PyObject *__pyx_v_pInstrumentIDs = 0;
+  PyObject *__pyx_v_InstrumentIDs = 0;
   PyObject *__pyx_v_ExchageID = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("SubscribeMarketData (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_pInstrumentIDs,&__pyx_n_s_ExchageID,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_InstrumentIDs,&__pyx_n_s_ExchageID,0};
     PyObject* values[2] = {0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -2074,16 +2021,16 @@ static PyObject *__pyx_pw_17SecurityFtdcMdApi_5MdApi_17SubscribeMarketData(PyObj
       kw_args = PyDict_Size(__pyx_kwds);
       switch (pos_args) {
         case  0:
-        if (likely((values[0] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_pInstrumentIDs)) != 0)) kw_args--;
+        if (likely((values[0] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_InstrumentIDs)) != 0)) kw_args--;
         else goto __pyx_L5_argtuple_error;
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_ExchageID)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("SubscribeMarketData", 1, 2, 2, 1); __PYX_ERR(0, 59, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("SubscribeMarketData", 1, 2, 2, 1); __PYX_ERR(0, 57, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "SubscribeMarketData") < 0)) __PYX_ERR(0, 59, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "SubscribeMarketData") < 0)) __PYX_ERR(0, 57, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -2091,25 +2038,25 @@ static PyObject *__pyx_pw_17SecurityFtdcMdApi_5MdApi_17SubscribeMarketData(PyObj
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
-    __pyx_v_pInstrumentIDs = values[0];
+    __pyx_v_InstrumentIDs = values[0];
     __pyx_v_ExchageID = values[1];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("SubscribeMarketData", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 59, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("SubscribeMarketData", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 57, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("SecurityFtdcMdApi.MdApi.SubscribeMarketData", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_17SecurityFtdcMdApi_5MdApi_16SubscribeMarketData(((struct __pyx_obj_17SecurityFtdcMdApi_MdApi *)__pyx_v_self), __pyx_v_pInstrumentIDs, __pyx_v_ExchageID);
+  __pyx_r = __pyx_pf_17SecurityFtdcMdApi_5MdApi_16SubscribeMarketData(((struct __pyx_obj_17SecurityFtdcMdApi_MdApi *)__pyx_v_self), __pyx_v_InstrumentIDs, __pyx_v_ExchageID);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_16SubscribeMarketData(struct __pyx_obj_17SecurityFtdcMdApi_MdApi *__pyx_v_self, PyObject *__pyx_v_pInstrumentIDs, PyObject *__pyx_v_ExchageID) {
+static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_16SubscribeMarketData(struct __pyx_obj_17SecurityFtdcMdApi_MdApi *__pyx_v_self, PyObject *__pyx_v_InstrumentIDs, PyObject *__pyx_v_ExchageID) {
   PyObject *__pyx_v_pExchageID = NULL;
   int __pyx_v_nCount;
   char **__pyx_v_ppInstrumentID;
@@ -2117,101 +2064,69 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_16SubscribeMarketData(struc
   long __pyx_v_i;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  PyObject *__pyx_t_2 = NULL;
-  char const *__pyx_t_3;
+  char const *__pyx_t_1;
+  int __pyx_t_2;
+  Py_ssize_t __pyx_t_3;
   int __pyx_t_4;
-  Py_ssize_t __pyx_t_5;
-  int __pyx_t_6;
-  char *__pyx_t_7;
-  int __pyx_t_8;
-  char const *__pyx_t_9;
+  PyObject *__pyx_t_5 = NULL;
+  char *__pyx_t_6;
+  int __pyx_t_7;
+  char const *__pyx_t_8;
+  PyObject *__pyx_t_9 = NULL;
   PyObject *__pyx_t_10 = NULL;
   PyObject *__pyx_t_11 = NULL;
   PyObject *__pyx_t_12 = NULL;
   PyObject *__pyx_t_13 = NULL;
   PyObject *__pyx_t_14 = NULL;
-  PyObject *__pyx_t_15 = NULL;
   __Pyx_RefNannySetupContext("SubscribeMarketData", 0);
 
   /* "SecurityFtdcMdApi.pyx":60
- * 
- *     def SubscribeMarketData(self, pInstrumentIDs, ExchageID):
- *         pExchageID = bytes(ExchageID, 'gbk')             # <<<<<<<<<<<<<<
+ *         # pExchageID = bytes(ExchageID, 'gbk')
+ *         # pExchageID = ExchageID.decode('utf-8').encode('gbk')
+ *         pExchageID = ExchageID             # <<<<<<<<<<<<<<
  *         cdef int nCount
  *         cdef char **ppInstrumentID
  */
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 60, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_ExchageID);
-  __Pyx_GIVEREF(__pyx_v_ExchageID);
-  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_ExchageID);
-  __Pyx_INCREF(__pyx_n_s_gbk);
-  __Pyx_GIVEREF(__pyx_n_s_gbk);
-  PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_n_s_gbk);
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)(&PyBytes_Type)), __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 60, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_v_pExchageID = ((PyObject*)__pyx_t_2);
-  __pyx_t_2 = 0;
+  __pyx_v_pExchageID = __pyx_v_ExchageID;
 
   /* "SecurityFtdcMdApi.pyx":64
  *         cdef char **ppInstrumentID
  *         cdef char *cExchangeID
  *         strcpy(cExchangeID, pExchageID)             # <<<<<<<<<<<<<<
- *         print(">>> SubscribeMarketData() cExchangeID = ", cExchangeID)
+ *         # print(">>> SubscribeMarketData() cExchangeID = ", cExchangeID)
  *         if self.spi is NULL: return
  */
-  __pyx_t_3 = __Pyx_PyObject_AsString(__pyx_v_pExchageID); if (unlikely((!__pyx_t_3) && PyErr_Occurred())) __PYX_ERR(0, 64, __pyx_L1_error)
-  strcpy(__pyx_v_cExchangeID, __pyx_t_3);
-
-  /* "SecurityFtdcMdApi.pyx":65
- *         cdef char *cExchangeID
- *         strcpy(cExchangeID, pExchageID)
- *         print(">>> SubscribeMarketData() cExchangeID = ", cExchangeID)             # <<<<<<<<<<<<<<
- *         if self.spi is NULL: return
- *         nCount = len(pInstrumentIDs)
- */
-  __pyx_t_2 = __Pyx_PyBytes_FromString(__pyx_v_cExchangeID); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 65, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 65, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_INCREF(__pyx_kp_s_SubscribeMarketData_cExchangeID);
-  __Pyx_GIVEREF(__pyx_kp_s_SubscribeMarketData_cExchangeID);
-  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_s_SubscribeMarketData_cExchangeID);
-  __Pyx_GIVEREF(__pyx_t_2);
-  PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_2);
-  __pyx_t_2 = 0;
-  if (__Pyx_PrintOne(0, __pyx_t_1) < 0) __PYX_ERR(0, 65, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_PyObject_AsString(__pyx_v_pExchageID); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) __PYX_ERR(0, 64, __pyx_L1_error)
+  strcpy(__pyx_v_cExchangeID, __pyx_t_1);
 
   /* "SecurityFtdcMdApi.pyx":66
  *         strcpy(cExchangeID, pExchageID)
- *         print(">>> SubscribeMarketData() cExchangeID = ", cExchangeID)
+ *         # print(">>> SubscribeMarketData() cExchangeID = ", cExchangeID)
  *         if self.spi is NULL: return             # <<<<<<<<<<<<<<
- *         nCount = len(pInstrumentIDs)
+ *         nCount = len(InstrumentIDs)
  *         ppInstrumentID = <char **>stdlib.malloc(sizeof(char *) * nCount)
  */
-  __pyx_t_4 = ((__pyx_v_self->spi == NULL) != 0);
-  if (__pyx_t_4) {
+  __pyx_t_2 = ((__pyx_v_self->spi == NULL) != 0);
+  if (__pyx_t_2) {
     __Pyx_XDECREF(__pyx_r);
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
   }
 
   /* "SecurityFtdcMdApi.pyx":67
- *         print(">>> SubscribeMarketData() cExchangeID = ", cExchangeID)
+ *         # print(">>> SubscribeMarketData() cExchangeID = ", cExchangeID)
  *         if self.spi is NULL: return
- *         nCount = len(pInstrumentIDs)             # <<<<<<<<<<<<<<
+ *         nCount = len(InstrumentIDs)             # <<<<<<<<<<<<<<
  *         ppInstrumentID = <char **>stdlib.malloc(sizeof(char *) * nCount)
  *         CheckMemory(ppInstrumentID)
  */
-  __pyx_t_5 = PyObject_Length(__pyx_v_pInstrumentIDs); if (unlikely(__pyx_t_5 == -1)) __PYX_ERR(0, 67, __pyx_L1_error)
-  __pyx_v_nCount = __pyx_t_5;
+  __pyx_t_3 = PyObject_Length(__pyx_v_InstrumentIDs); if (unlikely(__pyx_t_3 == -1)) __PYX_ERR(0, 67, __pyx_L1_error)
+  __pyx_v_nCount = __pyx_t_3;
 
   /* "SecurityFtdcMdApi.pyx":68
  *         if self.spi is NULL: return
- *         nCount = len(pInstrumentIDs)
+ *         nCount = len(InstrumentIDs)
  *         ppInstrumentID = <char **>stdlib.malloc(sizeof(char *) * nCount)             # <<<<<<<<<<<<<<
  *         CheckMemory(ppInstrumentID)
  *         try:
@@ -2219,20 +2134,20 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_16SubscribeMarketData(struc
   __pyx_v_ppInstrumentID = ((char **)malloc(((sizeof(char *)) * __pyx_v_nCount)));
 
   /* "SecurityFtdcMdApi.pyx":69
- *         nCount = len(pInstrumentIDs)
+ *         nCount = len(InstrumentIDs)
  *         ppInstrumentID = <char **>stdlib.malloc(sizeof(char *) * nCount)
  *         CheckMemory(ppInstrumentID)             # <<<<<<<<<<<<<<
  *         try:
  *             for i from 0 <= i < nCount:
  */
-  __pyx_t_6 = CheckMemory(__pyx_v_ppInstrumentID); if (unlikely(__pyx_t_6 == 0)) __PYX_ERR(0, 69, __pyx_L1_error)
+  __pyx_t_4 = CheckMemory(__pyx_v_ppInstrumentID); if (unlikely(__pyx_t_4 == 0)) __PYX_ERR(0, 69, __pyx_L1_error)
 
   /* "SecurityFtdcMdApi.pyx":70
  *         ppInstrumentID = <char **>stdlib.malloc(sizeof(char *) * nCount)
  *         CheckMemory(ppInstrumentID)
  *         try:             # <<<<<<<<<<<<<<
  *             for i from 0 <= i < nCount:
- *                 ppInstrumentID[i] = pInstrumentIDs[i]
+ *                 ppInstrumentID[i] = InstrumentIDs[i]
  */
   /*try:*/ {
 
@@ -2240,49 +2155,29 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_16SubscribeMarketData(struc
  *         CheckMemory(ppInstrumentID)
  *         try:
  *             for i from 0 <= i < nCount:             # <<<<<<<<<<<<<<
- *                 ppInstrumentID[i] = pInstrumentIDs[i]
- *                 print("ppInstrumentID[i] = ", ppInstrumentID[i])
+ *                 ppInstrumentID[i] = InstrumentIDs[i]
+ *                 # print("ppInstrumentID[i] = ", ppInstrumentID[i])
  */
-    __pyx_t_6 = __pyx_v_nCount;
-    for (__pyx_v_i = 0; __pyx_v_i < __pyx_t_6; __pyx_v_i++) {
+    __pyx_t_4 = __pyx_v_nCount;
+    for (__pyx_v_i = 0; __pyx_v_i < __pyx_t_4; __pyx_v_i++) {
 
       /* "SecurityFtdcMdApi.pyx":72
  *         try:
  *             for i from 0 <= i < nCount:
- *                 ppInstrumentID[i] = pInstrumentIDs[i]             # <<<<<<<<<<<<<<
- *                 print("ppInstrumentID[i] = ", ppInstrumentID[i])
+ *                 ppInstrumentID[i] = InstrumentIDs[i]             # <<<<<<<<<<<<<<
+ *                 # print("ppInstrumentID[i] = ", ppInstrumentID[i])
  *             with nogil: nCount = self.api.SubscribeMarketData(ppInstrumentID, nCount, cExchangeID)
  */
-      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_pInstrumentIDs, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 72, __pyx_L5_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_7 = __Pyx_PyObject_AsString(__pyx_t_1); if (unlikely((!__pyx_t_7) && PyErr_Occurred())) __PYX_ERR(0, 72, __pyx_L5_error)
-      (__pyx_v_ppInstrumentID[__pyx_v_i]) = __pyx_t_7;
-      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-      /* "SecurityFtdcMdApi.pyx":73
- *             for i from 0 <= i < nCount:
- *                 ppInstrumentID[i] = pInstrumentIDs[i]
- *                 print("ppInstrumentID[i] = ", ppInstrumentID[i])             # <<<<<<<<<<<<<<
- *             with nogil: nCount = self.api.SubscribeMarketData(ppInstrumentID, nCount, cExchangeID)
- *         finally:
- */
-      __pyx_t_1 = __Pyx_PyBytes_FromString((__pyx_v_ppInstrumentID[__pyx_v_i])); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 73, __pyx_L5_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 73, __pyx_L5_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __Pyx_INCREF(__pyx_kp_s_ppInstrumentID_i);
-      __Pyx_GIVEREF(__pyx_kp_s_ppInstrumentID_i);
-      PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_kp_s_ppInstrumentID_i);
-      __Pyx_GIVEREF(__pyx_t_1);
-      PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_1);
-      __pyx_t_1 = 0;
-      if (__Pyx_PrintOne(0, __pyx_t_2) < 0) __PYX_ERR(0, 73, __pyx_L5_error)
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_InstrumentIDs, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 72, __pyx_L5_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_6 = __Pyx_PyObject_AsString(__pyx_t_5); if (unlikely((!__pyx_t_6) && PyErr_Occurred())) __PYX_ERR(0, 72, __pyx_L5_error)
+      (__pyx_v_ppInstrumentID[__pyx_v_i]) = __pyx_t_6;
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
 
     /* "SecurityFtdcMdApi.pyx":74
- *                 ppInstrumentID[i] = pInstrumentIDs[i]
- *                 print("ppInstrumentID[i] = ", ppInstrumentID[i])
+ *                 ppInstrumentID[i] = InstrumentIDs[i]
+ *                 # print("ppInstrumentID[i] = ", ppInstrumentID[i])
  *             with nogil: nCount = self.api.SubscribeMarketData(ppInstrumentID, nCount, cExchangeID)             # <<<<<<<<<<<<<<
  *         finally:
  *             stdlib.free(ppInstrumentID)
@@ -2322,35 +2217,34 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_16SubscribeMarketData(struc
     /*exception exit:*/{
       __Pyx_PyThreadState_declare
       __pyx_L5_error:;
-      __pyx_t_10 = 0; __pyx_t_11 = 0; __pyx_t_12 = 0; __pyx_t_13 = 0; __pyx_t_14 = 0; __pyx_t_15 = 0;
+      __pyx_t_9 = 0; __pyx_t_10 = 0; __pyx_t_11 = 0; __pyx_t_12 = 0; __pyx_t_13 = 0; __pyx_t_14 = 0;
       __Pyx_PyThreadState_assign
-      __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (PY_MAJOR_VERSION >= 3) __Pyx_ExceptionSwap(&__pyx_t_13, &__pyx_t_14, &__pyx_t_15);
-      if ((PY_MAJOR_VERSION < 3) || unlikely(__Pyx_GetException(&__pyx_t_10, &__pyx_t_11, &__pyx_t_12) < 0)) __Pyx_ErrFetch(&__pyx_t_10, &__pyx_t_11, &__pyx_t_12);
+      __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+      if (PY_MAJOR_VERSION >= 3) __Pyx_ExceptionSwap(&__pyx_t_12, &__pyx_t_13, &__pyx_t_14);
+      if ((PY_MAJOR_VERSION < 3) || unlikely(__Pyx_GetException(&__pyx_t_9, &__pyx_t_10, &__pyx_t_11) < 0)) __Pyx_ErrFetch(&__pyx_t_9, &__pyx_t_10, &__pyx_t_11);
+      __Pyx_XGOTREF(__pyx_t_9);
       __Pyx_XGOTREF(__pyx_t_10);
       __Pyx_XGOTREF(__pyx_t_11);
       __Pyx_XGOTREF(__pyx_t_12);
       __Pyx_XGOTREF(__pyx_t_13);
       __Pyx_XGOTREF(__pyx_t_14);
-      __Pyx_XGOTREF(__pyx_t_15);
-      __pyx_t_6 = __pyx_lineno; __pyx_t_8 = __pyx_clineno; __pyx_t_9 = __pyx_filename;
+      __pyx_t_4 = __pyx_lineno; __pyx_t_7 = __pyx_clineno; __pyx_t_8 = __pyx_filename;
       {
         free(__pyx_v_ppInstrumentID);
       }
       __Pyx_PyThreadState_assign
       if (PY_MAJOR_VERSION >= 3) {
+        __Pyx_XGIVEREF(__pyx_t_12);
         __Pyx_XGIVEREF(__pyx_t_13);
         __Pyx_XGIVEREF(__pyx_t_14);
-        __Pyx_XGIVEREF(__pyx_t_15);
-        __Pyx_ExceptionReset(__pyx_t_13, __pyx_t_14, __pyx_t_15);
+        __Pyx_ExceptionReset(__pyx_t_12, __pyx_t_13, __pyx_t_14);
       }
+      __Pyx_XGIVEREF(__pyx_t_9);
       __Pyx_XGIVEREF(__pyx_t_10);
       __Pyx_XGIVEREF(__pyx_t_11);
-      __Pyx_XGIVEREF(__pyx_t_12);
-      __Pyx_ErrRestore(__pyx_t_10, __pyx_t_11, __pyx_t_12);
-      __pyx_t_10 = 0; __pyx_t_11 = 0; __pyx_t_12 = 0; __pyx_t_13 = 0; __pyx_t_14 = 0; __pyx_t_15 = 0;
-      __pyx_lineno = __pyx_t_6; __pyx_clineno = __pyx_t_8; __pyx_filename = __pyx_t_9;
+      __Pyx_ErrRestore(__pyx_t_9, __pyx_t_10, __pyx_t_11);
+      __pyx_t_9 = 0; __pyx_t_10 = 0; __pyx_t_11 = 0; __pyx_t_12 = 0; __pyx_t_13 = 0; __pyx_t_14 = 0;
+      __pyx_lineno = __pyx_t_4; __pyx_clineno = __pyx_t_7; __pyx_filename = __pyx_t_8;
       goto __pyx_L1_error;
     }
     __pyx_L6:;
@@ -2364,24 +2258,23 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_16SubscribeMarketData(struc
  *     def UnSubscribeMarketData(self, pInstrumentIDs, char *pExchageID):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_nCount); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 77, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_r = __pyx_t_2;
-  __pyx_t_2 = 0;
+  __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_nCount); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_r = __pyx_t_5;
+  __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "SecurityFtdcMdApi.pyx":59
- *         self.api.RegisterFront(pszFrontAddress)
+  /* "SecurityFtdcMdApi.pyx":57
+ *         self.api.RegisterFront(c_pszFrontAddress)
  * 
- *     def SubscribeMarketData(self, pInstrumentIDs, ExchageID):             # <<<<<<<<<<<<<<
- *         pExchageID = bytes(ExchageID, 'gbk')
- *         cdef int nCount
+ *     def SubscribeMarketData(self, InstrumentIDs, ExchageID):             # <<<<<<<<<<<<<<
+ *         # pExchageID = bytes(ExchageID, 'gbk')
+ *         # pExchageID = ExchageID.decode('utf-8').encode('gbk')
  */
 
   /* function exit code */
   __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_5);
   __Pyx_AddTraceback("SecurityFtdcMdApi.MdApi.SubscribeMarketData", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -2666,7 +2559,7 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_18UnSubscribeMarketData(str
  * 
  *     def ReqUserLogin(self, pReqUserLogin, int nRequestID):             # <<<<<<<<<<<<<<
  *         if self.spi is NULL: return
- *         print(">>> SecurityFtdcMdApi.pyx ReqUserLogin", pReqUserLogin, pReqUserLogin['BrokerID'])
+ *         # print(">>> SecurityFtdcMdApi.pyx ReqUserLogin", pReqUserLogin, pReqUserLogin['BrokerID'])
  */
 
 /* Python wrapper */
@@ -2733,15 +2626,14 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_20ReqUserLogin(struct __pyx
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
-  char const *__pyx_t_4;
+  char const *__pyx_t_3;
   __Pyx_RefNannySetupContext("ReqUserLogin", 0);
 
   /* "SecurityFtdcMdApi.pyx":95
  * 
  *     def ReqUserLogin(self, pReqUserLogin, int nRequestID):
  *         if self.spi is NULL: return             # <<<<<<<<<<<<<<
- *         print(">>> SecurityFtdcMdApi.pyx ReqUserLogin", pReqUserLogin, pReqUserLogin['BrokerID'])
+ *         # print(">>> SecurityFtdcMdApi.pyx ReqUserLogin", pReqUserLogin, pReqUserLogin['BrokerID'])
  *         cdef CSecurityFtdcReqUserLoginField loginField
  */
   __pyx_t_1 = ((__pyx_v_self->spi == NULL) != 0);
@@ -2751,31 +2643,8 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_20ReqUserLogin(struct __pyx
     goto __pyx_L0;
   }
 
-  /* "SecurityFtdcMdApi.pyx":96
- *     def ReqUserLogin(self, pReqUserLogin, int nRequestID):
- *         if self.spi is NULL: return
- *         print(">>> SecurityFtdcMdApi.pyx ReqUserLogin", pReqUserLogin, pReqUserLogin['BrokerID'])             # <<<<<<<<<<<<<<
- *         cdef CSecurityFtdcReqUserLoginField loginField
- *         memset(loginField.UserID, 0, sizeof(loginField.UserID))
- */
-  __pyx_t_2 = PyObject_GetItem(__pyx_v_pReqUserLogin, __pyx_n_s_BrokerID); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 96, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyTuple_New(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 96, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_INCREF(__pyx_kp_s_SecurityFtdcMdApi_pyx_ReqUserLo);
-  __Pyx_GIVEREF(__pyx_kp_s_SecurityFtdcMdApi_pyx_ReqUserLo);
-  PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_kp_s_SecurityFtdcMdApi_pyx_ReqUserLo);
-  __Pyx_INCREF(__pyx_v_pReqUserLogin);
-  __Pyx_GIVEREF(__pyx_v_pReqUserLogin);
-  PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_v_pReqUserLogin);
-  __Pyx_GIVEREF(__pyx_t_2);
-  PyTuple_SET_ITEM(__pyx_t_3, 2, __pyx_t_2);
-  __pyx_t_2 = 0;
-  if (__Pyx_PrintOne(0, __pyx_t_3) < 0) __PYX_ERR(0, 96, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
   /* "SecurityFtdcMdApi.pyx":98
- *         print(">>> SecurityFtdcMdApi.pyx ReqUserLogin", pReqUserLogin, pReqUserLogin['BrokerID'])
+ *         # print(">>> SecurityFtdcMdApi.pyx ReqUserLogin", pReqUserLogin, pReqUserLogin['BrokerID'])
  *         cdef CSecurityFtdcReqUserLoginField loginField
  *         memset(loginField.UserID, 0, sizeof(loginField.UserID))             # <<<<<<<<<<<<<<
  *         memset(loginField.BrokerID, 0, sizeof(loginField.BrokerID))
@@ -2788,7 +2657,7 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_20ReqUserLogin(struct __pyx
  *         memset(loginField.UserID, 0, sizeof(loginField.UserID))
  *         memset(loginField.BrokerID, 0, sizeof(loginField.BrokerID))             # <<<<<<<<<<<<<<
  *         memset(loginField.Password, 0, sizeof(loginField.Password))
- *         # loginField.BrokerID = pReqUserLogin['BrokerID']
+ *         strcpy(loginField.BrokerID, pReqUserLogin['BrokerID'])
  */
   memset(__pyx_v_loginField.BrokerID, 0, (sizeof(__pyx_v_loginField.BrokerID)));
 
@@ -2796,51 +2665,51 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_20ReqUserLogin(struct __pyx
  *         memset(loginField.UserID, 0, sizeof(loginField.UserID))
  *         memset(loginField.BrokerID, 0, sizeof(loginField.BrokerID))
  *         memset(loginField.Password, 0, sizeof(loginField.Password))             # <<<<<<<<<<<<<<
- *         # loginField.BrokerID = pReqUserLogin['BrokerID']
- *         # loginField.UserID = pReqUserLogin['UserID']
+ *         strcpy(loginField.BrokerID, pReqUserLogin['BrokerID'])
+ *         strcpy(loginField.UserID, pReqUserLogin['UserID'])
  */
   memset(__pyx_v_loginField.Password, 0, (sizeof(__pyx_v_loginField.Password)));
 
-  /* "SecurityFtdcMdApi.pyx":104
- *         # loginField.UserID = pReqUserLogin['UserID']
- *         # loginField.Password = pReqUserLogin['Password']
+  /* "SecurityFtdcMdApi.pyx":101
+ *         memset(loginField.BrokerID, 0, sizeof(loginField.BrokerID))
+ *         memset(loginField.Password, 0, sizeof(loginField.Password))
  *         strcpy(loginField.BrokerID, pReqUserLogin['BrokerID'])             # <<<<<<<<<<<<<<
  *         strcpy(loginField.UserID, pReqUserLogin['UserID'])
  *         strcpy(loginField.Password, pReqUserLogin['Password'])
  */
-  __pyx_t_3 = PyObject_GetItem(__pyx_v_pReqUserLogin, __pyx_n_s_BrokerID); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 104, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_AsString(__pyx_t_3); if (unlikely((!__pyx_t_4) && PyErr_Occurred())) __PYX_ERR(0, 104, __pyx_L1_error)
-  strcpy(__pyx_v_loginField.BrokerID, __pyx_t_4);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_2 = PyObject_GetItem(__pyx_v_pReqUserLogin, __pyx_n_s_BrokerID); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 101, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_AsString(__pyx_t_2); if (unlikely((!__pyx_t_3) && PyErr_Occurred())) __PYX_ERR(0, 101, __pyx_L1_error)
+  strcpy(__pyx_v_loginField.BrokerID, __pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":105
- *         # loginField.Password = pReqUserLogin['Password']
+  /* "SecurityFtdcMdApi.pyx":102
+ *         memset(loginField.Password, 0, sizeof(loginField.Password))
  *         strcpy(loginField.BrokerID, pReqUserLogin['BrokerID'])
  *         strcpy(loginField.UserID, pReqUserLogin['UserID'])             # <<<<<<<<<<<<<<
  *         strcpy(loginField.Password, pReqUserLogin['Password'])
  * 
  */
-  __pyx_t_3 = PyObject_GetItem(__pyx_v_pReqUserLogin, __pyx_n_s_UserID); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 105, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_AsString(__pyx_t_3); if (unlikely((!__pyx_t_4) && PyErr_Occurred())) __PYX_ERR(0, 105, __pyx_L1_error)
-  strcpy(__pyx_v_loginField.UserID, __pyx_t_4);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_2 = PyObject_GetItem(__pyx_v_pReqUserLogin, __pyx_n_s_UserID); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 102, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_AsString(__pyx_t_2); if (unlikely((!__pyx_t_3) && PyErr_Occurred())) __PYX_ERR(0, 102, __pyx_L1_error)
+  strcpy(__pyx_v_loginField.UserID, __pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":106
+  /* "SecurityFtdcMdApi.pyx":103
  *         strcpy(loginField.BrokerID, pReqUserLogin['BrokerID'])
  *         strcpy(loginField.UserID, pReqUserLogin['UserID'])
  *         strcpy(loginField.Password, pReqUserLogin['Password'])             # <<<<<<<<<<<<<<
  * 
  *         with nogil: nRequestID = self.api.ReqUserLogin(&loginField, nRequestID)
  */
-  __pyx_t_3 = PyObject_GetItem(__pyx_v_pReqUserLogin, __pyx_n_s_Password); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 106, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_AsString(__pyx_t_3); if (unlikely((!__pyx_t_4) && PyErr_Occurred())) __PYX_ERR(0, 106, __pyx_L1_error)
-  strcpy(__pyx_v_loginField.Password, __pyx_t_4);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_2 = PyObject_GetItem(__pyx_v_pReqUserLogin, __pyx_n_s_Password); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 103, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_AsString(__pyx_t_2); if (unlikely((!__pyx_t_3) && PyErr_Occurred())) __PYX_ERR(0, 103, __pyx_L1_error)
+  strcpy(__pyx_v_loginField.Password, __pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":108
+  /* "SecurityFtdcMdApi.pyx":105
  *         strcpy(loginField.Password, pReqUserLogin['Password'])
  * 
  *         with nogil: nRequestID = self.api.ReqUserLogin(&loginField, nRequestID)             # <<<<<<<<<<<<<<
@@ -2866,7 +2735,7 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_20ReqUserLogin(struct __pyx
       }
   }
 
-  /* "SecurityFtdcMdApi.pyx":109
+  /* "SecurityFtdcMdApi.pyx":106
  * 
  *         with nogil: nRequestID = self.api.ReqUserLogin(&loginField, nRequestID)
  *         return nRequestID             # <<<<<<<<<<<<<<
@@ -2874,10 +2743,10 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_20ReqUserLogin(struct __pyx
  *     def ReqUserLogout(self, pUserLogout, int nRequestID):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_nRequestID); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 109, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_r = __pyx_t_3;
-  __pyx_t_3 = 0;
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_nRequestID); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 106, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_r = __pyx_t_2;
+  __pyx_t_2 = 0;
   goto __pyx_L0;
 
   /* "SecurityFtdcMdApi.pyx":94
@@ -2885,13 +2754,12 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_20ReqUserLogin(struct __pyx
  * 
  *     def ReqUserLogin(self, pReqUserLogin, int nRequestID):             # <<<<<<<<<<<<<<
  *         if self.spi is NULL: return
- *         print(">>> SecurityFtdcMdApi.pyx ReqUserLogin", pReqUserLogin, pReqUserLogin['BrokerID'])
+ *         # print(">>> SecurityFtdcMdApi.pyx ReqUserLogin", pReqUserLogin, pReqUserLogin['BrokerID'])
  */
 
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
   __Pyx_AddTraceback("SecurityFtdcMdApi.MdApi.ReqUserLogin", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -2900,7 +2768,7 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_20ReqUserLogin(struct __pyx
   return __pyx_r;
 }
 
-/* "SecurityFtdcMdApi.pyx":111
+/* "SecurityFtdcMdApi.pyx":108
  *         return nRequestID
  * 
  *     def ReqUserLogout(self, pUserLogout, int nRequestID):             # <<<<<<<<<<<<<<
@@ -2936,11 +2804,11 @@ static PyObject *__pyx_pw_17SecurityFtdcMdApi_5MdApi_23ReqUserLogout(PyObject *_
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_nRequestID)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("ReqUserLogout", 1, 2, 2, 1); __PYX_ERR(0, 111, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("ReqUserLogout", 1, 2, 2, 1); __PYX_ERR(0, 108, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "ReqUserLogout") < 0)) __PYX_ERR(0, 111, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "ReqUserLogout") < 0)) __PYX_ERR(0, 108, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -2949,11 +2817,11 @@ static PyObject *__pyx_pw_17SecurityFtdcMdApi_5MdApi_23ReqUserLogout(PyObject *_
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
     __pyx_v_pUserLogout = values[0];
-    __pyx_v_nRequestID = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_nRequestID == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 111, __pyx_L3_error)
+    __pyx_v_nRequestID = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_nRequestID == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 108, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("ReqUserLogout", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 111, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("ReqUserLogout", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 108, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("SecurityFtdcMdApi.MdApi.ReqUserLogout", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2976,7 +2844,7 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_22ReqUserLogout(struct __py
   TSecurityFtdcBrokerIDType __pyx_t_4;
   __Pyx_RefNannySetupContext("ReqUserLogout", 0);
 
-  /* "SecurityFtdcMdApi.pyx":112
+  /* "SecurityFtdcMdApi.pyx":109
  * 
  *     def ReqUserLogout(self, pUserLogout, int nRequestID):
  *         if self.spi is NULL: return             # <<<<<<<<<<<<<<
@@ -2990,33 +2858,33 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_22ReqUserLogout(struct __py
     goto __pyx_L0;
   }
 
-  /* "SecurityFtdcMdApi.pyx":114
+  /* "SecurityFtdcMdApi.pyx":111
  *         if self.spi is NULL: return
  *         cdef CSecurityFtdcUserLogoutField logoutField
  *         logoutField.UserID = pUserLogout['UserID']             # <<<<<<<<<<<<<<
  *         logoutField.BrokerID = pUserLogout['BrokerID']
  *         with nogil: nRequestID = self.api.ReqUserLogout(&logoutField, nRequestID)
  */
-  __pyx_t_2 = PyObject_GetItem(__pyx_v_pUserLogout, __pyx_n_s_UserID); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 114, __pyx_L1_error)
+  __pyx_t_2 = PyObject_GetItem(__pyx_v_pUserLogout, __pyx_n_s_UserID); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 111, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (unlikely(__Pyx_carray_from_py_char(__pyx_t_2, __pyx_t_3, 16) < 0)) __PYX_ERR(0, 114, __pyx_L1_error)
+  if (unlikely(__Pyx_carray_from_py_char(__pyx_t_2, __pyx_t_3, 16) < 0)) __PYX_ERR(0, 111, __pyx_L1_error)
   memcpy(&(__pyx_v_logoutField.UserID[0]), __pyx_t_3, sizeof(__pyx_v_logoutField.UserID[0]) * (16));
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":115
+  /* "SecurityFtdcMdApi.pyx":112
  *         cdef CSecurityFtdcUserLogoutField logoutField
  *         logoutField.UserID = pUserLogout['UserID']
  *         logoutField.BrokerID = pUserLogout['BrokerID']             # <<<<<<<<<<<<<<
  *         with nogil: nRequestID = self.api.ReqUserLogout(&logoutField, nRequestID)
  *         return nRequestID
  */
-  __pyx_t_2 = PyObject_GetItem(__pyx_v_pUserLogout, __pyx_n_s_BrokerID); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 115, __pyx_L1_error)
+  __pyx_t_2 = PyObject_GetItem(__pyx_v_pUserLogout, __pyx_n_s_BrokerID); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 112, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (unlikely(__Pyx_carray_from_py_char(__pyx_t_2, __pyx_t_4, 11) < 0)) __PYX_ERR(0, 115, __pyx_L1_error)
+  if (unlikely(__Pyx_carray_from_py_char(__pyx_t_2, __pyx_t_4, 11) < 0)) __PYX_ERR(0, 112, __pyx_L1_error)
   memcpy(&(__pyx_v_logoutField.BrokerID[0]), __pyx_t_4, sizeof(__pyx_v_logoutField.BrokerID[0]) * (11));
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":116
+  /* "SecurityFtdcMdApi.pyx":113
  *         logoutField.UserID = pUserLogout['UserID']
  *         logoutField.BrokerID = pUserLogout['BrokerID']
  *         with nogil: nRequestID = self.api.ReqUserLogout(&logoutField, nRequestID)             # <<<<<<<<<<<<<<
@@ -3042,7 +2910,7 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_22ReqUserLogout(struct __py
       }
   }
 
-  /* "SecurityFtdcMdApi.pyx":117
+  /* "SecurityFtdcMdApi.pyx":114
  *         logoutField.BrokerID = pUserLogout['BrokerID']
  *         with nogil: nRequestID = self.api.ReqUserLogout(&logoutField, nRequestID)
  *         return nRequestID             # <<<<<<<<<<<<<<
@@ -3050,13 +2918,13 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_22ReqUserLogout(struct __py
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_nRequestID); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 117, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_nRequestID); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "SecurityFtdcMdApi.pyx":111
+  /* "SecurityFtdcMdApi.pyx":108
  *         return nRequestID
  * 
  *     def ReqUserLogout(self, pUserLogout, int nRequestID):             # <<<<<<<<<<<<<<
@@ -3075,7 +2943,7 @@ static PyObject *__pyx_pf_17SecurityFtdcMdApi_5MdApi_22ReqUserLogout(struct __py
   return __pyx_r;
 }
 
-/* "SecurityFtdcMdApi.pyx":120
+/* "SecurityFtdcMdApi.pyx":117
  * 
  * 
  * cdef extern int MdSpi_OnFrontConnected(self) except -1:             # <<<<<<<<<<<<<<
@@ -3091,14 +2959,14 @@ int MdSpi_OnFrontConnected(PyObject *__pyx_v_self) {
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("MdSpi_OnFrontConnected", 0);
 
-  /* "SecurityFtdcMdApi.pyx":121
+  /* "SecurityFtdcMdApi.pyx":118
  * 
  * cdef extern int MdSpi_OnFrontConnected(self) except -1:
  *     self.OnFrontConnected()             # <<<<<<<<<<<<<<
  *     return 0
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_OnFrontConnected); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 121, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_OnFrontConnected); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 118, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -3111,16 +2979,16 @@ int MdSpi_OnFrontConnected(PyObject *__pyx_v_self) {
     }
   }
   if (__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 121, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 118, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else {
-    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 121, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 118, __pyx_L1_error)
   }
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":122
+  /* "SecurityFtdcMdApi.pyx":119
  * cdef extern int MdSpi_OnFrontConnected(self) except -1:
  *     self.OnFrontConnected()
  *     return 0             # <<<<<<<<<<<<<<
@@ -3130,7 +2998,7 @@ int MdSpi_OnFrontConnected(PyObject *__pyx_v_self) {
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "SecurityFtdcMdApi.pyx":120
+  /* "SecurityFtdcMdApi.pyx":117
  * 
  * 
  * cdef extern int MdSpi_OnFrontConnected(self) except -1:             # <<<<<<<<<<<<<<
@@ -3150,7 +3018,7 @@ int MdSpi_OnFrontConnected(PyObject *__pyx_v_self) {
   return __pyx_r;
 }
 
-/* "SecurityFtdcMdApi.pyx":124
+/* "SecurityFtdcMdApi.pyx":121
  *     return 0
  * 
  * cdef extern int MdSpi_OnFrontDisconnected(self, int nReason) except -1:             # <<<<<<<<<<<<<<
@@ -3168,16 +3036,16 @@ int MdSpi_OnFrontDisconnected(PyObject *__pyx_v_self, int __pyx_v_nReason) {
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("MdSpi_OnFrontDisconnected", 0);
 
-  /* "SecurityFtdcMdApi.pyx":125
+  /* "SecurityFtdcMdApi.pyx":122
  * 
  * cdef extern int MdSpi_OnFrontDisconnected(self, int nReason) except -1:
  *     self.OnFrontDisconnected(nReason)             # <<<<<<<<<<<<<<
  *     return 0
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_OnFrontDisconnected); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 125, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_OnFrontDisconnected); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 122, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_nReason); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 125, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_nReason); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 122, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -3190,14 +3058,14 @@ int MdSpi_OnFrontDisconnected(PyObject *__pyx_v_self, int __pyx_v_nReason) {
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 125, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 125, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3206,20 +3074,20 @@ int MdSpi_OnFrontDisconnected(PyObject *__pyx_v_self, int __pyx_v_nReason) {
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 125, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 125, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 122, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 125, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -3227,7 +3095,7 @@ int MdSpi_OnFrontDisconnected(PyObject *__pyx_v_self, int __pyx_v_nReason) {
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":126
+  /* "SecurityFtdcMdApi.pyx":123
  * cdef extern int MdSpi_OnFrontDisconnected(self, int nReason) except -1:
  *     self.OnFrontDisconnected(nReason)
  *     return 0             # <<<<<<<<<<<<<<
@@ -3237,7 +3105,7 @@ int MdSpi_OnFrontDisconnected(PyObject *__pyx_v_self, int __pyx_v_nReason) {
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "SecurityFtdcMdApi.pyx":124
+  /* "SecurityFtdcMdApi.pyx":121
  *     return 0
  * 
  * cdef extern int MdSpi_OnFrontDisconnected(self, int nReason) except -1:             # <<<<<<<<<<<<<<
@@ -3259,7 +3127,7 @@ int MdSpi_OnFrontDisconnected(PyObject *__pyx_v_self, int __pyx_v_nReason) {
   return __pyx_r;
 }
 
-/* "SecurityFtdcMdApi.pyx":128
+/* "SecurityFtdcMdApi.pyx":125
  *     return 0
  * 
  * cdef extern int MdSpi_OnHeartBeatWarning(self, int nTimeLapse) except -1:             # <<<<<<<<<<<<<<
@@ -3277,16 +3145,16 @@ int MdSpi_OnHeartBeatWarning(PyObject *__pyx_v_self, int __pyx_v_nTimeLapse) {
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("MdSpi_OnHeartBeatWarning", 0);
 
-  /* "SecurityFtdcMdApi.pyx":129
+  /* "SecurityFtdcMdApi.pyx":126
  * 
  * cdef extern int MdSpi_OnHeartBeatWarning(self, int nTimeLapse) except -1:
  *     self.OnHeartBeatWarning(nTimeLapse)             # <<<<<<<<<<<<<<
  *     return 0
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_OnHeartBeatWarning); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 129, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_OnHeartBeatWarning); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 126, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_nTimeLapse); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 129, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_nTimeLapse); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 126, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -3299,14 +3167,14 @@ int MdSpi_OnHeartBeatWarning(PyObject *__pyx_v_self, int __pyx_v_nTimeLapse) {
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 129, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 129, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3315,20 +3183,20 @@ int MdSpi_OnHeartBeatWarning(PyObject *__pyx_v_self, int __pyx_v_nTimeLapse) {
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_t_3};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 129, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 129, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 126, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_3);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_t_3);
       __pyx_t_3 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 129, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
@@ -3336,7 +3204,7 @@ int MdSpi_OnHeartBeatWarning(PyObject *__pyx_v_self, int __pyx_v_nTimeLapse) {
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":130
+  /* "SecurityFtdcMdApi.pyx":127
  * cdef extern int MdSpi_OnHeartBeatWarning(self, int nTimeLapse) except -1:
  *     self.OnHeartBeatWarning(nTimeLapse)
  *     return 0             # <<<<<<<<<<<<<<
@@ -3346,7 +3214,7 @@ int MdSpi_OnHeartBeatWarning(PyObject *__pyx_v_self, int __pyx_v_nTimeLapse) {
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "SecurityFtdcMdApi.pyx":128
+  /* "SecurityFtdcMdApi.pyx":125
  *     return 0
  * 
  * cdef extern int MdSpi_OnHeartBeatWarning(self, int nTimeLapse) except -1:             # <<<<<<<<<<<<<<
@@ -3368,7 +3236,7 @@ int MdSpi_OnHeartBeatWarning(PyObject *__pyx_v_self, int __pyx_v_nTimeLapse) {
   return __pyx_r;
 }
 
-/* "SecurityFtdcMdApi.pyx":132
+/* "SecurityFtdcMdApi.pyx":129
  *     return 0
  * 
  * cdef extern int MdSpi_OnRspError(self, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:             # <<<<<<<<<<<<<<
@@ -3389,54 +3257,54 @@ int MdSpi_OnRspError(PyObject *__pyx_v_self, struct CSecurityFtdcRspInfoField *_
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("MdSpi_OnRspError", 0);
 
-  /* "SecurityFtdcMdApi.pyx":133
+  /* "SecurityFtdcMdApi.pyx":130
  * 
  * cdef extern int MdSpi_OnRspError(self, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
  *     dict_pRspInfo = {}             # <<<<<<<<<<<<<<
  *     dict_pRspInfo['ErrorMsg'] = pRspInfo.ErrorMsg
  *     dict_pRspInfo['ErrorID'] = pRspInfo.ErrorID
  */
-  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 133, __pyx_L1_error)
+  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 130, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_dict_pRspInfo = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":134
+  /* "SecurityFtdcMdApi.pyx":131
  * cdef extern int MdSpi_OnRspError(self, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
  *     dict_pRspInfo = {}
  *     dict_pRspInfo['ErrorMsg'] = pRspInfo.ErrorMsg             # <<<<<<<<<<<<<<
  *     dict_pRspInfo['ErrorID'] = pRspInfo.ErrorID
  *     self.OnRspError(dict_pRspInfo, nRequestID, bIsLast)
  */
-  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pRspInfo->ErrorMsg); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 134, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pRspInfo->ErrorMsg); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 131, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspInfo, __pyx_n_s_ErrorMsg, __pyx_t_1) < 0)) __PYX_ERR(0, 134, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspInfo, __pyx_n_s_ErrorMsg, __pyx_t_1) < 0)) __PYX_ERR(0, 131, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":135
+  /* "SecurityFtdcMdApi.pyx":132
  *     dict_pRspInfo = {}
  *     dict_pRspInfo['ErrorMsg'] = pRspInfo.ErrorMsg
  *     dict_pRspInfo['ErrorID'] = pRspInfo.ErrorID             # <<<<<<<<<<<<<<
  *     self.OnRspError(dict_pRspInfo, nRequestID, bIsLast)
  *     return 0
  */
-  __pyx_t_1 = __Pyx_PyInt_From_TSecurityFtdcErrorIDType(__pyx_v_pRspInfo->ErrorID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_TSecurityFtdcErrorIDType(__pyx_v_pRspInfo->ErrorID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 132, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspInfo, __pyx_n_s_ErrorID, __pyx_t_1) < 0)) __PYX_ERR(0, 135, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspInfo, __pyx_n_s_ErrorID, __pyx_t_1) < 0)) __PYX_ERR(0, 132, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":136
+  /* "SecurityFtdcMdApi.pyx":133
  *     dict_pRspInfo['ErrorMsg'] = pRspInfo.ErrorMsg
  *     dict_pRspInfo['ErrorID'] = pRspInfo.ErrorID
  *     self.OnRspError(dict_pRspInfo, nRequestID, bIsLast)             # <<<<<<<<<<<<<<
  *     return 0
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_OnRspError); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 136, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_OnRspError); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 133, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_nRequestID); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 136, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_nRequestID); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 133, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyBool_FromLong(__pyx_v_bIsLast); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 136, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyBool_FromLong(__pyx_v_bIsLast); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 133, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   __pyx_t_6 = 0;
@@ -3453,7 +3321,7 @@ int MdSpi_OnRspError(PyObject *__pyx_v_self, struct CSecurityFtdcRspInfoField *_
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[4] = {__pyx_t_5, __pyx_v_dict_pRspInfo, __pyx_t_3, __pyx_t_4};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 3+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 3+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 133, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3463,7 +3331,7 @@ int MdSpi_OnRspError(PyObject *__pyx_v_self, struct CSecurityFtdcRspInfoField *_
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[4] = {__pyx_t_5, __pyx_v_dict_pRspInfo, __pyx_t_3, __pyx_t_4};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 3+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 3+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 133, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3471,7 +3339,7 @@ int MdSpi_OnRspError(PyObject *__pyx_v_self, struct CSecurityFtdcRspInfoField *_
   } else
   #endif
   {
-    __pyx_t_7 = PyTuple_New(3+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(3+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 133, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     if (__pyx_t_5) {
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -3485,14 +3353,14 @@ int MdSpi_OnRspError(PyObject *__pyx_v_self, struct CSecurityFtdcRspInfoField *_
     PyTuple_SET_ITEM(__pyx_t_7, 2+__pyx_t_6, __pyx_t_4);
     __pyx_t_3 = 0;
     __pyx_t_4 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 136, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 133, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":137
+  /* "SecurityFtdcMdApi.pyx":134
  *     dict_pRspInfo['ErrorID'] = pRspInfo.ErrorID
  *     self.OnRspError(dict_pRspInfo, nRequestID, bIsLast)
  *     return 0             # <<<<<<<<<<<<<<
@@ -3502,7 +3370,7 @@ int MdSpi_OnRspError(PyObject *__pyx_v_self, struct CSecurityFtdcRspInfoField *_
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "SecurityFtdcMdApi.pyx":132
+  /* "SecurityFtdcMdApi.pyx":129
  *     return 0
  * 
  * cdef extern int MdSpi_OnRspError(self, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:             # <<<<<<<<<<<<<<
@@ -3526,12 +3394,12 @@ int MdSpi_OnRspError(PyObject *__pyx_v_self, struct CSecurityFtdcRspInfoField *_
   return __pyx_r;
 }
 
-/* "SecurityFtdcMdApi.pyx":139
+/* "SecurityFtdcMdApi.pyx":136
  *     return 0
  * 
  * cdef extern int MdSpi_OnRspUserLogin(self, CSecurityFtdcRspUserLoginField *pRspUserLogin, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:             # <<<<<<<<<<<<<<
- *     dict_pRspUserLogin = {}
- *     dict_pRspUserLogin['BrokerID'] = pRspUserLogin.BrokerID
+ *     # py_obj = <object>pRspUserLogin
+ *     # print(">>> MdSpi_OnRspUserLogin() py_obj ", py_obj)
  */
 
 int MdSpi_OnRspUserLogin(PyObject *__pyx_v_self, struct CSecurityFtdcRspUserLoginField *__pyx_v_pRspUserLogin, struct CSecurityFtdcRspInfoField *__pyx_v_pRspInfo, int __pyx_v_nRequestID, bool __pyx_v_bIsLast) {
@@ -3548,138 +3416,138 @@ int MdSpi_OnRspUserLogin(PyObject *__pyx_v_self, struct CSecurityFtdcRspUserLogi
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("MdSpi_OnRspUserLogin", 0);
 
-  /* "SecurityFtdcMdApi.pyx":140
- * 
- * cdef extern int MdSpi_OnRspUserLogin(self, CSecurityFtdcRspUserLoginField *pRspUserLogin, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
+  /* "SecurityFtdcMdApi.pyx":139
+ *     # py_obj = <object>pRspUserLogin
+ *     # print(">>> MdSpi_OnRspUserLogin() py_obj ", py_obj)
  *     dict_pRspUserLogin = {}             # <<<<<<<<<<<<<<
  *     dict_pRspUserLogin['BrokerID'] = pRspUserLogin.BrokerID
  *     dict_pRspUserLogin['UserID'] = pRspUserLogin.UserID
  */
-  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 140, __pyx_L1_error)
+  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 139, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_dict_pRspUserLogin = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":141
- * cdef extern int MdSpi_OnRspUserLogin(self, CSecurityFtdcRspUserLoginField *pRspUserLogin, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
+  /* "SecurityFtdcMdApi.pyx":140
+ *     # print(">>> MdSpi_OnRspUserLogin() py_obj ", py_obj)
  *     dict_pRspUserLogin = {}
  *     dict_pRspUserLogin['BrokerID'] = pRspUserLogin.BrokerID             # <<<<<<<<<<<<<<
  *     dict_pRspUserLogin['UserID'] = pRspUserLogin.UserID
  *     dict_pRspUserLogin['FrontID'] = pRspUserLogin.FrontID
  */
-  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pRspUserLogin->BrokerID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pRspUserLogin->BrokerID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspUserLogin, __pyx_n_s_BrokerID, __pyx_t_1) < 0)) __PYX_ERR(0, 141, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspUserLogin, __pyx_n_s_BrokerID, __pyx_t_1) < 0)) __PYX_ERR(0, 140, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":142
+  /* "SecurityFtdcMdApi.pyx":141
  *     dict_pRspUserLogin = {}
  *     dict_pRspUserLogin['BrokerID'] = pRspUserLogin.BrokerID
  *     dict_pRspUserLogin['UserID'] = pRspUserLogin.UserID             # <<<<<<<<<<<<<<
  *     dict_pRspUserLogin['FrontID'] = pRspUserLogin.FrontID
  *     dict_pRspUserLogin['LoginTime'] = pRspUserLogin.LoginTime
  */
-  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pRspUserLogin->UserID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 142, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pRspUserLogin->UserID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 141, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspUserLogin, __pyx_n_s_UserID, __pyx_t_1) < 0)) __PYX_ERR(0, 142, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspUserLogin, __pyx_n_s_UserID, __pyx_t_1) < 0)) __PYX_ERR(0, 141, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":143
+  /* "SecurityFtdcMdApi.pyx":142
  *     dict_pRspUserLogin['BrokerID'] = pRspUserLogin.BrokerID
  *     dict_pRspUserLogin['UserID'] = pRspUserLogin.UserID
  *     dict_pRspUserLogin['FrontID'] = pRspUserLogin.FrontID             # <<<<<<<<<<<<<<
  *     dict_pRspUserLogin['LoginTime'] = pRspUserLogin.LoginTime
  *     dict_pRspUserLogin['MaxOrderRef'] = pRspUserLogin.MaxOrderRef
  */
-  __pyx_t_1 = __Pyx_PyInt_From_TSecurityFtdcFrontIDType(__pyx_v_pRspUserLogin->FrontID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 143, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_TSecurityFtdcFrontIDType(__pyx_v_pRspUserLogin->FrontID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 142, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspUserLogin, __pyx_n_s_FrontID, __pyx_t_1) < 0)) __PYX_ERR(0, 143, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspUserLogin, __pyx_n_s_FrontID, __pyx_t_1) < 0)) __PYX_ERR(0, 142, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":144
+  /* "SecurityFtdcMdApi.pyx":143
  *     dict_pRspUserLogin['UserID'] = pRspUserLogin.UserID
  *     dict_pRspUserLogin['FrontID'] = pRspUserLogin.FrontID
  *     dict_pRspUserLogin['LoginTime'] = pRspUserLogin.LoginTime             # <<<<<<<<<<<<<<
  *     dict_pRspUserLogin['MaxOrderRef'] = pRspUserLogin.MaxOrderRef
  *     dict_pRspUserLogin['SessionID'] = pRspUserLogin.SessionID
  */
-  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pRspUserLogin->LoginTime); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 144, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pRspUserLogin->LoginTime); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 143, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspUserLogin, __pyx_n_s_LoginTime, __pyx_t_1) < 0)) __PYX_ERR(0, 144, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspUserLogin, __pyx_n_s_LoginTime, __pyx_t_1) < 0)) __PYX_ERR(0, 143, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":145
+  /* "SecurityFtdcMdApi.pyx":144
  *     dict_pRspUserLogin['FrontID'] = pRspUserLogin.FrontID
  *     dict_pRspUserLogin['LoginTime'] = pRspUserLogin.LoginTime
  *     dict_pRspUserLogin['MaxOrderRef'] = pRspUserLogin.MaxOrderRef             # <<<<<<<<<<<<<<
  *     dict_pRspUserLogin['SessionID'] = pRspUserLogin.SessionID
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pRspUserLogin->MaxOrderRef); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pRspUserLogin->MaxOrderRef); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspUserLogin, __pyx_n_s_MaxOrderRef, __pyx_t_1) < 0)) __PYX_ERR(0, 145, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspUserLogin, __pyx_n_s_MaxOrderRef, __pyx_t_1) < 0)) __PYX_ERR(0, 144, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":146
+  /* "SecurityFtdcMdApi.pyx":145
  *     dict_pRspUserLogin['LoginTime'] = pRspUserLogin.LoginTime
  *     dict_pRspUserLogin['MaxOrderRef'] = pRspUserLogin.MaxOrderRef
  *     dict_pRspUserLogin['SessionID'] = pRspUserLogin.SessionID             # <<<<<<<<<<<<<<
  * 
  *     dict_pRspInfo = {}
  */
-  __pyx_t_1 = __Pyx_PyInt_From_TSecurityFtdcSessionIDType(__pyx_v_pRspUserLogin->SessionID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 146, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_TSecurityFtdcSessionIDType(__pyx_v_pRspUserLogin->SessionID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 145, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspUserLogin, __pyx_n_s_SessionID, __pyx_t_1) < 0)) __PYX_ERR(0, 146, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspUserLogin, __pyx_n_s_SessionID, __pyx_t_1) < 0)) __PYX_ERR(0, 145, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":148
+  /* "SecurityFtdcMdApi.pyx":147
  *     dict_pRspUserLogin['SessionID'] = pRspUserLogin.SessionID
  * 
  *     dict_pRspInfo = {}             # <<<<<<<<<<<<<<
  *     dict_pRspInfo['ErrorID'] = pRspInfo.ErrorID
  *     dict_pRspInfo['ErrorMsg'] = pRspInfo.ErrorMsg
  */
-  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 148, __pyx_L1_error)
+  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 147, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_dict_pRspInfo = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":149
+  /* "SecurityFtdcMdApi.pyx":148
  * 
  *     dict_pRspInfo = {}
  *     dict_pRspInfo['ErrorID'] = pRspInfo.ErrorID             # <<<<<<<<<<<<<<
  *     dict_pRspInfo['ErrorMsg'] = pRspInfo.ErrorMsg
  * 
  */
-  __pyx_t_1 = __Pyx_PyInt_From_TSecurityFtdcErrorIDType(__pyx_v_pRspInfo->ErrorID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 149, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_TSecurityFtdcErrorIDType(__pyx_v_pRspInfo->ErrorID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 148, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspInfo, __pyx_n_s_ErrorID, __pyx_t_1) < 0)) __PYX_ERR(0, 149, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspInfo, __pyx_n_s_ErrorID, __pyx_t_1) < 0)) __PYX_ERR(0, 148, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":150
+  /* "SecurityFtdcMdApi.pyx":149
  *     dict_pRspInfo = {}
  *     dict_pRspInfo['ErrorID'] = pRspInfo.ErrorID
  *     dict_pRspInfo['ErrorMsg'] = pRspInfo.ErrorMsg             # <<<<<<<<<<<<<<
  * 
  *     self.OnRspUserLogin(dict_pRspUserLogin, dict_pRspInfo, nRequestID, bIsLast)
  */
-  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pRspInfo->ErrorMsg); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 150, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pRspInfo->ErrorMsg); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 149, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspInfo, __pyx_n_s_ErrorMsg, __pyx_t_1) < 0)) __PYX_ERR(0, 150, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspInfo, __pyx_n_s_ErrorMsg, __pyx_t_1) < 0)) __PYX_ERR(0, 149, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":152
+  /* "SecurityFtdcMdApi.pyx":151
  *     dict_pRspInfo['ErrorMsg'] = pRspInfo.ErrorMsg
  * 
  *     self.OnRspUserLogin(dict_pRspUserLogin, dict_pRspInfo, nRequestID, bIsLast)             # <<<<<<<<<<<<<<
  *     return 0
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_OnRspUserLogin); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_OnRspUserLogin); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 151, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_nRequestID); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_nRequestID); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 151, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyBool_FromLong(__pyx_v_bIsLast); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyBool_FromLong(__pyx_v_bIsLast); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 151, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   __pyx_t_6 = 0;
@@ -3696,7 +3564,7 @@ int MdSpi_OnRspUserLogin(PyObject *__pyx_v_self, struct CSecurityFtdcRspUserLogi
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[5] = {__pyx_t_5, __pyx_v_dict_pRspUserLogin, __pyx_v_dict_pRspInfo, __pyx_t_3, __pyx_t_4};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 152, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 151, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3706,7 +3574,7 @@ int MdSpi_OnRspUserLogin(PyObject *__pyx_v_self, struct CSecurityFtdcRspUserLogi
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[5] = {__pyx_t_5, __pyx_v_dict_pRspUserLogin, __pyx_v_dict_pRspInfo, __pyx_t_3, __pyx_t_4};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 152, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 151, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3714,7 +3582,7 @@ int MdSpi_OnRspUserLogin(PyObject *__pyx_v_self, struct CSecurityFtdcRspUserLogi
   } else
   #endif
   {
-    __pyx_t_7 = PyTuple_New(4+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 152, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(4+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 151, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     if (__pyx_t_5) {
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -3731,14 +3599,14 @@ int MdSpi_OnRspUserLogin(PyObject *__pyx_v_self, struct CSecurityFtdcRspUserLogi
     PyTuple_SET_ITEM(__pyx_t_7, 3+__pyx_t_6, __pyx_t_4);
     __pyx_t_3 = 0;
     __pyx_t_4 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 152, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 151, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":153
+  /* "SecurityFtdcMdApi.pyx":152
  * 
  *     self.OnRspUserLogin(dict_pRspUserLogin, dict_pRspInfo, nRequestID, bIsLast)
  *     return 0             # <<<<<<<<<<<<<<
@@ -3748,12 +3616,12 @@ int MdSpi_OnRspUserLogin(PyObject *__pyx_v_self, struct CSecurityFtdcRspUserLogi
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "SecurityFtdcMdApi.pyx":139
+  /* "SecurityFtdcMdApi.pyx":136
  *     return 0
  * 
  * cdef extern int MdSpi_OnRspUserLogin(self, CSecurityFtdcRspUserLoginField *pRspUserLogin, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:             # <<<<<<<<<<<<<<
- *     dict_pRspUserLogin = {}
- *     dict_pRspUserLogin['BrokerID'] = pRspUserLogin.BrokerID
+ *     # py_obj = <object>pRspUserLogin
+ *     # print(">>> MdSpi_OnRspUserLogin() py_obj ", py_obj)
  */
 
   /* function exit code */
@@ -3773,7 +3641,7 @@ int MdSpi_OnRspUserLogin(PyObject *__pyx_v_self, struct CSecurityFtdcRspUserLogi
   return __pyx_r;
 }
 
-/* "SecurityFtdcMdApi.pyx":155
+/* "SecurityFtdcMdApi.pyx":154
  *     return 0
  * 
  * cdef extern int MdSpi_OnRspUserLogout(self, CSecurityFtdcUserLogoutField *pUserLogout, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:             # <<<<<<<<<<<<<<
@@ -3786,7 +3654,7 @@ int MdSpi_OnRspUserLogout(CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED st
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("MdSpi_OnRspUserLogout", 0);
 
-  /* "SecurityFtdcMdApi.pyx":158
+  /* "SecurityFtdcMdApi.pyx":157
  * 
  *     # self.OnRspUserLogout(pUserLogout, pRspInfo, nRequestID, bIsLast)
  *     return 0             # <<<<<<<<<<<<<<
@@ -3796,7 +3664,7 @@ int MdSpi_OnRspUserLogout(CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED st
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "SecurityFtdcMdApi.pyx":155
+  /* "SecurityFtdcMdApi.pyx":154
  *     return 0
  * 
  * cdef extern int MdSpi_OnRspUserLogout(self, CSecurityFtdcUserLogoutField *pUserLogout, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:             # <<<<<<<<<<<<<<
@@ -3810,7 +3678,7 @@ int MdSpi_OnRspUserLogout(CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUSED st
   return __pyx_r;
 }
 
-/* "SecurityFtdcMdApi.pyx":160
+/* "SecurityFtdcMdApi.pyx":159
  *     return 0
  * 
  * cdef extern int MdSpi_OnRspSubMarketData(self, CSecurityFtdcSpecificInstrumentField *pSpecificInstrument, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:             # <<<<<<<<<<<<<<
@@ -3832,18 +3700,18 @@ int MdSpi_OnRspSubMarketData(PyObject *__pyx_v_self, struct CSecurityFtdcSpecifi
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("MdSpi_OnRspSubMarketData", 0);
 
-  /* "SecurityFtdcMdApi.pyx":162
+  /* "SecurityFtdcMdApi.pyx":161
  * cdef extern int MdSpi_OnRspSubMarketData(self, CSecurityFtdcSpecificInstrumentField *pSpecificInstrument, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
  *     # self.OnRspSubMarketData(pSpecificInstrument, pRspInfo, nRequestID, bIsLast)
  *     print("MdSpi_OnRspSubMarketData() >>>", pSpecificInstrument.InstrumentID, pSpecificInstrument.ExchangeID)             # <<<<<<<<<<<<<<
  *     dict_pSpecificInstrument = {}
  *     ###
  */
-  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pSpecificInstrument->InstrumentID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 162, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pSpecificInstrument->InstrumentID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 161, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_FromString(__pyx_v_pSpecificInstrument->ExchangeID); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 162, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_FromString(__pyx_v_pSpecificInstrument->ExchangeID); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 161, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyTuple_New(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 162, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 161, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_kp_s_MdSpi_OnRspSubMarketData);
   __Pyx_GIVEREF(__pyx_kp_s_MdSpi_OnRspSubMarketData);
@@ -3854,93 +3722,93 @@ int MdSpi_OnRspSubMarketData(PyObject *__pyx_v_self, struct CSecurityFtdcSpecifi
   PyTuple_SET_ITEM(__pyx_t_3, 2, __pyx_t_2);
   __pyx_t_1 = 0;
   __pyx_t_2 = 0;
-  if (__Pyx_PrintOne(0, __pyx_t_3) < 0) __PYX_ERR(0, 162, __pyx_L1_error)
+  if (__Pyx_PrintOne(0, __pyx_t_3) < 0) __PYX_ERR(0, 161, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":163
+  /* "SecurityFtdcMdApi.pyx":162
  *     # self.OnRspSubMarketData(pSpecificInstrument, pRspInfo, nRequestID, bIsLast)
  *     print("MdSpi_OnRspSubMarketData() >>>", pSpecificInstrument.InstrumentID, pSpecificInstrument.ExchangeID)
  *     dict_pSpecificInstrument = {}             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pSpecificInstrument['InstrumentID'] = pSpecificInstrument.InstrumentID
  */
-  __pyx_t_3 = PyDict_New(); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 163, __pyx_L1_error)
+  __pyx_t_3 = PyDict_New(); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 162, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_v_dict_pSpecificInstrument = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":165
+  /* "SecurityFtdcMdApi.pyx":164
  *     dict_pSpecificInstrument = {}
  *     ###
  *     dict_pSpecificInstrument['InstrumentID'] = pSpecificInstrument.InstrumentID             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pSpecificInstrument['ExchangeID'] = pSpecificInstrument.ExchangeID
  */
-  __pyx_t_3 = __Pyx_PyObject_FromString(__pyx_v_pSpecificInstrument->InstrumentID); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 165, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_FromString(__pyx_v_pSpecificInstrument->InstrumentID); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pSpecificInstrument, __pyx_n_s_InstrumentID, __pyx_t_3) < 0)) __PYX_ERR(0, 165, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pSpecificInstrument, __pyx_n_s_InstrumentID, __pyx_t_3) < 0)) __PYX_ERR(0, 164, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":167
+  /* "SecurityFtdcMdApi.pyx":166
  *     dict_pSpecificInstrument['InstrumentID'] = pSpecificInstrument.InstrumentID
  *     ###
  *     dict_pSpecificInstrument['ExchangeID'] = pSpecificInstrument.ExchangeID             # <<<<<<<<<<<<<<
  * 
  *     dict_pRspInfo = {}
  */
-  __pyx_t_3 = __Pyx_PyObject_FromString(__pyx_v_pSpecificInstrument->ExchangeID); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 167, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_FromString(__pyx_v_pSpecificInstrument->ExchangeID); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 166, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pSpecificInstrument, __pyx_n_s_ExchangeID, __pyx_t_3) < 0)) __PYX_ERR(0, 167, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pSpecificInstrument, __pyx_n_s_ExchangeID, __pyx_t_3) < 0)) __PYX_ERR(0, 166, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":169
+  /* "SecurityFtdcMdApi.pyx":168
  *     dict_pSpecificInstrument['ExchangeID'] = pSpecificInstrument.ExchangeID
  * 
  *     dict_pRspInfo = {}             # <<<<<<<<<<<<<<
  *     dict_pRspInfo['ErrorID'] = pRspInfo.ErrorID
  *     dict_pRspInfo['ErrorMsg'] = pRspInfo.ErrorMsg
  */
-  __pyx_t_3 = PyDict_New(); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 169, __pyx_L1_error)
+  __pyx_t_3 = PyDict_New(); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 168, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_v_dict_pRspInfo = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":170
+  /* "SecurityFtdcMdApi.pyx":169
  * 
  *     dict_pRspInfo = {}
  *     dict_pRspInfo['ErrorID'] = pRspInfo.ErrorID             # <<<<<<<<<<<<<<
  *     dict_pRspInfo['ErrorMsg'] = pRspInfo.ErrorMsg
  * 
  */
-  __pyx_t_3 = __Pyx_PyInt_From_TSecurityFtdcErrorIDType(__pyx_v_pRspInfo->ErrorID); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 170, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_TSecurityFtdcErrorIDType(__pyx_v_pRspInfo->ErrorID); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 169, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspInfo, __pyx_n_s_ErrorID, __pyx_t_3) < 0)) __PYX_ERR(0, 170, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspInfo, __pyx_n_s_ErrorID, __pyx_t_3) < 0)) __PYX_ERR(0, 169, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":171
+  /* "SecurityFtdcMdApi.pyx":170
  *     dict_pRspInfo = {}
  *     dict_pRspInfo['ErrorID'] = pRspInfo.ErrorID
  *     dict_pRspInfo['ErrorMsg'] = pRspInfo.ErrorMsg             # <<<<<<<<<<<<<<
  * 
  *     self.OnRspSubMarketData(dict_pSpecificInstrument, dict_pRspInfo, nRequestID, bIsLast)
  */
-  __pyx_t_3 = __Pyx_PyObject_FromString(__pyx_v_pRspInfo->ErrorMsg); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 171, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_FromString(__pyx_v_pRspInfo->ErrorMsg); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 170, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspInfo, __pyx_n_s_ErrorMsg, __pyx_t_3) < 0)) __PYX_ERR(0, 171, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pRspInfo, __pyx_n_s_ErrorMsg, __pyx_t_3) < 0)) __PYX_ERR(0, 170, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":173
+  /* "SecurityFtdcMdApi.pyx":172
  *     dict_pRspInfo['ErrorMsg'] = pRspInfo.ErrorMsg
  * 
  *     self.OnRspSubMarketData(dict_pSpecificInstrument, dict_pRspInfo, nRequestID, bIsLast)             # <<<<<<<<<<<<<<
  *     return 0
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_OnRspSubMarketData); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 173, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_OnRspSubMarketData); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 172, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_nRequestID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 173, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_nRequestID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 172, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyBool_FromLong(__pyx_v_bIsLast); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 173, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyBool_FromLong(__pyx_v_bIsLast); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 172, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   __pyx_t_6 = 0;
@@ -3957,7 +3825,7 @@ int MdSpi_OnRspSubMarketData(PyObject *__pyx_v_self, struct CSecurityFtdcSpecifi
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[5] = {__pyx_t_5, __pyx_v_dict_pSpecificInstrument, __pyx_v_dict_pRspInfo, __pyx_t_1, __pyx_t_4};
-    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 173, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -3967,7 +3835,7 @@ int MdSpi_OnRspSubMarketData(PyObject *__pyx_v_self, struct CSecurityFtdcSpecifi
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[5] = {__pyx_t_5, __pyx_v_dict_pSpecificInstrument, __pyx_v_dict_pRspInfo, __pyx_t_1, __pyx_t_4};
-    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 173, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -3975,7 +3843,7 @@ int MdSpi_OnRspSubMarketData(PyObject *__pyx_v_self, struct CSecurityFtdcSpecifi
   } else
   #endif
   {
-    __pyx_t_7 = PyTuple_New(4+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 173, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(4+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     if (__pyx_t_5) {
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -3992,14 +3860,14 @@ int MdSpi_OnRspSubMarketData(PyObject *__pyx_v_self, struct CSecurityFtdcSpecifi
     PyTuple_SET_ITEM(__pyx_t_7, 3+__pyx_t_6, __pyx_t_4);
     __pyx_t_1 = 0;
     __pyx_t_4 = 0;
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 173, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":174
+  /* "SecurityFtdcMdApi.pyx":173
  * 
  *     self.OnRspSubMarketData(dict_pSpecificInstrument, dict_pRspInfo, nRequestID, bIsLast)
  *     return 0             # <<<<<<<<<<<<<<
@@ -4009,7 +3877,7 @@ int MdSpi_OnRspSubMarketData(PyObject *__pyx_v_self, struct CSecurityFtdcSpecifi
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "SecurityFtdcMdApi.pyx":160
+  /* "SecurityFtdcMdApi.pyx":159
  *     return 0
  * 
  * cdef extern int MdSpi_OnRspSubMarketData(self, CSecurityFtdcSpecificInstrumentField *pSpecificInstrument, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:             # <<<<<<<<<<<<<<
@@ -4034,7 +3902,7 @@ int MdSpi_OnRspSubMarketData(PyObject *__pyx_v_self, struct CSecurityFtdcSpecifi
   return __pyx_r;
 }
 
-/* "SecurityFtdcMdApi.pyx":176
+/* "SecurityFtdcMdApi.pyx":175
  *     return 0
  * 
  * cdef extern int MdSpi_OnRspUnSubMarketData(self, CSecurityFtdcSpecificInstrumentField *pSpecificInstrument, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:             # <<<<<<<<<<<<<<
@@ -4047,7 +3915,7 @@ int MdSpi_OnRspUnSubMarketData(CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUS
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("MdSpi_OnRspUnSubMarketData", 0);
 
-  /* "SecurityFtdcMdApi.pyx":178
+  /* "SecurityFtdcMdApi.pyx":177
  * cdef extern int MdSpi_OnRspUnSubMarketData(self, CSecurityFtdcSpecificInstrumentField *pSpecificInstrument, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
  *     # self.OnRspUnSubMarketData(pSpecificInstrument, pRspInfo, nRequestID, bIsLast)
  *     return 0             # <<<<<<<<<<<<<<
@@ -4057,7 +3925,7 @@ int MdSpi_OnRspUnSubMarketData(CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUS
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "SecurityFtdcMdApi.pyx":176
+  /* "SecurityFtdcMdApi.pyx":175
  *     return 0
  * 
  * cdef extern int MdSpi_OnRspUnSubMarketData(self, CSecurityFtdcSpecificInstrumentField *pSpecificInstrument, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:             # <<<<<<<<<<<<<<
@@ -4071,12 +3939,12 @@ int MdSpi_OnRspUnSubMarketData(CYTHON_UNUSED PyObject *__pyx_v_self, CYTHON_UNUS
   return __pyx_r;
 }
 
-/* "SecurityFtdcMdApi.pyx":180
+/* "SecurityFtdcMdApi.pyx":179
  *     return 0
  * 
  * cdef extern int MdSpi_OnRtnDepthMarketData(self, CSecurityFtdcDepthMarketDataField *pDepthMarketData) except -1:             # <<<<<<<<<<<<<<
  *     # self.OnRtnDepthMarketData(pDepthMarketData)
- *     print(">>> MdSpi_OnRtnDepthMarketData()...")
+ *     # print(">>> MdSpi_OnRtnDepthMarketData()...")
  */
 
 int MdSpi_OnRtnDepthMarketData(PyObject *__pyx_v_self, struct CSecurityFtdcDepthMarketDataField *__pyx_v_pDepthMarketData) {
@@ -4090,622 +3958,613 @@ int MdSpi_OnRtnDepthMarketData(PyObject *__pyx_v_self, struct CSecurityFtdcDepth
   __Pyx_RefNannySetupContext("MdSpi_OnRtnDepthMarketData", 0);
 
   /* "SecurityFtdcMdApi.pyx":182
- * cdef extern int MdSpi_OnRtnDepthMarketData(self, CSecurityFtdcDepthMarketDataField *pDepthMarketData) except -1:
  *     # self.OnRtnDepthMarketData(pDepthMarketData)
- *     print(">>> MdSpi_OnRtnDepthMarketData()...")             # <<<<<<<<<<<<<<
- *     dict_pDepthMarketData = {}
- *     ###
- */
-  if (__Pyx_PrintOne(0, __pyx_kp_s_MdSpi_OnRtnDepthMarketData) < 0) __PYX_ERR(0, 182, __pyx_L1_error)
-
-  /* "SecurityFtdcMdApi.pyx":183
- *     # self.OnRtnDepthMarketData(pDepthMarketData)
- *     print(">>> MdSpi_OnRtnDepthMarketData()...")
+ *     # print(">>> MdSpi_OnRtnDepthMarketData()...")
  *     dict_pDepthMarketData = {}             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['TradingDay'] = pDepthMarketData.TradingDay
  */
-  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 183, __pyx_L1_error)
+  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 182, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_dict_pDepthMarketData = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":185
+  /* "SecurityFtdcMdApi.pyx":184
  *     dict_pDepthMarketData = {}
  *     ###
  *     dict_pDepthMarketData['TradingDay'] = pDepthMarketData.TradingDay             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['InstrumentID'] = pDepthMarketData.InstrumentID
  */
-  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pDepthMarketData->TradingDay); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 185, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pDepthMarketData->TradingDay); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 184, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_TradingDay, __pyx_t_1) < 0)) __PYX_ERR(0, 185, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_TradingDay, __pyx_t_1) < 0)) __PYX_ERR(0, 184, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":187
+  /* "SecurityFtdcMdApi.pyx":186
  *     dict_pDepthMarketData['TradingDay'] = pDepthMarketData.TradingDay
  *     ###
  *     dict_pDepthMarketData['InstrumentID'] = pDepthMarketData.InstrumentID             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['ExchangeID'] = pDepthMarketData.ExchangeID
  */
-  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pDepthMarketData->InstrumentID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 187, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pDepthMarketData->InstrumentID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 186, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_InstrumentID, __pyx_t_1) < 0)) __PYX_ERR(0, 187, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_InstrumentID, __pyx_t_1) < 0)) __PYX_ERR(0, 186, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":189
+  /* "SecurityFtdcMdApi.pyx":188
  *     dict_pDepthMarketData['InstrumentID'] = pDepthMarketData.InstrumentID
  *     ###
  *     dict_pDepthMarketData['ExchangeID'] = pDepthMarketData.ExchangeID             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['ExchangeInstID'] = pDepthMarketData.ExchangeInstID
  */
-  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pDepthMarketData->ExchangeID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 189, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pDepthMarketData->ExchangeID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 188, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_ExchangeID, __pyx_t_1) < 0)) __PYX_ERR(0, 189, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_ExchangeID, __pyx_t_1) < 0)) __PYX_ERR(0, 188, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":191
+  /* "SecurityFtdcMdApi.pyx":190
  *     dict_pDepthMarketData['ExchangeID'] = pDepthMarketData.ExchangeID
  *     ###
  *     dict_pDepthMarketData['ExchangeInstID'] = pDepthMarketData.ExchangeInstID             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['LastPrice'] = pDepthMarketData.LastPrice
  */
-  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pDepthMarketData->ExchangeInstID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 191, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pDepthMarketData->ExchangeInstID); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_ExchangeInstID, __pyx_t_1) < 0)) __PYX_ERR(0, 191, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_ExchangeInstID, __pyx_t_1) < 0)) __PYX_ERR(0, 190, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":193
+  /* "SecurityFtdcMdApi.pyx":192
  *     dict_pDepthMarketData['ExchangeInstID'] = pDepthMarketData.ExchangeInstID
  *     ###
  *     dict_pDepthMarketData['LastPrice'] = pDepthMarketData.LastPrice             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['PreSettlementPrice'] = pDepthMarketData.PreSettlementPrice
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->LastPrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 193, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->LastPrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 192, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_LastPrice, __pyx_t_1) < 0)) __PYX_ERR(0, 193, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_LastPrice, __pyx_t_1) < 0)) __PYX_ERR(0, 192, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":195
+  /* "SecurityFtdcMdApi.pyx":194
  *     dict_pDepthMarketData['LastPrice'] = pDepthMarketData.LastPrice
  *     ###
  *     dict_pDepthMarketData['PreSettlementPrice'] = pDepthMarketData.PreSettlementPrice             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['PreClosePrice'] = pDepthMarketData.PreClosePrice
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->PreSettlementPrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 195, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->PreSettlementPrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 194, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_PreSettlementPrice, __pyx_t_1) < 0)) __PYX_ERR(0, 195, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_PreSettlementPrice, __pyx_t_1) < 0)) __PYX_ERR(0, 194, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":197
+  /* "SecurityFtdcMdApi.pyx":196
  *     dict_pDepthMarketData['PreSettlementPrice'] = pDepthMarketData.PreSettlementPrice
  *     ###
  *     dict_pDepthMarketData['PreClosePrice'] = pDepthMarketData.PreClosePrice             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['PreOpenInterest'] = pDepthMarketData.PreOpenInterest
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->PreClosePrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 197, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->PreClosePrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 196, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_PreClosePrice, __pyx_t_1) < 0)) __PYX_ERR(0, 197, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_PreClosePrice, __pyx_t_1) < 0)) __PYX_ERR(0, 196, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":199
+  /* "SecurityFtdcMdApi.pyx":198
  *     dict_pDepthMarketData['PreClosePrice'] = pDepthMarketData.PreClosePrice
  *     ###
  *     dict_pDepthMarketData['PreOpenInterest'] = pDepthMarketData.PreOpenInterest             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['OpenPrice'] = pDepthMarketData.OpenPrice
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->PreOpenInterest); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 199, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->PreOpenInterest); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 198, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_PreOpenInterest, __pyx_t_1) < 0)) __PYX_ERR(0, 199, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_PreOpenInterest, __pyx_t_1) < 0)) __PYX_ERR(0, 198, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":201
+  /* "SecurityFtdcMdApi.pyx":200
  *     dict_pDepthMarketData['PreOpenInterest'] = pDepthMarketData.PreOpenInterest
  *     ###
  *     dict_pDepthMarketData['OpenPrice'] = pDepthMarketData.OpenPrice             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['HighestPrice'] = pDepthMarketData.HighestPrice
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->OpenPrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->OpenPrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 200, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_OpenPrice, __pyx_t_1) < 0)) __PYX_ERR(0, 201, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_OpenPrice, __pyx_t_1) < 0)) __PYX_ERR(0, 200, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":203
+  /* "SecurityFtdcMdApi.pyx":202
  *     dict_pDepthMarketData['OpenPrice'] = pDepthMarketData.OpenPrice
  *     ###
  *     dict_pDepthMarketData['HighestPrice'] = pDepthMarketData.HighestPrice             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['LowestPrice'] = pDepthMarketData.LowestPrice
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->HighestPrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 203, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->HighestPrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_HighestPrice, __pyx_t_1) < 0)) __PYX_ERR(0, 203, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_HighestPrice, __pyx_t_1) < 0)) __PYX_ERR(0, 202, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":205
+  /* "SecurityFtdcMdApi.pyx":204
  *     dict_pDepthMarketData['HighestPrice'] = pDepthMarketData.HighestPrice
  *     ###
  *     dict_pDepthMarketData['LowestPrice'] = pDepthMarketData.LowestPrice             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['Volume'] = pDepthMarketData.Volume
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->LowestPrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 205, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->LowestPrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 204, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_LowestPrice, __pyx_t_1) < 0)) __PYX_ERR(0, 205, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_LowestPrice, __pyx_t_1) < 0)) __PYX_ERR(0, 204, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":207
+  /* "SecurityFtdcMdApi.pyx":206
  *     dict_pDepthMarketData['LowestPrice'] = pDepthMarketData.LowestPrice
  *     ###
  *     dict_pDepthMarketData['Volume'] = pDepthMarketData.Volume             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['Turnover'] = pDepthMarketData.Turnover
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->Volume); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 207, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->Volume); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_Volume, __pyx_t_1) < 0)) __PYX_ERR(0, 207, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_Volume, __pyx_t_1) < 0)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":209
+  /* "SecurityFtdcMdApi.pyx":208
  *     dict_pDepthMarketData['Volume'] = pDepthMarketData.Volume
  *     ###
  *     dict_pDepthMarketData['Turnover'] = pDepthMarketData.Turnover             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['OpenInterest'] = pDepthMarketData.OpenInterest
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->Turnover); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 209, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->Turnover); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 208, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_Turnover, __pyx_t_1) < 0)) __PYX_ERR(0, 209, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_Turnover, __pyx_t_1) < 0)) __PYX_ERR(0, 208, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":211
+  /* "SecurityFtdcMdApi.pyx":210
  *     dict_pDepthMarketData['Turnover'] = pDepthMarketData.Turnover
  *     ###
  *     dict_pDepthMarketData['OpenInterest'] = pDepthMarketData.OpenInterest             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['ClosePrice'] = pDepthMarketData.ClosePrice
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->OpenInterest); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 211, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->OpenInterest); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_OpenInterest, __pyx_t_1) < 0)) __PYX_ERR(0, 211, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_OpenInterest, __pyx_t_1) < 0)) __PYX_ERR(0, 210, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":213
+  /* "SecurityFtdcMdApi.pyx":212
  *     dict_pDepthMarketData['OpenInterest'] = pDepthMarketData.OpenInterest
  *     ###
  *     dict_pDepthMarketData['ClosePrice'] = pDepthMarketData.ClosePrice             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['SettlementPrice'] = pDepthMarketData.SettlementPrice
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->ClosePrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 213, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->ClosePrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 212, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_ClosePrice, __pyx_t_1) < 0)) __PYX_ERR(0, 213, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_ClosePrice, __pyx_t_1) < 0)) __PYX_ERR(0, 212, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":215
+  /* "SecurityFtdcMdApi.pyx":214
  *     dict_pDepthMarketData['ClosePrice'] = pDepthMarketData.ClosePrice
  *     ###
  *     dict_pDepthMarketData['SettlementPrice'] = pDepthMarketData.SettlementPrice             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['UpperLimitPrice'] = pDepthMarketData.UpperLimitPrice
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->SettlementPrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 215, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->SettlementPrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 214, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_SettlementPrice, __pyx_t_1) < 0)) __PYX_ERR(0, 215, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_SettlementPrice, __pyx_t_1) < 0)) __PYX_ERR(0, 214, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":217
+  /* "SecurityFtdcMdApi.pyx":216
  *     dict_pDepthMarketData['SettlementPrice'] = pDepthMarketData.SettlementPrice
  *     ###
  *     dict_pDepthMarketData['UpperLimitPrice'] = pDepthMarketData.UpperLimitPrice             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['LowerLimitPrice'] = pDepthMarketData.LowerLimitPrice
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->UpperLimitPrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 217, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->UpperLimitPrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 216, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_UpperLimitPrice, __pyx_t_1) < 0)) __PYX_ERR(0, 217, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_UpperLimitPrice, __pyx_t_1) < 0)) __PYX_ERR(0, 216, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":219
+  /* "SecurityFtdcMdApi.pyx":218
  *     dict_pDepthMarketData['UpperLimitPrice'] = pDepthMarketData.UpperLimitPrice
  *     ###
  *     dict_pDepthMarketData['LowerLimitPrice'] = pDepthMarketData.LowerLimitPrice             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['PreDelta'] = pDepthMarketData.PreDelta
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->LowerLimitPrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 219, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->LowerLimitPrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_LowerLimitPrice, __pyx_t_1) < 0)) __PYX_ERR(0, 219, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_LowerLimitPrice, __pyx_t_1) < 0)) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":221
+  /* "SecurityFtdcMdApi.pyx":220
  *     dict_pDepthMarketData['LowerLimitPrice'] = pDepthMarketData.LowerLimitPrice
  *     ###
  *     dict_pDepthMarketData['PreDelta'] = pDepthMarketData.PreDelta             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['CurrDelta'] = pDepthMarketData.CurrDelta
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->PreDelta); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 221, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->PreDelta); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 220, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_PreDelta, __pyx_t_1) < 0)) __PYX_ERR(0, 221, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_PreDelta, __pyx_t_1) < 0)) __PYX_ERR(0, 220, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":223
+  /* "SecurityFtdcMdApi.pyx":222
  *     dict_pDepthMarketData['PreDelta'] = pDepthMarketData.PreDelta
  *     ###
  *     dict_pDepthMarketData['CurrDelta'] = pDepthMarketData.CurrDelta             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['PreIOPV'] = pDepthMarketData.PreIOPV
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->CurrDelta); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 223, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->CurrDelta); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 222, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_CurrDelta, __pyx_t_1) < 0)) __PYX_ERR(0, 223, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_CurrDelta, __pyx_t_1) < 0)) __PYX_ERR(0, 222, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":225
+  /* "SecurityFtdcMdApi.pyx":224
  *     dict_pDepthMarketData['CurrDelta'] = pDepthMarketData.CurrDelta
  *     ###
  *     dict_pDepthMarketData['PreIOPV'] = pDepthMarketData.PreIOPV             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['IOPV'] = pDepthMarketData.IOPV
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->PreIOPV); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 225, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->PreIOPV); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 224, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_PreIOPV, __pyx_t_1) < 0)) __PYX_ERR(0, 225, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_PreIOPV, __pyx_t_1) < 0)) __PYX_ERR(0, 224, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":227
+  /* "SecurityFtdcMdApi.pyx":226
  *     dict_pDepthMarketData['PreIOPV'] = pDepthMarketData.PreIOPV
  *     ###
  *     dict_pDepthMarketData['IOPV'] = pDepthMarketData.IOPV             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['AuctionPrice'] = pDepthMarketData.AuctionPrice
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->IOPV); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 227, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->IOPV); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 226, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_IOPV, __pyx_t_1) < 0)) __PYX_ERR(0, 227, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_IOPV, __pyx_t_1) < 0)) __PYX_ERR(0, 226, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":229
+  /* "SecurityFtdcMdApi.pyx":228
  *     dict_pDepthMarketData['IOPV'] = pDepthMarketData.IOPV
  *     ###
  *     dict_pDepthMarketData['AuctionPrice'] = pDepthMarketData.AuctionPrice             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['UpdateTime'] = pDepthMarketData.UpdateTime
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AuctionPrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 229, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AuctionPrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 228, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AuctionPrice, __pyx_t_1) < 0)) __PYX_ERR(0, 229, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AuctionPrice, __pyx_t_1) < 0)) __PYX_ERR(0, 228, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":231
+  /* "SecurityFtdcMdApi.pyx":230
  *     dict_pDepthMarketData['AuctionPrice'] = pDepthMarketData.AuctionPrice
  *     ###
  *     dict_pDepthMarketData['UpdateTime'] = pDepthMarketData.UpdateTime             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['UpdateMillisec'] = pDepthMarketData.UpdateMillisec
  */
-  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pDepthMarketData->UpdateTime); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 231, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pDepthMarketData->UpdateTime); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 230, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_UpdateTime, __pyx_t_1) < 0)) __PYX_ERR(0, 231, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_UpdateTime, __pyx_t_1) < 0)) __PYX_ERR(0, 230, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":233
+  /* "SecurityFtdcMdApi.pyx":232
  *     dict_pDepthMarketData['UpdateTime'] = pDepthMarketData.UpdateTime
  *     ###
  *     dict_pDepthMarketData['UpdateMillisec'] = pDepthMarketData.UpdateMillisec             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['BidPrice1'] = pDepthMarketData.BidPrice1
  */
-  __pyx_t_1 = __Pyx_PyInt_From_TSecurityFtdcMillisecType(__pyx_v_pDepthMarketData->UpdateMillisec); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 233, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_TSecurityFtdcMillisecType(__pyx_v_pDepthMarketData->UpdateMillisec); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 232, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_UpdateMillisec, __pyx_t_1) < 0)) __PYX_ERR(0, 233, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_UpdateMillisec, __pyx_t_1) < 0)) __PYX_ERR(0, 232, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":235
+  /* "SecurityFtdcMdApi.pyx":234
  *     dict_pDepthMarketData['UpdateMillisec'] = pDepthMarketData.UpdateMillisec
  *     ###
  *     dict_pDepthMarketData['BidPrice1'] = pDepthMarketData.BidPrice1             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['BidVolume1'] = pDepthMarketData.BidVolume1
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->BidPrice1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 235, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->BidPrice1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 234, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_BidPrice1, __pyx_t_1) < 0)) __PYX_ERR(0, 235, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_BidPrice1, __pyx_t_1) < 0)) __PYX_ERR(0, 234, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":237
+  /* "SecurityFtdcMdApi.pyx":236
  *     dict_pDepthMarketData['BidPrice1'] = pDepthMarketData.BidPrice1
  *     ###
  *     dict_pDepthMarketData['BidVolume1'] = pDepthMarketData.BidVolume1             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['AskPrice1'] = pDepthMarketData.AskPrice1
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->BidVolume1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 237, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->BidVolume1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 236, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_BidVolume1, __pyx_t_1) < 0)) __PYX_ERR(0, 237, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_BidVolume1, __pyx_t_1) < 0)) __PYX_ERR(0, 236, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":239
+  /* "SecurityFtdcMdApi.pyx":238
  *     dict_pDepthMarketData['BidVolume1'] = pDepthMarketData.BidVolume1
  *     ###
  *     dict_pDepthMarketData['AskPrice1'] = pDepthMarketData.AskPrice1             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['AskVolume1'] = pDepthMarketData.AskVolume1
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AskPrice1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 239, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AskPrice1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 238, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AskPrice1, __pyx_t_1) < 0)) __PYX_ERR(0, 239, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AskPrice1, __pyx_t_1) < 0)) __PYX_ERR(0, 238, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":241
+  /* "SecurityFtdcMdApi.pyx":240
  *     dict_pDepthMarketData['AskPrice1'] = pDepthMarketData.AskPrice1
  *     ###
  *     dict_pDepthMarketData['AskVolume1'] = pDepthMarketData.AskVolume1             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['BidPrice2'] = pDepthMarketData.BidPrice2
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AskVolume1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AskVolume1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 240, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AskVolume1, __pyx_t_1) < 0)) __PYX_ERR(0, 241, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AskVolume1, __pyx_t_1) < 0)) __PYX_ERR(0, 240, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":243
+  /* "SecurityFtdcMdApi.pyx":242
  *     dict_pDepthMarketData['AskVolume1'] = pDepthMarketData.AskVolume1
  *     ###
  *     dict_pDepthMarketData['BidPrice2'] = pDepthMarketData.BidPrice2             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['BidVolume2'] = pDepthMarketData.BidVolume2
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->BidPrice2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 243, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->BidPrice2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 242, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_BidPrice2, __pyx_t_1) < 0)) __PYX_ERR(0, 243, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_BidPrice2, __pyx_t_1) < 0)) __PYX_ERR(0, 242, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":245
+  /* "SecurityFtdcMdApi.pyx":244
  *     dict_pDepthMarketData['BidPrice2'] = pDepthMarketData.BidPrice2
  *     ###
  *     dict_pDepthMarketData['BidVolume2'] = pDepthMarketData.BidVolume2             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['AskPrice2'] = pDepthMarketData.AskPrice2
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->BidVolume2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->BidVolume2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_BidVolume2, __pyx_t_1) < 0)) __PYX_ERR(0, 245, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_BidVolume2, __pyx_t_1) < 0)) __PYX_ERR(0, 244, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":247
+  /* "SecurityFtdcMdApi.pyx":246
  *     dict_pDepthMarketData['BidVolume2'] = pDepthMarketData.BidVolume2
  *     ###
  *     dict_pDepthMarketData['AskPrice2'] = pDepthMarketData.AskPrice2             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['AskVolume2'] = pDepthMarketData.AskVolume2
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AskPrice2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 247, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AskPrice2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 246, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AskPrice2, __pyx_t_1) < 0)) __PYX_ERR(0, 247, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AskPrice2, __pyx_t_1) < 0)) __PYX_ERR(0, 246, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":249
+  /* "SecurityFtdcMdApi.pyx":248
  *     dict_pDepthMarketData['AskPrice2'] = pDepthMarketData.AskPrice2
  *     ###
  *     dict_pDepthMarketData['AskVolume2'] = pDepthMarketData.AskVolume2             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['BidPrice3'] = pDepthMarketData.BidPrice3
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AskVolume2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 249, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AskVolume2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 248, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AskVolume2, __pyx_t_1) < 0)) __PYX_ERR(0, 249, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AskVolume2, __pyx_t_1) < 0)) __PYX_ERR(0, 248, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":251
+  /* "SecurityFtdcMdApi.pyx":250
  *     dict_pDepthMarketData['AskVolume2'] = pDepthMarketData.AskVolume2
  *     ###
  *     dict_pDepthMarketData['BidPrice3'] = pDepthMarketData.BidPrice3             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['BidVolume3'] = pDepthMarketData.BidVolume3
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->BidPrice3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 251, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->BidPrice3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 250, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_BidPrice3, __pyx_t_1) < 0)) __PYX_ERR(0, 251, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_BidPrice3, __pyx_t_1) < 0)) __PYX_ERR(0, 250, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":253
+  /* "SecurityFtdcMdApi.pyx":252
  *     dict_pDepthMarketData['BidPrice3'] = pDepthMarketData.BidPrice3
  *     ###
  *     dict_pDepthMarketData['BidVolume3'] = pDepthMarketData.BidVolume3             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['AskPrice3'] = pDepthMarketData.AskPrice3
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->BidVolume3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 253, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->BidVolume3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 252, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_BidVolume3, __pyx_t_1) < 0)) __PYX_ERR(0, 253, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_BidVolume3, __pyx_t_1) < 0)) __PYX_ERR(0, 252, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":255
+  /* "SecurityFtdcMdApi.pyx":254
  *     dict_pDepthMarketData['BidVolume3'] = pDepthMarketData.BidVolume3
  *     ###
  *     dict_pDepthMarketData['AskPrice3'] = pDepthMarketData.AskPrice3             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['AskVolume3'] = pDepthMarketData.AskVolume3
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AskPrice3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 255, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AskPrice3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 254, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AskPrice3, __pyx_t_1) < 0)) __PYX_ERR(0, 255, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AskPrice3, __pyx_t_1) < 0)) __PYX_ERR(0, 254, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":257
+  /* "SecurityFtdcMdApi.pyx":256
  *     dict_pDepthMarketData['AskPrice3'] = pDepthMarketData.AskPrice3
  *     ###
  *     dict_pDepthMarketData['AskVolume3'] = pDepthMarketData.AskVolume3             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['BidPrice4'] = pDepthMarketData.BidPrice4
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AskVolume3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 257, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AskVolume3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 256, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AskVolume3, __pyx_t_1) < 0)) __PYX_ERR(0, 257, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AskVolume3, __pyx_t_1) < 0)) __PYX_ERR(0, 256, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":259
+  /* "SecurityFtdcMdApi.pyx":258
  *     dict_pDepthMarketData['AskVolume3'] = pDepthMarketData.AskVolume3
  *     ###
  *     dict_pDepthMarketData['BidPrice4'] = pDepthMarketData.BidPrice4             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['BidVolume4'] = pDepthMarketData.BidVolume4
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->BidPrice4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 259, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->BidPrice4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 258, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_BidPrice4, __pyx_t_1) < 0)) __PYX_ERR(0, 259, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_BidPrice4, __pyx_t_1) < 0)) __PYX_ERR(0, 258, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":261
+  /* "SecurityFtdcMdApi.pyx":260
  *     dict_pDepthMarketData['BidPrice4'] = pDepthMarketData.BidPrice4
  *     ###
  *     dict_pDepthMarketData['BidVolume4'] = pDepthMarketData.BidVolume4             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['AskPrice4'] = pDepthMarketData.AskPrice4
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->BidVolume4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 261, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->BidVolume4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 260, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_BidVolume4, __pyx_t_1) < 0)) __PYX_ERR(0, 261, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_BidVolume4, __pyx_t_1) < 0)) __PYX_ERR(0, 260, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":263
+  /* "SecurityFtdcMdApi.pyx":262
  *     dict_pDepthMarketData['BidVolume4'] = pDepthMarketData.BidVolume4
  *     ###
  *     dict_pDepthMarketData['AskPrice4'] = pDepthMarketData.AskPrice4             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['AskVolume4'] = pDepthMarketData.AskVolume4
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AskPrice4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 263, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AskPrice4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 262, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AskPrice4, __pyx_t_1) < 0)) __PYX_ERR(0, 263, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AskPrice4, __pyx_t_1) < 0)) __PYX_ERR(0, 262, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":265
+  /* "SecurityFtdcMdApi.pyx":264
  *     dict_pDepthMarketData['AskPrice4'] = pDepthMarketData.AskPrice4
  *     ###
  *     dict_pDepthMarketData['AskVolume4'] = pDepthMarketData.AskVolume4             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['BidPrice5'] = pDepthMarketData.BidPrice5
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AskVolume4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 265, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AskVolume4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 264, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AskVolume4, __pyx_t_1) < 0)) __PYX_ERR(0, 265, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AskVolume4, __pyx_t_1) < 0)) __PYX_ERR(0, 264, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":267
+  /* "SecurityFtdcMdApi.pyx":266
  *     dict_pDepthMarketData['AskVolume4'] = pDepthMarketData.AskVolume4
  *     ###
  *     dict_pDepthMarketData['BidPrice5'] = pDepthMarketData.BidPrice5             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['BidVolume5'] = pDepthMarketData.BidVolume5
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->BidPrice5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 267, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->BidPrice5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 266, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_BidPrice5, __pyx_t_1) < 0)) __PYX_ERR(0, 267, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_BidPrice5, __pyx_t_1) < 0)) __PYX_ERR(0, 266, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":269
+  /* "SecurityFtdcMdApi.pyx":268
  *     dict_pDepthMarketData['BidPrice5'] = pDepthMarketData.BidPrice5
  *     ###
  *     dict_pDepthMarketData['BidVolume5'] = pDepthMarketData.BidVolume5             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['AskPrice5'] = pDepthMarketData.AskPrice5
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->BidVolume5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 269, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->BidVolume5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 268, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_BidVolume5, __pyx_t_1) < 0)) __PYX_ERR(0, 269, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_BidVolume5, __pyx_t_1) < 0)) __PYX_ERR(0, 268, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":271
+  /* "SecurityFtdcMdApi.pyx":270
  *     dict_pDepthMarketData['BidVolume5'] = pDepthMarketData.BidVolume5
  *     ###
  *     dict_pDepthMarketData['AskPrice5'] = pDepthMarketData.AskPrice5             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['AskVolume5'] = pDepthMarketData.AskVolume5
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AskPrice5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 271, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AskPrice5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 270, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AskPrice5, __pyx_t_1) < 0)) __PYX_ERR(0, 271, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AskPrice5, __pyx_t_1) < 0)) __PYX_ERR(0, 270, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":273
+  /* "SecurityFtdcMdApi.pyx":272
  *     dict_pDepthMarketData['AskPrice5'] = pDepthMarketData.AskPrice5
  *     ###
  *     dict_pDepthMarketData['AskVolume5'] = pDepthMarketData.AskVolume5             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['AveragePrice'] = pDepthMarketData.AveragePrice
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AskVolume5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 273, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AskVolume5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 272, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AskVolume5, __pyx_t_1) < 0)) __PYX_ERR(0, 273, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AskVolume5, __pyx_t_1) < 0)) __PYX_ERR(0, 272, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":275
+  /* "SecurityFtdcMdApi.pyx":274
  *     dict_pDepthMarketData['AskVolume5'] = pDepthMarketData.AskVolume5
  *     ###
  *     dict_pDepthMarketData['AveragePrice'] = pDepthMarketData.AveragePrice             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['ActionDay'] = pDepthMarketData.ActionDay
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AveragePrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 275, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_pDepthMarketData->AveragePrice); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 274, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AveragePrice, __pyx_t_1) < 0)) __PYX_ERR(0, 275, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_AveragePrice, __pyx_t_1) < 0)) __PYX_ERR(0, 274, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":277
+  /* "SecurityFtdcMdApi.pyx":276
  *     dict_pDepthMarketData['AveragePrice'] = pDepthMarketData.AveragePrice
  *     ###
  *     dict_pDepthMarketData['ActionDay'] = pDepthMarketData.ActionDay             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['TradingPhase'] = pDepthMarketData.TradingPhase
  */
-  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pDepthMarketData->ActionDay); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_FromString(__pyx_v_pDepthMarketData->ActionDay); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 276, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_ActionDay, __pyx_t_1) < 0)) __PYX_ERR(0, 277, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_ActionDay, __pyx_t_1) < 0)) __PYX_ERR(0, 276, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":279
+  /* "SecurityFtdcMdApi.pyx":278
  *     dict_pDepthMarketData['ActionDay'] = pDepthMarketData.ActionDay
  *     ###
  *     dict_pDepthMarketData['TradingPhase'] = pDepthMarketData.TradingPhase             # <<<<<<<<<<<<<<
  *     ###
  *     dict_pDepthMarketData['OpenRestriction'] = pDepthMarketData.OpenRestriction
  */
-  __pyx_t_1 = __Pyx_PyInt_From_TSecurityFtdcTradingPhaseType(__pyx_v_pDepthMarketData->TradingPhase); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 279, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_TSecurityFtdcTradingPhaseType(__pyx_v_pDepthMarketData->TradingPhase); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 278, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_TradingPhase, __pyx_t_1) < 0)) __PYX_ERR(0, 279, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_TradingPhase, __pyx_t_1) < 0)) __PYX_ERR(0, 278, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":281
+  /* "SecurityFtdcMdApi.pyx":280
  *     dict_pDepthMarketData['TradingPhase'] = pDepthMarketData.TradingPhase
  *     ###
  *     dict_pDepthMarketData['OpenRestriction'] = pDepthMarketData.OpenRestriction             # <<<<<<<<<<<<<<
  * 
  *     self.OnRtnDepthMarketData(dict_pDepthMarketData)
  */
-  __pyx_t_1 = __Pyx_PyInt_From_TSecurityFtdcOpenRestrictionType(__pyx_v_pDepthMarketData->OpenRestriction); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 281, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_TSecurityFtdcOpenRestrictionType(__pyx_v_pDepthMarketData->OpenRestriction); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 280, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_OpenRestriction, __pyx_t_1) < 0)) __PYX_ERR(0, 281, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_dict_pDepthMarketData, __pyx_n_s_OpenRestriction, __pyx_t_1) < 0)) __PYX_ERR(0, 280, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":283
+  /* "SecurityFtdcMdApi.pyx":282
  *     dict_pDepthMarketData['OpenRestriction'] = pDepthMarketData.OpenRestriction
  * 
  *     self.OnRtnDepthMarketData(dict_pDepthMarketData)             # <<<<<<<<<<<<<<
  * 
  *     return 0
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_OnRtnDepthMarketData); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 283, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_OnRtnDepthMarketData); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 282, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -4718,13 +4577,13 @@ int MdSpi_OnRtnDepthMarketData(PyObject *__pyx_v_self, struct CSecurityFtdcDepth
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_dict_pDepthMarketData); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 283, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_dict_pDepthMarketData); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 282, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_3, __pyx_v_dict_pDepthMarketData};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 283, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 282, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_GOTREF(__pyx_t_1);
     } else
@@ -4732,19 +4591,19 @@ int MdSpi_OnRtnDepthMarketData(PyObject *__pyx_v_self, struct CSecurityFtdcDepth
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[2] = {__pyx_t_3, __pyx_v_dict_pDepthMarketData};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 283, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 282, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_GOTREF(__pyx_t_1);
     } else
     #endif
     {
-      __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 283, __pyx_L1_error)
+      __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 282, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
       __Pyx_INCREF(__pyx_v_dict_pDepthMarketData);
       __Pyx_GIVEREF(__pyx_v_dict_pDepthMarketData);
       PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_v_dict_pDepthMarketData);
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 283, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 282, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     }
@@ -4752,7 +4611,7 @@ int MdSpi_OnRtnDepthMarketData(PyObject *__pyx_v_self, struct CSecurityFtdcDepth
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "SecurityFtdcMdApi.pyx":285
+  /* "SecurityFtdcMdApi.pyx":284
  *     self.OnRtnDepthMarketData(dict_pDepthMarketData)
  * 
  *     return 0             # <<<<<<<<<<<<<<
@@ -4760,12 +4619,12 @@ int MdSpi_OnRtnDepthMarketData(PyObject *__pyx_v_self, struct CSecurityFtdcDepth
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "SecurityFtdcMdApi.pyx":180
+  /* "SecurityFtdcMdApi.pyx":179
  *     return 0
  * 
  * cdef extern int MdSpi_OnRtnDepthMarketData(self, CSecurityFtdcDepthMarketDataField *pDepthMarketData) except -1:             # <<<<<<<<<<<<<<
  *     # self.OnRtnDepthMarketData(pDepthMarketData)
- *     print(">>> MdSpi_OnRtnDepthMarketData()...")
+ *     # print(">>> MdSpi_OnRtnDepthMarketData()...")
  */
 
   /* function exit code */
@@ -5271,13 +5130,13 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_IOPV, __pyx_k_IOPV, sizeof(__pyx_k_IOPV), 0, 0, 1, 1},
   {&__pyx_n_s_IndexError, __pyx_k_IndexError, sizeof(__pyx_k_IndexError), 0, 0, 1, 1},
   {&__pyx_n_s_InstrumentID, __pyx_k_InstrumentID, sizeof(__pyx_k_InstrumentID), 0, 0, 1, 1},
+  {&__pyx_n_s_InstrumentIDs, __pyx_k_InstrumentIDs, sizeof(__pyx_k_InstrumentIDs), 0, 0, 1, 1},
   {&__pyx_n_s_LastPrice, __pyx_k_LastPrice, sizeof(__pyx_k_LastPrice), 0, 0, 1, 1},
   {&__pyx_n_s_LoginTime, __pyx_k_LoginTime, sizeof(__pyx_k_LoginTime), 0, 0, 1, 1},
   {&__pyx_n_s_LowerLimitPrice, __pyx_k_LowerLimitPrice, sizeof(__pyx_k_LowerLimitPrice), 0, 0, 1, 1},
   {&__pyx_n_s_LowestPrice, __pyx_k_LowestPrice, sizeof(__pyx_k_LowestPrice), 0, 0, 1, 1},
   {&__pyx_n_s_MaxOrderRef, __pyx_k_MaxOrderRef, sizeof(__pyx_k_MaxOrderRef), 0, 0, 1, 1},
   {&__pyx_kp_s_MdSpi_OnRspSubMarketData, __pyx_k_MdSpi_OnRspSubMarketData, sizeof(__pyx_k_MdSpi_OnRspSubMarketData), 0, 0, 1, 0},
-  {&__pyx_kp_s_MdSpi_OnRtnDepthMarketData, __pyx_k_MdSpi_OnRtnDepthMarketData, sizeof(__pyx_k_MdSpi_OnRtnDepthMarketData), 0, 0, 1, 0},
   {&__pyx_n_s_OnFrontConnected, __pyx_k_OnFrontConnected, sizeof(__pyx_k_OnFrontConnected), 0, 0, 1, 1},
   {&__pyx_n_s_OnFrontDisconnected, __pyx_k_OnFrontDisconnected, sizeof(__pyx_k_OnFrontDisconnected), 0, 0, 1, 1},
   {&__pyx_n_s_OnHeartBeatWarning, __pyx_k_OnHeartBeatWarning, sizeof(__pyx_k_OnHeartBeatWarning), 0, 0, 1, 1},
@@ -5295,15 +5154,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_PreIOPV, __pyx_k_PreIOPV, sizeof(__pyx_k_PreIOPV), 0, 0, 1, 1},
   {&__pyx_n_s_PreOpenInterest, __pyx_k_PreOpenInterest, sizeof(__pyx_k_PreOpenInterest), 0, 0, 1, 1},
   {&__pyx_n_s_PreSettlementPrice, __pyx_k_PreSettlementPrice, sizeof(__pyx_k_PreSettlementPrice), 0, 0, 1, 1},
-  {&__pyx_kp_s_SecurityFtdcMdApi_pyx_Init_afte, __pyx_k_SecurityFtdcMdApi_pyx_Init_afte, sizeof(__pyx_k_SecurityFtdcMdApi_pyx_Init_afte), 0, 0, 1, 0},
-  {&__pyx_kp_s_SecurityFtdcMdApi_pyx_Init_afte_2, __pyx_k_SecurityFtdcMdApi_pyx_Init_afte_2, sizeof(__pyx_k_SecurityFtdcMdApi_pyx_Init_afte_2), 0, 0, 1, 0},
-  {&__pyx_kp_s_SecurityFtdcMdApi_pyx_Init_afte_3, __pyx_k_SecurityFtdcMdApi_pyx_Init_afte_3, sizeof(__pyx_k_SecurityFtdcMdApi_pyx_Init_afte_3), 0, 0, 1, 0},
-  {&__pyx_kp_s_SecurityFtdcMdApi_pyx_Init_afte_4, __pyx_k_SecurityFtdcMdApi_pyx_Init_afte_4, sizeof(__pyx_k_SecurityFtdcMdApi_pyx_Init_afte_4), 0, 0, 1, 0},
-  {&__pyx_kp_s_SecurityFtdcMdApi_pyx_Init_begi, __pyx_k_SecurityFtdcMdApi_pyx_Init_begi, sizeof(__pyx_k_SecurityFtdcMdApi_pyx_Init_begi), 0, 0, 1, 0},
-  {&__pyx_kp_s_SecurityFtdcMdApi_pyx_ReqUserLo, __pyx_k_SecurityFtdcMdApi_pyx_ReqUserLo, sizeof(__pyx_k_SecurityFtdcMdApi_pyx_ReqUserLo), 0, 0, 1, 0},
   {&__pyx_n_s_SessionID, __pyx_k_SessionID, sizeof(__pyx_k_SessionID), 0, 0, 1, 1},
   {&__pyx_n_s_SettlementPrice, __pyx_k_SettlementPrice, sizeof(__pyx_k_SettlementPrice), 0, 0, 1, 1},
-  {&__pyx_kp_s_SubscribeMarketData_cExchangeID, __pyx_k_SubscribeMarketData_cExchangeID, sizeof(__pyx_k_SubscribeMarketData_cExchangeID), 0, 0, 1, 0},
   {&__pyx_n_s_TradingDay, __pyx_k_TradingDay, sizeof(__pyx_k_TradingDay), 0, 0, 1, 1},
   {&__pyx_n_s_TradingPhase, __pyx_k_TradingPhase, sizeof(__pyx_k_TradingPhase), 0, 0, 1, 1},
   {&__pyx_n_s_Turnover, __pyx_k_Turnover, sizeof(__pyx_k_Turnover), 0, 0, 1, 1},
@@ -5316,14 +5168,12 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_end, __pyx_k_end, sizeof(__pyx_k_end), 0, 0, 1, 1},
   {&__pyx_n_s_enumerate, __pyx_k_enumerate, sizeof(__pyx_k_enumerate), 0, 0, 1, 1},
   {&__pyx_n_s_file, __pyx_k_file, sizeof(__pyx_k_file), 0, 0, 1, 1},
-  {&__pyx_n_s_gbk, __pyx_k_gbk, sizeof(__pyx_k_gbk), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_nRequestID, __pyx_k_nRequestID, sizeof(__pyx_k_nRequestID), 0, 0, 1, 1},
   {&__pyx_n_s_pExchageID, __pyx_k_pExchageID, sizeof(__pyx_k_pExchageID), 0, 0, 1, 1},
   {&__pyx_n_s_pInstrumentIDs, __pyx_k_pInstrumentIDs, sizeof(__pyx_k_pInstrumentIDs), 0, 0, 1, 1},
   {&__pyx_n_s_pReqUserLogin, __pyx_k_pReqUserLogin, sizeof(__pyx_k_pReqUserLogin), 0, 0, 1, 1},
   {&__pyx_n_s_pUserLogout, __pyx_k_pUserLogout, sizeof(__pyx_k_pUserLogout), 0, 0, 1, 1},
-  {&__pyx_kp_s_ppInstrumentID_i, __pyx_k_ppInstrumentID_i, sizeof(__pyx_k_ppInstrumentID_i), 0, 0, 1, 0},
   {&__pyx_n_s_print, __pyx_k_print, sizeof(__pyx_k_print), 0, 0, 1, 1},
   {&__pyx_n_s_pszFlowPath, __pyx_k_pszFlowPath, sizeof(__pyx_k_pszFlowPath), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
@@ -5648,26 +5498,6 @@ static void __Pyx_RaiseArgtupleInvalid(
                  func_name, more_or_less, num_expected,
                  (num_expected == 1) ? "" : "s", num_found);
 }
-
-/* PyObjectCall */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw) {
-    PyObject *result;
-    ternaryfunc call = func->ob_type->tp_call;
-    if (unlikely(!call))
-        return PyObject_Call(func, arg, kw);
-    if (unlikely(Py_EnterRecursiveCall((char*)" while calling a Python object")))
-        return NULL;
-    result = (*call)(func, arg, kw);
-    Py_LeaveRecursiveCall();
-    if (unlikely(!result) && unlikely(!PyErr_Occurred())) {
-        PyErr_SetString(
-            PyExc_SystemError,
-            "NULL result without error in PyObject_Call");
-    }
-    return result;
-}
-#endif
 
 /* GetItemInt */
 static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j) {
@@ -6022,6 +5852,26 @@ done:
 #endif  // CPython < 3.6
 #endif  // CYTHON_FAST_PYCALL
 
+/* PyObjectCall */
+  #if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw) {
+    PyObject *result;
+    ternaryfunc call = func->ob_type->tp_call;
+    if (unlikely(!call))
+        return PyObject_Call(func, arg, kw);
+    if (unlikely(Py_EnterRecursiveCall((char*)" while calling a Python object")))
+        return NULL;
+    result = (*call)(func, arg, kw);
+    Py_LeaveRecursiveCall();
+    if (unlikely(!result) && unlikely(!PyErr_Occurred())) {
+        PyErr_SetString(
+            PyExc_SystemError,
+            "NULL result without error in PyObject_Call");
+    }
+    return result;
+}
+#endif
+
 /* PyObjectCallMethO */
   #if CYTHON_COMPILING_IN_CPYTHON
 static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg) {
@@ -6345,112 +6195,6 @@ bad:
     }
 }
 
-/* Print */
-      #if !CYTHON_COMPILING_IN_PYPY && PY_MAJOR_VERSION < 3
-static PyObject *__Pyx_GetStdout(void) {
-    PyObject *f = PySys_GetObject((char *)"stdout");
-    if (!f) {
-        PyErr_SetString(PyExc_RuntimeError, "lost sys.stdout");
-    }
-    return f;
-}
-static int __Pyx_Print(PyObject* f, PyObject *arg_tuple, int newline) {
-    int i;
-    if (!f) {
-        if (!(f = __Pyx_GetStdout()))
-            return -1;
-    }
-    Py_INCREF(f);
-    for (i=0; i < PyTuple_GET_SIZE(arg_tuple); i++) {
-        PyObject* v;
-        if (PyFile_SoftSpace(f, 1)) {
-            if (PyFile_WriteString(" ", f) < 0)
-                goto error;
-        }
-        v = PyTuple_GET_ITEM(arg_tuple, i);
-        if (PyFile_WriteObject(v, f, Py_PRINT_RAW) < 0)
-            goto error;
-        if (PyString_Check(v)) {
-            char *s = PyString_AsString(v);
-            Py_ssize_t len = PyString_Size(v);
-            if (len > 0) {
-                switch (s[len-1]) {
-                    case ' ': break;
-                    case '\f': case '\r': case '\n': case '\t': case '\v':
-                        PyFile_SoftSpace(f, 0);
-                        break;
-                    default:  break;
-                }
-            }
-        }
-    }
-    if (newline) {
-        if (PyFile_WriteString("\n", f) < 0)
-            goto error;
-        PyFile_SoftSpace(f, 0);
-    }
-    Py_DECREF(f);
-    return 0;
-error:
-    Py_DECREF(f);
-    return -1;
-}
-#else
-static int __Pyx_Print(PyObject* stream, PyObject *arg_tuple, int newline) {
-    PyObject* kwargs = 0;
-    PyObject* result = 0;
-    PyObject* end_string;
-    if (unlikely(!__pyx_print)) {
-        __pyx_print = PyObject_GetAttr(__pyx_b, __pyx_n_s_print);
-        if (!__pyx_print)
-            return -1;
-    }
-    if (stream) {
-        kwargs = PyDict_New();
-        if (unlikely(!kwargs))
-            return -1;
-        if (unlikely(PyDict_SetItem(kwargs, __pyx_n_s_file, stream) < 0))
-            goto bad;
-        if (!newline) {
-            end_string = PyUnicode_FromStringAndSize(" ", 1);
-            if (unlikely(!end_string))
-                goto bad;
-            if (PyDict_SetItem(kwargs, __pyx_n_s_end, end_string) < 0) {
-                Py_DECREF(end_string);
-                goto bad;
-            }
-            Py_DECREF(end_string);
-        }
-    } else if (!newline) {
-        if (unlikely(!__pyx_print_kwargs)) {
-            __pyx_print_kwargs = PyDict_New();
-            if (unlikely(!__pyx_print_kwargs))
-                return -1;
-            end_string = PyUnicode_FromStringAndSize(" ", 1);
-            if (unlikely(!end_string))
-                return -1;
-            if (PyDict_SetItem(__pyx_print_kwargs, __pyx_n_s_end, end_string) < 0) {
-                Py_DECREF(end_string);
-                return -1;
-            }
-            Py_DECREF(end_string);
-        }
-        kwargs = __pyx_print_kwargs;
-    }
-    result = PyObject_Call(__pyx_print, arg_tuple, kwargs);
-    if (unlikely(kwargs) && (kwargs != __pyx_print_kwargs))
-        Py_DECREF(kwargs);
-    if (!result)
-        return -1;
-    Py_DECREF(result);
-    return 0;
-bad:
-    if (kwargs != __pyx_print_kwargs)
-        Py_XDECREF(kwargs);
-    return -1;
-}
-#endif
-
 /* CIntToPy */
       static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value) {
     const int neg_one = (int) -1, const_zero = (int) 0;
@@ -6574,6 +6318,112 @@ bad:
                                      little, !is_unsigned);
     }
 }
+
+/* Print */
+      #if !CYTHON_COMPILING_IN_PYPY && PY_MAJOR_VERSION < 3
+static PyObject *__Pyx_GetStdout(void) {
+    PyObject *f = PySys_GetObject((char *)"stdout");
+    if (!f) {
+        PyErr_SetString(PyExc_RuntimeError, "lost sys.stdout");
+    }
+    return f;
+}
+static int __Pyx_Print(PyObject* f, PyObject *arg_tuple, int newline) {
+    int i;
+    if (!f) {
+        if (!(f = __Pyx_GetStdout()))
+            return -1;
+    }
+    Py_INCREF(f);
+    for (i=0; i < PyTuple_GET_SIZE(arg_tuple); i++) {
+        PyObject* v;
+        if (PyFile_SoftSpace(f, 1)) {
+            if (PyFile_WriteString(" ", f) < 0)
+                goto error;
+        }
+        v = PyTuple_GET_ITEM(arg_tuple, i);
+        if (PyFile_WriteObject(v, f, Py_PRINT_RAW) < 0)
+            goto error;
+        if (PyString_Check(v)) {
+            char *s = PyString_AsString(v);
+            Py_ssize_t len = PyString_Size(v);
+            if (len > 0) {
+                switch (s[len-1]) {
+                    case ' ': break;
+                    case '\f': case '\r': case '\n': case '\t': case '\v':
+                        PyFile_SoftSpace(f, 0);
+                        break;
+                    default:  break;
+                }
+            }
+        }
+    }
+    if (newline) {
+        if (PyFile_WriteString("\n", f) < 0)
+            goto error;
+        PyFile_SoftSpace(f, 0);
+    }
+    Py_DECREF(f);
+    return 0;
+error:
+    Py_DECREF(f);
+    return -1;
+}
+#else
+static int __Pyx_Print(PyObject* stream, PyObject *arg_tuple, int newline) {
+    PyObject* kwargs = 0;
+    PyObject* result = 0;
+    PyObject* end_string;
+    if (unlikely(!__pyx_print)) {
+        __pyx_print = PyObject_GetAttr(__pyx_b, __pyx_n_s_print);
+        if (!__pyx_print)
+            return -1;
+    }
+    if (stream) {
+        kwargs = PyDict_New();
+        if (unlikely(!kwargs))
+            return -1;
+        if (unlikely(PyDict_SetItem(kwargs, __pyx_n_s_file, stream) < 0))
+            goto bad;
+        if (!newline) {
+            end_string = PyUnicode_FromStringAndSize(" ", 1);
+            if (unlikely(!end_string))
+                goto bad;
+            if (PyDict_SetItem(kwargs, __pyx_n_s_end, end_string) < 0) {
+                Py_DECREF(end_string);
+                goto bad;
+            }
+            Py_DECREF(end_string);
+        }
+    } else if (!newline) {
+        if (unlikely(!__pyx_print_kwargs)) {
+            __pyx_print_kwargs = PyDict_New();
+            if (unlikely(!__pyx_print_kwargs))
+                return -1;
+            end_string = PyUnicode_FromStringAndSize(" ", 1);
+            if (unlikely(!end_string))
+                return -1;
+            if (PyDict_SetItem(__pyx_print_kwargs, __pyx_n_s_end, end_string) < 0) {
+                Py_DECREF(end_string);
+                return -1;
+            }
+            Py_DECREF(end_string);
+        }
+        kwargs = __pyx_print_kwargs;
+    }
+    result = PyObject_Call(__pyx_print, arg_tuple, kwargs);
+    if (unlikely(kwargs) && (kwargs != __pyx_print_kwargs))
+        Py_DECREF(kwargs);
+    if (!result)
+        return -1;
+    Py_DECREF(result);
+    return 0;
+bad:
+    if (kwargs != __pyx_print_kwargs)
+        Py_XDECREF(kwargs);
+    return -1;
+}
+#endif
 
 /* CIntToPy */
       static CYTHON_INLINE PyObject* __Pyx_PyInt_From_TSecurityFtdcMillisecType(TSecurityFtdcMillisecType value) {

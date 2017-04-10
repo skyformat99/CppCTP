@@ -28,17 +28,13 @@ cdef class MdApi:
         MdApi_Release(self)
 
     def Init(self):
-        print(">>> SecurityFtdcMdApi.pyx Init() begin")
+        # print(">>> SecurityFtdcMdApi.pyx Init() begin")
         if self.api is NULL or self.spi is not NULL: return
         self.spi = new CMdSpi(<PyObject *>self)
-        print(">>> SecurityFtdcMdApi.pyx Init() after create self.spi")
         self.spi.InitPyThread()
-        print(">>> SecurityFtdcMdApi.pyx Init() after InitPyThread")
         CheckMemory(self.spi)
         self.api.RegisterSpi(self.spi)
-        print(">>> SecurityFtdcMdApi.pyx Init() after RegisterSpi")
         self.api.Init()
-        print(">>> SecurityFtdcMdApi.pyx Init() after api Init")
 
     def Join(self):
         cdef int ret
@@ -52,25 +48,29 @@ cdef class MdApi:
         with nogil: ret = self.api.GetTradingDay()
         return ret
 
-    def RegisterFront(self, char *pszFrontAddress):
+    def RegisterFront(self, const_char *pszFrontAddress):
         if self.api is NULL: return
-        self.api.RegisterFront(pszFrontAddress)
+        cdef char *c_pszFrontAddress
+        strcpy(c_pszFrontAddress, pszFrontAddress)
+        self.api.RegisterFront(c_pszFrontAddress)
 
-    def SubscribeMarketData(self, pInstrumentIDs, ExchageID):
-        pExchageID = bytes(ExchageID, 'gbk')
+    def SubscribeMarketData(self, InstrumentIDs, ExchageID):
+        # pExchageID = bytes(ExchageID, 'gbk')
+        # pExchageID = ExchageID.decode('utf-8').encode('gbk')
+        pExchageID = ExchageID
         cdef int nCount
         cdef char **ppInstrumentID
         cdef char *cExchangeID
         strcpy(cExchangeID, pExchageID)
-        print(">>> SubscribeMarketData() cExchangeID = ", cExchangeID)
+        # print(">>> SubscribeMarketData() cExchangeID = ", cExchangeID)
         if self.spi is NULL: return
-        nCount = len(pInstrumentIDs)
+        nCount = len(InstrumentIDs)
         ppInstrumentID = <char **>stdlib.malloc(sizeof(char *) * nCount)
         CheckMemory(ppInstrumentID)
         try:
             for i from 0 <= i < nCount:
-                ppInstrumentID[i] = pInstrumentIDs[i]
-                print("ppInstrumentID[i] = ", ppInstrumentID[i])
+                ppInstrumentID[i] = InstrumentIDs[i]
+                # print("ppInstrumentID[i] = ", ppInstrumentID[i])
             with nogil: nCount = self.api.SubscribeMarketData(ppInstrumentID, nCount, cExchangeID)
         finally:
             stdlib.free(ppInstrumentID)
@@ -93,7 +93,7 @@ cdef class MdApi:
 
     def ReqUserLogin(self, pReqUserLogin, int nRequestID):
         if self.spi is NULL: return
-        print(">>> SecurityFtdcMdApi.pyx ReqUserLogin", pReqUserLogin, pReqUserLogin['BrokerID'])
+        # print(">>> SecurityFtdcMdApi.pyx ReqUserLogin", pReqUserLogin, pReqUserLogin['BrokerID'])
         cdef CSecurityFtdcReqUserLoginField loginField
         memset(loginField.UserID, 0, sizeof(loginField.UserID))
         memset(loginField.BrokerID, 0, sizeof(loginField.BrokerID))
@@ -134,6 +134,8 @@ cdef extern int MdSpi_OnRspError(self, CSecurityFtdcRspInfoField *pRspInfo, int 
     return 0
 
 cdef extern int MdSpi_OnRspUserLogin(self, CSecurityFtdcRspUserLoginField *pRspUserLogin, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, cbool bIsLast) except -1:
+    # py_obj = <object>pRspUserLogin
+    # print(">>> MdSpi_OnRspUserLogin() py_obj ", py_obj)
     dict_pRspUserLogin = {}
     dict_pRspUserLogin['BrokerID'] = pRspUserLogin.BrokerID
     dict_pRspUserLogin['UserID'] = pRspUserLogin.UserID
@@ -176,7 +178,7 @@ cdef extern int MdSpi_OnRspUnSubMarketData(self, CSecurityFtdcSpecificInstrument
 
 cdef extern int MdSpi_OnRtnDepthMarketData(self, CSecurityFtdcDepthMarketDataField *pDepthMarketData) except -1:
     # self.OnRtnDepthMarketData(pDepthMarketData)
-    print(">>> MdSpi_OnRtnDepthMarketData()...")
+    # print(">>> MdSpi_OnRtnDepthMarketData()...")
     dict_pDepthMarketData = {}
     ###交易日
     dict_pDepthMarketData['TradingDay'] = pDepthMarketData.TradingDay
