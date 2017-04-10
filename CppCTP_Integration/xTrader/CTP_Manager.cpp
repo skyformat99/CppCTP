@@ -39,6 +39,9 @@ CTP_Manager::CTP_Manager() {
 	this->l_sessions = new list<Session *>();
 	this->isClosingSaved = false;
 	this->system_init_flag = false;
+	this->trading_day = "";
+	this->isMdLogin = false;
+	this->isCTPFinishedPositionInit = false;
 	//this->ten_min_flag = false;
 	//this->one_min_flag = false;
 	//this->one_second_flag = false;
@@ -48,9 +51,9 @@ bool CTP_Manager::ten_min_flag = false;
 bool CTP_Manager::one_min_flag = false;
 bool CTP_Manager::one_second_flag = false;
 
-bool CTP_Manager::CheckIn(Login *login) {
-	
-}
+//bool CTP_Manager::CheckIn(Login *login) {
+//	
+//}
 
 /// trader login
 bool CTP_Manager::TraderLogin(string traderid, string password, Trader *op) {
@@ -574,6 +577,22 @@ int CTP_Manager::getOn_Off() {
 
 void CTP_Manager::setOn_Off(int on_off) {
 	this->on_off = on_off;
+}
+
+/// 设置行情是否登陆完成
+bool CTP_Manager::getMdLogin() {
+	return this->isMdLogin;
+}
+void CTP_Manager::setMdLogin(bool isMdLogin) {
+	this->isMdLogin = isMdLogin;
+}
+
+/// 设置ctp仓位是否初始化完成
+bool CTP_Manager::getCTPFinishedPositionInit() {
+	return this->isCTPFinishedPositionInit;
+}
+void CTP_Manager::setCTPFinishedPositionInit(bool isCTPFinishedPositionInit) {
+	this->isCTPFinishedPositionInit = isCTPFinishedPositionInit;
 }
 
 /// 设置交易日
@@ -3094,6 +3113,26 @@ bool CTP_Manager::initYesterdayPosition() {
 
 /// 初始化策略(策略更新trading_day, 期货账户更新order_ref)
 bool CTP_Manager::initStrategyAndFutureAccount() {
+	USER_PRINT("CTP_Manager::initStrategyAndFutureAccount()");
+	std::cout << "CTP_Manager::initStrategyAndFutureAccount()" << std::endl;
+	/// 如果ctp_manager交易日为空,说明未初始化完成
+	if (this->trading_day == "")
+	{
+		std::cout << "\tctp_manager交易日为空,初始化失败!" << std::endl;
+		this->setCTPFinishedPositionInit(false);
+		return false;
+	}
+	else {
+		std::cout << "\tctp_manager交易日 不 为空" << std::endl;
+		if (this->getMdLogin()) {
+			std::cout << "\t行情 已 登陆成功,初始化成功" << std::endl;
+			this->setCTPFinishedPositionInit(true);
+		}
+		else {
+			std::cout << "\t行情 未 登陆成功,初始化失败!" << std::endl;
+			this->setCTPFinishedPositionInit(false);
+		}
+	}
 	bool flag = true;
 	list<Strategy *>::iterator stg_itor;
 	list<Strategy *>::iterator stg_itor_yesterday;

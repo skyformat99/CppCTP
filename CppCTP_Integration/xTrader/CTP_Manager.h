@@ -22,7 +22,7 @@ class CTP_Manager {
 public:
 	CTP_Manager();
 	///登陆
-	bool CheckIn(Login *login);
+	//bool CheckIn(Login *login);
 
 	/// trader login
 	bool TraderLogin(string traderid, string password, Trader *op);
@@ -145,6 +145,14 @@ public:
 	int getOn_Off();
 	void setOn_Off(int on_off);
 
+	/// 设置行情是否登陆完成
+	bool getMdLogin();
+	void setMdLogin(bool isMdLogin);
+
+	/// 设置ctp仓位是否初始化完成
+	bool getCTPFinishedPositionInit();
+	void setCTPFinishedPositionInit(bool isCTPFinishedPositionInit);
+
 	/// 处理客户端发来的消息
 	static void HandleMessage(int fd, char *msg, CTP_Manager *ctp_m);
 
@@ -185,7 +193,7 @@ public:
 	//bool initYesterdayPositionDetail();
 
 private:
-	Login *login;
+	//Login *login;
 	list<string> *l_instrument;
 	list<string > *l_unsubinstrument;
 	list<string> *l_trader;
@@ -200,6 +208,8 @@ private:
 	int on_off; //开关
 	string trading_day;
 	bool isClosingSaved;
+	bool isMdLogin;
+	bool isCTPFinishedPositionInit;
 	list<Session *> *l_sessions;
 	list<USER_CThostFtdcOrderField *> *l_posdetail;
 	list<USER_CThostFtdcOrderField *> *l_posdetail_yesterday;

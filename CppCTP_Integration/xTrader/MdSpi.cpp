@@ -171,6 +171,7 @@ void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtd
 		string s_trading_day = this->mdapi->GetTradingDay();
 		std::cout << "MdSpi.cpp s_trading_day = " << s_trading_day << std::endl;
 		this->ctp_m->setTradingDay(s_trading_day);
+		this->ctp_m->setMdLogin(true);
 		/*sem_post(&login_sem);
 		if (this->isFirstTimeLogged == false) {
 		sem_init(&submarket_sem, 0, 1);
@@ -178,7 +179,6 @@ void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtd
 		}*/
 	}
 	//释放
-	//std::unique_lock <std::mutex> lck(md_mtx);
 	md_cv.notify_one();
 }
 

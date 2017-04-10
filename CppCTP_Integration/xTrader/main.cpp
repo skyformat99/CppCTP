@@ -50,22 +50,47 @@ string stopsave_time = "15:01:00";
 
 /*信号处理*/
 void sig_handler(int signo) {
+
 	if (signo == SIGINT) {
 		printf("main.cpp sig_handler()");
-		printf("\t\033[32m服务端关闭，开始保存策略持仓明细.\033[0m\n");
 
 		if (ctp_m) {
-			ctp_m->saveStrategyPositionDetail();
-			ctp_m->updateSystemFlag();
+
+			bool isTrading = false;
+
+			list<Strategy *>::iterator stg_itor;
+			for (stg_itor = ctp_m->getListStrategy()->begin();
+				stg_itor != ctp_m->getListStrategy()->end(); stg_itor++) { // 遍历ctp_m维护的Strategy List
+				if ((*stg_itor)->isStgTradeTasking()) {
+					/// 一旦有策略仍然在交易中,跳出循环
+					isTrading = true;
+					break;
+				}
+			}
+
+			if (!isTrading) { // 如果策略全部处于非交易状态,则可以进行关闭
+				if (!ctp_m->getCTPFinishedPositionInit()) { // ctp_m未初始化成功，则不做保存工作
+					printf("\t\033[31m服务端 未 完成初始化!!!\033[0m\n");
+				}
+				else {
+					printf("\t\033[32m服务端正常关闭，开始保存策略持仓明细.\033[0m\n");
+					ctp_m->saveStrategyPositionDetail();
+
+				}
+				/// 正常关闭,更新标志位
+				ctp_m->updateSystemFlag();
+				close(sockfd);
+				exit(1);
+			}
+			else {
+				printf("\t\033[31m服务端 有 策略处于交易状态,稍后再试!!!\033[0m\n");
+			}
 		}
 		else {
 			printf("\t\033[31m服务端 未 正常关闭!!!\033[0m\n");
+			close(sockfd);
 			exit(1);
 		}
-		
-		close(sockfd);
-		printf("\t\033[32m服务端正常关闭.\033[0m\n");
-		exit(1);
 	}
 }
 
