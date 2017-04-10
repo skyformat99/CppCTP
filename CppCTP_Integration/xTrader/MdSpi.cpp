@@ -17,7 +17,8 @@ const string PASS = "669822";
 struct timespec outtime = {3, 0};
 std::condition_variable md_cv;
 std::mutex md_mtx;
-#define RSP_TIMEOUT	120
+
+#define MD_RSP_TIMEOUT	120
 
 //初始化构造函数
 MdSpi::MdSpi(CThostFtdcMdApi *mdapi) {
@@ -74,12 +75,13 @@ void MdSpi::timeraddMS(struct timeval *now_time, int ms) {
 void MdSpi::Connect(char *frontAddress) {
 	USER_PRINT("MdSpi::Connect")
 	this->mdapi->RegisterFront(frontAddress); //24H
+	//sleep(1);
 	this->mdapi->Init();
 	//int ret = this->controlTimeOut(&connect_sem);
 
 	//等待回调
-	std::unique_lock<std::mutex> lck(md_mtx);
-	while (md_cv.wait_for(lck, std::chrono::seconds(RSP_TIMEOUT)) == std::cv_status::timeout) {
+	std::unique_lock<std::mutex> md_lck(md_mtx);
+	while (md_cv.wait_for(md_lck, std::chrono::seconds(MD_RSP_TIMEOUT)) == std::cv_status::timeout) {
 		std::cout << "MdSpi::Connect()" << std::endl;
 		std::cout << "\t行情连接等待超时" << std::endl;
 		return;
@@ -88,9 +90,11 @@ void MdSpi::Connect(char *frontAddress) {
 
 //响应连接
 void MdSpi::OnFrontConnected() {
+	//std::unique_lock <std::mutex> lck(md_mtx);
 	USER_PRINT("MdSpi::OnFrontConnected");
+	md_cv.notify_one();
 
-	const char *BrokerID = this->BrokerID.c_str();
+	/*const char *BrokerID = this->BrokerID.c_str();
 	char *r_BrokerID = new char[strlen(BrokerID) + 1];
 	strcpy(r_BrokerID, BrokerID);
 
@@ -100,12 +104,9 @@ void MdSpi::OnFrontConnected() {
 
 	const char *Password = this->Password.c_str();
 	char *r_Password = new char[strlen(Password) + 1];
-	strcpy(r_Password, BrokerID);
+	strcpy(r_Password, BrokerID);*/
 
-	this->Login(r_BrokerID, r_UserID, r_Password);
-	
-	md_cv.notify_one();
-	
+	//this->Login(r_BrokerID, r_UserID, r_Password);
 	//this->Login("9999", "058176", "669822");
 }
 
@@ -126,8 +127,8 @@ void MdSpi::Login(char *BrokerID, char *UserID, char *Password) {
 	USER_PRINT("MdSpi::Login TimeOut!")
 	}*/
 	//等待回调
-	std::unique_lock<std::mutex> lck(md_mtx);
-	while (md_cv.wait_for(lck, std::chrono::seconds(RSP_TIMEOUT)) == std::cv_status::timeout) {
+	std::unique_lock<std::mutex> md_lck(md_mtx);
+	while (md_cv.wait_for(md_lck, std::chrono::seconds(MD_RSP_TIMEOUT)) == std::cv_status::timeout) {
 		std::cout << "MdSpi::Connect()" << std::endl;
 		std::cout << "\t行情登录等待超时" << std::endl;
 		return;
@@ -176,11 +177,9 @@ void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtd
 		this->SubMarketData(this->ppInstrumentID, this->nCount);
 		}*/
 	}
-
-	if (bIsLast) {
-		//释放
-		md_cv.notify_one();
-	}
+	//释放
+	//std::unique_lock <std::mutex> lck(md_mtx);
+	md_cv.notify_one();
 }
 
 //返回数据是否报错
