@@ -2285,24 +2285,6 @@ void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, 
 
 		USER_CThostFtdcOrderField *new_pos = new USER_CThostFtdcOrderField();
 
-		cout << "instrumentid = " << p.getStringField("instrumentid") << ", ";
-		cout << "orderref = " << p.getStringField("orderref") << ", ";
-		cout << "userid = " << p.getStringField("userid") << ", ";
-		cout << "direction = " << p.getIntField("direction") << ", ";
-		cout << "comboffsetflag = " << p.getStringField("comboffsetflag") << ", ";
-		cout << "combhedgeflag = " << p.getStringField("combhedgeflag") << ", ";
-		cout << "limitprice = " << p.getField("limitprice").Double() << ", ";
-		cout << "volumetotaloriginal = " << p.getIntField("volumetotaloriginal") << ", ";
-		cout << "tradingday = " << p.getStringField("tradingday") << ", ";
-		cout << "tradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
-		cout << "orderstatus = " << p.getIntField("orderstatus") << ", ";
-		cout << "volumetraded = " << p.getIntField("volumetraded") << ", ";
-		cout << "volumetotal = " << p.getIntField("volumetotal") << ", ";
-		cout << "insertdate = " << p.getStringField("insertdate") << ", ";
-		cout << "inserttime = " << p.getStringField("inserttime") << ", ";
-		cout << "strategyid = " << p.getStringField("strategyid") << ", ";
-		cout << "volumetradedbatch = " << p.getIntField("volumetradedbatch") << ", ";
-
 		strcpy(new_pos->InstrumentID, p.getStringField("instrumentid"));
 		strcpy(new_pos->OrderRef, p.getStringField("orderref"));
 		strcpy(new_pos->UserID, p.getStringField("userid"));
@@ -2318,12 +2300,29 @@ void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, 
 		new_pos->VolumeTotal = p.getIntField("volumetotal");
 		strcpy(new_pos->InsertDate, p.getStringField("insertdate"));
 		strcpy(new_pos->InsertTime, p.getStringField("inserttime"));
-		
 		strcpy(new_pos->StrategyID, p.getStringField("strategyid"));
-
-		std::cout << "\tnew_pos->StrategyID = " << new_pos->StrategyID << std::endl;
-
 		new_pos->VolumeTradedBatch = p.getIntField("volumetradedbatch");
+
+		/*std::cout << "instrumentid = " << p.getStringField("instrumentid") << ", ";
+		std::cout << "orderref = " << p.getStringField("orderref") << ", ";
+		std::cout << "userid = " << p.getStringField("userid") << ", ";
+		std::cout << "direction = " << p.getIntField("direction") << ", ";
+		std::cout << "comboffsetflag = " << p.getStringField("comboffsetflag") << ", ";
+		std::cout << "combhedgeflag = " << p.getStringField("combhedgeflag") << ", ";
+		std::cout << "limitprice = " << p.getField("limitprice").Double() << ", ";
+		std::cout << "volumetotaloriginal = " << p.getIntField("volumetotaloriginal") << ", ";
+		std::cout << "tradingday = " << p.getStringField("tradingday") << ", ";
+		std::cout << "tradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
+		std::cout << "orderstatus = " << p.getIntField("orderstatus") << ", ";
+		std::cout << "volumetraded = " << p.getIntField("volumetraded") << ", ";
+		std::cout << "volumetotal = " << p.getIntField("volumetotal") << ", ";
+		std::cout << "insertdate = " << p.getStringField("insertdate") << ", ";
+		std::cout << "inserttime = " << p.getStringField("inserttime") << ", ";
+		std::cout << "strategyid = " << p.getStringField("strategyid") << ", ";
+		std::cout << "volumetradedbatch = " << p.getIntField("volumetradedbatch") << ", ";
+		std::cout << "\tnew_pos->StrategyID = " << new_pos->StrategyID << std::endl;*/
+
+		
 
 		l_posd->push_back(new_pos);
 	}
@@ -2467,24 +2466,6 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 
 		USER_CThostFtdcOrderField *new_pos = new USER_CThostFtdcOrderField();
 
-		cout << "\tinstrumentid = " << p.getStringField("instrumentid") << ", ";
-		cout << "\torderref = " << p.getStringField("orderref") << ", ";
-		cout << "\tuserid = " << p.getStringField("userid") << ", ";
-		cout << "\tdirection = " << p.getIntField("direction") << ", ";
-		cout << "\tcomboffsetflag = " << p.getStringField("comboffsetflag") << ", ";
-		cout << "\tcombhedgeflag = " << p.getStringField("combhedgeflag") << ", ";
-		cout << "\tlimitprice = " << p.getField("limitprice").Double() << ", ";
-		cout << "\tvolumetotaloriginal = " << p.getIntField("volumetotaloriginal") << ", ";
-		cout << "\ttradingday = " << p.getStringField("tradingday") << ", ";
-		cout << "\ttradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
-		cout << "\torderstatus = " << p.getIntField("orderstatus") << ", ";
-		cout << "\tvolumetraded = " << p.getIntField("volumetraded") << ", ";
-		cout << "\tvolumetotal = " << p.getIntField("volumetotal") << ", ";
-		cout << "\tinsertdate = " << p.getStringField("insertdate") << ", ";
-		cout << "\tinserttime = " << p.getStringField("inserttime") << ", ";
-		cout << "\tstrategyid = " << p.getStringField("strategyid") << ", ";
-		cout << "\tvolumetradedbatch = " << p.getIntField("volumetradedbatch") << std::endl;
-
 		strcpy(new_pos->InstrumentID, p.getStringField("instrumentid"));
 		strcpy(new_pos->OrderRef, p.getStringField("orderref"));
 		strcpy(new_pos->UserID, p.getStringField("userid"));
@@ -2502,6 +2483,24 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 		strcpy(new_pos->InsertTime, p.getStringField("inserttime"));
 		strcpy(new_pos->StrategyID, p.getStringField("strategyid"));
 		new_pos->VolumeTradedBatch = p.getIntField("volumetradedbatch");
+
+		/*cout << "\tinstrumentid = " << p.getStringField("instrumentid") << ", ";
+		cout << "\torderref = " << p.getStringField("orderref") << ", ";
+		cout << "\tuserid = " << p.getStringField("userid") << ", ";
+		cout << "\tdirection = " << p.getIntField("direction") << ", ";
+		cout << "\tcomboffsetflag = " << p.getStringField("comboffsetflag") << ", ";
+		cout << "\tcombhedgeflag = " << p.getStringField("combhedgeflag") << ", ";
+		cout << "\tlimitprice = " << p.getField("limitprice").Double() << ", ";
+		cout << "\tvolumetotaloriginal = " << p.getIntField("volumetotaloriginal") << ", ";
+		cout << "\ttradingday = " << p.getStringField("tradingday") << ", ";
+		cout << "\ttradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
+		cout << "\torderstatus = " << p.getIntField("orderstatus") << ", ";
+		cout << "\tvolumetraded = " << p.getIntField("volumetraded") << ", ";
+		cout << "\tvolumetotal = " << p.getIntField("volumetotal") << ", ";
+		cout << "\tinsertdate = " << p.getStringField("insertdate") << ", ";
+		cout << "\tinserttime = " << p.getStringField("inserttime") << ", ";
+		cout << "\tstrategyid = " << p.getStringField("strategyid") << ", ";
+		cout << "\tvolumetradedbatch = " << p.getIntField("volumetradedbatch") << std::endl;*/
 
 		l_posd->push_back(new_pos);
 	}
@@ -2581,18 +2580,7 @@ void DBManager::getAllPositionDetailTrade(list<USER_CThostFtdcTradeField *> *l_p
 
 		USER_CThostFtdcTradeField *new_pos = new USER_CThostFtdcTradeField();
 
-		cout << "instrumentid = " << p.getStringField("instrumentid") << ", ";
-		cout << "orderref = " << p.getStringField("orderref") << ", ";
-		cout << "userid = " << p.getStringField("userid") << ", ";
-		cout << "direction = " << p.getIntField("direction") << ", ";
-		cout << "offsetflag = " << p.getStringField("offsetflag") << ", ";
-		cout << "hedgeflag = " << p.getStringField("hedgeflag") << ", ";
-		cout << "price = " << p.getField("price").Double() << ", ";
-		cout << "tradingday = " << p.getStringField("tradingday") << ", ";
-		cout << "tradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
-		cout << "tradedate = " << p.getStringField("tradedate") << ", ";
-		cout << "strategyid = " << p.getStringField("strategyid") << ", ";
-		cout << "volume = " << p.getIntField("volume") << ", ";
+		
 
 		strcpy(new_pos->InstrumentID, p.getStringField("instrumentid"));
 		strcpy(new_pos->OrderRef, p.getStringField("orderref"));
@@ -2607,7 +2595,20 @@ void DBManager::getAllPositionDetailTrade(list<USER_CThostFtdcTradeField *> *l_p
 		strcpy(new_pos->StrategyID, p.getStringField("strategyid"));
 		new_pos->Volume = p.getIntField("volume");
 
-		std::cout << "\tnew_pos->StrategyID = " << new_pos->StrategyID << std::endl;
+
+		/*cout << "instrumentid = " << p.getStringField("instrumentid") << ", ";
+		cout << "orderref = " << p.getStringField("orderref") << ", ";
+		cout << "userid = " << p.getStringField("userid") << ", ";
+		cout << "direction = " << p.getIntField("direction") << ", ";
+		cout << "offsetflag = " << p.getStringField("offsetflag") << ", ";
+		cout << "hedgeflag = " << p.getStringField("hedgeflag") << ", ";
+		cout << "price = " << p.getField("price").Double() << ", ";
+		cout << "tradingday = " << p.getStringField("tradingday") << ", ";
+		cout << "tradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
+		cout << "tradedate = " << p.getStringField("tradedate") << ", ";
+		cout << "strategyid = " << p.getStringField("strategyid") << ", ";
+		cout << "volume = " << p.getIntField("volume") << ", ";
+		std::cout << "\tnew_pos->StrategyID = " << new_pos->StrategyID << std::endl;*/
 
 		l_posd->push_back(new_pos);
 	}
@@ -2742,18 +2743,7 @@ void DBManager::getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeFiel
 
 		USER_CThostFtdcTradeField *new_pos = new USER_CThostFtdcTradeField();
 
-		cout << "\tinstrumentid = " << p.getStringField("instrumentid") << ", ";
-		cout << "\torderref = " << p.getStringField("orderref") << ", ";
-		cout << "\tuserid = " << p.getStringField("userid") << ", ";
-		cout << "\tdirection = " << p.getIntField("direction") << ", ";
-		cout << "\toffsetflag = " << p.getStringField("offsetflag") << ", ";
-		cout << "\thedgeflag = " << p.getStringField("hedgeflag") << ", ";
-		cout << "\tprice = " << p.getField("price").Double() << ", ";
-		cout << "\ttradingday = " << p.getStringField("tradingday") << ", ";
-		cout << "\ttradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
-		cout << "\ttradedate = " << p.getIntField("tradedate") << ", ";
-		cout << "\tstrategyid = " << p.getStringField("strategyid") << ", ";
-		cout << "\tvolume = " << p.getIntField("volume") << std::endl;
+		
 
 		strcpy(new_pos->InstrumentID, p.getStringField("instrumentid"));
 		strcpy(new_pos->OrderRef, p.getStringField("orderref"));
@@ -2767,6 +2757,19 @@ void DBManager::getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeFiel
 		strcpy(new_pos->TradeDate, p.getStringField("tradedate"));
 		strcpy(new_pos->StrategyID, p.getStringField("strategyid"));
 		new_pos->Volume = p.getIntField("volume");
+
+		/*cout << "\tinstrumentid = " << p.getStringField("instrumentid") << ", ";
+		cout << "\torderref = " << p.getStringField("orderref") << ", ";
+		cout << "\tuserid = " << p.getStringField("userid") << ", ";
+		cout << "\tdirection = " << p.getIntField("direction") << ", ";
+		cout << "\toffsetflag = " << p.getStringField("offsetflag") << ", ";
+		cout << "\thedgeflag = " << p.getStringField("hedgeflag") << ", ";
+		cout << "\tprice = " << p.getField("price").Double() << ", ";
+		cout << "\ttradingday = " << p.getStringField("tradingday") << ", ";
+		cout << "\ttradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
+		cout << "\ttradedate = " << p.getIntField("tradedate") << ", ";
+		cout << "\tstrategyid = " << p.getStringField("strategyid") << ", ";
+		cout << "\tvolume = " << p.getIntField("volume") << std::endl;*/
 
 		l_posd->push_back(new_pos);
 	}
