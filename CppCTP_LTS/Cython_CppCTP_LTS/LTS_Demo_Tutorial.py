@@ -7,12 +7,6 @@ class MyMdApi(MdApi):
 
     def OnFrontConnected(self):
         print('OnFrontConnected: Login...')
-        # 登陆参数设置
-        pReqUserLogin = {}
-        pReqUserLogin['BrokerID'] = b'2011'
-        pReqUserLogin['UserID'] = b'010000040178'
-        pReqUserLogin['Password'] = b'7174516'
-        self.ReqUserLogin(pReqUserLogin, 1)
 
     def OnFrontDisconnected(self, nReason):
         print('OnFrontDisconnected:', nReason)
@@ -24,10 +18,6 @@ class MyMdApi(MdApi):
         print('OnRspUserLogin:', pRspInfo)
         if pRspInfo['ErrorID'] == 0: # Success
             print('GetTradingDay:', self.GetTradingDay())
-            # 订阅行情参数配置
-            instrumentIDs = [b'000001']
-            pExchangeID = b'SSE'
-            self.SubscribeMarketData(instrumentIDs, pExchangeID)
         else:
             print('>>> OnRspUserLogin() ErrorID = ', pRspInfo['ErrorID'])
 
@@ -50,9 +40,26 @@ class MyMdApi(MdApi):
 if __name__ == '__main__':
     #测试从此处开始
     mdapi = MyMdApi()
+    # 创建流文件
     mdapi.Create(b'conn/md')
+    # 注册前置地址
     mdapi.RegisterFront(b'tcp://180.166.216.228:24513')
+    # 初始化
     mdapi.Init()
+    time.sleep(1)
+
+    # 登陆
+    pReqUserLogin = {}
+    pReqUserLogin['BrokerID'] = b'2011'
+    pReqUserLogin['UserID'] = b'010000040178'
+    pReqUserLogin['Password'] = b'7174516'
+    mdapi.ReqUserLogin(pReqUserLogin, 1)
+    time.sleep(1)
+
+    # 订阅行情
+    instrumentIDs = [b'000001']
+    pExchangeID = b'SSE'
+    mdapi.SubscribeMarketData(instrumentIDs, pExchangeID)
 
     try:
         while 1:
