@@ -934,26 +934,26 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 		rapidjson::Value create_info_object(rapidjson::kObjectType);
 		create_info_object.SetObject();
 
-		create_info_object.AddMember("instrumentid", rapidjson::StringRef((*pod_itor)->InstrumentID), allocator4);
-		create_info_object.AddMember("orderref", rapidjson::StringRef((*pod_itor)->OrderRef), allocator4);
-		create_info_object.AddMember("userid", rapidjson::StringRef((*pod_itor)->UserID), allocator4);
-		//create_info_object.AddMember("direction", (*pod_itor)->Direction, allocator4);
+		create_info_object.AddMember("InstrumentID", rapidjson::StringRef((*pod_itor)->InstrumentID), allocator);
+		create_info_object.AddMember("OrderRef", rapidjson::StringRef((*pod_itor)->OrderRef), allocator);
+		create_info_object.AddMember("UserID", rapidjson::StringRef((*pod_itor)->UserID), allocator);
+		//create_info_object.AddMember("Direction", (*pod_itor)->Direction, allocator);
 		string direction;
 		direction = (*pod_itor)->Direction;
-		create_info_object.AddMember("direction", rapidjson::StringRef(direction.c_str()), allocator4);
-		create_info_object.AddMember("comboffsetflag", rapidjson::StringRef((*pod_itor)->CombOffsetFlag), allocator4);
-		create_info_object.AddMember("combhedgeflag", rapidjson::StringRef((*pod_itor)->CombHedgeFlag), allocator4);
-		create_info_object.AddMember("limitprice", (*pod_itor)->LimitPrice, allocator4);
-		create_info_object.AddMember("volumetotaloriginal", (*pod_itor)->VolumeTotalOriginal, allocator4);
-		create_info_object.AddMember("tradingday", rapidjson::StringRef((*pod_itor)->TradingDay), allocator4);
-		create_info_object.AddMember("tradingdayrecord", rapidjson::StringRef((*pod_itor)->TradingDayRecord), allocator4);
-		create_info_object.AddMember("orderstatus", (*pod_itor)->OrderStatus, allocator4);
-		create_info_object.AddMember("volumetraded", (*pod_itor)->VolumeTraded, allocator4);
-		create_info_object.AddMember("volumetotal", (*pod_itor)->VolumeTotal, allocator4);
-		create_info_object.AddMember("insertdate", rapidjson::StringRef((*pod_itor)->InsertDate), allocator4);
-		create_info_object.AddMember("inserttime", rapidjson::StringRef((*pod_itor)->InsertTime), allocator4);
-		create_info_object.AddMember("strategyid", rapidjson::StringRef((*pod_itor)->StrategyID), allocator4);
-		create_info_object.AddMember("volumetradedbatch", (*pod_itor)->VolumeTradedBatch, allocator4);
+		create_info_object.AddMember("Direction", rapidjson::StringRef(direction.c_str()), allocator);
+		create_info_object.AddMember("CombOffsetFlag", rapidjson::StringRef((*pod_itor)->CombOffsetFlag), allocator);
+		create_info_object.AddMember("CombHedgeFlag", rapidjson::StringRef((*pod_itor)->CombHedgeFlag), allocator);
+		create_info_object.AddMember("LimitPrice", (*pod_itor)->LimitPrice, allocator);
+		create_info_object.AddMember("VolumeTotalOriginal", (*pod_itor)->VolumeTotalOriginal, allocator);
+		create_info_object.AddMember("TradingDay", rapidjson::StringRef((*pod_itor)->TradingDay), allocator);
+		create_info_object.AddMember("TradingDayRecord", rapidjson::StringRef((*pod_itor)->TradingDayRecord), allocator);
+		create_info_object.AddMember("OrderStatus", (*pod_itor)->OrderStatus, allocator);
+		create_info_object.AddMember("VolumeTraded", (*pod_itor)->VolumeTraded, allocator);
+		create_info_object.AddMember("VolumeTotal", (*pod_itor)->VolumeTotal, allocator);
+		create_info_object.AddMember("InsertDate", rapidjson::StringRef((*pod_itor)->InsertDate), allocator);
+		create_info_object.AddMember("InsertTime", rapidjson::StringRef((*pod_itor)->InsertTime), allocator);
+		create_info_object.AddMember("StrategyID", rapidjson::StringRef((*pod_itor)->StrategyID), allocator);
+		create_info_object.AddMember("VolumeTradedBatch", (*pod_itor)->VolumeTradedBatch, allocator);
 
 		create_info_array4.PushBack(create_info_object, allocator4);
 
@@ -1024,31 +1024,31 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 		rapidjson::Value create_info_object(rapidjson::kObjectType);
 		create_info_object.SetObject();
 
-		create_info_object.AddMember("instrumentid", rapidjson::StringRef((*pod_itor_trade)->InstrumentID), allocator5);
-		create_info_object.AddMember("orderref", rapidjson::StringRef((*pod_itor_trade)->OrderRef), allocator5);
-		create_info_object.AddMember("userid", rapidjson::StringRef((*pod_itor_trade)->UserID), allocator5);
+		create_info_object.AddMember("InstrumentID", rapidjson::StringRef((*pod_itor_trade)->InstrumentID), allocator5);
+		create_info_object.AddMember("OrderRef", rapidjson::StringRef((*pod_itor_trade)->OrderRef), allocator5);
+		create_info_object.AddMember("UserID", rapidjson::StringRef((*pod_itor_trade)->UserID), allocator5);
 
 		string direction;
 		direction = (*pod_itor_trade)->Direction;
-		create_info_object.AddMember("direction", rapidjson::StringRef(direction.c_str()), allocator5);
+		create_info_object.AddMember("Direction", rapidjson::StringRef(direction.c_str()), allocator5);
 
 		string OffsetFlag;
 		OffsetFlag = (*pod_itor_trade)->OffsetFlag;
-		create_info_object.AddMember("offsetflag", rapidjson::StringRef(OffsetFlag.c_str()), allocator5);
+		create_info_object.AddMember("OffsetFlag", rapidjson::StringRef(OffsetFlag.c_str()), allocator5);
 
 		string HedgeFlag;
 		HedgeFlag = (*pod_itor_trade)->HedgeFlag;
-		create_info_object.AddMember("hedgeflag", rapidjson::StringRef(HedgeFlag.c_str()), allocator5);
+		create_info_object.AddMember("HedgeFlag", rapidjson::StringRef(HedgeFlag.c_str()), allocator5);
 
-		//create_info_object.AddMember("direction", (*pod_itor)->Direction, allocator5);
-		//create_info_object.AddMember("offsetflag", (*pod_itor)->OffsetFlag, allocator5);
-		//create_info_object.AddMember("hedgeflag", (*pod_itor)->HedgeFlag, allocator5);
-		create_info_object.AddMember("price", (*pod_itor_trade)->Price, allocator5);
-		create_info_object.AddMember("tradingday", rapidjson::StringRef((*pod_itor_trade)->TradingDay), allocator5);
-		create_info_object.AddMember("tradingdayrecord", rapidjson::StringRef((*pod_itor_trade)->TradingDayRecord), allocator5);
-		create_info_object.AddMember("tradedate", rapidjson::StringRef((*pod_itor_trade)->TradeDate), allocator5);
-		create_info_object.AddMember("strategyid", rapidjson::StringRef((*pod_itor_trade)->StrategyID), allocator5);
-		create_info_object.AddMember("volume", (*pod_itor_trade)->Volume, allocator5);
+		//create_info_object.AddMember("Direction", (*pod_itor)->Direction, allocator5);
+		//create_info_object.AddMember("OffsetFlag", (*pod_itor)->OffsetFlag, allocator5);
+		//create_info_object.AddMember("HedgeFlag", (*pod_itor)->HedgeFlag, allocator5);
+		create_info_object.AddMember("Price", (*pod_itor_trade)->Price, allocator5);
+		create_info_object.AddMember("TradingDay", rapidjson::StringRef((*pod_itor_trade)->TradingDay), allocator5);
+		create_info_object.AddMember("TradingDayRecord", rapidjson::StringRef((*pod_itor_trade)->TradingDayRecord), allocator5);
+		create_info_object.AddMember("TradeDate", rapidjson::StringRef((*pod_itor_trade)->TradeDate), allocator5);
+		create_info_object.AddMember("StrategyID", rapidjson::StringRef((*pod_itor_trade)->StrategyID), allocator5);
+		create_info_object.AddMember("Volume", (*pod_itor_trade)->Volume, allocator5);
 
 		create_info_array5.PushBack(create_info_object, allocator5);
 
@@ -2711,26 +2711,26 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					rapidjson::Value create_info_object(rapidjson::kObjectType);
 					create_info_object.SetObject();
 
-					create_info_object.AddMember("instrumentid", rapidjson::StringRef((*pod_itor)->InstrumentID), allocator);
-					create_info_object.AddMember("orderref", rapidjson::StringRef((*pod_itor)->OrderRef), allocator);
-					create_info_object.AddMember("userid", rapidjson::StringRef((*pod_itor)->UserID), allocator);
-					//create_info_object.AddMember("direction", (*pod_itor)->Direction, allocator);
+					create_info_object.AddMember("InstrumentID", rapidjson::StringRef((*pod_itor)->InstrumentID), allocator);
+					create_info_object.AddMember("OrderRef", rapidjson::StringRef((*pod_itor)->OrderRef), allocator);
+					create_info_object.AddMember("UserID", rapidjson::StringRef((*pod_itor)->UserID), allocator);
+					//create_info_object.AddMember("Direction", (*pod_itor)->Direction, allocator);
 					string direction;
 					direction = (*pod_itor)->Direction;
-					create_info_object.AddMember("direction", rapidjson::StringRef(direction.c_str()), allocator);
-					create_info_object.AddMember("comboffsetflag", rapidjson::StringRef((*pod_itor)->CombOffsetFlag), allocator);
-					create_info_object.AddMember("combhedgeflag", rapidjson::StringRef((*pod_itor)->CombHedgeFlag), allocator);
-					create_info_object.AddMember("limitprice", (*pod_itor)->LimitPrice, allocator);
-					create_info_object.AddMember("volumetotaloriginal", (*pod_itor)->VolumeTotalOriginal, allocator);
-					create_info_object.AddMember("tradingday", rapidjson::StringRef((*pod_itor)->TradingDay), allocator);
-					create_info_object.AddMember("tradingdayrecord", rapidjson::StringRef((*pod_itor)->TradingDayRecord), allocator);
-					create_info_object.AddMember("orderstatus", (*pod_itor)->OrderStatus, allocator);
-					create_info_object.AddMember("volumetraded", (*pod_itor)->VolumeTraded, allocator);
-					create_info_object.AddMember("volumetotal", (*pod_itor)->VolumeTotal, allocator);
-					create_info_object.AddMember("insertdate", rapidjson::StringRef((*pod_itor)->InsertDate), allocator);
-					create_info_object.AddMember("inserttime", rapidjson::StringRef((*pod_itor)->InsertTime), allocator);
-					create_info_object.AddMember("strategyid", rapidjson::StringRef((*pod_itor)->StrategyID), allocator);
-					create_info_object.AddMember("volumetradedbatch", (*pod_itor)->VolumeTradedBatch, allocator);
+					create_info_object.AddMember("Direction", rapidjson::StringRef(direction.c_str()), allocator);
+					create_info_object.AddMember("CombOffsetFlag", rapidjson::StringRef((*pod_itor)->CombOffsetFlag), allocator);
+					create_info_object.AddMember("CombHedgeFlag", rapidjson::StringRef((*pod_itor)->CombHedgeFlag), allocator);
+					create_info_object.AddMember("LimitPrice", (*pod_itor)->LimitPrice, allocator);
+					create_info_object.AddMember("VolumeTotalOriginal", (*pod_itor)->VolumeTotalOriginal, allocator);
+					create_info_object.AddMember("TradingDay", rapidjson::StringRef((*pod_itor)->TradingDay), allocator);
+					create_info_object.AddMember("TradingDayRecord", rapidjson::StringRef((*pod_itor)->TradingDayRecord), allocator);
+					create_info_object.AddMember("OrderStatus", (*pod_itor)->OrderStatus, allocator);
+					create_info_object.AddMember("VolumeTraded", (*pod_itor)->VolumeTraded, allocator);
+					create_info_object.AddMember("VolumeTotal", (*pod_itor)->VolumeTotal, allocator);
+					create_info_object.AddMember("InsertDate", rapidjson::StringRef((*pod_itor)->InsertDate), allocator);
+					create_info_object.AddMember("InsertTime", rapidjson::StringRef((*pod_itor)->InsertTime), allocator);
+					create_info_object.AddMember("StrategyID", rapidjson::StringRef((*pod_itor)->StrategyID), allocator);
+					create_info_object.AddMember("VolumeTradedBatch", (*pod_itor)->VolumeTradedBatch, allocator);
 
 					create_info_array.PushBack(create_info_object, allocator);
 
@@ -2864,31 +2864,31 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					rapidjson::Value create_info_object(rapidjson::kObjectType);
 					create_info_object.SetObject();
 
-					create_info_object.AddMember("instrumentid", rapidjson::StringRef((*pod_itor)->InstrumentID), allocator);
-					create_info_object.AddMember("orderref", rapidjson::StringRef((*pod_itor)->OrderRef), allocator);
-					create_info_object.AddMember("userid", rapidjson::StringRef((*pod_itor)->UserID), allocator);
+					create_info_object.AddMember("InstrumentID", rapidjson::StringRef((*pod_itor)->InstrumentID), allocator);
+					create_info_object.AddMember("OrderRef", rapidjson::StringRef((*pod_itor)->OrderRef), allocator);
+					create_info_object.AddMember("UserID", rapidjson::StringRef((*pod_itor)->UserID), allocator);
 
 					string direction;
 					direction = (*pod_itor)->Direction;
-					create_info_object.AddMember("direction", rapidjson::StringRef(direction.c_str()), allocator);
+					create_info_object.AddMember("Direction", rapidjson::StringRef(direction.c_str()), allocator);
 
 					string OffsetFlag;
 					OffsetFlag = (*pod_itor)->OffsetFlag;
-					create_info_object.AddMember("offsetflag", rapidjson::StringRef(OffsetFlag.c_str()), allocator);
+					create_info_object.AddMember("OffsetFlag", rapidjson::StringRef(OffsetFlag.c_str()), allocator);
 
 					string HedgeFlag;
 					HedgeFlag = (*pod_itor)->HedgeFlag;
-					create_info_object.AddMember("hedgeflag", rapidjson::StringRef(HedgeFlag.c_str()), allocator);
+					create_info_object.AddMember("HedgeFlag", rapidjson::StringRef(HedgeFlag.c_str()), allocator);
 
-					//create_info_object.AddMember("direction", (*pod_itor)->Direction, allocator);
-					//create_info_object.AddMember("offsetflag", (*pod_itor)->OffsetFlag, allocator);
-					//create_info_object.AddMember("hedgeflag", (*pod_itor)->HedgeFlag, allocator);
-					create_info_object.AddMember("price", (*pod_itor)->Price, allocator);
-					create_info_object.AddMember("tradingday", rapidjson::StringRef((*pod_itor)->TradingDay), allocator);
-					create_info_object.AddMember("tradingdayrecord", rapidjson::StringRef((*pod_itor)->TradingDayRecord), allocator);
-					create_info_object.AddMember("tradedate", rapidjson::StringRef((*pod_itor)->TradeDate), allocator);
-					create_info_object.AddMember("strategyid", rapidjson::StringRef((*pod_itor)->StrategyID), allocator);
-					create_info_object.AddMember("volume", (*pod_itor)->Volume, allocator);
+					//create_info_object.AddMember("Direction", (*pod_itor)->Direction, allocator);
+					//create_info_object.AddMember("OffsetFlag", (*pod_itor)->OffsetFlag, allocator);
+					//create_info_object.AddMember("HedgeFlag", (*pod_itor)->HedgeFlag, allocator);
+					create_info_object.AddMember("Price", (*pod_itor)->Price, allocator);
+					create_info_object.AddMember("TradingDay", rapidjson::StringRef((*pod_itor)->TradingDay), allocator);
+					create_info_object.AddMember("TradingDayRecord", rapidjson::StringRef((*pod_itor)->TradingDayRecord), allocator);
+					create_info_object.AddMember("TradeDate", rapidjson::StringRef((*pod_itor)->TradeDate), allocator);
+					create_info_object.AddMember("StrategyID", rapidjson::StringRef((*pod_itor)->StrategyID), allocator);
+					create_info_object.AddMember("Volume", (*pod_itor)->Volume, allocator);
 
 					create_info_array.PushBack(create_info_object, allocator);
 

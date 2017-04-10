@@ -22,11 +22,11 @@ std::mutex md_mtx;
 //初始化构造函数
 MdSpi::MdSpi(CThostFtdcMdApi *mdapi) {
 	this->last_tick_data = new CThostFtdcDepthMarketDataField();
-	sem_init(&connect_sem, 0, 0);
+	/*sem_init(&connect_sem, 0, 0);
 	sem_init(&login_sem, 0, 0);
 	sem_init(&logout_sem, 0, 0);
 	sem_init(&submarket_sem, 0, 0);
-	sem_init(&unsubmarket_sem, 0, 0);
+	sem_init(&unsubmarket_sem, 0, 0);*/
 	this->isLogged = false;
 	this->isFirstTimeLogged = true;
     this->mdapi = mdapi;
@@ -41,25 +41,25 @@ void MdSpi::Join() {
 	this->mdapi->Join();
 }
 
-//协程控制
-int MdSpi::controlTimeOut(sem_t *t, int timeout) {
-	/*协程开始*/
-	struct timeval now;
-	struct timespec outtime;
-	gettimeofday(&now, NULL);
-	//cout << now.tv_sec << " " << (now.tv_usec) << "\n";
-	timeraddMS(&now, timeout);
-	outtime.tv_sec = now.tv_sec;
-	outtime.tv_nsec = now.tv_usec * 1000;
-	//cout << outtime.tv_sec << " " << (outtime.tv_nsec) << "\n";
-	int ret = sem_timedwait(t, &outtime);
-	int value;
-	sem_getvalue(t, &value);
-	//cout << "value = " << value << endl;
-	//cout << "ret = " << ret << endl;
-	/*协程结束*/
-	return ret;
-}
+////协程控制
+//int MdSpi::controlTimeOut(sem_t *t, int timeout) {
+//	/*协程开始*/
+//	struct timeval now;
+//	struct timespec outtime;
+//	gettimeofday(&now, NULL);
+//	//cout << now.tv_sec << " " << (now.tv_usec) << "\n";
+//	timeraddMS(&now, timeout);
+//	outtime.tv_sec = now.tv_sec;
+//	outtime.tv_nsec = now.tv_usec * 1000;
+//	//cout << outtime.tv_sec << " " << (outtime.tv_nsec) << "\n";
+//	int ret = sem_timedwait(t, &outtime);
+//	int value;
+//	sem_getvalue(t, &value);
+//	//cout << "value = " << value << endl;
+//	//cout << "ret = " << ret << endl;
+//	/*协程结束*/
+//	return ret;
+//}
 
 //增加毫秒
 void MdSpi::timeraddMS(struct timeval *now_time, int ms) {
@@ -88,27 +88,22 @@ void MdSpi::Connect(char *frontAddress) {
 
 //响应连接
 void MdSpi::OnFrontConnected() {
-	USER_PRINT("MdSpi::OnFrontConnected")
-	if (this->isFirstTimeLogged) {
-		sem_post(&connect_sem);
-	} else {
+	USER_PRINT("MdSpi::OnFrontConnected");
 
-		sem_init(&login_sem, 0, 1);
+	const char *BrokerID = this->BrokerID.c_str();
+	char *r_BrokerID = new char[strlen(BrokerID) + 1];
+	strcpy(r_BrokerID, BrokerID);
 
-		const char *BrokerID = this->BrokerID.c_str();
-		char *r_BrokerID = new char[strlen(BrokerID) + 1];
-		strcpy(r_BrokerID, BrokerID);
+	const char *UserID = this->UserID.c_str();
+	char *r_UserID = new char[strlen(UserID) + 1];
+	strcpy(r_UserID, BrokerID);
 
-		const char *UserID = this->UserID.c_str();
-		char *r_UserID = new char[strlen(UserID) + 1];
-		strcpy(r_UserID, BrokerID);
+	const char *Password = this->Password.c_str();
+	char *r_Password = new char[strlen(Password) + 1];
+	strcpy(r_Password, BrokerID);
 
-		const char *Password = this->Password.c_str();
-		char *r_Password = new char[strlen(Password) + 1];
-		strcpy(r_Password, BrokerID);
-		
-		this->Login(r_BrokerID, r_UserID, r_Password);
-	}
+	this->Login(r_BrokerID, r_UserID, r_Password);
+	
 	md_cv.notify_one();
 	
 	//this->Login("9999", "058176", "669822");
@@ -204,10 +199,10 @@ void MdSpi::Logout(char *BrokerID, char *UserID) {
 	strcpy(logoutField->BrokerID, BrokerID);
 	strcpy(logoutField->UserID, UserID);
 	this->mdapi->ReqUserLogout(logoutField, this->loginRequestID);
-	int ret = this->controlTimeOut(&logout_sem);
+	/*int ret = this->controlTimeOut(&logout_sem);
 	if (ret == -1) {
 		USER_PRINT("MdSpi::Logout TimeOut!");
-	}
+	}*/
 }
 
 //响应登出
@@ -217,7 +212,7 @@ void MdSpi::OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout, CThostFtdcRs
 	if (bIsLast && !(this->IsErrorRspInfo(pRspInfo))) {
 		USER_PRINT("OnRspUserLogout");
 		this->isLogged = false;
-		sem_post(&logout_sem);
+		//sem_post(&logout_sem);
 	}
 }
 
@@ -229,10 +224,10 @@ void MdSpi::SubMarketData(char *ppInstrumentID[], int nCount) {
 		this->ppInstrumentID = ppInstrumentID;
 		this->nCount = nCount;
 		this->mdapi->SubscribeMarketData(ppInstrumentID, nCount);
-		int ret = this->controlTimeOut(&submarket_sem);
+		/*int ret = this->controlTimeOut(&submarket_sem);
 		if (ret == -1) {
 			USER_PRINT("MdSpi::SubMarketData TimeOut!");
-		}
+		}*/
 	} else {
 		USER_PRINT("Please Login First!");
 	}
@@ -302,10 +297,10 @@ void MdSpi::UnSubscribeMarketData(char *ppInstrumentID[], int nCount) {
 	if (this->isLogged) {
 		USER_PRINT("UnSubscribeMarketData");
 			this->mdapi->UnSubscribeMarketData(ppInstrumentID, nCount);
-		int ret = this->controlTimeOut(&unsubmarket_sem);
+		/*int ret = this->controlTimeOut(&unsubmarket_sem);
 		if (ret == -1) {
 			USER_PRINT("MdSpi::UnSubscribeMarketData TimeOut!");
-		}
+		}*/
 	}
 	else {
 		USER_PRINT("Please Login First!");

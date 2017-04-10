@@ -39,7 +39,7 @@ public:
 	//增加毫秒
 	void timeraddMS(struct timeval *a, int ms);
 	//协程控制
-	int controlTimeOut(sem_t *t, int timeout = 5000);
+	//int controlTimeOut(sem_t *t, int timeout = 5000);
 	//登录
 	void Login(char *BrokerID, char *UserID, char *Password);
     ///登录请求响应
@@ -111,11 +111,11 @@ private:
 	string BrokerID;
 	string UserID;
 	string Password;
-	sem_t connect_sem;
+	/*sem_t connect_sem;
 	sem_t login_sem;
 	sem_t logout_sem;
 	sem_t submarket_sem;
-	sem_t unsubmarket_sem;
+	sem_t unsubmarket_sem;*/
 	list<Strategy *> *l_strategys;
 	CTP_Manager *ctp_m;
 	CThostFtdcDepthMarketDataField *last_tick_data;
