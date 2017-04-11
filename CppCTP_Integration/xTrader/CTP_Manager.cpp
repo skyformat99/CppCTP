@@ -2419,8 +2419,13 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
 				build_doc.AddMember("UserID", rapidjson::StringRef(s_UserID.c_str()), allocator);
 				build_doc.AddMember("StrategyID", rapidjson::StringRef(s_StrategyID.c_str()), allocator);
-				build_doc.AddMember("MsgResult", 0, allocator);
-				build_doc.AddMember("MsgErrorReason", "", allocator);
+				
+				
+				// 是否找到要修改的策略
+				bool isFindStrategy = false;
+				bool isStgTradeTasking = false;
+				bool isPositionMeetChanged = true;
+				
 				//创建Info数组
 				rapidjson::Value create_info_array(rapidjson::kArrayType);
 
@@ -2434,169 +2439,461 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						std::cout << "q_user_id = " << q_user_id << std::endl;
 						std::cout << "q_strategy_id = " << q_strategy_id << std::endl;
 						list<Strategy *>::iterator stg_itor;
-						for (stg_itor = ctp_m->getListStrategy()->begin(); stg_itor != ctp_m->getListStrategy()->end(); stg_itor++) {
-							std::cout << "(*stg_itor)->getStgUserId() = " << (*stg_itor)->getStgUserId() << std::endl;
-							std::cout << "(*stg_itor)->getStgStrategyId() = " << (*stg_itor)->getStgStrategyId() << std::endl;
-							if (((*stg_itor)->getStgUserId() == q_user_id) && ((*stg_itor)->getStgStrategyId() == q_strategy_id)) {
-								std::cout << "找到即将修改的Strategy" << std::endl;
 
-								(*stg_itor)->setStgPositionABuy(object["position_a_buy"].GetInt());
-								(*stg_itor)->setStgPositionABuyToday(object["position_a_buy_today"].GetInt());
-								(*stg_itor)->setStgPositionABuyYesterday(object["position_a_buy_yesterday"].GetInt());
+						if (!isFindStrategy) // 没找到对应的策略
+						{
+							for (stg_itor = ctp_m->getListStrategy()->begin(); stg_itor != ctp_m->getListStrategy()->end(); stg_itor++) {
+								std::cout << "(*stg_itor)->getStgUserId() = " << (*stg_itor)->getStgUserId() << std::endl;
+								std::cout << "(*stg_itor)->getStgStrategyId() = " << (*stg_itor)->getStgStrategyId() << std::endl;
+								if (((*stg_itor)->getStgUserId() == q_user_id) && ((*stg_itor)->getStgStrategyId() == q_strategy_id)) {
+									std::cout << "找到即将修改的Strategy" << std::endl;
+									isFindStrategy = true;
 
-								(*stg_itor)->setStgPositionBBuy(object["position_b_buy"].GetInt());
-								(*stg_itor)->setStgPositionBBuyToday(object["position_b_buy_today"].GetInt());
-								(*stg_itor)->setStgPositionBBuyYesterday(object["position_b_buy_yesterday"].GetInt());
+									/// 交易执行中无法修改持仓
+									if ((*stg_itor)->isStgTradeTasking())
+									{
+										isStgTradeTasking = true;
+										break;
+									}
 
-								(*stg_itor)->setStgPositionASell(object["position_a_sell"].GetInt());
-								(*stg_itor)->setStgPositionASellToday(object["position_a_sell_today"].GetInt());
-								(*stg_itor)->setStgPositionASellYesterday(object["position_a_sell_yesterday"].GetInt());
+									/// 判断仓位数量,界面发送的修改数量大于系统中的数量,判断为出错
+									if (((*stg_itor)->getStgPositionABuy() < object["position_a_buy"].GetInt()) 
+										|| ((*stg_itor)->getStgPositionABuyYesterday() < object["position_a_buy_yesterday"].GetInt())
+										|| ((*stg_itor)->getStgPositionABuyToday() < object["position_a_buy_today"].GetInt())
+										|| ((*stg_itor)->getStgPositionBBuy() < object["position_b_buy"].GetInt())
+										|| ((*stg_itor)->getStgPositionBBuyToday() < object["position_b_buy_today"].GetInt())
+										|| ((*stg_itor)->getStgPositionBBuyYesterday() < object["position_b_buy_yesterday"].GetInt())
+										|| ((*stg_itor)->getStgPositionASell() < object["position_a_sell"].GetInt())
+										|| ((*stg_itor)->getStgPositionASellToday() < object["position_a_sell_today"].GetInt())
+										|| ((*stg_itor)->getStgPositionASellYesterday() < object["position_a_sell_yesterday"].GetInt())
+										|| ((*stg_itor)->getStgPositionBSell() < object["position_b_sell"].GetInt())
+										|| ((*stg_itor)->getStgPositionBSellToday() < object["position_b_sell_today"].GetInt())
+										|| ((*stg_itor)->getStgPositionBSellYesterday() < object["position_b_sell_yesterday"].GetInt()))
+									{
+										isPositionMeetChanged = false;
+										break;
+									}
 
+									list<USER_CThostFtdcOrderField *>::iterator position_itor;			//order持仓明细
+									list<USER_CThostFtdcTradeField *>::iterator position_trade_itor;	//trade持仓明细
 
-								(*stg_itor)->setStgPositionBSell(object["position_b_sell"].GetInt());
-								(*stg_itor)->setStgPositionBSellToday(object["position_b_sell_today"].GetInt());
-								(*stg_itor)->setStgPositionBSellYesterday(object["position_b_sell_yesterday"].GetInt());
-								
-								//(*stg_itor)->setStgSpreadShift(object["spread_shift"].GetDouble());
-								//(*stg_itor)->setStgBuyClose(object["buy_close"].GetDouble());
-								//(*stg_itor)->setStgStopLoss(object["stop_loss"].GetDouble());
-								//(*stg_itor)->setStgIsActive(object["is_active"].GetBool());
-								//(*stg_itor)->setStgStrategyId(object["strategy_id"].GetString());
-								//(*stg_itor)->setStgLotsBatch(object["lots_batch"].GetInt());
-								//(*stg_itor)->setStgSellOpen(object["sell_open"].GetDouble());
-								//(*stg_itor)->setStgOrderAlgorithm(object["order_algorithm"].GetString());
-								//(*stg_itor)->setStgTraderId(object["trader_id"].GetString());
-								//(*stg_itor)->setStgAOrderActionTiresLimit(object["a_order_action_limit"].GetInt());
-								//(*stg_itor)->setStgBOrderActionTiresLimit(object["b_order_action_limit"].GetInt());
-								//(*stg_itor)->setStgSellClose(object["sell_close"].GetDouble());
-								//(*stg_itor)->setStgBuyOpen(object["buy_open"].GetDouble());
-								//(*stg_itor)->setStgOnlyClose(object["only_close"].GetInt());
+									int num_need_to_delete = 0; //可以被删掉的数量
+									int count = 0;				//计数
 
-								/*新增字段*/
+									(*stg_itor)->setStgPositionABuy(object["position_a_buy"].GetInt());
 
-								//(*stg_itor)->setStgTradeModel(object["trade_model"].GetString());
-								//(*stg_itor)->setStgHoldProfit(object["hold_profit"].GetDouble());
-								//(*stg_itor)->setStgCloseProfit(object["close_profit"].GetDouble());
-								//(*stg_itor)->setStgCommisstion(object["commission"].GetDouble());
-								
-								//(*stg_itor)->setStgTradeVolume(object["trade_volume"].GetInt());
-								//(*stg_itor)->setStgAmount(object["amount"].GetDouble());
-								//(*stg_itor)->setStgAverageShift(object["average_shift"].GetDouble());
+									//循环判断删除最早的仓位 position_a_buy_yesterday
+									num_need_to_delete = (*stg_itor)->getStgPositionABuyYesterday() - object["position_a_buy_yesterday"].GetInt();
+									// order
+									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
+										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end(), count < num_need_to_delete;
+										)
+									{
 
-
-								//遍历list_instrument_id
-								/*const Value& info_object = object["list_instrument_id"];
-								if (info_object.IsArray()) {
-									for (int j = 0; j < info_object.Size(); j++) {
-										std::string instrument = info_object[j].GetString();
-										std::cout << "instrument[" << j << "] = " << instrument << std::endl;
-										if (j == 0) {
-											(*stg_itor)->setStgInstrumentIdA(instrument);
+										if ((!strcmp((*position_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdA().c_str()))
+											&& (strcmp((*position_itor)->InsertDate, ctp_m->getTradingDay().c_str()))
+											&& (*position_itor)->Direction == '0') //合约id相同，日期不相同删除,方向为买
+										{
+											delete (*position_itor);
+											position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->erase(position_itor); //移除
+											count++;
 										}
-										else if (j == 1) {
-											(*stg_itor)->setStgInstrumentIdB(instrument);
+										else {
+											position_itor++;
 										}
 									}
-								}*/
+									// trade
+									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
+										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end(), count < num_need_to_delete;
+										)
+									{
 
-								
-								//(*stg_itor)->setStgUserId(object["user_id"].GetString());
-								
-								//(*stg_itor)->setStgLots(object["lots"].GetInt());
-								//(*stg_itor)->setStgAWaitPriceTick(object["a_wait_price_tick"].GetDouble());
-								//(*stg_itor)->setStgBWaitPriceTick(object["b_wait_price_tick"].GetDouble());
-								//(*stg_itor)->setOn_Off(object["StrategyOnoff"].GetInt());
+										if ((!strcmp((*position_trade_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdA().c_str()))
+											&& (strcmp((*position_trade_itor)->TradeDate, ctp_m->getTradingDay().c_str()))
+											&& (*position_trade_itor)->Direction == '0') //合约id相同，日期不相同删除，方向为买
+										{
+											delete (*position_trade_itor);
+											position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->erase(position_trade_itor); //移除
+											count++;
+										}
+										else {
+											position_trade_itor++;
+										}
+									}
+									(*stg_itor)->setStgPositionABuyYesterday(object["position_a_buy_yesterday"].GetInt());
+									
+									//循环判断删除最早的仓位 position_a_buy_today
+									num_need_to_delete = (*stg_itor)->getStgPositionABuyToday() - object["position_a_buy_today"].GetInt();
+									// order
+									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
+										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end(), count < num_need_to_delete;
+										) 
+									{
+										
+										if ((!strcmp((*position_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdA().c_str()))
+											&& (!strcmp((*position_itor)->InsertDate, ctp_m->getTradingDay().c_str()))
+											&& (*position_itor)->Direction == '0') //合约id相同，日期相同，方向为买
+										{
+											delete (*position_itor);
+											position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->erase(position_itor); //移除
+											count++;
+										}
+										else {
+											position_itor++;
+										}
+									}
+									// trade
+									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
+										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end(), count < num_need_to_delete;
+										)
+									{
 
-								
-								static_dbm->UpdateStrategy((*stg_itor));
+										if ((!strcmp((*position_trade_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdA().c_str()))
+											&& (!strcmp((*position_trade_itor)->TradeDate, ctp_m->getTradingDay().c_str()))
+											&& (*position_trade_itor)->Direction == '0') //合约id相同，日期相同删除
+										{
+											delete (*position_trade_itor);
+											position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->erase(position_trade_itor); //移除
+											count++;
+										}
+										else {
+											position_trade_itor++;
+										}
+									}
+									(*stg_itor)->setStgPositionABuyToday(object["position_a_buy_today"].GetInt());
 
-								/************************************************************************/
-								/* 校准仓位之后,更新所有的运行标志位
+
+
+									(*stg_itor)->setStgPositionBBuy(object["position_b_buy"].GetInt());
+
+									//循环判断删除最早的仓位 position_b_buy_yesterday
+									num_need_to_delete = (*stg_itor)->getStgPositionBBuyYesterday() - object["position_b_buy_yesterday"].GetInt();
+									// order
+									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
+										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end(), count < num_need_to_delete;
+										)
+									{
+
+										if ((!strcmp((*position_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdB().c_str()))
+											&& (strcmp((*position_itor)->InsertDate, ctp_m->getTradingDay().c_str()))
+											&& (*position_itor)->Direction == '0') //合约id相同，日期不相同删除,方向为买
+										{
+											delete (*position_itor);
+											position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->erase(position_itor); //移除
+											count++;
+										}
+										else {
+											position_itor++;
+										}
+									}
+									// trade
+									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
+										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end(), count < num_need_to_delete;
+										)
+									{
+
+										if ((!strcmp((*position_trade_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdB().c_str()))
+											&& (strcmp((*position_trade_itor)->TradeDate, ctp_m->getTradingDay().c_str()))
+											&& (*position_trade_itor)->Direction == '0') //合约id相同，日期不相同删除，方向为买
+										{
+											delete (*position_trade_itor);
+											position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->erase(position_trade_itor); //移除
+											count++;
+										}
+										else {
+											position_trade_itor++;
+										}
+									}
+									(*stg_itor)->setStgPositionBBuyYesterday(object["position_b_buy_yesterday"].GetInt());
+
+									//循环判断删除最早的仓位 position_b_buy_today
+									num_need_to_delete = (*stg_itor)->getStgPositionBBuyToday() - object["position_b_buy_today"].GetInt();
+									// order
+									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
+										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end(), count < num_need_to_delete;
+										)
+									{
+
+										if ((!strcmp((*position_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdB().c_str()))
+											&& (!strcmp((*position_itor)->InsertDate, ctp_m->getTradingDay().c_str()))
+											&& (*position_itor)->Direction == '0') //合约id相同，日期相同，方向为买
+										{
+											delete (*position_itor);
+											position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->erase(position_itor); //移除
+											count++;
+										}
+										else {
+											position_itor++;
+										}
+									}
+									// trade
+									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
+										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end(), count < num_need_to_delete;
+										)
+									{
+
+										if ((!strcmp((*position_trade_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdB().c_str()))
+											&& (!strcmp((*position_trade_itor)->TradeDate, ctp_m->getTradingDay().c_str()))
+											&& (*position_trade_itor)->Direction == '0') //合约id相同，日期相同删除
+										{
+											delete (*position_trade_itor);
+											position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->erase(position_trade_itor); //移除
+											count++;
+										}
+										else {
+											position_trade_itor++;
+										}
+									}
+									(*stg_itor)->setStgPositionBBuyToday(object["position_b_buy_today"].GetInt());
+
+
+
+
+									/*(*stg_itor)->setStgPositionASell(object["position_a_sell"].GetInt());
+									(*stg_itor)->setStgPositionASellToday(object["position_a_sell_today"].GetInt());
+									(*stg_itor)->setStgPositionASellYesterday(object["position_a_sell_yesterday"].GetInt());
+
+
+									(*stg_itor)->setStgPositionBSell(object["position_b_sell"].GetInt());
+									(*stg_itor)->setStgPositionBSellToday(object["position_b_sell_today"].GetInt());
+									(*stg_itor)->setStgPositionBSellYesterday(object["position_b_sell_yesterday"].GetInt());*/
+
+									(*stg_itor)->setStgPositionASell(object["position_a_sell"].GetInt());
+
+									//循环判断删除最早的仓位 position_a_buy_yesterday
+									num_need_to_delete = (*stg_itor)->getStgPositionASellYesterday() - object["position_a_sell_yesterday"].GetInt();
+									// order
+									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
+										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end(), count < num_need_to_delete;
+										)
+									{
+
+										if ((!strcmp((*position_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdA().c_str()))
+											&& (strcmp((*position_itor)->InsertDate, ctp_m->getTradingDay().c_str()))
+											&& (*position_itor)->Direction == '1') //合约id相同，日期不相同删除,方向为卖
+										{
+											delete (*position_itor);
+											position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->erase(position_itor); //移除
+											count++;
+										}
+										else {
+											position_itor++;
+										}
+									}
+									// trade
+									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
+										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end(), count < num_need_to_delete;
+										)
+									{
+
+										if ((!strcmp((*position_trade_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdA().c_str()))
+											&& (strcmp((*position_trade_itor)->TradeDate, ctp_m->getTradingDay().c_str()))
+											&& (*position_trade_itor)->Direction == '1') //合约id相同，日期不相同删除，方向为卖
+										{
+											delete (*position_trade_itor);
+											position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->erase(position_trade_itor); //移除
+											count++;
+										}
+										else {
+											position_trade_itor++;
+										}
+									}
+									(*stg_itor)->setStgPositionASellYesterday(object["position_a_sell_yesterday"].GetInt());
+
+									//循环判断删除最早的仓位 position_a_sell_today
+									num_need_to_delete = (*stg_itor)->getStgPositionASellToday() - object["position_a_sell_today"].GetInt();
+									// order
+									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
+										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end(), count < num_need_to_delete;
+										)
+									{
+
+										if ((!strcmp((*position_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdA().c_str()))
+											&& (!strcmp((*position_itor)->InsertDate, ctp_m->getTradingDay().c_str()))
+											&& (*position_itor)->Direction == '1') //合约id相同，日期相同，方向为卖
+										{
+											delete (*position_itor);
+											position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->erase(position_itor); //移除
+											count++;
+										}
+										else {
+											position_itor++;
+										}
+									}
+									// trade
+									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
+										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end(), count < num_need_to_delete;
+										)
+									{
+
+										if ((!strcmp((*position_trade_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdA().c_str()))
+											&& (!strcmp((*position_trade_itor)->TradeDate, ctp_m->getTradingDay().c_str()))
+											&& (*position_trade_itor)->Direction == '1') //合约id相同，日期相同删除，方向为卖
+										{
+											delete (*position_trade_itor);
+											position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->erase(position_trade_itor); //移除
+											count++;
+										}
+										else {
+											position_trade_itor++;
+										}
+									}
+									(*stg_itor)->setStgPositionASellToday(object["position_a_sell_today"].GetInt());
+
+
+
+									(*stg_itor)->setStgPositionBSell(object["position_b_sell"].GetInt());
+
+									//循环判断删除最早的仓位 position_b_sell_yesterday
+									num_need_to_delete = (*stg_itor)->getStgPositionBSellYesterday() - object["position_b_sell_yesterday"].GetInt();
+									// order
+									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
+										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end(), count < num_need_to_delete;
+										)
+									{
+
+										if ((!strcmp((*position_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdB().c_str()))
+											&& (strcmp((*position_itor)->InsertDate, ctp_m->getTradingDay().c_str()))
+											&& (*position_itor)->Direction == '1') //合约id相同，日期不相同删除,方向为卖
+										{
+											delete (*position_itor);
+											position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->erase(position_itor); //移除
+											count++;
+										}
+										else {
+											position_itor++;
+										}
+									}
+									// trade
+									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
+										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end(), count < num_need_to_delete;
+										)
+									{
+
+										if ((!strcmp((*position_trade_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdB().c_str()))
+											&& (strcmp((*position_trade_itor)->TradeDate, ctp_m->getTradingDay().c_str()))
+											&& (*position_trade_itor)->Direction == '1') //合约id相同，日期不相同删除，方向为卖
+										{
+											delete (*position_trade_itor);
+											position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->erase(position_trade_itor); //移除
+											count++;
+										}
+										else {
+											position_trade_itor++;
+										}
+									}
+									(*stg_itor)->setStgPositionBSellYesterday(object["position_b_sell_yesterday"].GetInt());
+
+									//循环判断删除最早的仓位 position_b_buy_today
+									num_need_to_delete = (*stg_itor)->getStgPositionBSellToday() - object["position_b_sell_today"].GetInt();
+									// order
+									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
+										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end(), count < num_need_to_delete;
+										)
+									{
+
+										if ((!strcmp((*position_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdB().c_str()))
+											&& (!strcmp((*position_itor)->InsertDate, ctp_m->getTradingDay().c_str()))
+											&& (*position_itor)->Direction == '1') //合约id相同，日期相同，方向为卖
+										{
+											delete (*position_itor);
+											position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->erase(position_itor); //移除
+											count++;
+										}
+										else {
+											position_itor++;
+										}
+									}
+									// trade
+									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
+										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end(), count < num_need_to_delete;
+										)
+									{
+
+										if ((!strcmp((*position_trade_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdB().c_str()))
+											&& (!strcmp((*position_trade_itor)->TradeDate, ctp_m->getTradingDay().c_str()))
+											&& (*position_trade_itor)->Direction == '1') //合约id相同，日期相同删除，方向为卖
+										{
+											delete (*position_trade_itor);
+											position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->erase(position_trade_itor); //移除
+											count++;
+										}
+										else {
+											position_trade_itor++;
+										}
+									}
+									(*stg_itor)->setStgPositionBSellToday(object["position_b_sell_today"].GetInt());
+
+									static_dbm->UpdateStrategy((*stg_itor));
+
+									/************************************************************************/
+									/* 校准仓位之后,更新所有的运行标志位
 									a:期货账户开关打开
 									b:更新交易执行状态标志位task_status
 									c:更新tick锁stg_select_order_algorithm_flag为释放*/
-								/************************************************************************/
-								(*stg_itor)->getStgUser()->setOn_Off(1);
-								(*stg_itor)->update_task_status();
-								(*stg_itor)->setStgSelectOrderAlgorithmFlag("CTP_Manager::HandleMessage() msgtype == 12", false);
+									/************************************************************************/
+									(*stg_itor)->getStgUser()->setOn_Off(1);
+									(*stg_itor)->update_task_status();
+									(*stg_itor)->setStgSelectOrderAlgorithmFlag("CTP_Manager::HandleMessage() msgtype == 12", false);
 
-								std::cout << "Strategy修改持仓完成!" << std::endl;
+									std::cout << "Strategy修改持仓完成!" << std::endl;
 
-								/*构造内容json*/
-								rapidjson::Value create_info_object(rapidjson::kObjectType);
-								create_info_object.SetObject();
+									/*构造内容json*/
+									rapidjson::Value create_info_object(rapidjson::kObjectType);
+									create_info_object.SetObject();
 
-								create_info_object.AddMember("trader_id", rapidjson::StringRef((*stg_itor)->getStgTraderId().c_str()), allocator);
-								create_info_object.AddMember("user_id", rapidjson::StringRef((*stg_itor)->getStgUserId().c_str()), allocator);
-								create_info_object.AddMember("strategy_id", rapidjson::StringRef((*stg_itor)->getStgStrategyId().c_str()), allocator);
-								create_info_object.AddMember("position_a_buy", (*stg_itor)->getStgPositionABuy(), allocator);
-								create_info_object.AddMember("position_a_buy_today", (*stg_itor)->getStgPositionABuyToday(), allocator);
-								create_info_object.AddMember("position_a_buy_yesterday", (*stg_itor)->getStgPositionABuyYesterday(), allocator);
-								create_info_object.AddMember("position_a_sell", (*stg_itor)->getStgPositionASell(), allocator);
-								create_info_object.AddMember("position_a_sell_today", (*stg_itor)->getStgPositionASellToday(), allocator);
-								create_info_object.AddMember("position_a_sell_yesterday", (*stg_itor)->getStgPositionASellYesterday(), allocator);
-								create_info_object.AddMember("position_b_buy", (*stg_itor)->getStgPositionBBuy(), allocator);
-								create_info_object.AddMember("position_b_buy_today", (*stg_itor)->getStgPositionBBuyToday(), allocator);
-								create_info_object.AddMember("position_b_buy_yesterday", (*stg_itor)->getStgPositionBBuyYesterday(), allocator);
-								create_info_object.AddMember("position_b_sell", (*stg_itor)->getStgPositionBSell(), allocator);
-								create_info_object.AddMember("position_b_sell_today", (*stg_itor)->getStgPositionBSellToday(), allocator);
-								create_info_object.AddMember("position_b_sell_yesterday", (*stg_itor)->getStgPositionBSellYesterday(), allocator);
-								
-								//create_info_object.AddMember("spread_shift", (*stg_itor)->getStgSpreadShift(), allocator);
-								//create_info_object.AddMember("buy_close", (*stg_itor)->getStgBuyClose(), allocator);
-								//create_info_object.AddMember("stop_loss", (*stg_itor)->getStgStopLoss(), allocator);
-								////create_info_object.AddMember("is_active", (*stg_itor)->isStgIsActive(), allocator);
-								//create_info_object.AddMember("lots_batch", (*stg_itor)->getStgLotsBatch(), allocator);
-								//create_info_object.AddMember("sell_open", (*stg_itor)->getStgSellOpen(), allocator);
-								//create_info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator);
-								//create_info_object.AddMember("a_order_action_limit", (*stg_itor)->getStgAOrderActionTiresLimit(), allocator);
-								//create_info_object.AddMember("b_order_action_limit", (*stg_itor)->getStgBOrderActionTiresLimit(), allocator);
-								//create_info_object.AddMember("sell_close", (*stg_itor)->getStgSellClose(), allocator);
-								//create_info_object.AddMember("buy_open", (*stg_itor)->getStgBuyOpen(), allocator);
-								//create_info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator);
-								///*新增字段*/
-								//create_info_object.AddMember("trade_model", rapidjson::StringRef((*stg_itor)->getStgTradeModel().c_str()), allocator);
-								//create_info_object.AddMember("hold_profit", (*stg_itor)->getStgHoldProfit(), allocator);
-								//create_info_object.AddMember("close_profit", (*stg_itor)->getStgCloseProfit(), allocator);
-								//create_info_object.AddMember("commission", (*stg_itor)->getStgCommission(), allocator);
-								//create_info_object.AddMember("position", (*stg_itor)->getStgPosition(), allocator);
-								//create_info_object.AddMember("position_buy", (*stg_itor)->getStgPositionBuy(), allocator);
-								//create_info_object.AddMember("position_sell", (*stg_itor)->getStgPositionSell(), allocator);
-								//create_info_object.AddMember("trade_volume", (*stg_itor)->getStgTradeVolume(), allocator);
-								//create_info_object.AddMember("amount", (*stg_itor)->getStgAmount(), allocator);
-								//create_info_object.AddMember("average_shift", (*stg_itor)->getStgAverageShift(), allocator);
+									create_info_object.AddMember("trader_id", rapidjson::StringRef((*stg_itor)->getStgTraderId().c_str()), allocator);
+									create_info_object.AddMember("user_id", rapidjson::StringRef((*stg_itor)->getStgUserId().c_str()), allocator);
+									create_info_object.AddMember("strategy_id", rapidjson::StringRef((*stg_itor)->getStgStrategyId().c_str()), allocator);
+									create_info_object.AddMember("position_a_buy", (*stg_itor)->getStgPositionABuy(), allocator);
+									create_info_object.AddMember("position_a_buy_today", (*stg_itor)->getStgPositionABuyToday(), allocator);
+									create_info_object.AddMember("position_a_buy_yesterday", (*stg_itor)->getStgPositionABuyYesterday(), allocator);
+									create_info_object.AddMember("position_a_sell", (*stg_itor)->getStgPositionASell(), allocator);
+									create_info_object.AddMember("position_a_sell_today", (*stg_itor)->getStgPositionASellToday(), allocator);
+									create_info_object.AddMember("position_a_sell_yesterday", (*stg_itor)->getStgPositionASellYesterday(), allocator);
+									create_info_object.AddMember("position_b_buy", (*stg_itor)->getStgPositionBBuy(), allocator);
+									create_info_object.AddMember("position_b_buy_today", (*stg_itor)->getStgPositionBBuyToday(), allocator);
+									create_info_object.AddMember("position_b_buy_yesterday", (*stg_itor)->getStgPositionBBuyYesterday(), allocator);
+									create_info_object.AddMember("position_b_sell", (*stg_itor)->getStgPositionBSell(), allocator);
+									create_info_object.AddMember("position_b_sell_today", (*stg_itor)->getStgPositionBSellToday(), allocator);
+									create_info_object.AddMember("position_b_sell_yesterday", (*stg_itor)->getStgPositionBSellYesterday(), allocator);
 
+									create_info_array.PushBack(create_info_object, allocator);
 
-								/*rapidjson::Value instrument_array(rapidjson::kArrayType);
-								for (int j = 0; j < 2; j++) {
-									rapidjson::Value instrument_object(rapidjson::kObjectType);
-									instrument_object.SetObject();
-									if (j == 0) {
-										instrument_object.SetString(rapidjson::StringRef((*stg_itor)->getStgInstrumentIdA().c_str()));
-									}
-									else if (j == 1) {
-										instrument_object.SetString(rapidjson::StringRef((*stg_itor)->getStgInstrumentIdB().c_str()));
-									}
-
-									instrument_array.PushBack(instrument_object, allocator);
 								}
-								create_info_object.AddMember("list_instrument_id", instrument_array, allocator);
-								create_info_object.AddMember("lots", (*stg_itor)->getStgLots(), allocator);
-								create_info_object.AddMember("a_wait_price_tick", (*stg_itor)->getStgAWaitPriceTick(), allocator);
-								create_info_object.AddMember("b_wait_price_tick", (*stg_itor)->getStgBWaitPriceTick(), allocator);
-								create_info_object.AddMember("StrategyOnoff", (*stg_itor)->getOn_Off(), allocator);*/
-
-								create_info_array.PushBack(create_info_object, allocator);
-
-							}
-							else {
-								std::cout << "未能找到修改的Strategy" << std::endl;
+								else {
+									std::cout << "未能找到修改的Strategy" << std::endl;
+								}
 							}
 						}
 					}
 				}
 				else {
 					std::cout << "未收到修改策略信息" << std::endl;
+				}
+				
+				/// 如果找到修改的策略
+				if (isFindStrategy) {
+					if (isStgTradeTasking) //策略正在交易
+					{
+						build_doc.AddMember("MsgResult", 1, allocator);
+						build_doc.AddMember("MsgErrorReason", "策略正在交易,无法修改持仓!", allocator);
+					}
+					else {
+
+						if (!isPositionMeetChanged)
+						{
+							build_doc.AddMember("MsgResult", 1, allocator);
+							build_doc.AddMember("MsgErrorReason", "修改持仓数量大于当前持仓数量!", allocator);
+						}
+
+						build_doc.AddMember("MsgResult", 0, allocator);
+						build_doc.AddMember("MsgErrorReason", "", allocator);
+					}
+				}
+				else {
+					build_doc.AddMember("MsgResult", 1, allocator);
+					build_doc.AddMember("MsgErrorReason", "未能找到修改的Strategy!", allocator);
 				}
 
 				build_doc.AddMember("Info", create_info_array, allocator);
