@@ -2252,7 +2252,7 @@ void DBManager::UpdatePositionDetail(USER_CThostFtdcOrderField *posd) {
 
 void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, string traderid, string userid) {
 	USER_PRINT("DBManager::getAllPositionDetail");
-	
+	std::cout << "DBManager::getAllPositionDetail()" << std::endl;
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
 		list<USER_CThostFtdcOrderField *>::iterator itor;
@@ -2303,24 +2303,24 @@ void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, 
 		strcpy(new_pos->StrategyID, p.getStringField("strategyid"));
 		new_pos->VolumeTradedBatch = p.getIntField("volumetradedbatch");
 
-		/*std::cout << "instrumentid = " << p.getStringField("instrumentid") << ", ";
-		std::cout << "orderref = " << p.getStringField("orderref") << ", ";
-		std::cout << "userid = " << p.getStringField("userid") << ", ";
-		std::cout << "direction = " << p.getIntField("direction") << ", ";
-		std::cout << "comboffsetflag = " << p.getStringField("comboffsetflag") << ", ";
-		std::cout << "combhedgeflag = " << p.getStringField("combhedgeflag") << ", ";
-		std::cout << "limitprice = " << p.getField("limitprice").Double() << ", ";
-		std::cout << "volumetotaloriginal = " << p.getIntField("volumetotaloriginal") << ", ";
-		std::cout << "tradingday = " << p.getStringField("tradingday") << ", ";
-		std::cout << "tradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
-		std::cout << "orderstatus = " << p.getIntField("orderstatus") << ", ";
-		std::cout << "volumetraded = " << p.getIntField("volumetraded") << ", ";
-		std::cout << "volumetotal = " << p.getIntField("volumetotal") << ", ";
-		std::cout << "insertdate = " << p.getStringField("insertdate") << ", ";
-		std::cout << "inserttime = " << p.getStringField("inserttime") << ", ";
-		std::cout << "strategyid = " << p.getStringField("strategyid") << ", ";
-		std::cout << "volumetradedbatch = " << p.getIntField("volumetradedbatch") << ", ";
-		std::cout << "\tnew_pos->StrategyID = " << new_pos->StrategyID << std::endl;*/
+		std::cout << "\tinstrumentid = " << p.getStringField("instrumentid") << ", ";
+		std::cout << "\torderref = " << p.getStringField("orderref") << ", ";
+		std::cout << "\tuserid = " << p.getStringField("userid") << ", ";
+		std::cout << "\tdirection = " << p.getIntField("direction") << ", ";
+		std::cout << "\tcomboffsetflag = " << p.getStringField("comboffsetflag") << ", ";
+		std::cout << "\tcombhedgeflag = " << p.getStringField("combhedgeflag") << ", ";
+		std::cout << "\tlimitprice = " << p.getField("limitprice").Double() << ", ";
+		std::cout << "\tvolumetotaloriginal = " << p.getIntField("volumetotaloriginal") << ", ";
+		std::cout << "\ttradingday = " << p.getStringField("tradingday") << ", ";
+		std::cout << "\ttradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
+		std::cout << "\torderstatus = " << p.getIntField("orderstatus") << ", ";
+		std::cout << "\tvolumetraded = " << p.getIntField("volumetraded") << ", ";
+		std::cout << "\tvolumetotal = " << p.getIntField("volumetotal") << ", ";
+		std::cout << "\tinsertdate = " << p.getStringField("insertdate") << ", ";
+		std::cout << "\tinserttime = " << p.getStringField("inserttime") << ", ";
+		std::cout << "\tstrategyid = " << p.getStringField("strategyid") << ", ";
+		std::cout << "\tvolumetradedbatch = " << p.getIntField("volumetradedbatch") << ", ";
+		std::cout << "\tnew_pos->StrategyID = " << new_pos->StrategyID << std::endl;
 
 		
 

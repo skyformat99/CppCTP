@@ -2448,8 +2448,6 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								(*stg_itor)->setStgPositionBBuyToday(object["position_b_buy_today"].GetInt());
 								(*stg_itor)->setStgPositionBBuyYesterday(object["position_b_buy_yesterday"].GetInt());
 
-
-
 								(*stg_itor)->setStgPositionASell(object["position_a_sell"].GetInt());
 								(*stg_itor)->setStgPositionASellToday(object["position_a_sell_today"].GetInt());
 								(*stg_itor)->setStgPositionASellYesterday(object["position_a_sell_yesterday"].GetInt());
@@ -3297,11 +3295,13 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 	if (this->l_posdetail->size() > 0) { // 如果今持仓明细有记录
 		std::cout << "\tCTP_Manager::initStrategyAndFutureAccount() 今持仓明细有记录(order)" << std::endl;
 		if (strcmp(this->l_posdetail->front()->TradingDayRecord, this->getTradingDay().c_str())) { //当今持仓明细第一条数据记录时间与CTP TradingDay时间不相等，清空操作昨持仓明细集合
+			
 			// 清空数据库
 			this->dbm->DropPositionDetail();
 			this->dbm->DropPositionDetailYesterday();
 
 			for (position_itor = this->l_posdetail->begin(); position_itor != this->l_posdetail->end(); position_itor++) { // 遍历今持仓明细列表
+				std::cout << "(*position_itor)->InsertTime = " << (*position_itor)->InsertTime << std::endl;
 				//日期不等
 				if (strcmp((*position_itor)->TradingDayRecord, this->getTradingDay().c_str())) {
 					// 删除昨持仓明细对象,如果存在就删除,没有跳出
