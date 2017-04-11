@@ -2484,7 +2484,7 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 		strcpy(new_pos->StrategyID, p.getStringField("strategyid"));
 		new_pos->VolumeTradedBatch = p.getIntField("volumetradedbatch");
 
-		/*cout << "\tinstrumentid = " << p.getStringField("instrumentid") << ", ";
+		cout << "\tinstrumentid = " << p.getStringField("instrumentid") << ", ";
 		cout << "\torderref = " << p.getStringField("orderref") << ", ";
 		cout << "\tuserid = " << p.getStringField("userid") << ", ";
 		cout << "\tdirection = " << p.getIntField("direction") << ", ";
@@ -2500,7 +2500,7 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 		cout << "\tinsertdate = " << p.getStringField("insertdate") << ", ";
 		cout << "\tinserttime = " << p.getStringField("inserttime") << ", ";
 		cout << "\tstrategyid = " << p.getStringField("strategyid") << ", ";
-		cout << "\tvolumetradedbatch = " << p.getIntField("volumetradedbatch") << std::endl;*/
+		cout << "\tvolumetradedbatch = " << p.getIntField("volumetradedbatch") << std::endl;
 
 		l_posd->push_back(new_pos);
 	}
@@ -2743,14 +2743,12 @@ void DBManager::getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeFiel
 
 		USER_CThostFtdcTradeField *new_pos = new USER_CThostFtdcTradeField();
 
-		
-
 		strcpy(new_pos->InstrumentID, p.getStringField("instrumentid"));
 		strcpy(new_pos->OrderRef, p.getStringField("orderref"));
 		strcpy(new_pos->UserID, p.getStringField("userid"));
 		new_pos->Direction = p.getIntField("direction");
-		new_pos->OffsetFlag = p.getStringField("offsetflag")[0];
-		new_pos->HedgeFlag = p.getStringField("hedgeflag")[0];
+		new_pos->OffsetFlag = p.getIntField("offsetflag");
+		new_pos->HedgeFlag = p.getIntField("hedgeflag");
 		new_pos->Price = p.getField("price").Double();
 		strcpy(new_pos->TradingDay, p.getStringField("tradingday"));
 		strcpy(new_pos->TradingDayRecord, p.getStringField("tradingdayrecord"));
@@ -2758,18 +2756,18 @@ void DBManager::getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeFiel
 		strcpy(new_pos->StrategyID, p.getStringField("strategyid"));
 		new_pos->Volume = p.getIntField("volume");
 
-		/*cout << "\tinstrumentid = " << p.getStringField("instrumentid") << ", ";
+		cout << "\tinstrumentid = " << p.getStringField("instrumentid") << ", ";
 		cout << "\torderref = " << p.getStringField("orderref") << ", ";
 		cout << "\tuserid = " << p.getStringField("userid") << ", ";
 		cout << "\tdirection = " << p.getIntField("direction") << ", ";
-		cout << "\toffsetflag = " << p.getStringField("offsetflag") << ", ";
-		cout << "\thedgeflag = " << p.getStringField("hedgeflag") << ", ";
+		cout << "\toffsetflag = " << p.getIntField("offsetflag") << ", ";
+		cout << "\thedgeflag = " << p.getIntField("hedgeflag") << ", ";
 		cout << "\tprice = " << p.getField("price").Double() << ", ";
 		cout << "\ttradingday = " << p.getStringField("tradingday") << ", ";
 		cout << "\ttradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
 		cout << "\ttradedate = " << p.getIntField("tradedate") << ", ";
 		cout << "\tstrategyid = " << p.getStringField("strategyid") << ", ";
-		cout << "\tvolume = " << p.getIntField("volume") << std::endl;*/
+		cout << "\tvolume = " << p.getIntField("volume") << std::endl;
 
 		l_posd->push_back(new_pos);
 	}

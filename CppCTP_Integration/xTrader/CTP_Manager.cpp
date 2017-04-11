@@ -958,26 +958,27 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 		create_info_object.AddMember("UserID", rapidjson::StringRef((*pod_itor)->UserID), allocator4);
 		//create_info_object.AddMember("Direction", (*pod_itor)->Direction, allocator);
 		
-		string direction;
-		direction = (*pod_itor)->Direction;
-		create_info_object.AddMember("Direction", rapidjson::StringRef(direction.c_str()), allocator4);
+		/*string direction;
+		std::cout << "msgtype == 15 (*pod_itor)->Direction = " << (*pod_itor)->Direction << std::endl;
+		direction = (*pod_itor)->Direction;*/
+		create_info_object.AddMember("Direction", (*pod_itor)->Direction, allocator4);
 		
-		string CombOffsetFlag;
-		CombOffsetFlag = (*pod_itor)->CombOffsetFlag[0];
-		create_info_object.AddMember("CombOffsetFlag", rapidjson::StringRef(CombOffsetFlag.c_str()), allocator4);
+		/*string CombOffsetFlag;
+		CombOffsetFlag = (*pod_itor)->CombOffsetFlag[0];*/
+		create_info_object.AddMember("CombOffsetFlag", (*pod_itor)->CombOffsetFlag[0], allocator4);
 		
-		string CombHedgeFlag;
-		CombHedgeFlag = (*pod_itor)->CombHedgeFlag[0];
-		create_info_object.AddMember("CombHedgeFlag", rapidjson::StringRef(CombHedgeFlag.c_str()), allocator4);
+		/*string CombHedgeFlag;
+		CombHedgeFlag = (*pod_itor)->CombHedgeFlag[0];*/
+		create_info_object.AddMember("CombHedgeFlag", (*pod_itor)->CombHedgeFlag[0], allocator4);
 
 		create_info_object.AddMember("LimitPrice", (*pod_itor)->LimitPrice, allocator4);
 		create_info_object.AddMember("VolumeTotalOriginal", (*pod_itor)->VolumeTotalOriginal, allocator4);
 		create_info_object.AddMember("TradingDay", rapidjson::StringRef((*pod_itor)->TradingDay), allocator4);
 		create_info_object.AddMember("TradingDayRecord", rapidjson::StringRef((*pod_itor)->TradingDayRecord), allocator4);
 
-		string OrderStatus;
-		OrderStatus = (*pod_itor)->OrderStatus;
-		create_info_object.AddMember("OrderStatus", rapidjson::StringRef(OrderStatus.c_str()), allocator4);
+		/*string OrderStatus;
+		OrderStatus = (*pod_itor)->OrderStatus;*/
+		create_info_object.AddMember("OrderStatus", (*pod_itor)->OrderStatus, allocator4);
 
 		create_info_object.AddMember("VolumeTraded", (*pod_itor)->VolumeTraded, allocator4);
 		create_info_object.AddMember("VolumeTotal", (*pod_itor)->VolumeTotal, allocator4);
@@ -1059,17 +1060,66 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 		create_info_object.AddMember("OrderRef", rapidjson::StringRef((*pod_itor_trade)->OrderRef), allocator5);
 		create_info_object.AddMember("UserID", rapidjson::StringRef((*pod_itor_trade)->UserID), allocator5);
 
-		string direction;
-		direction = (*pod_itor_trade)->Direction;
-		create_info_object.AddMember("Direction", rapidjson::StringRef(direction.c_str()), allocator5);
+		/*string direction;
+		if ((*pod_itor_trade)->Direction == '0')
+		{
+			direction = "0";
+		}
+		else if ((*pod_itor_trade)->Direction == '1')
+		{
+			direction = "1";
+		}*/
+		create_info_object.AddMember("Direction", (*pod_itor_trade)->Direction, allocator5);
 
-		string OffsetFlag;
-		OffsetFlag = (*pod_itor_trade)->OffsetFlag;
-		create_info_object.AddMember("OffsetFlag", rapidjson::StringRef(OffsetFlag.c_str()), allocator5);
+		/*string OffsetFlag;
+		if ((*pod_itor_trade)->OffsetFlag == '0')
+		{
+			OffsetFlag = "0";
+		}
+		else if ((*pod_itor_trade)->OffsetFlag == '1')
+		{
+			OffsetFlag = "1";
+		}
+		else if ((*pod_itor_trade)->OffsetFlag == '2')
+		{
+			OffsetFlag = "2";
+		}
+		else if ((*pod_itor_trade)->OffsetFlag == '3')
+		{
+			OffsetFlag = "3";
+		}
+		else if ((*pod_itor_trade)->OffsetFlag == '4')
+		{
+			OffsetFlag = "4";
+		}
+		else if ((*pod_itor_trade)->OffsetFlag == '5')
+		{
+			OffsetFlag = "5";
+		}
+		else if ((*pod_itor_trade)->OffsetFlag == '6')
+		{
+			OffsetFlag = "6";
+		}*/
+		create_info_object.AddMember("OffsetFlag", (*pod_itor_trade)->OffsetFlag, allocator5);
 
-		string HedgeFlag;
-		HedgeFlag = (*pod_itor_trade)->HedgeFlag;
-		create_info_object.AddMember("HedgeFlag", rapidjson::StringRef(HedgeFlag.c_str()), allocator5);
+		/*string HedgeFlag;
+		if ((*pod_itor_trade)->HedgeFlag == '1')
+		{
+		HedgeFlag = "1";
+		}
+		else if ((*pod_itor_trade)->HedgeFlag == '2')
+		{
+		HedgeFlag = "2";
+		}
+		else if ((*pod_itor_trade)->HedgeFlag == '3')
+		{
+		HedgeFlag = "3";
+		}
+		else if ((*pod_itor_trade)->HedgeFlag == '5')
+		{
+		HedgeFlag = "5";
+		}*/
+		create_info_object.AddMember("HedgeFlag", (*pod_itor_trade)->HedgeFlag, allocator5);
 
 		//create_info_object.AddMember("Direction", (*pod_itor)->Direction, allocator5);
 		//create_info_object.AddMember("OffsetFlag", (*pod_itor)->OffsetFlag, allocator5);
@@ -2747,26 +2797,26 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					create_info_object.AddMember("UserID", rapidjson::StringRef((*pod_itor)->UserID), allocator);
 					//create_info_object.AddMember("Direction", (*pod_itor)->Direction, allocator);
 
-					string direction;
-					direction = (*pod_itor)->Direction;
-					create_info_object.AddMember("Direction", rapidjson::StringRef(direction.c_str()), allocator);
+					/*string direction;
+					direction = (*pod_itor)->Direction;*/
+					create_info_object.AddMember("Direction", (*pod_itor)->Direction, allocator);
 
-					string CombOffsetFlag;
-					CombOffsetFlag = (*pod_itor)->CombOffsetFlag[0];
-					create_info_object.AddMember("CombOffsetFlag", rapidjson::StringRef(CombOffsetFlag.c_str()), allocator);
+					/*string CombOffsetFlag;
+					CombOffsetFlag = (*pod_itor)->CombOffsetFlag[0];*/
+					create_info_object.AddMember("CombOffsetFlag", (*pod_itor)->CombOffsetFlag[0], allocator);
 
-					string CombHedgeFlag;
-					CombHedgeFlag = (*pod_itor)->CombHedgeFlag[0];
-					create_info_object.AddMember("CombHedgeFlag", rapidjson::StringRef(CombHedgeFlag.c_str()), allocator);
+					/*string CombHedgeFlag;
+					CombHedgeFlag = (*pod_itor)->CombHedgeFlag[0];*/
+					create_info_object.AddMember("CombHedgeFlag", (*pod_itor)->CombHedgeFlag[0], allocator);
 
 					create_info_object.AddMember("LimitPrice", (*pod_itor)->LimitPrice, allocator);
 					create_info_object.AddMember("VolumeTotalOriginal", (*pod_itor)->VolumeTotalOriginal, allocator);
 					create_info_object.AddMember("TradingDay", rapidjson::StringRef((*pod_itor)->TradingDay), allocator);
 					create_info_object.AddMember("TradingDayRecord", rapidjson::StringRef((*pod_itor)->TradingDayRecord), allocator);
 
-					string OrderStatus;
-					OrderStatus = (*pod_itor)->OrderStatus;
-					create_info_object.AddMember("OrderStatus", rapidjson::StringRef(OrderStatus.c_str()), allocator);
+					/*string OrderStatus;
+					OrderStatus = (*pod_itor)->OrderStatus;*/
+					create_info_object.AddMember("OrderStatus", (*pod_itor)->OrderStatus, allocator);
 
 					create_info_object.AddMember("VolumeTraded", (*pod_itor)->VolumeTraded, allocator);
 					create_info_object.AddMember("VolumeTotal", (*pod_itor)->VolumeTotal, allocator);
@@ -2911,17 +2961,66 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					create_info_object.AddMember("OrderRef", rapidjson::StringRef((*pod_itor)->OrderRef), allocator);
 					create_info_object.AddMember("UserID", rapidjson::StringRef((*pod_itor)->UserID), allocator);
 
-					string direction;
-					direction = (*pod_itor)->Direction;
-					create_info_object.AddMember("Direction", rapidjson::StringRef(direction.c_str()), allocator);
+					/*string direction;
+					if ((*pod_itor)->Direction == '0')
+					{
+					direction = "0";
+					}
+					else if ((*pod_itor)->Direction == '1')
+					{
+					direction = "1";
+					}*/
+					create_info_object.AddMember("Direction", (*pod_itor)->Direction, allocator);
 
-					string OffsetFlag;
-					OffsetFlag = (*pod_itor)->OffsetFlag;
-					create_info_object.AddMember("OffsetFlag", rapidjson::StringRef(OffsetFlag.c_str()), allocator);
+					/*string OffsetFlag;
+					if ((*pod_itor)->OffsetFlag == '0')
+					{
+					OffsetFlag = "0";
+					}
+					else if ((*pod_itor)->OffsetFlag == '1')
+					{
+					OffsetFlag = "1";
+					}
+					else if ((*pod_itor)->OffsetFlag == '2')
+					{
+					OffsetFlag = "2";
+					}
+					else if ((*pod_itor)->OffsetFlag == '3')
+					{
+					OffsetFlag = "3";
+					}
+					else if ((*pod_itor)->OffsetFlag == '4')
+					{
+					OffsetFlag = "4";
+					}
+					else if ((*pod_itor)->OffsetFlag == '5')
+					{
+					OffsetFlag = "5";
+					}
+					else if ((*pod_itor)->OffsetFlag == '6')
+					{
+					OffsetFlag = "6";
+					}*/
+					create_info_object.AddMember("OffsetFlag", (*pod_itor)->OffsetFlag, allocator);
 
-					string HedgeFlag;
-					HedgeFlag = (*pod_itor)->HedgeFlag;
-					create_info_object.AddMember("HedgeFlag", rapidjson::StringRef(HedgeFlag.c_str()), allocator);
+					/*string HedgeFlag;
+					if ((*pod_itor)->HedgeFlag == '1')
+					{
+						HedgeFlag = "1";
+					}
+					else if ((*pod_itor)->HedgeFlag == '2')
+					{
+						HedgeFlag = "2";
+					}
+					else if ((*pod_itor)->HedgeFlag == '3')
+					{
+						HedgeFlag = "3";
+					}
+					else if ((*pod_itor)->HedgeFlag == '5')
+					{
+						HedgeFlag = "5";
+					}*/
+					create_info_object.AddMember("HedgeFlag", (*pod_itor)->HedgeFlag, allocator);
 
 					//create_info_object.AddMember("Direction", (*pod_itor)->Direction, allocator);
 					//create_info_object.AddMember("OffsetFlag", (*pod_itor)->OffsetFlag, allocator);
