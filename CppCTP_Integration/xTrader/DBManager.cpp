@@ -742,6 +742,7 @@ int DBManager::UpdateStrategyOnlyCloseOnOff(Strategy *stg) {
 }
 
 void DBManager::UpdateStrategy(Strategy *stg) {
+	USER_PRINT("DBManager::UpdateStrategy()");
 	int count_number = 0;
 
 	std::cout << "DBManager::UpdateStrategy" << std::endl;
