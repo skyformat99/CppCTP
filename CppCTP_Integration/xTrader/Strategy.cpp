@@ -1241,7 +1241,12 @@ void Strategy::Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
 	if (count_number > 0) {
 		std::cout << "Strategy::Update_Position_Detail_To_DB()" << std::endl;
 		std::cout << "\t收盘保存昨持仓明细 找到(Order)!" << std::endl;
-		this->stg_save_strategy_conn->update(DB_POSITIONDETAIL_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON(
+		this->stg_save_strategy_conn->update(DB_POSITIONDETAIL_COLLECTION, BSON(
+			"userid" << posd->UserID 
+			<< "strategyid" << posd->StrategyID 
+			<< "tradingday" << posd->TradingDay 
+			<< "orderref" << posd->OrderRef 
+			<< "is_active" << ISACTIVE), BSON("$set" << BSON(
 			"instrumentid" << posd->InstrumentID 
 			<< "orderref" << posd->OrderRef
 			<< "userid" << posd->UserID
@@ -1274,19 +1279,15 @@ void Strategy::Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
 		BSONObjBuilder b;
 
 		b.append("userid", posd->UserID);
-		b.append("strategyid", posd->StrategyID);
 		b.append("tradingday", posd->TradingDay);
 		b.append("orderref", posd->OrderRef);
 		b.append("is_active", ISACTIVE);
 		b.append("instrumentid", posd->InstrumentID);
-		b.append("orderref", posd->OrderRef);
-		b.append("userid", posd->UserID);
 		b.append("direction", posd->Direction);
 		b.append("comboffsetflag", posd->CombOffsetFlag);
 		b.append("combhedgeflag", posd->CombHedgeFlag);
 		b.append("limitprice", posd->LimitPrice);
 		b.append("volumetotaloriginal", posd->VolumeTotalOriginal);
-		b.append("tradingday", posd->TradingDay);
 		b.append("tradingdayrecord", posd->TradingDayRecord);
 		b.append("orderstatus", posd->OrderStatus);
 		b.append("volumetraded", posd->VolumeTraded);
@@ -1395,16 +1396,12 @@ void Strategy::Update_Position_Trade_Detail_To_DB(USER_CThostFtdcTradeField *pos
 		b.append("orderref", posd->OrderRef);
 		b.append("is_active", ISACTIVE);
 		b.append("instrumentid", posd->InstrumentID);
-		b.append("orderref", posd->OrderRef);
-		b.append("userid", posd->UserID);
 		b.append("direction", posd->Direction);
 		b.append("offsetflag", posd->OffsetFlag);
 		b.append("hedgeflag", posd->HedgeFlag);
 		b.append("price", posd->Price);
-		b.append("tradingday", posd->TradingDay);
 		b.append("tradingdayrecord", posd->TradingDayRecord);
 		b.append("tradedate", posd->TradeDate);
-		b.append("strategyid", posd->StrategyID);
 		b.append("volume", posd->Volume);
 
 		BSONObj p = b.obj();
@@ -1490,7 +1487,8 @@ void Strategy::update_task_status() {
 		&& (this->stg_list_order_pending->size() == 0)) {
 		/*this->printStrategyInfo("更新交易状态");
 		this->printStrategyInfoPosition();*/
-		this->stg_trade_tasking = false;
+		//this->stg_trade_tasking = false;
+		this->setStgTradeTasking(false);
 	}
 	else
 	{
@@ -1505,7 +1503,7 @@ void Strategy::update_task_status() {
 		std::cout << "stg_position_b_buy_yesterday = " << stg_position_b_buy_yesterday << std::endl;
 		std::cout << "this->stg_list_order_pending->size() = " << this->stg_list_order_pending->size() << std::endl;*/
 
-		this->stg_trade_tasking = true;
+		this->setStgTradeTasking(true);
 	}
 	//std::cout << "After update this.trade_tasking = " << this->stg_trade_tasking << endl;
 	std::cout << "\t挂单列表长度 = " << this->stg_list_order_pending->size() << std::endl;
@@ -2334,7 +2332,7 @@ void Strategy::Order_Algorithm_One() {
 		}
 		if ((order_volume <= 0)) {
 			//std::cout << "发单手数错误值 = " << order_volume << endl;
-			this->stg_trade_tasking = false;
+			this->setStgTradeTasking(false);
 			return;
 		} else {
 			//std::cout << "发单手数 = " << order_volume << endl;
@@ -2402,7 +2400,7 @@ void Strategy::Order_Algorithm_One() {
 
 		this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One() 价差买平", true); // 开启下单锁
 
-		//this->stg_trade_tasking = true;
+		//this->setStgTradeTasking(true);
 		this->printStrategyInfo("价差买平");
 		//this->update_task_status();
 
@@ -2464,7 +2462,7 @@ void Strategy::Order_Algorithm_One() {
 		}
 		if ((order_volume <= 0)) {
 			//std::cout << "发单手数错误值 = " << order_volume << endl;
-			this->stg_trade_tasking = false;
+			this->setStgTradeTasking(false);
 			return;
 		} else {
 			//std::cout << "发单手数 = " << order_volume << endl;
@@ -2531,7 +2529,7 @@ void Strategy::Order_Algorithm_One() {
 
 		this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One() 价差卖开", true); // 开启下单锁
 		
-		//this->stg_trade_tasking = true;
+		//this->setStgTradeTasking(true);
 		//this->printStrategyInfo("价差卖开");
 		//this->update_task_status();
 
@@ -2604,7 +2602,7 @@ void Strategy::Order_Algorithm_One() {
 
 		if (order_volume <= 0) {
 			//std::cout << "发单手数错误值 = " << order_volume << endl;
-			this->stg_trade_tasking = false;
+			this->setStgTradeTasking(false);
 			return;
 		} else {
 			//std::cout << "发单手数 = " << order_volume << endl;
@@ -2717,7 +2715,7 @@ void Strategy::Order_Algorithm_One() {
 
 		if (order_volume <= 0) {
 			//std::cout << "发单手数错误值 = " << order_volume << endl;
-			this->stg_trade_tasking = false;
+			this->setStgTradeTasking(false);
 			return;
 		} else {
 			//std::cout << "发单手数 = " << order_volume << endl;
@@ -4297,11 +4295,14 @@ void Strategy::setStgStrategyId(string stgStrategyId) {
 }
 
 bool Strategy::isStgTradeTasking() {
-	return stg_trade_tasking;
+	return this->stg_trade_tasking;
 }
 
 void Strategy::setStgTradeTasking(bool stgTradeTasking) {
-	stg_trade_tasking = stgTradeTasking;
+	std::cout << "Strategy::setStgTradeTasking()" << std::endl;
+	this->stg_trade_tasking = stgTradeTasking;
+	std::cout << "\tstg_select_order_algorithm_flag = " << this->stg_select_order_algorithm_flag << std::endl;
+	std::cout << "\tstg_trade_tasking = " << stgTradeTasking << std::endl;
 }
 
 string Strategy::getStgTraderId() {
@@ -4347,14 +4348,15 @@ string Strategy::getStgTradingDay() {
 void Strategy::setStgSelectOrderAlgorithmFlag(string msg, bool stg_select_order_algorithm_flag) {
 	time_t tt = system_clock::to_time_t(system_clock::now());
 	std::string nowt(std::ctime(&tt));
+	this->stg_select_order_algorithm_flag = stg_select_order_algorithm_flag;
 	std::cout << "Strategy::setStgSelectOrderAlgorithmFlag():" << std::endl;
 	std::cout << "\t调用者 = " << msg << std::endl;
 	//std::cout << "====策略状态信息====" << std::endl;
 	std::cout << "\t时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
 	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
 	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
-	std::cout << "\tstg_select_order_algorithm_flag = " << stg_select_order_algorithm_flag << std::endl;
-	this->stg_select_order_algorithm_flag = stg_select_order_algorithm_flag;
+	std::cout << "\tstg_select_order_algorithm_flag = " << this->stg_select_order_algorithm_flag << std::endl;
+	std::cout << "\tstg_trade_tasking = " << this->stg_trade_tasking << std::endl;
 }
 
 bool Strategy::getStgSelectOrderAlgorithmFlag() {

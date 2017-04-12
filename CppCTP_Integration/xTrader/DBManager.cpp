@@ -2586,8 +2586,8 @@ void DBManager::getAllPositionDetailTrade(list<USER_CThostFtdcTradeField *> *l_p
 		strcpy(new_pos->OrderRef, p.getStringField("orderref"));
 		strcpy(new_pos->UserID, p.getStringField("userid"));
 		new_pos->Direction = p.getIntField("direction");
-		new_pos->OffsetFlag = p.getStringField("offsetflag")[0];
-		new_pos->HedgeFlag = p.getStringField("hedgeflag")[0];
+		new_pos->OffsetFlag = p.getIntField("offsetflag");
+		new_pos->HedgeFlag = p.getIntField("hedgeflag");
 		new_pos->Price = p.getField("price").Double();
 		strcpy(new_pos->TradingDay, p.getStringField("tradingday"));
 		strcpy(new_pos->TradingDayRecord, p.getStringField("tradingdayrecord"));

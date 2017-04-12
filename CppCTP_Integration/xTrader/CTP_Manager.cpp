@@ -2431,6 +2431,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 				/*1:进行策略的修改,更新到数据库*/
 				if (infoArray.IsArray()) {
+					USER_PRINT("infoArray.IsArray()");
 					std::cout << "info is array" << std::endl;
 					for (int i = 0; i < infoArray.Size(); i++) {
 						const Value& object = infoArray[i];
@@ -2448,10 +2449,11 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								if (((*stg_itor)->getStgUserId() == q_user_id) && ((*stg_itor)->getStgStrategyId() == q_strategy_id)) {
 									std::cout << "找到即将修改的Strategy" << std::endl;
 									isFindStrategy = true;
-
+									USER_PRINT("判断修改持仓...");
 									/// 交易执行中无法修改持仓
 									if ((*stg_itor)->isStgTradeTasking())
 									{
+										USER_PRINT("处于交易中...");
 										isStgTradeTasking = true;
 										break;
 									}
@@ -2470,6 +2472,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 										|| ((*stg_itor)->getStgPositionBSellToday() < object["position_b_sell_today"].GetInt())
 										|| ((*stg_itor)->getStgPositionBSellYesterday() < object["position_b_sell_yesterday"].GetInt()))
 									{
+										USER_PRINT("界面发送的修改数量大于系统中的数量,出错...");
 										isPositionMeetChanged = false;
 										break;
 									}
@@ -2482,6 +2485,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 									(*stg_itor)->setStgPositionABuy(object["position_a_buy"].GetInt());
 
+									USER_PRINT("循环判断删除最早的仓位 position_a_buy_yesterday...");
 									//循环判断删除最早的仓位 position_a_buy_yesterday
 									num_need_to_delete = (*stg_itor)->getStgPositionABuyYesterday() - object["position_a_buy_yesterday"].GetInt();
 									// order
@@ -2869,6 +2873,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					}
 				}
 				else {
+					USER_PRINT("infoArray.Is Not Array()");
 					std::cout << "未收到修改策略信息" << std::endl;
 				}
 				
