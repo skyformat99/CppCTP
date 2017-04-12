@@ -1517,6 +1517,9 @@ void Strategy::update_task_status() {
 	if (this->stg_trade_tasking) {
 		this->setStgSelectOrderAlgorithmFlag("Strategy::update_task_status()", false);
 	}
+	else {
+		this->getStgSelectOrderAlgorithmFlag();
+	}
 
 }
 
@@ -4360,6 +4363,16 @@ void Strategy::setStgSelectOrderAlgorithmFlag(string msg, bool stg_select_order_
 }
 
 bool Strategy::getStgSelectOrderAlgorithmFlag() {
+	time_t tt = system_clock::to_time_t(system_clock::now());
+	std::string nowt(std::ctime(&tt));
+	this->stg_select_order_algorithm_flag = stg_select_order_algorithm_flag;
+	std::cout << "Strategy::getStgSelectOrderAlgorithmFlag():" << std::endl;
+	//std::cout << "====策略状态信息====" << std::endl;
+	std::cout << "\t时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
+	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
+	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
+	std::cout << "\tstg_select_order_algorithm_flag = " << this->stg_select_order_algorithm_flag << std::endl;
+	std::cout << "\tstg_trade_tasking = " << this->stg_trade_tasking << std::endl;
 	return this->stg_select_order_algorithm_flag;
 }
 
