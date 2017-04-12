@@ -51,8 +51,10 @@ string stopsave_time = "15:01:00";
 /*信号处理*/
 void sig_handler(int signo) {
 
+	std::cout << "main.cpp sig_handler()" << std::endl;
+
 	if (signo == SIGINT) {
-		printf("main.cpp sig_handler()");
+		printf("main.cpp sig_handler()\n");
 
 		if (ctp_m) {
 
@@ -62,6 +64,7 @@ void sig_handler(int signo) {
 			for (stg_itor = ctp_m->getListStrategy()->begin();
 				stg_itor != ctp_m->getListStrategy()->end(); stg_itor++) { // 遍历ctp_m维护的Strategy List
 				if ((*stg_itor)->isStgTradeTasking()) {
+					std::cout << "\t\033[31m策略(" << (*stg_itor)->getStgUserId() << ", " << (*stg_itor)->getStgStrategyId() << ") 处于交易状态\033[0m" << std::endl;
 					/// 一旦有策略仍然在交易中,跳出循环
 					isTrading = true;
 					break;

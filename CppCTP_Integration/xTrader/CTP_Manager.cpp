@@ -3909,7 +3909,7 @@ bool CTP_Manager::syncStrategyAddToUsers(Strategy *stg) {
 		std::cout << "\t系统存在账户 = " << (*user_itor)->getUserID() << std::endl;
 		std::cout << "\t增加策略账户 = " << stg->getStgUserId() << std::endl;
 		if ((stg->getStgUserId() == (*user_itor)->getUserID())
-			&& (stg->getStgStrategyId() == (*user_itor)->getTraderID())) {
+			&& (stg->getStgTraderId() == (*user_itor)->getTraderID())) {
 			std::cout << "\t期货账户,交易员均相同,开始同步..." << std::endl;
 			isFindUser = true;
 			(*user_itor)->addStrategyToList(stg);
