@@ -2205,9 +2205,10 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 			this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pOrder);
 			//delete[] codeDst;
 			strategyid = temp.substr(len_order_ref - 2, 2);
-			std::cout << "\t策略编号 = " << strategyid << std::endl;
+			std::cout << "\t回报策略编号 = " << strategyid << std::endl;
 			list<Strategy *>::iterator itor;
 			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+				std::cout << "\t系统策略编号 = " << (*itor)->getStgStrategyId() << std::endl;
 				if ((*itor)->getStgStrategyId() == strategyid) {
 					(*itor)->OnRtnOrder(pOrder);
 					//break;
@@ -2305,9 +2306,10 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 			//this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pOrder);
 			//delete[] codeDst;
 			strategyid = temp.substr(len_order_ref - 2, 2);
-			std::cout << "\t策略编号 = " << strategyid << std::endl;
+			std::cout << "\t回报策略编号 = " << strategyid << std::endl;
 			list<Strategy *>::iterator itor;
 			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+				std::cout << "\t系统策略编号 = " << (*itor)->getStgStrategyId() << std::endl;
 				if ((*itor)->getStgStrategyId() == strategyid) {
 					(*itor)->OnRtnTrade(pTrade);
 					//break;
