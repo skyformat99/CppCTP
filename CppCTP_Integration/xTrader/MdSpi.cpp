@@ -257,7 +257,7 @@ void MdSpi::UnSubMarket(list<string> *l_instrument) {
 	int i = 0;
 	const char *charResult;
 	for (itor = l_instrument->begin(), i = 0; itor != l_instrument->end(); itor++, i++) {
-		cout << *itor << endl;
+		//cout << *itor << endl;
 		charResult = (*itor).c_str();
 		instrumentID[i] = new char[strlen(charResult) + 1];
 		strcpy(instrumentID[i], charResult);
@@ -281,9 +281,9 @@ void MdSpi::UnSubMarket(list<string> *l_instrument) {
 //订阅行情应答
 void MdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("OnRspSubMarketData");
+	std::cout << "MdSpi::OnRspSubMarketData()" << std::endl;
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (pSpecificInstrument) {
-			std::cout << "MdSpi::OnRspSubMarketData()" << std::endl;
 			std::cout << "\t订阅行情应答" << std::endl;
 			std::cout << "\t订阅行情合约代码:" << pSpecificInstrument->InstrumentID << std::endl;
 		}
@@ -292,10 +292,11 @@ void MdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstr
 
 //取消订阅行情
 void MdSpi::UnSubscribeMarketData(char *ppInstrumentID[], int nCount) {
-	USER_PRINT("MdSpi::UnSubscribeMarketData")
+	USER_PRINT("MdSpi::UnSubscribeMarketData");
+	std::cout << "MdSpi::UnSubscribeMarketData()" << std::endl;
 	if (this->isLogged) {
 		USER_PRINT("UnSubscribeMarketData");
-			this->mdapi->UnSubscribeMarketData(ppInstrumentID, nCount);
+		this->mdapi->UnSubscribeMarketData(ppInstrumentID, nCount);
 		/*int ret = this->controlTimeOut(&unsubmarket_sem);
 		if (ret == -1) {
 			USER_PRINT("MdSpi::UnSubscribeMarketData TimeOut!");
@@ -345,12 +346,12 @@ CTP_Manager * MdSpi::getCtpManager() {
 
 //取消订阅行情应答
 void MdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-	USER_PRINT(bIsLast)
+	USER_PRINT(bIsLast);
+	std::cout << "MdSpi::OnRspUnSubMarketData()" << std::endl;
 	if (bIsLast && !(this->IsErrorRspInfo(pRspInfo))) {
-		USER_PRINT("OnRspUnSubMarketData")
-		cout << "取消订阅行情应答" << endl;
-		cout << "取消合约代码:" << pSpecificInstrument->InstrumentID << endl;
-		cout << "取消应答信息:" << pRspInfo->ErrorID << " " << pRspInfo->ErrorMsg << endl;
+		USER_PRINT("OnRspUnSubMarketData");
+		cout << "\t取消合约代码:" << pSpecificInstrument->InstrumentID << endl;
+		cout << "\t取消应答信息:" << pRspInfo->ErrorID << " " << pRspInfo->ErrorMsg << endl;
 		//sem_post(&unsubmarket_sem);
 	}
 }
