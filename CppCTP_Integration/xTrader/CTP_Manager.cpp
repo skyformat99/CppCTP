@@ -1918,6 +1918,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								std::cout << "Strategy新建完成!" << std::endl;
 								/// 将策略加到维护列表里
 								ctp_m->getListStrategy()->push_back(new_stg);
+								/// 将策略添加到User策略列表里
+								ctp_m->syncStrategyAddToUsers(new_stg);
+
 								/// 订阅合约
 								/// 添加策略的合约到l_instrument
 								ctp_m->addSubInstrument(new_stg->getStgInstrumentIdA(), ctp_m->getL_Instrument());
@@ -2090,8 +2093,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						ctp_m->UnSubmarketData(ctp_m->getMdSpi(), (*stg_itor)->getStgInstrumentIdB(), ctp_m->getL_UnsubInstrument());
 
 						// 删除策略
-						delete (*stg_itor);
+						//delete (*stg_itor);
 						stg_itor = ctp_m->getListStrategy()->erase(stg_itor);
+						// 同步删除到User策略列表
+						ctp_m->syncStrategyDeleteToUsers(s_TraderID, s_UserID, s_StrategyID);
 					}
 					else {
 						std::cout << "未能找到修改的Strategy" << std::endl;
@@ -3887,6 +3892,84 @@ void CTP_Manager::sendTradeOffLineMessage(string user_id) {
 				}
 			}
 		}
+	}
+}
+
+/// 策略增加后同步到Users
+bool CTP_Manager::syncStrategyAddToUsers(Strategy *stg) {
+	USER_PRINT("CTP_Manager::syncStrategyAddToUsers");
+	std::cout << "CTP_Manager::syncStrategyAddToUsers()" << std::endl;
+	bool isAddSuccess = false;
+	bool isFindUser = false;
+
+	list<User *>::iterator user_itor;
+
+	/// 添加策略到user列表里
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
+		std::cout << "\t系统存在账户 = " << (*user_itor)->getUserID() << std::endl;
+		std::cout << "\t增加策略账户 = " << stg->getStgUserId() << std::endl;
+		if ((stg->getStgUserId() == (*user_itor)->getUserID())
+			&& (stg->getStgStrategyId() == (*user_itor)->getTraderID())) {
+			std::cout << "\t期货账户,交易员均相同,开始同步..." << std::endl;
+			isFindUser = true;
+			(*user_itor)->addStrategyToList(stg);
+			isAddSuccess = true;
+		}
+	}
+
+	if (isFindUser && isAddSuccess) {
+		std::cout << "\t新增策略已同步到期货账户!" << std::endl;
+		return true;
+	}
+	else {
+		std::cout << "\t新增策略 未 同步到期货账户!" << std::endl;
+		return false;
+	}
+
+}
+
+/// 策略删除后同步到Users
+bool CTP_Manager::syncStrategyDeleteToUsers(string d_traderid, string d_userid, string d_strategyid) {
+	USER_PRINT("CTP_Manager::syncStrategyAddToUsers");
+	std::cout << "CTP_Manager::syncStrategyAddToUsers()" << std::endl;
+	bool isDeleteSuccess = false;
+	bool isFindUser = false;
+
+	list<User *>::iterator user_itor;
+	list<Strategy *>::iterator stg_itor;
+
+	/// 添加策略到user列表里
+	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
+		std::cout << "\t系统存在账户 = " << (*user_itor)->getUserID() << std::endl;
+		std::cout << "\t欲删除策略账户id = " << d_userid << std::endl;
+		std::cout << "\t欲删除策略id = " << d_strategyid << std::endl;
+		if ((d_userid == (*user_itor)->getUserID())
+			&& (d_traderid == (*user_itor)->getTraderID())) {
+			std::cout << "\t期货账户,交易员均相同,开始匹配策略id..." << std::endl;
+			isFindUser = true;
+			for (stg_itor = (*user_itor)->getListStrategy()->begin(); stg_itor != (*user_itor)->getListStrategy()->end(); ) {
+				if ((*stg_itor)->getStgStrategyId() == d_strategyid)
+				{
+					std::cout << "\t策略id匹配成功..." << std::endl;
+					delete (*stg_itor);
+					stg_itor = (*user_itor)->getListStrategy()->erase(stg_itor);
+					isDeleteSuccess = true;
+					break;
+				}
+				else {
+					stg_itor++;
+				}
+			}
+		}
+	}
+
+	if (isFindUser && isDeleteSuccess) {
+		std::cout << "\t删除策略已同步到期货账户!" << std::endl;
+		return true;
+	}
+	else {
+		std::cout << "\t删除策略 未 同步到期货账户!" << std::endl;
+		return false;
 	}
 }
 

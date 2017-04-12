@@ -192,6 +192,12 @@ public:
 	/// 初始化昨仓明细
 	//bool initYesterdayPositionDetail();
 
+	/// 策略增加后同步到Users
+	bool syncStrategyAddToUsers(Strategy *stg);
+
+	/// 策略删除后同步到Users
+	bool syncStrategyDeleteToUsers(string traderid, string userid, string strategyid);
+
 private:
 	//Login *login;
 	list<string> *l_instrument;
