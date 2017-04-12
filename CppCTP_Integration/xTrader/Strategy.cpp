@@ -1456,6 +1456,7 @@ int Strategy::getStgSellCloseOnOff() {
 
 /// 更新交易状态
 void Strategy::update_task_status() {
+	std::cout << "Strategy::update_task_status()" << std::endl;
 	//update_status_mtx.lock();
 	USER_PRINT("Strategy::update_task_status");
 	USER_PRINT(this->stg_trade_tasking);
@@ -2844,6 +2845,7 @@ void Strategy::Exec_OnRspOrderAction() {
 
 // 报单回报
 void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
+	std::cout << "Strategy::Exec_OnRtnOrder()" << std::endl;
 	USER_PRINT("Exec_OnRtnOrder");
 	USER_PRINT(pOrder->InstrumentID);
 	USER_PRINT(pOrder->VolumeTraded);
@@ -3094,6 +3096,7 @@ void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketDat
 
 /// 更新挂单list
 void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
+	std::cout << "Strategy::update_pending_order_list()" << std::endl;
 	USER_PRINT("Strategy::update_pending_order_list");
 	/************************************************************************/
 	/* 此处pOrder应该谨慎操作                                                  */
@@ -3652,6 +3655,7 @@ void Strategy::update_position_detail(USER_CThostFtdcTradeField *pTrade) {
 
 /// 更新持仓明细(Order)
 void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
+	std::cout << "Strategy::update_position_detail()" << std::endl;
 	USER_PRINT("Strategy::update_position_detail");
 	/************************************************************************/
 	/* """
