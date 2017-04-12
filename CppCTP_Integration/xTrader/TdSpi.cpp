@@ -2224,7 +2224,8 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 	USER_PRINT("TdSpi::OnRtnTrade");
 	if (pTrade) {
-		//cout << "===========================TdSpi::OnRtnTrade()===================================" << endl;
+		std::cout << "TdSpi::OnRtnTrade()" << std::endl;
+		//std::cout << "===========================TdSpi::OnRtnTrade()===================================" << std::endl;
 		/////经纪公司代码
 		//cout << "||经纪公司代码:" << pTrade->BrokerID << ", ";
 		/////投资者代码
@@ -2293,10 +2294,10 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 		string temp(pTrade->OrderRef);
 		std::cout << "\t报单引用 = " << temp << std::endl;
 		int len_order_ref = temp.length();
-		std::cout << "\t报单引用长度 = " << len_order_ref << std::endl;
+		//std::cout << "\t报单引用长度 = " << len_order_ref << std::endl;
 
 		string result = temp.substr(0, 1);
-		std::cout << "\tafter substr temp = " << temp << std::endl;
+		//std::cout << "\tafter substr temp = " << temp << std::endl;
 		string strategyid = "";
 
 		if (len_order_ref == 12 && result == "1") { // 通过本交易系统发出去的order长度12,首位字符为1
@@ -2304,6 +2305,7 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 			//this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pOrder);
 			//delete[] codeDst;
 			strategyid = temp.substr(len_order_ref - 2, 2);
+			std::cout << "\t策略编号 = " << strategyid << std::endl;
 			list<Strategy *>::iterator itor;
 			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 				if ((*itor)->getStgStrategyId() == strategyid) {
