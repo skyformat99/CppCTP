@@ -2063,29 +2063,29 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 		//	USER_PRINT((*sid_itor)->getSessionID());
 		//	if (pOrder->SessionID == (*sid_itor)->getSessionID()) {
 		std::cout << "TdSpi::OnRtnOrder()" << std::endl;
-		std::cout << "\t=================================================================================" << endl;
+		//std::cout << "\t=================================================================================" << endl;
 		///经纪公司代码
-		std::cout << "\t||经纪公司代码:" << pOrder->BrokerID << ", ";
+		//std::cout << "\t||经纪公司代码:" << pOrder->BrokerID << ", ";
 		///投资者代码
-		std::cout << "\t投资者代码:" << pOrder->InvestorID << ", ";
+		//std::cout << "\t投资者代码:" << pOrder->InvestorID << ", ";
 		///合约代码
-		std::cout << "\t合约代码:" << pOrder->InstrumentID << ",       ";
+		//std::cout << "\t合约代码:" << pOrder->InstrumentID << ",       ";
 		///报单引用
-		std::cout << "\t报单引用:" << pOrder->OrderRef << ", ";
+		//std::cout << "\t报单引用:" << pOrder->OrderRef << ", ";
 		///用户代码
-		std::cout << "\t用户代码:" << pOrder->UserID << endl;
+		//std::cout << "\t用户代码:" << pOrder->UserID << endl;
 		///报单价格条件
-		std::cout << "\t||报单价格条件:" << pOrder->OrderPriceType << ",    ";
+		//std::cout << "\t||报单价格条件:" << pOrder->OrderPriceType << ",    ";
 		///买卖方向
-		std::cout << "\t\t\t买卖方向:" << pOrder->Direction << ",        ";
+		//std::cout << "\t\t\t买卖方向:" << pOrder->Direction << ",        ";
 		///组合开平标志
-		std::cout << "\t组合开平标志:" << pOrder->CombOffsetFlag << ",        ";
+		//std::cout << "\t组合开平标志:" << pOrder->CombOffsetFlag << ",        ";
 		///组合投机套保标志
-		std::cout << "\t组合投机套保标志:" << pOrder->CombHedgeFlag << ",    ";
+		//std::cout << "\t组合投机套保标志:" << pOrder->CombHedgeFlag << ",    ";
 		///价格
-		std::cout << "\t价格:" << pOrder->LimitPrice << endl;
+		//std::cout << "\t价格:" << pOrder->LimitPrice << endl;
 		///数量
-		std::cout << "\t||数量:" << pOrder->VolumeTotalOriginal << ",            ";
+		//std::cout << "\t||数量:" << pOrder->VolumeTotalOriginal << ",            ";
 		///有效期类型
 		//std::cout << "\t有效期类型:" << pOrder->TimeCondition << ", ";
 		///GTD日期
@@ -2125,15 +2125,15 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 		///报单提示序号
 		//std::cout << "\t报单提示序号:" << pOrder->NotifySequence << endl;
 		///交易日
-		std::cout << "\t\t\t交易日:" << pOrder->TradingDay << ",   ";
+		//std::cout << "\t\t\t交易日:" << pOrder->TradingDay << ",   ";
 		///结算编号
 		//std::cout << "\t结算编号:" << pOrder->SettlementID << ", ";
 		///报单编号
-		std::cout << "\t\t报单编号:" << pOrder->OrderSysID << ", ";
+		//std::cout << "\t\t报单编号:" << pOrder->OrderSysID << ", ";
 		/////报单来源
 		//std::cout << "\t报单来源:" << pOrder->OrderSource << ", ";
 		/////报单状态
-		std::cout << "\t报单状态:" << pOrder->OrderStatus << endl;
+		//std::cout << "\t报单状态:" << pOrder->OrderStatus << endl;
 		/////报单类型
 		//std::cout << "\t||报单类型:" << pOrder->OrderType << ", ";
 		/////今成交数量
@@ -2180,7 +2180,7 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 		//std::cout << "\t||郑商所成交数量:" << pOrder->ZCETotalTradedVolume << ", ";
 		/////互换单标志
 		//std::cout << "\t互换单标志:" << pOrder->IsSwapOrder << endl;
-		std::cout << "\t=================================================================================" << endl;
+		//std::cout << "\t=================================================================================" << endl;
 
 		//		this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pOrder);
 		//		//delete[] codeDst;
@@ -2195,10 +2195,9 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 		string temp(pOrder->OrderRef);
 		std::cout << "\t报单引用 = " << temp << std::endl;
 		int len_order_ref = temp.length();
-		std::cout << "\t报单引用长度 = " << len_order_ref << std::endl;
 		
 		string result = temp.substr(0, 1);
-		std::cout << "\tafter substr temp = " << temp << std::endl;
+		//std::cout << "\tafter substr temp = " << temp << std::endl;
 		string strategyid = "";
 		
 		if (len_order_ref == 12 && result == "1") { // 通过本交易系统发出去的order长度12,首位字符为1
@@ -2206,6 +2205,7 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 			this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pOrder);
 			//delete[] codeDst;
 			strategyid = temp.substr(len_order_ref - 2, 2);
+			std::cout << "\t策略编号 = " << strategyid << std::endl;
 			list<Strategy *>::iterator itor;
 			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 				if ((*itor)->getStgStrategyId() == strategyid) {
