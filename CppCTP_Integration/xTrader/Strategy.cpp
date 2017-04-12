@@ -4308,6 +4308,8 @@ bool Strategy::isStgTradeTasking() {
 void Strategy::setStgTradeTasking(bool stgTradeTasking) {
 	std::cout << "Strategy::setStgTradeTasking()" << std::endl;
 	this->stg_trade_tasking = stgTradeTasking;
+	std::cout << "\t期货账号 = " << this->getStgUserId() << std::endl;
+	std::cout << "\t策略编号 = " << this->getStgStrategyId() << std::endl;
 	std::cout << "\tstg_select_order_algorithm_flag = " << this->stg_select_order_algorithm_flag << std::endl;
 	std::cout << "\tstg_trade_tasking = " << stgTradeTasking << std::endl;
 }

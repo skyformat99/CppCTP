@@ -1675,15 +1675,15 @@ bool User::ComparePositionTotal() {
 	std::cout << "\tthis->l_position_detail_from_local_order->size() = " << this->l_position_detail_from_local_order->size() << std::endl;
 	std::cout << "\tthis->l_position_detail_from_local_trade->size() = " << this->l_position_detail_from_local_trade->size() << std::endl;
 
-	//判断比较的长度,有其中一组长度不相等,即存在错误仓位
-	if ((this->l_position_detail_from_ctp->size() != this->l_position_detail_from_local_order->size()) ||
-		(this->l_position_detail_from_local_order->size() != this->l_position_detail_from_local_trade->size())) {
-		std::cout << "\t期货账户 = " << this->getUserID() << std::endl;
-		std::cout << "\t\033[31m持仓明细列表数目总数不正确!\033[0m" << std::endl;
-		is_same_flag = false;
-		this->setIsPositionRight(is_same_flag);
-		return is_same_flag;
-	}
+	////判断比较的长度,有其中一组长度不相等,即存在错误仓位
+	//if ((this->l_position_detail_from_ctp->size() != this->l_position_detail_from_local_order->size()) ||
+	//	(this->l_position_detail_from_local_order->size() != this->l_position_detail_from_local_trade->size())) {
+	//	std::cout << "\t期货账户 = " << this->getUserID() << std::endl;
+	//	std::cout << "\t\033[31m持仓明细列表数目总数不正确!\033[0m" << std::endl;
+	//	is_same_flag = false;
+	//	this->setIsPositionRight(is_same_flag);
+	//	return is_same_flag;
+	//}
 
 	// 如果全部size为0,直接返回,提高执行效率
 	if ((this->l_position_detail_from_ctp->size() == 0) &&
