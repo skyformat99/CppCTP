@@ -606,17 +606,17 @@ string CTP_Manager::getTradingDay() {
 
 /// 初始化数据发送
 void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, int i_MsgRef, int i_MsgSrc, string s_UserID, string s_StrategyID) {
-
+	std::cout << "CTP_Manager::InitClientData()" << std::endl;
 	rapidjson::Document build_doc;
 	rapidjson::StringBuffer buffer;
 	rapidjson::Writer<StringBuffer> writer(buffer);
 
-	std::cout << "服务端发送客户端初始化数据" << std::endl;
+	std::cout << "\t服务端发送客户端初始化数据" << std::endl;
 
 	/************************************************************************/
 	/*请求行情接口配置信息     msgtype == 4                                                       */
 	/************************************************************************/
-	std::cout << "请求行情接口配置信息..." << std::endl;
+	std::cout << "\t请求行情接口配置信息..." << std::endl;
 
 	list<MarketConfig *> l_marketconfig;
 	static_dbm->getAllMarketConfig(&l_marketconfig);
@@ -651,23 +651,23 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	build_doc.Accept(writer);
 	//rsp_msg = const_cast<char *>(buffer.GetString());
 	//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-	std::cout << "服务端响应数据 = " << buffer.GetString() << std::endl;
+	std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 	if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
-		printf("先前客户端已断开!!!\n");
+		printf("\t客户端已断开!!!\n");
 		//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
 		if (errno == EPIPE) {
-			std::cout << "EPIPE" << std::endl;
+			std::cout << "\tEPIPE" << std::endl;
 			//break;
 		}
-		perror("protocal error");
+		perror("\tprotocal error");
 	}
 
 
 	/************************************************************************/
 	/*请求账户信息        msgtype == 2                                                    */
 	/************************************************************************/
-	std::cout << "请求账户信息..." << std::endl;
+	std::cout << "\t请求账户信息..." << std::endl;
 	//list<FutureAccount *> l_futureaccount;
 	//static_dbm->SearchFutrueListByTraderID(s_TraderID, &l_futureaccount);
 
@@ -717,13 +717,13 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	build_doc2.Accept(writer2);
 	//rsp_msg = const_cast<char *>(buffer2.GetString());
 	//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-	std::cout << "服务端响应数据 = " << buffer2.GetString() << std::endl;
+	std::cout << "\t服务端响应数据 = " << buffer2.GetString() << std::endl;
 
 	if (write_msg(fd, const_cast<char *>(buffer2.GetString()), strlen(buffer2.GetString())) < 0) {
-		printf("先前客户端已断开!!!\n");
+		printf("\t客户端已断开!!!\n");
 		//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
 		if (errno == EPIPE) {
-			std::cout << "EPIPE" << std::endl;
+			std::cout << "\tEPIPE" << std::endl;
 			//break;
 		}
 		perror("protocal error");
@@ -733,7 +733,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	/************************************************************************/
 	/*请求查询算法             msgtype == 11                                            */
 	/************************************************************************/
-	std::cout << "请求查询算法..." << std::endl;
+	std::cout << "\t请求查询算法..." << std::endl;
 
 
 	rapidjson::Document build_doc3;
@@ -769,16 +769,16 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	build_doc3.Accept(writer3);
 	//rsp_msg = const_cast<char *>(buffer.GetString());
 	//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-	std::cout << "服务端响应数据 = " << buffer3.GetString() << std::endl;
+	std::cout << "\t服务端响应数据 = " << buffer3.GetString() << std::endl;
 
 	if (write_msg(fd, const_cast<char *>(buffer3.GetString()), strlen(buffer3.GetString())) < 0) {
-		printf("先前客户端已断开!!!\n");
+		printf("\t客户端已断开!!!\n");
 		//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
 		if (errno == EPIPE) {
-			std::cout << "EPIPE" << std::endl;
+			std::cout << "\tEPIPE" << std::endl;
 			//break;
 		}
-		perror("protocal error");
+		perror("\tprotocal error");
 	}
 
 
@@ -787,7 +787,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	/************************************************************************/
 	/*请求查询策略信息      msgtype == 3                                                   */
 	/************************************************************************/
-	std::cout << "请求查询策略信息..." << std::endl;
+	std::cout << "\t请求查询策略信息..." << std::endl;
 
 
 	rapidjson::Document build_doc4;
@@ -905,16 +905,16 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	build_doc4.Accept(writer4);
 	//rsp_msg = const_cast<char *>(buffer.GetString());
 	//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-	std::cout << "服务端响应数据 = " << buffer4.GetString() << std::endl;
+	std::cout << "\t服务端响应数据 = " << buffer4.GetString() << std::endl;
 
 	if (write_msg(fd, const_cast<char *>(buffer4.GetString()), strlen(buffer4.GetString())) < 0) {
-		printf("先前客户端已断开!!!\n");
+		printf("\t客户端已断开!!!\n");
 		//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
 		if (errno == EPIPE) {
-			std::cout << "EPIPE" << std::endl;
+			std::cout << "\tEPIPE" << std::endl;
 			//break;
 		}
-		perror("protocal error");
+		perror("\tprotocal error");
 	}
 
 
@@ -922,7 +922,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	/* 查询期货账户昨日持仓明细(order)    msgtype == 15                                                                 */
 	/************************************************************************/
 	// 查询期货账户昨日持仓明细
-	std::cout << "查询期货账户昨日持仓明细..." << std::endl;
+	std::cout << "\t查询期货账户昨日持仓明细..." << std::endl;
 
 
 	rapidjson::Document build_doc5;
@@ -1006,16 +1006,16 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	build_doc5.Accept(writer5);
 	//rsp_msg = const_cast<char *>(buffer5.GetString());
 	//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-	std::cout << "服务端响应数据 = " << buffer5.GetString() << std::endl;
+	std::cout << "\t服务端响应数据 = " << buffer5.GetString() << std::endl;
 
 	if (write_msg(fd, const_cast<char *>(buffer5.GetString()), strlen(buffer5.GetString())) < 0) {
-		printf("先前客户端已断开!!!\n");
+		printf("\t客户端已断开!!!\n");
 		//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
 		if (errno == EPIPE) {
-			std::cout << "EPIPE" << std::endl;
+			std::cout << "\tEPIPE" << std::endl;
 			//break;
 		}
-		perror("protocal error");
+		perror("\tprotocal error");
 	}
 
 
@@ -1026,7 +1026,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	/*查询期货账户昨日持仓明细(trade) msgtype == 17                                                                      */
 	/************************************************************************/
 	// 查询期货账户昨日持仓明细(trade)
-	std::cout << "查询期货账户昨日持仓明细..." << std::endl;
+	std::cout << "\t查询期货账户昨日持仓明细..." << std::endl;
 
 	bFind = false;
 
@@ -1150,24 +1150,25 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	build_doc6.Accept(writer6);
 	//rsp_msg = const_cast<char *>(buffer6.GetString());
 	//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-	std::cout << "服务端响应数据 = " << buffer6.GetString() << std::endl;
+	std::cout << "\t服务端响应数据 = " << buffer6.GetString() << std::endl;
 
 	if (write_msg(fd, const_cast<char *>(buffer6.GetString()), strlen(buffer6.GetString())) < 0) {
-		printf("先前客户端已断开!!!\n");
+		printf("\t客户端已断开!!!\n");
 		//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
 		if (errno == EPIPE) {
-			std::cout << "EPIPE" << std::endl;
+			std::cout << "\tEPIPE" << std::endl;
 			//break;
 		}
-		perror("protocal error");
+		perror("\tprotocal error");
 	}
 }
 
 /// 处理客户端发来的消息
 void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
-	//std::cout << "HandleMessage fd = " << fd << std::endl;
-	std::cout << "服务端收到的数据 = " << msg_tmp << std::endl;
-	std::cout << "CTP管理类地址 = " << ctp_m << std::endl;
+	std::cout << "CTP_Manager::HandleMessage" << std::endl;
+	std::cout << "\t服务端收到的数据 = " << msg_tmp << std::endl;
+	std::cout << "\tCTP管理类地址 = " << ctp_m << std::endl;
+	std::cout << "\t通信文件流标识 = " << fd << std::endl;
 	static_dbm->setIs_Online(ctp_m->getDBManager()->getIs_Online());
 
 	//const char *rsp_msg;
@@ -1185,7 +1186,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 	strcpy(msg, msg_tmp);
 
 	if (doc.ParseInsitu(msg).HasParseError()) { // 解析出错
-		std::cout << "json parse error" << std::endl;
+		std::cout << "\tjson parse error" << std::endl;
 		//return;
 		build_doc.SetObject();
 		rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
@@ -1195,7 +1196,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 	}
 	else {
 		if (!doc.HasMember("MsgType")) { // json不包含MsgType key
-			std::cout << "json had no msgtype" << std::endl;
+			std::cout << "\tjson had no msgtype" << std::endl;
 			//return;
 			build_doc.SetObject();
 			rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
@@ -1209,10 +1210,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 			int msgtype = s.GetInt();
 			global_msg_type = msgtype;
 
-			std::cout << "msgtype = " << msgtype << std::endl;
+			std::cout << "\tmsgtype = " << msgtype << std::endl;
 
 			if (msgtype == 1) { // TraderInfo
-				std::cout << "请求交易登录..." << std::endl;
+				std::cout << "\t请求交易登录..." << std::endl;
 				rapidjson::Value &TraderID = doc["TraderID"];
 				rapidjson::Value &Password = doc["Password"];
 				rapidjson::Value &MsgRef = doc["MsgRef"];
@@ -1224,12 +1225,12 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				int i_MsgSendFlag = MsgSendFlag.GetInt();
 				int i_MsgSrc = MsgSrc.GetInt();
 
-				std::cout << "收到交易员ID = " << s_TraderID << std::endl;
-				std::cout << "收到交易员密码 = " << s_Password << std::endl;
+				std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
+				std::cout << "\t收到交易员密码 = " << s_Password << std::endl;
 
 				bool isTraderExists = static_dbm->FindTraderByTraderIdAndPassword(s_TraderID, s_Password, op);
 				if (isTraderExists) { // 用户存在
-					std::cout << "交易员存在..." << std::endl;
+					std::cout << "\t交易员存在..." << std::endl;
 					build_doc.SetObject();
 					rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
 					build_doc.AddMember("MsgRef", server_msg_ref++, allocator);
@@ -1245,23 +1246,23 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					build_doc.Accept(writer);
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-					std::cout << "服务端响应数据 = " << buffer.GetString() << std::endl;
+					std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
-						printf("先前客户端已断开!!!\n");
+						printf("\t客户端已断开!!!\n");
 						//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
 						if (errno == EPIPE) {
-							std::cout << "EPIPE" << std::endl;
+							std::cout << "\tEPIPE" << std::endl;
 							//break;
 						}
-						perror("protocal error");
+						perror("\tprotocal error");
 					}
 
 					InitClientData(fd, ctp_m, s_TraderID, server_msg_ref, i_MsgSrc);
 
 				}
 				else {
-					std::cout << "交易员不存在..." << std::endl;
+					std::cout << "\t交易员不存在..." << std::endl;
 					build_doc.SetObject();
 					rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
 					build_doc.AddMember("MsgRef", server_msg_ref++, allocator);
@@ -1269,11 +1270,11 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					build_doc.AddMember("MsgType", 1, allocator);
 					build_doc.AddMember("TraderName", "", allocator);
 					if (s_TraderID == "") {
-						std::cout << "s_TraderID == ''" << std::endl;
+						std::cout << "\ts_TraderID == ''" << std::endl;
 						build_doc.AddMember("TraderID", "", allocator);
 					}
 					else {
-						std::cout << "!s_TraderID == ''" << std::endl;
+						std::cout << "\ts_TraderID == ''" << std::endl;
 						build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
 					}
 					build_doc.AddMember("OnOff", 0, allocator);
@@ -1284,21 +1285,21 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					build_doc.Accept(writer);
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-					std::cout << "服务端响应数据 = " << buffer.GetString() << std::endl;
+					std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
-						printf("先前客户端已断开!!!\n");
+						printf("\t客户端已断开!!!\n");
 						//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
 						if (errno == EPIPE) {
 							std::cout << "EPIPE" << std::endl;
 							//break;
 						}
-						perror("protocal error");
+						perror("\tprotocal error");
 					}
 				}
 			}
 			else if (msgtype == 2) { // UserInfo
-				std::cout << "请求账户信息..." << std::endl;
+				std::cout << "\t请求账户信息..." << std::endl;
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
 				rapidjson::Value &MsgRef = doc["MsgRef"];
@@ -1355,7 +1356,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 			}
 			else if (msgtype == 3) { // 请求查询策略信息
-				std::cout << "请求查询策略信息..." << std::endl;
+				std::cout << "\t请求查询策略信息..." << std::endl;
 
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
@@ -1486,7 +1487,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 			}
 			else if (msgtype == 4) { // market行情接口参数信息
-				std::cout << "请求行情接口配置信息..." << std::endl;
+				std::cout << "\t请求行情接口配置信息..." << std::endl;
 
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
@@ -1534,7 +1535,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 			}
 			else if (msgtype == 5) { // 修改Strategy（修改Strategy参数,不带修改持仓信息）
-				std::cout << "请求策略修改..." << std::endl;
+				std::cout << "\t请求策略修改..." << std::endl;
 
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
@@ -1773,7 +1774,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 			}
 			else if (msgtype == 6) { // 新建Strategy新建策略
-				std::cout << "新建Strategy..." << std::endl;
+				std::cout << "\t新建Strategy..." << std::endl;
 
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
@@ -2029,7 +2030,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
 			}
 			else if (msgtype == 7) { // 删除Strategy（修改Strategy参数）
-				std::cout << "删除策略..." << std::endl;
+				std::cout << "\t删除策略..." << std::endl;
 
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
@@ -2108,7 +2109,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
 			}
 			else if (msgtype == 8) { // 交易员开关
-				std::cout << "交易员开关..." << std::endl;
+				std::cout << "\t交易员开关..." << std::endl;
 
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
@@ -2160,7 +2161,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 			}
 			else if (msgtype == 9) { // 期货账户开关
-				std::cout << "期货账户开关..." << std::endl;
+				std::cout << "\t期货账户开关..." << std::endl;
 
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
@@ -2216,7 +2217,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 			}
 			else if (msgtype == 10) { // 查询策略昨仓
-				std::cout << "查询策略昨仓..." << std::endl;
+				std::cout << "\t查询策略昨仓..." << std::endl;
 
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
@@ -2353,7 +2354,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 			}
 			else if (msgtype == 11) { //查询算法
-				std::cout << "请求查询算法..." << std::endl;
+				std::cout << "\t请求查询算法..." << std::endl;
 
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
@@ -2395,7 +2396,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
 			}
 			else if (msgtype == 12) { // 修改Strategy（修改Strategy参数,带修改持仓信息）
-				std::cout << "请求策略持仓修改..." << std::endl;
+				std::cout << "\t请求策略持仓修改..." << std::endl;
 
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
@@ -2500,7 +2501,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									num_need_to_delete = (*stg_itor)->getStgPositionABuyYesterday() - object["position_a_buy_yesterday"].GetInt();
 									// order
 									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
-										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end(), count < num_need_to_delete;
+										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
 										)
 									{
 
@@ -2518,7 +2519,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									}
 									// trade
 									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
-										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end(), count < num_need_to_delete;
+										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end() && (count < num_need_to_delete);
 										)
 									{
 
@@ -2541,7 +2542,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									num_need_to_delete = (*stg_itor)->getStgPositionABuyToday() - object["position_a_buy_today"].GetInt();
 									// order
 									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
-										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end(), count < num_need_to_delete;
+										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
 										) 
 									{
 										
@@ -2559,7 +2560,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									}
 									// trade
 									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
-										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end(), count < num_need_to_delete;
+										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end() && (count < num_need_to_delete);
 										)
 									{
 
@@ -2586,13 +2587,18 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									USER_PRINT(object["position_b_buy_yesterday"].GetInt());
 									num_need_to_delete = (*stg_itor)->getStgPositionBBuyYesterday() - object["position_b_buy_yesterday"].GetInt();
 									USER_PRINT("order recursive...");
-
+									USER_PRINT("(*stg_itor)->getStg_List_Position_Detail_From_Order()");
+									USER_PRINT((*stg_itor)->getStg_List_Position_Detail_From_Order()->size());
 									// order
 									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
-										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end(), count < num_need_to_delete;
+										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
 										)
 									{
-
+										std::cout << "\t(*position_itor)->InstrumentID = " << (*position_itor)->InstrumentID << std::endl;
+										std::cout << "\t(*stg_itor)->getStgInstrumentIdB = " << (*stg_itor)->getStgInstrumentIdB() << std::endl;
+										std::cout << "\t(*position_itor)->InsertDate = " << (*position_itor)->InsertDate << std::endl;
+										std::cout << "\tctp_m->getTradingDay().c_str = " << ctp_m->getTradingDay().c_str() << std::endl;
+										std::cout << "\t(*position_itor)->Direction = " << (*position_itor)->Direction << std::endl;
 										if ((!strcmp((*position_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdB().c_str()))
 											&& (strcmp((*position_itor)->InsertDate, ctp_m->getTradingDay().c_str()))
 											&& (*position_itor)->Direction == '0') //合约id相同，日期不相同删除,方向为买
@@ -2608,7 +2614,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									USER_PRINT("trade recursive...");
 									// trade
 									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
-										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end(), count < num_need_to_delete;
+										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end() && (count < num_need_to_delete);
 										)
 									{
 
@@ -2631,7 +2637,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									num_need_to_delete = (*stg_itor)->getStgPositionBBuyToday() - object["position_b_buy_today"].GetInt();
 									// order
 									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
-										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end(), count < num_need_to_delete;
+										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
 										)
 									{
 
@@ -2649,7 +2655,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									}
 									// trade
 									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
-										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end(), count < num_need_to_delete;
+										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end() && (count < num_need_to_delete);
 										)
 									{
 
@@ -2686,7 +2692,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									num_need_to_delete = (*stg_itor)->getStgPositionASellYesterday() - object["position_a_sell_yesterday"].GetInt();
 									// order
 									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
-										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end(), count < num_need_to_delete;
+										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
 										)
 									{
 
@@ -2704,7 +2710,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									}
 									// trade
 									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
-										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end(), count < num_need_to_delete;
+										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end() && (count < num_need_to_delete);
 										)
 									{
 
@@ -2727,7 +2733,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									num_need_to_delete = (*stg_itor)->getStgPositionASellToday() - object["position_a_sell_today"].GetInt();
 									// order
 									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
-										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end(), count < num_need_to_delete;
+										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
 										)
 									{
 
@@ -2745,7 +2751,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									}
 									// trade
 									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
-										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end(), count < num_need_to_delete;
+										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end() && (count < num_need_to_delete);
 										)
 									{
 
@@ -2772,7 +2778,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									num_need_to_delete = (*stg_itor)->getStgPositionBSellYesterday() - object["position_b_sell_yesterday"].GetInt();
 									// order
 									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
-										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end(), count < num_need_to_delete;
+										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
 										)
 									{
 
@@ -2790,7 +2796,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									}
 									// trade
 									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
-										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end(), count < num_need_to_delete;
+										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end() && (count < num_need_to_delete);
 										)
 									{
 
@@ -2813,7 +2819,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									num_need_to_delete = (*stg_itor)->getStgPositionBSellToday() - object["position_b_sell_today"].GetInt();
 									// order
 									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
-										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end(), count < num_need_to_delete;
+										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
 										)
 									{
 
@@ -2831,7 +2837,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									}
 									// trade
 									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
-										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end(), count < num_need_to_delete;
+										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end() && (count < num_need_to_delete);
 										)
 									{
 
@@ -2927,7 +2933,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 			}
 			else if (msgtype == 13) { // 策略开关
-				std::cout << "策略开关..." << std::endl;
+				std::cout << "\t策略开关..." << std::endl;
 
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
@@ -3001,7 +3007,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
 			}
 			else if (msgtype == 14) {// 策略只平开关
-				std::cout << "策略只平开关..." << std::endl;
+				std::cout << "\t策略只平开关..." << std::endl;
 
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
@@ -3073,7 +3079,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
 			}
 			else if (msgtype == 15) { // 查询期货账户昨日持仓明细
-				std::cout << "查询期货账户昨日持仓明细..." << std::endl;
+				std::cout << "\t查询期货账户昨日持仓明细..." << std::endl;
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
 				rapidjson::Value &MsgRef = doc["MsgRef"];
@@ -3164,7 +3170,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
 			}
 			else if (msgtype == 16) { // 查询服务端sessions
-				std::cout << "请求服务端sessions信息..." << std::endl;
+				std::cout << "\t请求服务端sessions信息..." << std::endl;
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
 				rapidjson::Value &MsgRef = doc["MsgRef"]; 
@@ -3238,7 +3244,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
 			}
 			else if (msgtype == 17) { // 查询期货账户昨日持仓明细(trade)
-				std::cout << "查询期货账户昨日持仓明细..." << std::endl;
+				std::cout << "\t查询期货账户昨日持仓明细..." << std::endl;
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
 				rapidjson::Value &MsgRef = doc["MsgRef"];
@@ -3800,7 +3806,7 @@ void CTP_Manager::delSocketFD(string user_id, int fd) {
 
 /// 发送行情断线通知
 void CTP_Manager::sendMarketOffLineMessage() {
-	
+	std::cout << "CTP_Manager::sendMarketOffLineMessage()" << std::endl;
 
 	std::cout << "服务端发送发送行情断线通知" << std::endl;
 
@@ -3830,13 +3836,13 @@ void CTP_Manager::sendMarketOffLineMessage() {
 		for (int_itor = m_itor->second->begin(); int_itor != m_itor->second->end(); int_itor++)
 		{
 			if (write_msg((*int_itor), const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
-				printf("先前客户端已断开!!!\n");
+				printf("\t客户端已断开!!!\n");
 				//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
 				if (errno == EPIPE) {
 					std::cout << "EPIPE" << std::endl;
 					//break;
 				}
-				perror("protocal error");
+				perror("\tprotocal error");
 			}
 		}
 	}
@@ -3844,8 +3850,8 @@ void CTP_Manager::sendMarketOffLineMessage() {
 
 /// 发送交易断线通知
 void CTP_Manager::sendTradeOffLineMessage(string user_id) {
-
-	std::cout << "发送交易断线通知" << std::endl;
+	std::cout << "CTP_Manager::sendTradeOffLineMessage()" << std::endl;
+	std::cout << "\t发送交易断线通知" << std::endl;
 
 	/************************************************************************/
 	/*发送交易断线通知     msgtype == 19                                       */
@@ -3885,10 +3891,10 @@ void CTP_Manager::sendTradeOffLineMessage(string user_id) {
 					printf("先前客户端已断开!!!\n");
 					//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
 					if (errno == EPIPE) {
-						std::cout << "EPIPE" << std::endl;
+						std::cout << "\tEPIPE" << std::endl;
 						//break;
 					}
-					perror("protocal error");
+					perror("\tprotocal error");
 				}
 			}
 		}

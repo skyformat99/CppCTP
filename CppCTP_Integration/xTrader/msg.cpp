@@ -52,7 +52,8 @@ int write_msg(int sockfd, char *buff, size_t len) {
  * 读取的数据存放在buff中*/
 /************************************************************************/
 int read_msg(int sockfd, char *buff, size_t len) {
-	printf("开始接收消息... \n");
+	printf("msg.cpp read_msg()");
+	printf("\t开始接收消息... \n");
 	Msg message;
 	memset(&message, 0, sizeof(message));
 	size_t size;
@@ -74,7 +75,7 @@ int read_msg(int sockfd, char *buff, size_t len) {
 	if ((s == (unsigned char)message.checknum) && (!strcmp("gmqh_sh_2016", message.head))) {
 		
 		memcpy(buff, message.buff, len);
-		printf("消息接收完毕 \n");
+		printf("\t消息接收完毕 \n");
 		return sizeof(message);
 	}
 	//printf("read_msg4 \n");

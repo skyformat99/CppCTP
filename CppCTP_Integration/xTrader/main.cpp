@@ -110,9 +110,10 @@ void out_addr(struct sockaddr_in *clientaddr) {
 
 /*输出服务器端时间*/
 void do_service(int fd) {
+	printf("main.cpp do_service()");
 	/*和客户端进行读写操作(双向通信)*/
 	char buff[MAX_BUFFER_SIZE];
-	printf("服务端开始监听...\n");
+	printf("\t服务端开始监听...\n");
 	while (1)
 	{
 		memset(buff, 0, sizeof(buff));
@@ -148,6 +149,7 @@ void do_service(int fd) {
 
 /*输出文件描述符*/
 void out_fd(int fd) {
+	printf("main.cpp out_fd()");
 	struct sockaddr_in addr;
 	socklen_t len = sizeof(addr);
 	//从fd中获取连接的客户端相关信息
@@ -159,7 +161,7 @@ void out_fd(int fd) {
 	memset(ip, 0, sizeof(ip));
 	int port = ntohs(addr.sin_port);
 	inet_ntop(AF_INET, &addr.sin_addr.s_addr, ip, sizeof(ip));
-	printf("来自ip地址:%16s(%5d) 已连接!!!\n", ip, port);
+	printf("\t来自ip地址:%16s(%5d) 已连接!!!\n", ip, port);
 }
 
 /*线程调用*/

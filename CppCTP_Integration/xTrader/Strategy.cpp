@@ -4307,7 +4307,17 @@ bool Strategy::isStgTradeTasking() {
 
 void Strategy::setStgTradeTasking(bool stgTradeTasking) {
 	std::cout << "Strategy::setStgTradeTasking()" << std::endl;
-	this->stg_trade_tasking = stgTradeTasking;
+	if (((this->getOn_Off()) &&
+		(this->stg_user->getOn_Off()) &&
+		(this->stg_user->GetTrader()->getOn_Off()) &&
+		(this->stg_user->getCTP_Manager()->getOn_Off())))
+	{
+		this->stg_trade_tasking = stgTradeTasking;
+	}
+	else {
+		std::cout << "\t请检查开关再进行trade_tasking设置!" << std::endl;
+	}
+	
 	std::cout << "\t期货账号 = " << this->getStgUserId() << std::endl;
 	std::cout << "\t策略编号 = " << this->getStgStrategyId() << std::endl;
 	std::cout << "\tstg_select_order_algorithm_flag = " << this->stg_select_order_algorithm_flag << std::endl;
@@ -4357,7 +4367,18 @@ string Strategy::getStgTradingDay() {
 void Strategy::setStgSelectOrderAlgorithmFlag(string msg, bool stg_select_order_algorithm_flag) {
 	time_t tt = system_clock::to_time_t(system_clock::now());
 	std::string nowt(std::ctime(&tt));
-	this->stg_select_order_algorithm_flag = stg_select_order_algorithm_flag;
+
+	if (((this->getOn_Off()) &&
+		(this->stg_user->getOn_Off()) &&
+		(this->stg_user->GetTrader()->getOn_Off()) &&
+		(this->stg_user->getCTP_Manager()->getOn_Off())))
+	{
+		this->stg_select_order_algorithm_flag = stg_select_order_algorithm_flag;
+	}
+	else {
+		std::cout << "\t请检查开关再进行stg_select_order_algorithm_flag设置!" << std::endl;
+	}
+
 	std::cout << "Strategy::setStgSelectOrderAlgorithmFlag():" << std::endl;
 	std::cout << "\t调用者 = " << msg << std::endl;
 	//std::cout << "====策略状态信息====" << std::endl;
