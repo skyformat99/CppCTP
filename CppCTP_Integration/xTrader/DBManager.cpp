@@ -277,7 +277,7 @@ bool DBManager::FindTraderByTraderIdAndPassword(string traderid, string password
 }
 
 void DBManager::getAllTrader(list<string> *l_trader) {
-
+	std::cout << "DBManager::getAllTrader()" << std::endl;
 	/// 初始化的时候，必须保证list为空
 	if (l_trader->size() > 0) {
 		list<string>::iterator Itor;
@@ -297,7 +297,7 @@ void DBManager::getAllTrader(list<string> *l_trader) {
 		while (cursor->more()) {
 
 			BSONObj p = cursor->next();
-			cout << "*" << "traderid:" << p.getStringField("traderid") << "  "
+			cout << "\t*" << "traderid:" << p.getStringField("traderid") << "  "
 				<< "tradername:" << p.getStringField("tradername") << "  "
 				<< "password:" << p.getStringField("password") << "  "
 				<< "isactive:" << p.getStringField("isactive") << " "
@@ -310,6 +310,7 @@ void DBManager::getAllTrader(list<string> *l_trader) {
 }
 
 void DBManager::getAllObjTrader(list<Trader *> *l_trader) {
+	std::cout << "DBManager::getAllObjTrader()" << std::endl;
 	/// 初始化的时候，必须保证list为空
 	if (l_trader->size() > 0) {
 		list<Trader *>::iterator Itor;
@@ -322,7 +323,7 @@ void DBManager::getAllObjTrader(list<Trader *> *l_trader) {
 	int countnum = this->conn->count(DB_OPERATOR_COLLECTION);
 	USER_PRINT(countnum);
 	if (countnum == 0) {
-		cout << "DBManager::getAllTrader is NONE!" << endl;
+		cout << "\tDBManager::getAllTrader is NONE!" << endl;
 	}
 	else {
 		unique_ptr<DBClientCursor> cursor =
@@ -330,7 +331,7 @@ void DBManager::getAllObjTrader(list<Trader *> *l_trader) {
 		while (cursor->more()) {
 			Trader *op = new Trader();
 			BSONObj p = cursor->next();
-			cout << "*" << "traderid:" << p.getStringField("traderid") << "  "
+			cout << "\t*" << "traderid:" << p.getStringField("traderid") << "  "
 				<< "tradername:" << p.getStringField("tradername") << "  "
 				<< "password:" << p.getStringField("password") << "  "
 				<< "isactive:" << p.getStringField("isactive") << " "
@@ -550,7 +551,7 @@ void DBManager::SearchFutrueListByTraderID(string traderid, list<FutureAccount *
 
 void DBManager::getAllFutureAccount(list<User *> *l_user) {
 	USER_PRINT(this->is_online);
-	
+	std::cout << "DBManager::getAllFutureAccount()" << std::endl;
 	string DB_FUTUREACCOUNT_COLLECTION;
 	if (this->is_online) {
 		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount";
@@ -577,7 +578,7 @@ void DBManager::getAllFutureAccount(list<User *> *l_user) {
 			this->conn->query(DB_FUTUREACCOUNT_COLLECTION, MONGO_QUERY("isactive" << ISACTIVE));
 		while (cursor->more()) {
 			BSONObj p = cursor->next();
-			cout << "*" << "brokerid:" << p.getStringField("brokerid") << "  "
+			cout << "\t*" << "brokerid:" << p.getStringField("brokerid") << "  "
 				<< "traderid:" << p.getStringField("traderid") << "  "
 				<< "password:" << p.getStringField("password") << "  "
 				<< "userid:" << p.getStringField("userid") << "  "
@@ -817,6 +818,7 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 	}
 }
 void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, string userid) {
+	std::cout << "DBManager::getAllStrategy()" << std::endl;
 	/// 初始化的时候，必须保证list为空
 	if (l_strategys->size() > 0) {
 		list<Strategy *>::iterator Itor;
@@ -844,55 +846,55 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 	while (cursor->more()) {
 		BSONObj p = cursor->next();
 		Strategy *stg = new Strategy();
-		cout << "position_a_sell_today = " << p.getIntField("position_a_sell_today") << ", ";
-		cout << "position_b_sell = " << p.getIntField("position_b_sell") << ", ";
-		cout << "spread_shift = " << p.getField("spread_shift").Double() << ", ";
-		cout << "position_b_sell_today = " << p.getIntField("position_b_sell_today") << ", ";
-		cout << "position_b_buy_today = " << p.getIntField("position_b_buy_today") << ", ";
-		cout << "position_a_sell = " << p.getIntField("position_a_sell") << ", ";
-		cout << "buy_close = " << p.getField("buy_close").Double() << ", ";
-		cout << "stop_loss = " << p.getField("stop_loss").Double() << ", ";
-		cout << "position_b_buy_yesterday = " << p.getIntField("position_b_buy_yesterday") << ", ";
-		cout << "is_active = " << p.getField("is_active").Bool() << ", ";
-		cout << "position_b_sell_yesterday = " << p.getIntField("position_b_sell_yesterday") << ", ";
-		cout << "strategy_id = " << p.getStringField("strategy_id") << ", "; //string type
-		cout << "position_b_buy = " << p.getIntField("position_b_buy") << ", ";
-		cout << "lots_batch = " << p.getIntField("lots_batch") << ", ";
-		cout << "position_a_buy = " << p.getIntField("position_a_buy") << ", ";
-		cout << "sell_open = " << p.getField("sell_open").Double() << ", ";
-		cout << "order_algorithm = " << p.getStringField("order_algorithm") << ", "; //string type
-		cout << "trader_id = " << p.getStringField("trader_id") << ", "; // string type
-		cout << "a_order_action_limit = " << p.getIntField("a_order_action_limit") << ", ";
-		cout << "b_order_action_limit = " << p.getIntField("b_order_action_limit") << ", ";
-		cout << "sell_close = " << p.getField("sell_close").Double() << ", ";
-		cout << "buy_open = " << p.getField("buy_open").Double() << ", ";
-		cout << "only_close = " << p.getIntField("only_close") << ", ";
+		//cout << "\tposition_a_sell_today = " << p.getIntField("position_a_sell_today") << ", ";
+		//cout << "\tposition_b_sell = " << p.getIntField("position_b_sell") << ", ";
+		//cout << "\tspread_shift = " << p.getField("spread_shift").Double() << ", ";
+		//cout << "\tposition_b_sell_today = " << p.getIntField("position_b_sell_today") << ", ";
+		//cout << "\tposition_b_buy_today = " << p.getIntField("position_b_buy_today") << ", ";
+		//cout << "\tposition_a_sell = " << p.getIntField("position_a_sell") << ", ";
+		//cout << "\tbuy_close = " << p.getField("buy_close").Double() << ", ";
+		//cout << "\tstop_loss = " << p.getField("stop_loss").Double() << ", ";
+		//cout << "\tposition_b_buy_yesterday = " << p.getIntField("position_b_buy_yesterday") << ", ";
+		//cout << "\tis_active = " << p.getField("is_active").Bool() << ", ";
+		//cout << "\tposition_b_sell_yesterday = " << p.getIntField("position_b_sell_yesterday") << ", ";
+		//cout << "\tstrategy_id = " << p.getStringField("strategy_id") << ", "; //string type
+		//cout << "\tposition_b_buy = " << p.getIntField("position_b_buy") << ", ";
+		//cout << "\tlots_batch = " << p.getIntField("lots_batch") << ", ";
+		//cout << "\tposition_a_buy = " << p.getIntField("position_a_buy") << ", ";
+		//cout << "\tsell_open = " << p.getField("sell_open").Double() << ", ";
+		//cout << "\torder_algorithm = " << p.getStringField("order_algorithm") << ", "; //string type
+		//cout << "\ttrader_id = " << p.getStringField("trader_id") << ", "; // string type
+		//cout << "\ta_order_action_limit = " << p.getIntField("a_order_action_limit") << ", ";
+		//cout << "\tb_order_action_limit = " << p.getIntField("b_order_action_limit") << ", ";
+		//cout << "\tsell_close = " << p.getField("sell_close").Double() << ", ";
+		//cout << "\tbuy_open = " << p.getField("buy_open").Double() << ", ";
+		//cout << "\tonly_close = " << p.getIntField("only_close") << ", ";
 
-		/*新增字段*/
+		///*新增字段*/
 
-		cout << "trade_model" << p.getStringField("trade_model") << ", ";
-		cout << "hold_profit" << p.getField("hold_profit").Double() << ", ";
-		cout << "close_profit" << p.getField("close_profit").Double() << ", ";
-		cout << "commission" << p.getField("commission").Double() << ", ";
-		cout << "position" << p.getIntField("position") << ", ";
-		cout << "position_buy" << p.getIntField("position_buy") << ", ";
-		cout << "position_sell" << p.getIntField("position_sell") << ", ";
-		cout << "trade_volume" << p.getIntField("trade_volume") << ", ";
-		cout << "amount" << p.getField("amount").Double() << ", ";
-		cout << "average_shift" << p.getField("average_shift").Double() << ", ";
+		//cout << "\ttrade_model" << p.getStringField("trade_model") << ", ";
+		//cout << "\thold_profit" << p.getField("hold_profit").Double() << ", ";
+		//cout << "\tclose_profit" << p.getField("close_profit").Double() << ", ";
+		//cout << "\tcommission" << p.getField("commission").Double() << ", ";
+		//cout << "\tposition" << p.getIntField("position") << ", ";
+		//cout << "\tposition_buy" << p.getIntField("position_buy") << ", ";
+		//cout << "\tposition_sell" << p.getIntField("position_sell") << ", ";
+		//cout << "\ttrade_volume" << p.getIntField("trade_volume") << ", ";
+		//cout << "\tamount" << p.getField("amount").Double() << ", ";
+		//cout << "\taverage_shift" << p.getField("average_shift").Double() << ", ";
 
-		cout << "a_limit_price_shift" << p.getIntField("a_limit_price_shift") << ", ";
-		cout << "b_limit_price_shift" << p.getIntField("b_limit_price_shift") << ", ";
+		//cout << "\ta_limit_price_shift" << p.getIntField("a_limit_price_shift") << ", ";
+		//cout << "\tb_limit_price_shift" << p.getIntField("b_limit_price_shift") << ", ";
 
-		cout << "position_a_buy_yesterday = " << p.getIntField("position_a_buy_yesterday") << ", ";
-		cout << "user_id = " << p.getStringField("user_id") << ", "; // string type
-		cout << "position_a_buy_today = " << p.getIntField("position_a_buy_today") << ", ";
-		cout << "position_a_sell_yesterday = " << p.getIntField("position_a_sell_yesterday") << ", ";
-		cout << "lots = " << p.getIntField("lots") << ", ";
-		cout << "a_wait_price_tick = " << p.getField("a_wait_price_tick").Double() << ", ";
-		cout << "b_wait_price_tick = " << p.getField("b_wait_price_tick").Double() << ", ";
-		//cout << "strategy_on_off = " << p.getField("strategy_on_off").Int() << endl;
-		cout << "trading_day = " << p.getStringField("trading_day") << endl;
+		//cout << "\tposition_a_buy_yesterday = " << p.getIntField("position_a_buy_yesterday") << ", ";
+		//cout << "\tuser_id = " << p.getStringField("user_id") << ", "; // string type
+		//cout << "\tposition_a_buy_today = " << p.getIntField("position_a_buy_today") << ", ";
+		//cout << "\tposition_a_sell_yesterday = " << p.getIntField("position_a_sell_yesterday") << ", ";
+		//cout << "\tlots = " << p.getIntField("lots") << ", ";
+		//cout << "\ta_wait_price_tick = " << p.getField("a_wait_price_tick").Double() << ", ";
+		//cout << "\tb_wait_price_tick = " << p.getField("b_wait_price_tick").Double() << ", ";
+		////cout << "strategy_on_off = " << p.getField("strategy_on_off").Int() << endl;
+		//cout << "\ttrading_day = " << p.getStringField("trading_day") << endl;
 
 		stg->setStgAWaitPriceTick(p.getField("a_wait_price_tick").Double());
 		stg->setStgBWaitPriceTick(p.getField("b_wait_price_tick").Double());
@@ -926,8 +928,8 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 		stg->setStgALimitPriceShift(p.getIntField("a_limit_price_shift"));
 		stg->setStgBLimitPriceShift(p.getIntField("b_limit_price_shift"));
 
-		std::cout << "after stg->setStgTradingDay = " << stg->getStgTradingDay() << std::endl;
-		std::cout << "address stg = " << stg << std::endl;
+		/*std::cout << "\tafter stg->setStgTradingDay = " << stg->getStgTradingDay() << std::endl;
+		std::cout << "\taddress stg = " << stg << std::endl;*/
 
 		stg->setStgAOrderActionTiresLimit(p.getIntField("a_order_action_limit"));
 		stg->setStgBOrderActionTiresLimit(p.getIntField("b_order_action_limit"));
@@ -973,6 +975,7 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 }
 
 void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<User *> *l_users, string traderid) {
+	std::cout << "DBManager::getAllStrategyByActiveUser()" << std::endl;
 	USER_PRINT("getAllStrategyByActiveUser");
 	list<User *>::iterator user_itor;
 	/// 初始化的时候，必须保证list为空
@@ -998,7 +1001,7 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 		while (cursor->more()) {
 			BSONObj p = cursor->next();
 			Strategy *stg = new Strategy();
-			cout << "position_a_sell_today = " << p.getIntField("position_a_sell_today") << ", ";
+			cout << "\tposition_a_sell_today = " << p.getIntField("position_a_sell_today") << ", ";
 			cout << "position_b_sell = " << p.getIntField("position_b_sell") << ", ";
 			cout << "spread_shift = " << p.getField("spread_shift").Double() << ", ";
 			cout << "position_b_sell_today = " << p.getIntField("position_b_sell_today") << ", ";
@@ -1045,12 +1048,12 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 			cout << "lots = " << p.getIntField("lots") << ", ";
 			cout << "a_wait_price_tick = " << p.getField("a_wait_price_tick").Double() << ", ";
 			cout << "b_wait_price_tick = " << p.getField("b_wait_price_tick").Double() << ", ";
-			cout << "strategy_on_off = " << p.getIntField("strategy_on_off") << endl;
-			cout << "sell_open_on_off = " << p.getIntField("sell_open_on_off") << endl;
-			cout << "buy_close_on_off = " << p.getIntField("buy_close_on_off") << endl;
-			cout << "sell_close_on_off = " << p.getIntField("sell_close_on_off") << endl;
-			cout << "buy_open_on_off = " << p.getIntField("buy_open_on_off") << endl;
-			cout << "trading_day = " << p.getStringField("trading_day") << endl;
+			cout << "strategy_on_off = " << p.getIntField("strategy_on_off") << ", ";
+			cout << "sell_open_on_off = " << p.getIntField("sell_open_on_off") << ", ";
+			cout << "buy_close_on_off = " << p.getIntField("buy_close_on_off") << ", ";
+			cout << "sell_close_on_off = " << p.getIntField("sell_close_on_off") << ", ";
+			cout << "buy_open_on_off = " << p.getIntField("buy_open_on_off") << ", ";
+			cout << "trading_day = " << p.getStringField("trading_day") << ", ";
 
 			stg->setStgAWaitPriceTick(p.getField("a_wait_price_tick").Double());
 			stg->setStgBWaitPriceTick(p.getField("b_wait_price_tick").Double());
@@ -1083,8 +1086,8 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 			stg->setStgBLimitPriceShift(p.getIntField("b_limit_price_shift"));
 			stg->setStgTradingDay(p.getStringField("trading_day"));
 
-			std::cout << "after stg->setStgTradingDay = " << stg->getStgTradingDay() << std::endl;
-			std::cout << "address stg = " << stg << std::endl;
+			/*std::cout << "\tafter stg->setStgTradingDay = " << stg->getStgTradingDay() << std::endl;
+			std::cout << "\taddress stg = " << stg << std::endl;*/
 
 			stg->setStgAOrderActionTiresLimit(p.getIntField("a_order_action_limit"));
 			stg->setStgBOrderActionTiresLimit(p.getIntField("b_order_action_limit"));
@@ -1115,8 +1118,8 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 				stg->setStgInstrumentIdB(elements[1].String());
 				stg->addInstrumentToList(stg->getStgInstrumentIdA());
 				stg->addInstrumentToList(stg->getStgInstrumentIdB());
-				cout << "stg->setStgInstrumentIdA(elements[0])" << stg->getStgInstrumentIdA() << endl;
-				cout << "stg->setStgInstrumentIdA(elements[1])" << stg->getStgInstrumentIdB() << endl;
+				cout << "stg->setStgInstrumentIdA(elements[0]) = " << stg->getStgInstrumentIdA() << ", ";
+				cout << "stg->setStgInstrumentIdA(elements[1]) = " << stg->getStgInstrumentIdB() << endl;
 			}
 
 			//for (vector<BSONElement>::iterator it = elements.begin(); it != elements.end(); ++it) {
@@ -1330,54 +1333,54 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 	while (cursor->more()) {
 		BSONObj p = cursor->next();
 		Strategy *stg = new Strategy();
-		cout << "position_a_sell_today = " << p.getIntField("position_a_sell_today") << ", ";
-		cout << "position_b_sell = " << p.getIntField("position_b_sell") << ", ";
-		cout << "spread_shift = " << p.getField("spread_shift").Double() << ", ";
-		cout << "position_b_sell_today = " << p.getIntField("position_b_sell_today") << ", ";
-		cout << "position_b_buy_today = " << p.getIntField("position_b_buy_today") << ", ";
-		cout << "position_a_sell = " << p.getIntField("position_a_sell") << ", ";
-		cout << "buy_close = " << p.getField("buy_close").Double() << ", ";
-		cout << "stop_loss = " << p.getField("stop_loss").Double() << ", ";
-		cout << "position_b_buy_yesterday = " << p.getIntField("position_b_buy_yesterday") << ", ";
-		cout << "is_active = " << p.getField("is_active").Bool() << ", ";
-		cout << "position_b_sell_yesterday = " << p.getIntField("position_b_sell_yesterday") << ", ";
-		cout << "strategy_id = " << p.getStringField("strategy_id") << ", "; //string type
-		cout << "position_b_buy = " << p.getIntField("position_b_buy") << ", ";
-		cout << "lots_batch = " << p.getIntField("lots_batch") << ", ";
-		cout << "position_a_buy = " << p.getIntField("position_a_buy") << ", ";
-		cout << "sell_open = " << p.getField("sell_open").Double() << ", ";
-		cout << "order_algorithm = " << p.getStringField("order_algorithm") << ", "; //string type
-		cout << "trader_id = " << p.getStringField("trader_id") << ", "; // string type
-		cout << "a_order_action_limit = " << p.getIntField("a_order_action_limit") << ", ";
-		cout << "b_order_action_limit = " << p.getIntField("b_order_action_limit") << ", ";
-		cout << "sell_close = " << p.getField("sell_close").Double() << ", ";
-		cout << "buy_open = " << p.getField("buy_open").Double() << ", ";
-		cout << "only_close = " << p.getIntField("only_close") << ", ";
+		//cout << "position_a_sell_today = " << p.getIntField("position_a_sell_today") << ", ";
+		//cout << "position_b_sell = " << p.getIntField("position_b_sell") << ", ";
+		//cout << "spread_shift = " << p.getField("spread_shift").Double() << ", ";
+		//cout << "position_b_sell_today = " << p.getIntField("position_b_sell_today") << ", ";
+		//cout << "position_b_buy_today = " << p.getIntField("position_b_buy_today") << ", ";
+		//cout << "position_a_sell = " << p.getIntField("position_a_sell") << ", ";
+		//cout << "buy_close = " << p.getField("buy_close").Double() << ", ";
+		//cout << "stop_loss = " << p.getField("stop_loss").Double() << ", ";
+		//cout << "position_b_buy_yesterday = " << p.getIntField("position_b_buy_yesterday") << ", ";
+		//cout << "is_active = " << p.getField("is_active").Bool() << ", ";
+		//cout << "position_b_sell_yesterday = " << p.getIntField("position_b_sell_yesterday") << ", ";
+		//cout << "strategy_id = " << p.getStringField("strategy_id") << ", "; //string type
+		//cout << "position_b_buy = " << p.getIntField("position_b_buy") << ", ";
+		//cout << "lots_batch = " << p.getIntField("lots_batch") << ", ";
+		//cout << "position_a_buy = " << p.getIntField("position_a_buy") << ", ";
+		//cout << "sell_open = " << p.getField("sell_open").Double() << ", ";
+		//cout << "order_algorithm = " << p.getStringField("order_algorithm") << ", "; //string type
+		//cout << "trader_id = " << p.getStringField("trader_id") << ", "; // string type
+		//cout << "a_order_action_limit = " << p.getIntField("a_order_action_limit") << ", ";
+		//cout << "b_order_action_limit = " << p.getIntField("b_order_action_limit") << ", ";
+		//cout << "sell_close = " << p.getField("sell_close").Double() << ", ";
+		//cout << "buy_open = " << p.getField("buy_open").Double() << ", ";
+		//cout << "only_close = " << p.getIntField("only_close") << ", ";
 
-		/*新增字段*/
+		///*新增字段*/
 
-		cout << "trade_model" << p.getStringField("trade_model") << ", ";
-		cout << "hold_profit" << p.getField("hold_profit").Double() << ", ";
-		cout << "close_profit" << p.getField("close_profit").Double() << ", ";
-		cout << "commission" << p.getField("commission").Double() << ", ";
-		cout << "position" << p.getIntField("position") << ", ";
-		cout << "position_buy" << p.getIntField("position_buy") << ", ";
-		cout << "position_sell" << p.getIntField("position_sell") << ", ";
-		cout << "trade_volume" << p.getIntField("trade_volume") << ", ";
-		cout << "amount" << p.getField("amount").Double() << ", ";
-		cout << "average_shift" << p.getField("average_shift").Double() << ", ";
-		cout << "a_limit_price_shift" << p.getIntField("a_limit_price_shift") << ", ";
-		cout << "b_limit_price_shift" << p.getIntField("b_limit_price_shift") << ", ";
+		//cout << "trade_model" << p.getStringField("trade_model") << ", ";
+		//cout << "hold_profit" << p.getField("hold_profit").Double() << ", ";
+		//cout << "close_profit" << p.getField("close_profit").Double() << ", ";
+		//cout << "commission" << p.getField("commission").Double() << ", ";
+		//cout << "position" << p.getIntField("position") << ", ";
+		//cout << "position_buy" << p.getIntField("position_buy") << ", ";
+		//cout << "position_sell" << p.getIntField("position_sell") << ", ";
+		//cout << "trade_volume" << p.getIntField("trade_volume") << ", ";
+		//cout << "amount" << p.getField("amount").Double() << ", ";
+		//cout << "average_shift" << p.getField("average_shift").Double() << ", ";
+		//cout << "a_limit_price_shift" << p.getIntField("a_limit_price_shift") << ", ";
+		//cout << "b_limit_price_shift" << p.getIntField("b_limit_price_shift") << ", ";
 
-		cout << "position_a_buy_yesterday = " << p.getIntField("position_a_buy_yesterday") << ", ";
-		cout << "user_id = " << p.getStringField("user_id") << ", "; // string type
-		cout << "position_a_buy_today = " << p.getIntField("position_a_buy_today") << ", ";
-		cout << "position_a_sell_yesterday = " << p.getIntField("position_a_sell_yesterday") << ", ";
-		cout << "lots = " << p.getIntField("lots") << ", ";
-		cout << "a_wait_price_tick = " << p.getField("a_wait_price_tick").Double() << ", ";
-		cout << "b_wait_price_tick = " << p.getField("b_wait_price_tick").Double() << ", ";
-		//cout << "strategy_on_off = " << p.getField("strategy_on_off").Int() << endl;
-		cout << "trading_day = " << p.getStringField("trading_day") << endl;
+		//cout << "position_a_buy_yesterday = " << p.getIntField("position_a_buy_yesterday") << ", ";
+		//cout << "user_id = " << p.getStringField("user_id") << ", "; // string type
+		//cout << "position_a_buy_today = " << p.getIntField("position_a_buy_today") << ", ";
+		//cout << "position_a_sell_yesterday = " << p.getIntField("position_a_sell_yesterday") << ", ";
+		//cout << "lots = " << p.getIntField("lots") << ", ";
+		//cout << "a_wait_price_tick = " << p.getField("a_wait_price_tick").Double() << ", ";
+		//cout << "b_wait_price_tick = " << p.getField("b_wait_price_tick").Double() << ", ";
+		////cout << "strategy_on_off = " << p.getField("strategy_on_off").Int() << endl;
+		//cout << "trading_day = " << p.getStringField("trading_day") << endl;
 
 		stg->setStgAWaitPriceTick(p.getField("a_wait_price_tick").Double());
 		stg->setStgBWaitPriceTick(p.getField("b_wait_price_tick").Double());
@@ -1408,7 +1411,7 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 		stg->setStgAverageShift(p.getField("average_shift").Double());
 		stg->setStgTradingDay(p.getStringField("trading_day"));
 
-		std::cout << "after stg->setStgTradingDay = " << stg->getStgTradingDay() << std::endl;
+		//std::cout << "after stg->setStgTradingDay = " << stg->getStgTradingDay() << std::endl;
 
 		stg->setStgAOrderActionTiresLimit(p.getIntField("a_order_action_limit"));
 		stg->setStgBOrderActionTiresLimit(p.getIntField("b_order_action_limit"));
@@ -1492,57 +1495,57 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 	while (cursor->more()) {
 		BSONObj p = cursor->next();
 		Strategy *stg = new Strategy();
-		cout << "position_a_sell_today = " << p.getIntField("position_a_sell_today") << ", ";
-		cout << "position_b_sell = " << p.getIntField("position_b_sell") << ", ";
-		cout << "spread_shift = " << p.getField("spread_shift").Double() << ", ";
-		cout << "position_b_sell_today = " << p.getIntField("position_b_sell_today") << ", ";
-		cout << "position_b_buy_today = " << p.getIntField("position_b_buy_today") << ", ";
-		cout << "position_a_sell = " << p.getIntField("position_a_sell") << ", ";
-		cout << "buy_close = " << p.getField("buy_close").Double() << ", ";
-		cout << "stop_loss = " << p.getField("stop_loss").Double() << ", ";
-		cout << "position_b_buy_yesterday = " << p.getIntField("position_b_buy_yesterday") << ", ";
-		cout << "is_active = " << p.getField("is_active").Bool() << ", ";
-		cout << "position_b_sell_yesterday = " << p.getIntField("position_b_sell_yesterday") << ", ";
-		cout << "strategy_id = " << p.getStringField("strategy_id") << ", "; //string type
-		cout << "position_b_buy = " << p.getIntField("position_b_buy") << ", ";
-		cout << "lots_batch = " << p.getIntField("lots_batch") << ", ";
-		cout << "position_a_buy = " << p.getIntField("position_a_buy") << ", ";
-		cout << "sell_open = " << p.getField("sell_open").Double() << ", ";
-		cout << "order_algorithm = " << p.getStringField("order_algorithm") << ", "; //string type
-		cout << "trader_id = " << p.getStringField("trader_id") << ", "; // string type
-		cout << "a_order_action_limit = " << p.getIntField("a_order_action_limit") << ", ";
-		cout << "b_order_action_limit = " << p.getIntField("b_order_action_limit") << ", ";
-		cout << "sell_close = " << p.getField("sell_close").Double() << ", ";
-		cout << "buy_open = " << p.getField("buy_open").Double() << ", ";
-		cout << "only_close = " << p.getIntField("only_close") << ", ";
+		//cout << "position_a_sell_today = " << p.getIntField("position_a_sell_today") << ", ";
+		//cout << "position_b_sell = " << p.getIntField("position_b_sell") << ", ";
+		//cout << "spread_shift = " << p.getField("spread_shift").Double() << ", ";
+		//cout << "position_b_sell_today = " << p.getIntField("position_b_sell_today") << ", ";
+		//cout << "position_b_buy_today = " << p.getIntField("position_b_buy_today") << ", ";
+		//cout << "position_a_sell = " << p.getIntField("position_a_sell") << ", ";
+		//cout << "buy_close = " << p.getField("buy_close").Double() << ", ";
+		//cout << "stop_loss = " << p.getField("stop_loss").Double() << ", ";
+		//cout << "position_b_buy_yesterday = " << p.getIntField("position_b_buy_yesterday") << ", ";
+		//cout << "is_active = " << p.getField("is_active").Bool() << ", ";
+		//cout << "position_b_sell_yesterday = " << p.getIntField("position_b_sell_yesterday") << ", ";
+		//cout << "strategy_id = " << p.getStringField("strategy_id") << ", "; //string type
+		//cout << "position_b_buy = " << p.getIntField("position_b_buy") << ", ";
+		//cout << "lots_batch = " << p.getIntField("lots_batch") << ", ";
+		//cout << "position_a_buy = " << p.getIntField("position_a_buy") << ", ";
+		//cout << "sell_open = " << p.getField("sell_open").Double() << ", ";
+		//cout << "order_algorithm = " << p.getStringField("order_algorithm") << ", "; //string type
+		//cout << "trader_id = " << p.getStringField("trader_id") << ", "; // string type
+		//cout << "a_order_action_limit = " << p.getIntField("a_order_action_limit") << ", ";
+		//cout << "b_order_action_limit = " << p.getIntField("b_order_action_limit") << ", ";
+		//cout << "sell_close = " << p.getField("sell_close").Double() << ", ";
+		//cout << "buy_open = " << p.getField("buy_open").Double() << ", ";
+		//cout << "only_close = " << p.getIntField("only_close") << ", ";
 
 
-		/*新增字段*/
+		///*新增字段*/
 
-		cout << "trade_model" << p.getStringField("trade_model") << ", ";
-		cout << "hold_profit" << p.getField("hold_profit").Double() << ", ";
-		cout << "close_profit" << p.getField("close_profit").Double() << ", ";
-		cout << "commission" << p.getField("commission").Double() << ", ";
-		cout << "position" << p.getIntField("position") << ", ";
-		cout << "position_buy" << p.getIntField("position_buy") << ", ";
-		cout << "position_sell" << p.getIntField("position_sell") << ", ";
-		cout << "trade_volume" << p.getIntField("trade_volume") << ", ";
-		cout << "amount" << p.getField("amount").Double() << ", ";
-		cout << "average_shift" << p.getField("average_shift").Double() << ", ";
+		//cout << "trade_model" << p.getStringField("trade_model") << ", ";
+		//cout << "hold_profit" << p.getField("hold_profit").Double() << ", ";
+		//cout << "close_profit" << p.getField("close_profit").Double() << ", ";
+		//cout << "commission" << p.getField("commission").Double() << ", ";
+		//cout << "position" << p.getIntField("position") << ", ";
+		//cout << "position_buy" << p.getIntField("position_buy") << ", ";
+		//cout << "position_sell" << p.getIntField("position_sell") << ", ";
+		//cout << "trade_volume" << p.getIntField("trade_volume") << ", ";
+		//cout << "amount" << p.getField("amount").Double() << ", ";
+		//cout << "average_shift" << p.getField("average_shift").Double() << ", ";
 
-		cout << "a_limit_price_shift" << p.getIntField("a_limit_price_shift") << ", ";
-		cout << "b_limit_price_shift" << p.getIntField("b_limit_price_shift") << ", ";
-		cout << "trading_day" << p.getStringField("trading_day") << ", ";
+		//cout << "a_limit_price_shift" << p.getIntField("a_limit_price_shift") << ", ";
+		//cout << "b_limit_price_shift" << p.getIntField("b_limit_price_shift") << ", ";
+		//cout << "trading_day" << p.getStringField("trading_day") << ", ";
 
 
-		cout << "position_a_buy_yesterday = " << p.getIntField("position_a_buy_yesterday") << ", ";
-		cout << "user_id = " << p.getStringField("user_id") << ", "; // string type
-		cout << "position_a_buy_today = " << p.getIntField("position_a_buy_today") << ", ";
-		cout << "position_a_sell_yesterday = " << p.getIntField("position_a_sell_yesterday") << ", ";
-		cout << "lots = " << p.getIntField("lots") << ", ";
-		cout << "a_wait_price_tick = " << p.getField("a_wait_price_tick").Double() << ", ";
-		cout << "b_wait_price_tick = " << p.getField("b_wait_price_tick").Double() << ", ";
-		cout << "StrategyOnoff = " << p.getField("StrategyOnoff").Int() << endl;
+		//cout << "position_a_buy_yesterday = " << p.getIntField("position_a_buy_yesterday") << ", ";
+		//cout << "user_id = " << p.getStringField("user_id") << ", "; // string type
+		//cout << "position_a_buy_today = " << p.getIntField("position_a_buy_today") << ", ";
+		//cout << "position_a_sell_yesterday = " << p.getIntField("position_a_sell_yesterday") << ", ";
+		//cout << "lots = " << p.getIntField("lots") << ", ";
+		//cout << "a_wait_price_tick = " << p.getField("a_wait_price_tick").Double() << ", ";
+		//cout << "b_wait_price_tick = " << p.getField("b_wait_price_tick").Double() << ", ";
+		//cout << "StrategyOnoff = " << p.getField("StrategyOnoff").Int() << endl;
 
 		stg->setStgAWaitPriceTick(p.getField("a_wait_price_tick").Double());
 		stg->setStgBWaitPriceTick(p.getField("b_wait_price_tick").Double());
@@ -1642,54 +1645,54 @@ void DBManager::getAllStrategyYesterdayByActiveUser(list<Strategy *> *l_strategy
 		while (cursor->more()) {
 			BSONObj p = cursor->next();
 			Strategy *stg = new Strategy();
-			cout << "position_a_sell_today = " << p.getIntField("position_a_sell_today") << ", ";
-			cout << "position_b_sell = " << p.getIntField("position_b_sell") << ", ";
-			cout << "spread_shift = " << p.getField("spread_shift").Double() << ", ";
-			cout << "position_b_sell_today = " << p.getIntField("position_b_sell_today") << ", ";
-			cout << "position_b_buy_today = " << p.getIntField("position_b_buy_today") << ", ";
-			cout << "position_a_sell = " << p.getIntField("position_a_sell") << ", ";
-			cout << "buy_close = " << p.getField("buy_close").Double() << ", ";
-			cout << "stop_loss = " << p.getField("stop_loss").Double() << ", ";
-			cout << "position_b_buy_yesterday = " << p.getIntField("position_b_buy_yesterday") << ", ";
-			cout << "is_active = " << p.getField("is_active").Bool() << ", ";
-			cout << "position_b_sell_yesterday = " << p.getIntField("position_b_sell_yesterday") << ", ";
-			cout << "strategy_id = " << p.getStringField("strategy_id") << ", "; //string type
-			cout << "position_b_buy = " << p.getIntField("position_b_buy") << ", ";
-			cout << "lots_batch = " << p.getIntField("lots_batch") << ", ";
-			cout << "position_a_buy = " << p.getIntField("position_a_buy") << ", ";
-			cout << "sell_open = " << p.getField("sell_open").Double() << ", ";
-			cout << "order_algorithm = " << p.getStringField("order_algorithm") << ", "; //string type
-			cout << "trader_id = " << p.getStringField("trader_id") << ", "; // string type
-			cout << "a_order_action_limit = " << p.getIntField("a_order_action_limit") << ", ";
-			cout << "b_order_action_limit = " << p.getIntField("b_order_action_limit") << ", ";
-			cout << "sell_close = " << p.getField("sell_close").Double() << ", ";
-			cout << "buy_open = " << p.getField("buy_open").Double() << ", ";
-			cout << "only_close = " << p.getIntField("only_close") << ", ";
+			//cout << "position_a_sell_today = " << p.getIntField("position_a_sell_today") << ", ";
+			//cout << "position_b_sell = " << p.getIntField("position_b_sell") << ", ";
+			//cout << "spread_shift = " << p.getField("spread_shift").Double() << ", ";
+			//cout << "position_b_sell_today = " << p.getIntField("position_b_sell_today") << ", ";
+			//cout << "position_b_buy_today = " << p.getIntField("position_b_buy_today") << ", ";
+			//cout << "position_a_sell = " << p.getIntField("position_a_sell") << ", ";
+			//cout << "buy_close = " << p.getField("buy_close").Double() << ", ";
+			//cout << "stop_loss = " << p.getField("stop_loss").Double() << ", ";
+			//cout << "position_b_buy_yesterday = " << p.getIntField("position_b_buy_yesterday") << ", ";
+			//cout << "is_active = " << p.getField("is_active").Bool() << ", ";
+			//cout << "position_b_sell_yesterday = " << p.getIntField("position_b_sell_yesterday") << ", ";
+			//cout << "strategy_id = " << p.getStringField("strategy_id") << ", "; //string type
+			//cout << "position_b_buy = " << p.getIntField("position_b_buy") << ", ";
+			//cout << "lots_batch = " << p.getIntField("lots_batch") << ", ";
+			//cout << "position_a_buy = " << p.getIntField("position_a_buy") << ", ";
+			//cout << "sell_open = " << p.getField("sell_open").Double() << ", ";
+			//cout << "order_algorithm = " << p.getStringField("order_algorithm") << ", "; //string type
+			//cout << "trader_id = " << p.getStringField("trader_id") << ", "; // string type
+			//cout << "a_order_action_limit = " << p.getIntField("a_order_action_limit") << ", ";
+			//cout << "b_order_action_limit = " << p.getIntField("b_order_action_limit") << ", ";
+			//cout << "sell_close = " << p.getField("sell_close").Double() << ", ";
+			//cout << "buy_open = " << p.getField("buy_open").Double() << ", ";
+			//cout << "only_close = " << p.getIntField("only_close") << ", ";
 
-			/*新增字段*/
+			///*新增字段*/
 
-			cout << "trade_model" << p.getStringField("trade_model") << ", ";
-			cout << "hold_profit" << p.getField("hold_profit").Double() << ", ";
-			cout << "close_profit" << p.getField("close_profit").Double() << ", ";
-			cout << "commission" << p.getField("commission").Double() << ", ";
-			cout << "position" << p.getIntField("position") << ", ";
-			cout << "position_buy" << p.getIntField("position_buy") << ", ";
-			cout << "position_sell" << p.getIntField("position_sell") << ", ";
-			cout << "trade_volume" << p.getIntField("trade_volume") << ", ";
-			cout << "amount" << p.getField("amount").Double() << ", ";
-			cout << "average_shift" << p.getField("average_shift").Double() << ", ";
-			cout << "a_limit_price_shift" << p.getIntField("a_limit_price_shift") << ", ";
-			cout << "b_limit_price_shift" << p.getIntField("b_limit_price_shift") << ", ";
+			//cout << "trade_model" << p.getStringField("trade_model") << ", ";
+			//cout << "hold_profit" << p.getField("hold_profit").Double() << ", ";
+			//cout << "close_profit" << p.getField("close_profit").Double() << ", ";
+			//cout << "commission" << p.getField("commission").Double() << ", ";
+			//cout << "position" << p.getIntField("position") << ", ";
+			//cout << "position_buy" << p.getIntField("position_buy") << ", ";
+			//cout << "position_sell" << p.getIntField("position_sell") << ", ";
+			//cout << "trade_volume" << p.getIntField("trade_volume") << ", ";
+			//cout << "amount" << p.getField("amount").Double() << ", ";
+			//cout << "average_shift" << p.getField("average_shift").Double() << ", ";
+			//cout << "a_limit_price_shift" << p.getIntField("a_limit_price_shift") << ", ";
+			//cout << "b_limit_price_shift" << p.getIntField("b_limit_price_shift") << ", ";
 
-			cout << "position_a_buy_yesterday = " << p.getIntField("position_a_buy_yesterday") << ", ";
-			cout << "user_id = " << p.getStringField("user_id") << ", "; // string type
-			cout << "position_a_buy_today = " << p.getIntField("position_a_buy_today") << ", ";
-			cout << "position_a_sell_yesterday = " << p.getIntField("position_a_sell_yesterday") << ", ";
-			cout << "lots = " << p.getIntField("lots") << ", ";
-			cout << "a_wait_price_tick = " << p.getField("a_wait_price_tick").Double() << ", ";
-			cout << "b_wait_price_tick = " << p.getField("b_wait_price_tick").Double() << ", ";
-			//cout << "strategy_on_off = " << p.getField("strategy_on_off").Int() << endl;
-			cout << "trading_day = " << p.getStringField("trading_day") << endl;
+			//cout << "position_a_buy_yesterday = " << p.getIntField("position_a_buy_yesterday") << ", ";
+			//cout << "user_id = " << p.getStringField("user_id") << ", "; // string type
+			//cout << "position_a_buy_today = " << p.getIntField("position_a_buy_today") << ", ";
+			//cout << "position_a_sell_yesterday = " << p.getIntField("position_a_sell_yesterday") << ", ";
+			//cout << "lots = " << p.getIntField("lots") << ", ";
+			//cout << "a_wait_price_tick = " << p.getField("a_wait_price_tick").Double() << ", ";
+			//cout << "b_wait_price_tick = " << p.getField("b_wait_price_tick").Double() << ", ";
+			////cout << "strategy_on_off = " << p.getField("strategy_on_off").Int() << endl;
+			//cout << "trading_day = " << p.getStringField("trading_day") << endl;
 
 			stg->setStgAWaitPriceTick(p.getField("a_wait_price_tick").Double());
 			stg->setStgBWaitPriceTick(p.getField("b_wait_price_tick").Double());
@@ -1722,8 +1725,8 @@ void DBManager::getAllStrategyYesterdayByActiveUser(list<Strategy *> *l_strategy
 			stg->setStgBLimitPriceShift(p.getIntField("b_limit_price_shift"));
 			stg->setStgTradingDay(p.getStringField("trading_day"));
 
-			std::cout << "after stg->setStgTradingDay = " << stg->getStgTradingDay() << std::endl;
-			std::cout << "address stg = " << stg << std::endl;
+			/*std::cout << "after stg->setStgTradingDay = " << stg->getStgTradingDay() << std::endl;
+			std::cout << "address stg = " << stg << std::endl;*/
 
 			stg->setStgAOrderActionTiresLimit(p.getIntField("a_order_action_limit"));
 			stg->setStgBOrderActionTiresLimit(p.getIntField("b_order_action_limit"));
@@ -1863,6 +1866,7 @@ void DBManager::UpdateMarketConfig(MarketConfig *mc) {
 }
 
 void DBManager::getAllMarketConfig(list<MarketConfig *> *l_marketconfig) {
+	std::cout << "DBManager::getAllMarketConfig()" << std::endl;
 	string DB_MARKETCONFIG_COLLECTION;
 	if (this->is_online) {
 		DB_MARKETCONFIG_COLLECTION = "CTP.marketconfig";
@@ -1888,7 +1892,7 @@ void DBManager::getAllMarketConfig(list<MarketConfig *> *l_marketconfig) {
 			this->conn->query(DB_MARKETCONFIG_COLLECTION, MONGO_QUERY("isactive" << ISACTIVE));
 		while (cursor->more()) {
 			BSONObj p = cursor->next();
-			cout << "*" << "market_id:" << p.getStringField("market_id") << "  "
+			cout << "\t*" << "market_id:" << p.getStringField("market_id") << "  "
 				<< "market_frontAddr:" << p.getStringField("market_frontAddr") << "  "
 				<< "broker_id:" << p.getStringField("broker_id") << "  "
 				<< "userid:" << p.getStringField("user_id") << "  "
@@ -1909,6 +1913,7 @@ void DBManager::getAllMarketConfig(list<MarketConfig *> *l_marketconfig) {
 }
 
 MarketConfig * DBManager::getOneMarketConfig() {
+	std::cout << "DBManager::getOneMarketConfig()" << std::endl;
 	USER_PRINT(this->is_online);
 	string DB_MARKETCONFIG_COLLECTION;
 	if (this->is_online) {
@@ -1920,14 +1925,14 @@ MarketConfig * DBManager::getOneMarketConfig() {
 	}
 	int countnum = this->conn->count(DB_MARKETCONFIG_COLLECTION);
 	if (countnum == 0) {
-		cout << "DBManager::getOneMarketConfig None!" << endl;
+		cout << "\tDBManager::getOneMarketConfig None!" << endl;
 	}
 	else {
-		cout << "MarketConfig * DBManager::getOneMarketConfig() isactive" << ISACTIVE << endl;
+		cout << "\tMarketConfig * DBManager::getOneMarketConfig() isactive" << ISACTIVE << endl;
 		BSONObj p = this->conn->findOne(DB_MARKETCONFIG_COLLECTION, BSON("isactive" << ISACTIVE));
-		cout << "market_id = " << p.getStringField("market_id") << endl;
+		cout << "\tmarket_id = " << p.getStringField("market_id") << endl;
 		if ((strcmp(p.getStringField("market_id"), ""))) {
-			cout << "*" << "market_id:" << p.getStringField("market_id") << "  "
+			cout << "\t*" << "market_id:" << p.getStringField("market_id") << "  "
 				<< "market_frontAddr:" << p.getStringField("market_frontAddr") << "  "
 				<< "broker_id:" << p.getStringField("broker_id") << "  "
 				<< "userid:" << p.getStringField("user_id") << "  "
@@ -2001,6 +2006,7 @@ void DBManager::UpdateAlgorithm(Algorithm *alg) {
 
 }
 void DBManager::getAllAlgorithm(list<Algorithm *> *l_alg) {
+	std::cout << "DBManager::getAllAlgorithm()" << std::endl;
 	/// 初始化的时候，必须保证list为空
 	if (l_alg->size() > 0) {
 		list<Algorithm *>::iterator alg_itor;
@@ -2018,7 +2024,7 @@ void DBManager::getAllAlgorithm(list<Algorithm *> *l_alg) {
 			this->conn->query(DB_ALGORITHM_COLLECTION, MONGO_QUERY("isactive" << ISACTIVE));
 		while (cursor->more()) {
 			BSONObj p = cursor->next();
-			cout << "*" << "name:" << p.getStringField("name") << "  "
+			cout << "\t*" << "name:" << p.getStringField("name") << "  "
 				<< "isactive:" << p.getStringField("isactive") << "*" << endl;
 			Algorithm *alg = new Algorithm();
 			alg->setAlgName(p.getStringField("name"));
@@ -2278,8 +2284,6 @@ void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, 
 		cursor = this->conn->query(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 	}
 
-	
-	std::cout << "DBManager::getAllPositionDetail" << std::endl;
 	while (cursor->more()) {
 		
 		BSONObj p = cursor->next();
@@ -2305,25 +2309,23 @@ void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, 
 		new_pos->VolumeTradedBatch = p.getIntField("volumetradedbatch");
 
 		std::cout << "\tinstrumentid = " << p.getStringField("instrumentid") << ", ";
-		std::cout << "\torderref = " << p.getStringField("orderref") << ", ";
-		std::cout << "\tuserid = " << p.getStringField("userid") << ", ";
-		std::cout << "\tdirection = " << p.getIntField("direction") << ", ";
-		std::cout << "\tcomboffsetflag = " << p.getStringField("comboffsetflag") << ", ";
-		std::cout << "\tcombhedgeflag = " << p.getStringField("combhedgeflag") << ", ";
-		std::cout << "\tlimitprice = " << p.getField("limitprice").Double() << ", ";
-		std::cout << "\tvolumetotaloriginal = " << p.getIntField("volumetotaloriginal") << ", ";
-		std::cout << "\ttradingday = " << p.getStringField("tradingday") << ", ";
-		std::cout << "\ttradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
-		std::cout << "\torderstatus = " << p.getIntField("orderstatus") << ", ";
-		std::cout << "\tvolumetraded = " << p.getIntField("volumetraded") << ", ";
-		std::cout << "\tvolumetotal = " << p.getIntField("volumetotal") << ", ";
-		std::cout << "\tinsertdate = " << p.getStringField("insertdate") << ", ";
-		std::cout << "\tinserttime = " << p.getStringField("inserttime") << ", ";
-		std::cout << "\tstrategyid = " << p.getStringField("strategyid") << ", ";
-		std::cout << "\tvolumetradedbatch = " << p.getIntField("volumetradedbatch") << ", ";
-		std::cout << "\tnew_pos->StrategyID = " << new_pos->StrategyID << std::endl;
-
-		
+		std::cout << "orderref = " << p.getStringField("orderref") << ", ";
+		std::cout << "userid = " << p.getStringField("userid") << ", ";
+		std::cout << "direction = " << p.getIntField("direction") << ", ";
+		std::cout << "comboffsetflag = " << p.getStringField("comboffsetflag") << ", ";
+		std::cout << "combhedgeflag = " << p.getStringField("combhedgeflag") << ", ";
+		std::cout << "limitprice = " << p.getField("limitprice").Double() << ", ";
+		std::cout << "volumetotaloriginal = " << p.getIntField("volumetotaloriginal") << ", ";
+		std::cout << "tradingday = " << p.getStringField("tradingday") << ", ";
+		std::cout << "tradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
+		std::cout << "orderstatus = " << p.getIntField("orderstatus") << ", ";
+		std::cout << "volumetraded = " << p.getIntField("volumetraded") << ", ";
+		std::cout << "volumetotal = " << p.getIntField("volumetotal") << ", ";
+		std::cout << "insertdate = " << p.getStringField("insertdate") << ", ";
+		std::cout << "inserttime = " << p.getStringField("inserttime") << ", ";
+		std::cout << "strategyid = " << p.getStringField("strategyid") << ", ";
+		std::cout << "volumetradedbatch = " << p.getIntField("volumetradedbatch") << ", ";
+		std::cout << "new_pos->StrategyID = " << new_pos->StrategyID << std::endl;
 
 		l_posd->push_back(new_pos);
 	}
@@ -2485,23 +2487,23 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 		strcpy(new_pos->StrategyID, p.getStringField("strategyid"));
 		new_pos->VolumeTradedBatch = p.getIntField("volumetradedbatch");
 
-		cout << "\tinstrumentid = " << p.getStringField("instrumentid") << ", ";
-		cout << "\torderref = " << p.getStringField("orderref") << ", ";
-		cout << "\tuserid = " << p.getStringField("userid") << ", ";
-		cout << "\tdirection = " << p.getIntField("direction") << ", ";
-		cout << "\tcomboffsetflag = " << p.getStringField("comboffsetflag") << ", ";
-		cout << "\tcombhedgeflag = " << p.getStringField("combhedgeflag") << ", ";
-		cout << "\tlimitprice = " << p.getField("limitprice").Double() << ", ";
-		cout << "\tvolumetotaloriginal = " << p.getIntField("volumetotaloriginal") << ", ";
-		cout << "\ttradingday = " << p.getStringField("tradingday") << ", ";
-		cout << "\ttradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
-		cout << "\torderstatus = " << p.getIntField("orderstatus") << ", ";
-		cout << "\tvolumetraded = " << p.getIntField("volumetraded") << ", ";
-		cout << "\tvolumetotal = " << p.getIntField("volumetotal") << ", ";
-		cout << "\tinsertdate = " << p.getStringField("insertdate") << ", ";
-		cout << "\tinserttime = " << p.getStringField("inserttime") << ", ";
-		cout << "\tstrategyid = " << p.getStringField("strategyid") << ", ";
-		cout << "\tvolumetradedbatch = " << p.getIntField("volumetradedbatch") << std::endl;
+		cout << "\n\tinstrumentid = " << p.getStringField("instrumentid") << ", ";
+		cout << "orderref = " << p.getStringField("orderref") << ", ";
+		cout << "userid = " << p.getStringField("userid") << ", ";
+		cout << "direction = " << p.getIntField("direction") << ", ";
+		cout << "comboffsetflag = " << p.getStringField("comboffsetflag") << ", ";
+		cout << "combhedgeflag = " << p.getStringField("combhedgeflag") << ", ";
+		cout << "limitprice = " << p.getField("limitprice").Double() << ", ";
+		cout << "volumetotaloriginal = " << p.getIntField("volumetotaloriginal") << ", ";
+		cout << "tradingday = " << p.getStringField("tradingday") << ", ";
+		cout << "tradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
+		cout << "orderstatus = " << p.getIntField("orderstatus") << ", ";
+		cout << "volumetraded = " << p.getIntField("volumetraded") << ", ";
+		cout << "volumetotal = " << p.getIntField("volumetotal") << ", ";
+		cout << "insertdate = " << p.getStringField("insertdate") << ", ";
+		cout << "inserttime = " << p.getStringField("inserttime") << ", ";
+		cout << "strategyid = " << p.getStringField("strategyid") << ", ";
+		cout << "volumetradedbatch = " << p.getIntField("volumetradedbatch") << std::endl;
 
 		l_posd->push_back(new_pos);
 	}
@@ -2548,7 +2550,7 @@ void DBManager::UpdatePositionDetailTrade(USER_CThostFtdcTradeField *posd) {
 
 void DBManager::getAllPositionDetailTrade(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id, string userid) {
 	USER_PRINT("DBManager::getAllPositionDetailTrade");
-
+	std::cout << "DBManager::getAllPositionDetailTrade()" << std::endl;
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
 		list<USER_CThostFtdcTradeField *>::iterator itor;
@@ -2573,8 +2575,6 @@ void DBManager::getAllPositionDetailTrade(list<USER_CThostFtdcTradeField *> *l_p
 		cursor = this->conn->query(DB_POSITIONDETAIL_TRADE_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 	}
 
-
-	std::cout << "DBManager::getAllPositionDetailTrade" << std::endl;
 	while (cursor->more()) {
 
 		BSONObj p = cursor->next();
@@ -2757,18 +2757,18 @@ void DBManager::getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeFiel
 		strcpy(new_pos->StrategyID, p.getStringField("strategyid"));
 		new_pos->Volume = p.getIntField("volume");
 
-		cout << "\tinstrumentid = " << p.getStringField("instrumentid") << ", ";
-		cout << "\torderref = " << p.getStringField("orderref") << ", ";
-		cout << "\tuserid = " << p.getStringField("userid") << ", ";
-		cout << "\tdirection = " << p.getIntField("direction") << ", ";
-		cout << "\toffsetflag = " << p.getIntField("offsetflag") << ", ";
-		cout << "\thedgeflag = " << p.getIntField("hedgeflag") << ", ";
-		cout << "\tprice = " << p.getField("price").Double() << ", ";
-		cout << "\ttradingday = " << p.getStringField("tradingday") << ", ";
-		cout << "\ttradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
-		cout << "\ttradedate = " << p.getIntField("tradedate") << ", ";
-		cout << "\tstrategyid = " << p.getStringField("strategyid") << ", ";
-		cout << "\tvolume = " << p.getIntField("volume") << std::endl;
+		cout << "\n\tinstrumentid = " << p.getStringField("instrumentid") << ", ";
+		cout << "orderref = " << p.getStringField("orderref") << ", ";
+		cout << "userid = " << p.getStringField("userid") << ", ";
+		cout << "direction = " << p.getIntField("direction") << ", ";
+		cout << "offsetflag = " << p.getIntField("offsetflag") << ", ";
+		cout << "hedgeflag = " << p.getIntField("hedgeflag") << ", ";
+		cout << "price = " << p.getField("price").Double() << ", ";
+		cout << "tradingday = " << p.getStringField("tradingday") << ", ";
+		cout << "tradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
+		cout << "tradedate = " << p.getIntField("tradedate") << ", ";
+		cout << "strategyid = " << p.getStringField("strategyid") << ", ";
+		cout << "volume = " << p.getIntField("volume") << std::endl;
 
 		l_posd->push_back(new_pos);
 	}

@@ -31,6 +31,7 @@ static unsigned char msg_check(Msg *message) {
  * 发送的数据存放在buff中*/
 /************************************************************************/
 int write_msg(int sockfd, char *buff, size_t len) {
+	printf("msg.cpp write_msg()");
 	printf("开始发消息... \n");
 	Msg message;
 	memset(&message, 0, sizeof(message));
@@ -44,7 +45,7 @@ int write_msg(int sockfd, char *buff, size_t len) {
 	if (write(sockfd, &message, sizeof(message)) != sizeof(message)) {
 		return -1;
 	}
-	printf("消息发送完毕 \n");
+	printf("\t消息发送完毕 \n");
 }
 
 /************************************************************************/
