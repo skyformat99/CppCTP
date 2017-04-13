@@ -3112,8 +3112,6 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
 	std::cout << "\tBegin:this->stg_pending_a_open = " << this->stg_pending_a_open << std::endl;
 
-
-
 	if (strlen(pOrder->OrderSysID) != 0) { // 如果报单编号不为空，为交易所返回
 		if (pOrder->OrderStatus == '0') { // 全部成交
 			//std::cout << "更新挂单,全部成交" << std::endl;
@@ -3143,6 +3141,9 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 			}
 
 		}
+		else if (pOrder->OrderStatus == '2') { ///部分成交不在队列中
+			std::cout << "\tpOrder->OrderStatus = 2 部分成交不在队列中" << std::endl;
+		}
 		else if (pOrder->OrderStatus == '3') { // 未成交还在队列中
 			//std::cout << "更新挂单,未成交还在队列中" << std::endl;
 			bool isExists = false;
@@ -3171,6 +3172,10 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 				this->stg_list_order_pending->push_back(pOrder_tmp);
 			}
 		}
+		else if (pOrder->OrderStatus == '4') //未成交不在队列中
+		{
+			std::cout << "\tpOrder->OrderStatus = 4 未成交不在队列中" << std::endl;
+		}
 		else if (pOrder->OrderStatus == '5') { // 撤单
 			//std::cout << "更新挂单,撤单" << std::endl;
 			list<CThostFtdcOrderField *>::iterator itor;
@@ -3186,7 +3191,13 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 			}
 		}
 		else if (pOrder->OrderStatus == 'a') { // 未知
-			
+			std::cout << "\tpOrder->OrderStatus = a 未知" << std::endl;
+		}
+		else if (pOrder->OrderStatus == 'b') { // 尚未触发
+			std::cout << "\tpOrder->OrderStatus = b 尚未触发" << std::endl;
+		}
+		else if (pOrder->OrderStatus == 'c') { // 已触发
+			std::cout << "\tpOrder->OrderStatus = c 已触发" << std::endl;
 		}
 
 		// 遍历挂单列表，找出A合约开仓未成交的量
@@ -3686,7 +3697,8 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 
 		this->stg_list_position_detail_from_order->push_back(new_order);
 		USER_PRINT("pOrder->CombOffsetFlag[0] == 0 away");
-	} else if (pOrder->CombOffsetFlag[0] == '3') { // 平今
+	} 
+	else if (pOrder->CombOffsetFlag[0] == '3') { // 平今
 		USER_PRINT("平今in");
 		list<USER_CThostFtdcOrderField *>::iterator itor;
 		for (itor = this->stg_list_position_detail_from_order->begin(); 
@@ -3797,11 +3809,45 @@ void Strategy::add_VolumeTradedBatch(CThostFtdcOrderField *pOrder, USER_CThostFt
 		if (!is_exists) {
 			new_Order->VolumeTradedBatch = new_Order->VolumeTraded;
 		}
-
-		
+	}
+	else if (new_Order->OrderStatus == '2') ///部分成交不在队列中
+	{
+		std::cout << "\tnew_Order->OrderStatus == '2' 部分成交不在队列中" << std::endl;
+		new_Order->VolumeTradedBatch = 0;
+	}
+	else if (new_Order->OrderStatus == '3') ///未成交还在队列中
+	{
+		std::cout << "\tnew_Order->OrderStatus == '3' 未成交还在队列中" << std::endl;
+		new_Order->VolumeTradedBatch = 0;
+	}
+	else if (new_Order->OrderStatus == '4') ///未成交不在队列中
+	{
+		std::cout << "\tnew_Order->OrderStatus == '4' 未成交不在队列中" << std::endl;
+		new_Order->VolumeTradedBatch = 0;
+	}
+	else if (new_Order->OrderStatus == '5') ///撤单
+	{
+		std::cout << "\tnew_Order->OrderStatus == '5' 撤单" << std::endl;
+		new_Order->VolumeTradedBatch = 0;
+	}
+	else if (new_Order->OrderStatus == 'a') ///未知
+	{
+		std::cout << "\tnew_Order->OrderStatus == 'a' 未知" << std::endl;
+		new_Order->VolumeTradedBatch = 0;
+	}
+	else if (new_Order->OrderStatus == 'b') ///尚未触发
+	{
+		std::cout << "\tnew_Order->OrderStatus == 'b' 尚未触发" << std::endl;
+		new_Order->VolumeTradedBatch = 0;
+	}
+	else if (new_Order->OrderStatus == 'c') ///已触发
+	{
+		std::cout << "\tnew_Order->OrderStatus == 'c' 已触发" << std::endl;
+		new_Order->VolumeTradedBatch = 0;
 	}
 	else
 	{
+		std::cout << "\tnew_Order->OrderStatus不在系统范围内!" << std::endl;
 		new_Order->VolumeTradedBatch = 0;
 	}
 	std::cout << "Strategy::add_VolumeTradedBatch()" << std::endl;
