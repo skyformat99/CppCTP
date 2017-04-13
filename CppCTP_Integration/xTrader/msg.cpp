@@ -32,7 +32,7 @@ static unsigned char msg_check(Msg *message) {
 /************************************************************************/
 int write_msg(int sockfd, char *buff, size_t len) {
 	printf("msg.cpp write_msg()");
-	printf("开始发消息... \n");
+	printf("\t开始发消息... ");
 	Msg message;
 	memset(&message, 0, sizeof(message));
 	//strcpy(message.head, "gmqh_sh_2016");
