@@ -447,6 +447,9 @@ public:
 	void printStrategyInfo(string message); //调试输出
 	void printStrategyInfoPosition();
 
+	void setStgUpdatePositionDetailRecordTime(string stg_update_position_detail_record_time);
+	string getStgUpdatePositionDetailRecordTime();
+
 private:
 	Trader *trader;
 	User *user;
@@ -494,6 +497,7 @@ private:
 	double stg_amount;					// 成交金额
 	double stg_average_shift;			// 平均滑点
 	string stg_trading_day;				// 交易日
+	string stg_update_position_detail_record_time; // 策略持仓明细修改记录时间
 
 	int stg_position_a_buy_today;		// A合约买持仓今仓
 	int stg_position_a_buy_yesterday;	// A合约买持仓昨仓

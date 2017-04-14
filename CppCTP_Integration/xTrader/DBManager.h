@@ -177,6 +177,12 @@ public:
 	void getAllPositionDetailTrade(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id = "", string userid = "");
 	void DropPositionDetailTrade();
 
+
+	/************************************************************************/
+	/* 更新修改持仓明细记录                                                    */
+	/************************************************************************/
+	bool UpdatePositionModifyRecord(Strategy *stg, string recordtime);
+
 	void CreatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *posd);
 	void DeletePositionDetailTradeYesterday(USER_CThostFtdcTradeField *posd);
 	void UpdatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *posd);

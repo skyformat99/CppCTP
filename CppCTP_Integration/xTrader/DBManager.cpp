@@ -24,6 +24,7 @@ using std::unique_ptr;
 #define DB_ADMIN_COLLECTION						"CTP.admin"
 #define DB_STRATEGY_COLLECTION					"CTP.strategy"
 #define DB_POSITIONDETAIL_COLLECTION			"CTP.positiondetail"
+#define DB_POSITIONMODIFYRECORD_COLLECTION		"CTP.positionmodifyrecord"
 #define DB_POSITIONDETAIL_YESTERDAY_COLLECTION	"CTP.positiondetail_yesterday"
 #define DB_POSITIONDETAIL_TRADE_COLLECTION		"CTP.positiondetail_trade"
 #define DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION	"CTP.positiondetail_trade_yesterday"
@@ -651,6 +652,7 @@ int DBManager::CreateStrategy(Strategy *stg) {
 		b.append("average_shift", stg->getStgAverageShift());
 		b.append("a_limit_price_shift", stg->getStgALimitPriceShift());
 		b.append("b_limit_price_shift", stg->getStgBLimitPriceShift());
+		b.append("update_position_detail_record_time", stg->getStgUpdatePositionDetailRecordTime());
 
 
 		// 创建一个数组对象
@@ -808,6 +810,7 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 			<< "a_wait_price_tick" << stg->getStgAWaitPriceTick()
 			<< "b_wait_price_tick" << stg->getStgBWaitPriceTick()
 			<< "trading_day" << stg->getStgTradingDay()
+			<< "update_position_detail_record_time" << stg->getStgUpdatePositionDetailRecordTime()
 			<< "list_instrument_id" << BSON_ARRAY(stg->getStgInstrumentIdA() << stg->getStgInstrumentIdB()))));
 
 		USER_PRINT("DBManager::UpdateStrategy ok");
@@ -1191,6 +1194,7 @@ int DBManager::CreateStrategyYesterday(Strategy *stg) {
 		b.append("average_shift", stg->getStgAverageShift());
 		b.append("a_limit_price_shift", stg->getStgALimitPriceShift());
 		b.append("b_limit_price_shift", stg->getStgBLimitPriceShift());
+		b.append("update_position_detail_record_time", stg->getStgUpdatePositionDetailRecordTime());
 
 
 		// 创建一个数组对象
@@ -2622,6 +2626,27 @@ void DBManager::DropPositionDetailTrade() {
 	USER_PRINT("DBManager::DropPositionDetailTrade");
 	this->conn->dropCollection(DB_POSITIONDETAIL_TRADE_COLLECTION);
 	USER_PRINT("DBManager::DropPositionDetailTrade ok");
+}
+
+/************************************************************************/
+/* 更新修改持仓明细记录                                                    */
+/************************************************************************/
+bool DBManager::UpdatePositionModifyRecord(Strategy *stg, string recordtime) {
+	std::cout << "DBManager::UpdatePositionModifyRecord()" << std::endl;
+	int count_number = 0;
+	bool flag = true;
+	count_number = this->conn->count(DB_POSITIONMODIFYRECORD_COLLECTION,
+		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str()) << "is_active" << true));
+
+	if (count_number > 0) {
+		cout << "\t策略已存在,进行更新操作!" << endl;
+
+	}
+	else {
+		cout << "\t策略不存在!" << endl;
+		flag = false;
+	}
+	return flag;
 }
 
 void DBManager::CreatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *posd) {

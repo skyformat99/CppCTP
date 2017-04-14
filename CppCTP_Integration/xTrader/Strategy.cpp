@@ -80,6 +80,7 @@ Strategy::Strategy(User *stg_user) {
 	this->stg_select_order_algorithm_flag = false; //默认允许选择下单算法锁为false，可以选择
 	this->stg_lock_order_ref = "";
 	this->stg_tick_systime_record = "";		// 系统接收tick的时间
+	this->stg_update_position_detail_record_time = ""; // 最后一次修改持仓明细记录时间
 	this->stg_save_strategy_conn = DBManager::getDBConnection();
 
 	this->stg_user = stg_user;					// 默认用户为空
@@ -1861,6 +1862,13 @@ void Strategy::printStrategyInfoPosition() {
 		<< "B合约今卖 = " << this->stg_position_b_sell_today << ", "
 		<< "B合约昨卖 = " << this->stg_position_b_buy_yesterday << ", "
 		<< "B合约总卖 = " << this->stg_position_b_sell << std::endl;*/
+}
+
+void Strategy::setStgUpdatePositionDetailRecordTime(string stg_update_position_detail_record_time) {
+	this->stg_update_position_detail_record_time = stg_update_position_detail_record_time;
+}
+string Strategy::getStgUpdatePositionDetailRecordTime() {
+	return this->stg_update_position_detail_record_time;
 }
 
 // 获取持仓明细
