@@ -138,11 +138,12 @@ void MdSpi::Login(char *BrokerID, char *UserID, char *Password) {
 //响应登录
 void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo,
                            int nRequestID, bool bIsLast) {
-	USER_PRINT("MdSpi::OnRspUserLogin")
-	USER_PRINT(bIsLast)
+	USER_PRINT("MdSpi::OnRspUserLogin");
+	USER_PRINT(bIsLast);
+	std::cout << "MdSpi::OnRspUserLogin()" << std::endl;
 	if (bIsLast && !(this->IsErrorRspInfo(pRspInfo))) {
 		///交易日
-		cout << "交易日" << pRspUserLogin->TradingDay << ", ";
+		cout << "\t*交易日" << pRspUserLogin->TradingDay << ", ";
 		///登录成功时间
 		cout << "登录成功时间" << pRspUserLogin->LoginTime << ", ";
 		///经纪公司代码
@@ -150,7 +151,7 @@ void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtd
 		///用户代码
 		cout << "用户代码" << pRspUserLogin->UserID << ", ";
 		///交易系统名称
-		cout << "交易系统名称" << pRspUserLogin->SystemName << endl;
+		cout << "交易系统名称" << pRspUserLogin->SystemName << ", ";
 		///前置编号
 		cout << "前置编号" << pRspUserLogin->FrontID << ", ";
 		///会话编号
@@ -160,13 +161,13 @@ void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtd
 		///上期所时间
 		cout << "上期所时间" << pRspUserLogin->SHFETime << ", ";
 		///大商所时间
-		cout << "大商所时间" << pRspUserLogin->DCETime << endl;
+		cout << "大商所时间" << pRspUserLogin->DCETime << ", ";
 		///郑商所时间
 		cout << "郑商所时间" << pRspUserLogin->CZCETime << ", ";
 		///中金所时间
 		cout << "中金所时间" << pRspUserLogin->FFEXTime << ", ";
 		///能源中心时间
-		cout << "能源中心时间" << pRspUserLogin->INETime << endl;
+		cout << "能源中心时间" << pRspUserLogin->INETime << ", ";
 		this->isLogged = true;
 		string s_trading_day = this->mdapi->GetTradingDay();
 		std::cout << "MdSpi.cpp s_trading_day = " << s_trading_day << std::endl;
@@ -285,7 +286,7 @@ void MdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstr
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (pSpecificInstrument) {
 			std::cout << "\t订阅行情应答" << std::endl;
-			std::cout << "\t订阅行情合约代码:" << pSpecificInstrument->InstrumentID << std::endl;
+			std::cout << "\t订阅行情合约代码:\033[32m" << pSpecificInstrument->InstrumentID << "\033[0m" << std::endl;
 		}
 	}
 }
@@ -350,8 +351,8 @@ void MdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificIns
 	std::cout << "MdSpi::OnRspUnSubMarketData()" << std::endl;
 	if (bIsLast && !(this->IsErrorRspInfo(pRspInfo))) {
 		USER_PRINT("OnRspUnSubMarketData");
-		cout << "\t取消合约代码:" << pSpecificInstrument->InstrumentID << endl;
-		cout << "\t取消应答信息:" << pRspInfo->ErrorID << " " << pRspInfo->ErrorMsg << endl;
+		cout << "\t取消合约代码:\033[32m" << pSpecificInstrument->InstrumentID << "\033[0m" << endl;
+		cout << "\t取消应答信息:" << pRspInfo->ErrorID << ", " << pRspInfo->ErrorMsg << endl;
 		//sem_post(&unsubmarket_sem);
 	}
 }

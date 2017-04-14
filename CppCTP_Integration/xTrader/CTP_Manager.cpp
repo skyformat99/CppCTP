@@ -3630,7 +3630,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 			this->dbm->DropPositionDetailYesterday();
 
 			for (position_itor = this->l_posdetail->begin(); position_itor != this->l_posdetail->end(); position_itor++) { // 遍历今持仓明细列表
-				std::cout << "(*position_itor)->InsertTime = " << (*position_itor)->InsertTime << std::endl;
+				std::cout << "\t(*position_itor)->InsertTime = " << (*position_itor)->InsertTime << std::endl;
 				//日期不等
 				if (strcmp((*position_itor)->TradingDayRecord, this->getTradingDay().c_str())) {
 					// 删除昨持仓明细对象,如果存在就删除,没有跳出
@@ -4489,9 +4489,9 @@ bool CTP_Manager::init(bool is_online) {
 		std::cout << "\t行情订阅已初始化!" << std::endl;
 	}
 
-	std::cout << "===========恭喜============" << std::endl;
-	std::cout << "|=!xTrader系统初始化完成!=|" << std::endl;
-	std::cout << "===========================" << std::endl;
+	std::cout << "\033[32m===========恭喜============\033[0m" << std::endl;
+	std::cout << "\033[32m|=!xTrader系统初始化完成!=|\033[0m" << std::endl;
+	std::cout << "\033[32m===========================\033[0m" << std::endl;
 
 	return init_flag;
 }

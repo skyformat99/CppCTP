@@ -2488,7 +2488,7 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 		strcpy(new_pos->StrategyID, p.getStringField("strategyid"));
 		new_pos->VolumeTradedBatch = p.getIntField("volumetradedbatch");
 
-		cout << "\n\tinstrumentid = " << p.getStringField("instrumentid") << ", ";
+		cout << "\t*instrumentid = " << p.getStringField("instrumentid") << ", ";
 		cout << "orderref = " << p.getStringField("orderref") << ", ";
 		cout << "userid = " << p.getStringField("userid") << ", ";
 		cout << "direction = " << p.getIntField("direction") << ", ";
@@ -2758,7 +2758,7 @@ void DBManager::getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeFiel
 		strcpy(new_pos->StrategyID, p.getStringField("strategyid"));
 		new_pos->Volume = p.getIntField("volume");
 
-		cout << "\n\tinstrumentid = " << p.getStringField("instrumentid") << ", ";
+		cout << "\t*instrumentid = " << p.getStringField("instrumentid") << ", ";
 		cout << "orderref = " << p.getStringField("orderref") << ", ";
 		cout << "userid = " << p.getStringField("userid") << ", ";
 		cout << "direction = " << p.getIntField("direction") << ", ";
