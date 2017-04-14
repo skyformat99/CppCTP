@@ -525,6 +525,8 @@ void MdSpi::CopyTickData(CThostFtdcDepthMarketDataField *dst, CThostFtdcDepthMar
 void MdSpi::OnFrontDisconnected(int nReason) {
 	USER_PRINT("MdSpi::OnFrontDisconnected");
 	USER_PRINT(nReason);
+	std::cout << "MdSpi::OnFrontDisconnected()" << std::endl;
+	std::cout << "\t断线原因 = " << nReason << std::endl;
 	this->isFirstTimeLogged = false;
 	this->ctp_m->sendMarketOffLineMessage();
 }
