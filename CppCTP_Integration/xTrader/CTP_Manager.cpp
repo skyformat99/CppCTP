@@ -4469,10 +4469,6 @@ bool CTP_Manager::init(bool is_online) {
 	std::cout << "t初始化今仓持仓明细完成..." << std::endl;
 #endif
 	
-	//初始化完毕,开启系统全局开关
-	this->setOn_Off(1);
-	this->dbm->UpdateSystemRunningStatus("on");
-
 	if (this->mdspi != NULL) {
 		/// 向mdspi赋值strategys
 		//this->mdspi->setListStrategy(this->l_strategys);
@@ -4492,6 +4488,10 @@ bool CTP_Manager::init(bool is_online) {
 	std::cout << "\033[32m===========恭喜============\033[0m" << std::endl;
 	std::cout << "\033[32m|=!xTrader系统初始化完成!=|\033[0m" << std::endl;
 	std::cout << "\033[32m===========================\033[0m" << std::endl;
+
+	//初始化完毕,开启系统全局开关
+	this->setOn_Off(1);
+	this->dbm->UpdateSystemRunningStatus("on");
 
 	return init_flag;
 }
