@@ -395,7 +395,7 @@ void timer_handler() {
 int main(int argc, char *argv[]) {
 
 	if (argc < 3) {
-		printf("usage: %s #port #mode\n", argv[0]);
+		printf("usage: %s port mode\n", argv[0]);
 		printf("port: 0~65536\n");
 		printf("mode: 1:online 0:offline\n");
 		exit(1);
@@ -410,8 +410,6 @@ int main(int argc, char *argv[]) {
 
 	// 初始化mongoDB
 	mongo::client::initialize();
-
-	
 
 	// 初始化CTP_Manager
 	ctp_m = new CTP_Manager();
@@ -445,8 +443,6 @@ int main(int argc, char *argv[]) {
 
 	//CTPManager设置定时器
 	ctp_m->setCalTimer(&tHello);
-
-	
 
 	// 程序入口，初始化资源
 	if (!ctp_m->init(init_flag)) {

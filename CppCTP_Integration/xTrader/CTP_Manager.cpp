@@ -3396,17 +3396,17 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 		build_doc.Accept(writer);
 		//rsp_msg = const_cast<char *>(buffer.GetString());
 		//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-		std::cout << "服务端响应数据 = " << buffer.GetString() << std::endl;
+		std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 		if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
-			printf("先前客户端已断开!!!\n");
+			printf("\t先前客户端已断开!!!\n");
 			//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
 			if (errno == EPIPE) {
-				std::cout << "EPIPE信号" << std::endl;
+				std::cout << "\tEPIPE信号" << std::endl;
 				//break;
 			}
 			
-			perror("protocal error");
+			perror("\tprotocal error\n");
 		}
 	}
 }
