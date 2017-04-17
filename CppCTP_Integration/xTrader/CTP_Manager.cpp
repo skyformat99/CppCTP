@@ -2440,7 +2440,6 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				/*1:进行策略的修改,更新到数据库*/
 				if (infoArray.IsArray()) {
 					USER_PRINT("infoArray.IsArray()");
-					std::cout << "info is array" << std::endl;
 					for (int i = 0; i < infoArray.Size(); i++) {
 						const Value& object = infoArray[i];
 						std::string q_user_id = object["user_id"].GetString();
@@ -2452,10 +2451,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						if (!isFindStrategy) // 没找到对应的策略
 						{
 							for (stg_itor = ctp_m->getListStrategy()->begin(); stg_itor != ctp_m->getListStrategy()->end(); stg_itor++) {
-								std::cout << "(*stg_itor)->getStgUserId() = " << (*stg_itor)->getStgUserId() << std::endl;
-								std::cout << "(*stg_itor)->getStgStrategyId() = " << (*stg_itor)->getStgStrategyId() << std::endl;
+								std::cout << "\t(*stg_itor)->getStgUserId() = " << (*stg_itor)->getStgUserId() << std::endl;
+								std::cout << "\t(*stg_itor)->getStgStrategyId() = " << (*stg_itor)->getStgStrategyId() << std::endl;
 								if (((*stg_itor)->getStgUserId() == q_user_id) && ((*stg_itor)->getStgStrategyId() == q_strategy_id)) {
-									std::cout << "找到即将修改的Strategy" << std::endl;
+									std::cout << "\t找到即将修改的Strategy" << std::endl;
 									isFindStrategy = true;
 									USER_PRINT("判断修改持仓...");
 									/// 交易执行中无法修改持仓
@@ -2859,6 +2858,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 									// 最新修改时间
 									(*stg_itor)->setStgUpdatePositionDetailRecordTime(Utils::getDate());
+									(*stg_itor)->setStgIsPositionRight(false);
 
 									static_dbm->UpdateStrategy((*stg_itor));
 
@@ -3570,8 +3570,8 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 	list<USER_CThostFtdcOrderField *>::iterator position_itor;
 	list<USER_CThostFtdcTradeField *>::iterator position_trade_itor;
 
-	std::cout << "CTP_Manager::initStrategyAndFutureAccount()" << std::endl;
 	std::cout << "\tCTP_Manager 系统交易日 = " << this->getTradingDay() << std::endl;
+	// 判断策略
 	bool is_equal = false;
 	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
 		// 遍历Strategy
@@ -3608,6 +3608,8 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 
 			// 更新今仓最新交易时间
 			(*stg_itor)->setStgTradingDay(this->getTradingDay());
+			(*stg_itor)->setStgUpdatePositionDetailRecordTime("");
+			(*stg_itor)->setStgIsPositionRight(true);
 
 			// 更新今仓到数据库
 			this->dbm->UpdateStrategy((*stg_itor));
@@ -4100,8 +4102,9 @@ bool CTP_Manager::init(bool is_online) {
 	6:初始化今仓
 	7:初始化行情SPI*/
 	/************************************************************************/
-
+	//设置盘中还是盘后
 	this->dbm->setIs_Online(is_online);
+
 	std::cout << "\t初始化网络环境完成..." << std::endl;
 	if (!this->dbm->getDBConnection()) {
 		std::cout << "\tMongoDB数据库连接有问题..." << std::endl;
@@ -4211,6 +4214,11 @@ bool CTP_Manager::init(bool is_online) {
 	MarketConfig *mc = this->dbm->getOneMarketConfig();
 	if (mc != NULL) {
 		this->mdspi = this->CreateMd(mc->getMarketFrontAddr(), mc->getBrokerID(), mc->getUserID(), mc->getPassword(), this->l_strategys);
+	}
+	else {
+		std::cout << "\t行情初始化失败!" << std::endl;
+		init_flag = false;
+		return init_flag;
 	}
 	std::cout << "\t初始化行情完成..." << std::endl;
 

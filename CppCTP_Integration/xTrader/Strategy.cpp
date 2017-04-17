@@ -2866,8 +2866,19 @@ void Strategy::Exec_OnRspOrderAction() {
 void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	std::cout << "Strategy::Exec_OnRtnOrder()" << std::endl;
 	USER_PRINT("Exec_OnRtnOrder");
-	USER_PRINT(pOrder->InstrumentID);
-	USER_PRINT(pOrder->VolumeTraded);
+
+	if (!this->is_position_right) //如果有修改持仓,开始过滤,从修改时间后开始接收
+	{
+		string compare_date = pOrder->InsertDate; //报单日期
+		string compare_time = pOrder->InsertTime; //报单时间
+		// 如果pOrder的时间在修改持仓之后
+		if (Utils::compareTradingDaySeconds((compare_date + compare_time).c_str(), this->stg_update_position_detail_record_time.c_str())) {
+			this->setStgIsPositionRight(true);
+		}
+		else {
+			return;
+		}
+	}
 
 	// 添加字段,本次成交量
 	USER_CThostFtdcOrderField *order_new = new USER_CThostFtdcOrderField();
@@ -2982,7 +2993,18 @@ void Strategy::ExEc_OnRtnTrade(CThostFtdcTradeField *pTrade) {
 	//this->update_position_detail(pTrade); 
 	//this->update_position(pTrade);
 	//this->update_task_status();
-
+	if (!this->is_position_right) //如果有修改持仓,开始过滤,从修改时间后开始接收
+	{
+		string compare_date = pTrade->TradeDate; //报单日期
+		string compare_time = pTrade->TradeTime; //报单时间
+		// 如果pOrder的时间在修改持仓之后
+		if (Utils::compareTradingDaySeconds((compare_date + compare_time).c_str(), this->stg_update_position_detail_record_time.c_str())) {
+			this->setStgIsPositionRight(true);
+		}
+		else {
+			return;
+		}
+	}
 	USER_CThostFtdcTradeField *new_trade = new USER_CThostFtdcTradeField();
 	this->CopyTradeDataToNew(new_trade, pTrade);
 	this->update_position_detail(new_trade);

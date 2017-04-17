@@ -1088,7 +1088,17 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 			stg->setStgALimitPriceShift(p.getIntField("a_limit_price_shift"));
 			stg->setStgBLimitPriceShift(p.getIntField("b_limit_price_shift"));
 			stg->setStgTradingDay(p.getStringField("trading_day"));
+			// 设置是否有修改过持仓
 			stg->setStgUpdatePositionDetailRecordTime(p.getStringField("update_position_detail_record_time"));
+			// 当持仓修改时间不为空，说明曾经有修改
+			if (stg->getStgUpdatePositionDetailRecordTime() != "")
+			{
+				stg->setStgIsPositionRight(false);
+			}
+			else {
+				stg->setStgIsPositionRight(true);
+			}
+			
 
 			/*std::cout << "\tafter stg->setStgTradingDay = " << stg->getStgTradingDay() << std::endl;
 			std::cout << "\taddress stg = " << stg << std::endl;*/
@@ -1730,6 +1740,17 @@ void DBManager::getAllStrategyYesterdayByActiveUser(list<Strategy *> *l_strategy
 			stg->setStgALimitPriceShift(p.getIntField("a_limit_price_shift"));
 			stg->setStgBLimitPriceShift(p.getIntField("b_limit_price_shift"));
 			stg->setStgTradingDay(p.getStringField("trading_day"));
+
+			// 设置是否有修改过持仓
+			stg->setStgUpdatePositionDetailRecordTime(p.getStringField("update_position_detail_record_time"));
+			// 当持仓修改时间不为空，说明曾经有修改
+			if (stg->getStgUpdatePositionDetailRecordTime() != "")
+			{
+				stg->setStgIsPositionRight(false);
+			}
+			else {
+				stg->setStgIsPositionRight(true);
+			}
 
 			/*std::cout << "after stg->setStgTradingDay = " << stg->getStgTradingDay() << std::endl;
 			std::cout << "address stg = " << stg << std::endl;*/
