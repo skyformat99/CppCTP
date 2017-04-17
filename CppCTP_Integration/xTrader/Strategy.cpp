@@ -3540,7 +3540,7 @@ void Strategy::update_position_detail(CThostFtdcTradeField *pTrade_cal) {
 				if ((!strcmp((*Itor)->TradingDay, pTrade->TradingDay)) 
 					&& (!strcmp((*Itor)->InstrumentID, pTrade->InstrumentID))
 					&& ((*Itor)->HedgeFlag == pTrade->HedgeFlag) 
-					&& ((*Itor)->Direction == pTrade->Direction)) {
+					&& ((*Itor)->Direction != pTrade->Direction)) {
 						// pTrade的volume等于持仓明细列表里的volume
 						if (((*Itor)->Volume) == (pTrade->Volume)) {
 							delete (*Itor);
@@ -3559,7 +3559,7 @@ void Strategy::update_position_detail(CThostFtdcTradeField *pTrade_cal) {
 				if ((!strcmp((*Itor)->TradingDay, pTrade->TradingDay))
 					&& (!strcmp((*Itor)->InstrumentID, pTrade->InstrumentID))
 					&& ((*Itor)->HedgeFlag == pTrade->HedgeFlag)
-					&& ((*Itor)->Direction == pTrade->Direction)) {
+					&& ((*Itor)->Direction != pTrade->Direction)) {
 						// pTrade的volume等于持仓明细列表里的volume
 						if (((*Itor)->Volume) == (pTrade->Volume)) {
 							delete (*Itor);
@@ -3613,9 +3613,10 @@ void Strategy::update_position_detail(USER_CThostFtdcTradeField *pTrade) {
 	else if (pTrade->OffsetFlag == '3') { //pTrade中"OffsetFlag"值 = "3"为平今
 		list<USER_CThostFtdcTradeField *>::iterator itor;
 		for (itor = this->stg_list_position_detail_from_trade->begin(); itor != this->stg_list_position_detail_from_trade->end();) {
-			if ((!strcmp((*itor)->TradingDay, pTrade->TradingDay)) &&
+			if ((!strcmp((*itor)->TradeDate, pTrade->TradeDate)) &&
 				(!strcmp((*itor)->InstrumentID, pTrade->InstrumentID)) &&
-				((*itor)->HedgeFlag == pTrade->HedgeFlag)) { //持仓明细中trade与pTrade比较：交易日相同、合约代码相同、投保标志相同
+				((*itor)->HedgeFlag == pTrade->HedgeFlag) &&
+				((*itor)->Direction != pTrade->Direction)) { //持仓明细中trade与pTrade比较：交易日相同、合约代码相同、投保标志相同
 				if (pTrade->Volume == (*itor)->Volume)
 				{
 					delete (*itor);
@@ -3642,9 +3643,10 @@ void Strategy::update_position_detail(USER_CThostFtdcTradeField *pTrade) {
 	else if (pTrade->OffsetFlag == '4') { //pTrade中"OffsetFlag"值 = "4"为平昨
 		list<USER_CThostFtdcTradeField *>::iterator itor;
 		for (itor = this->stg_list_position_detail_from_trade->begin(); itor != this->stg_list_position_detail_from_trade->end();) {
-			if ((strcmp((*itor)->TradingDay, pTrade->TradingDay)) &&
+			if ((strcmp((*itor)->TradeDate, pTrade->TradeDate)) &&
 				(!strcmp((*itor)->InstrumentID, pTrade->InstrumentID)) &&
-				((*itor)->HedgeFlag == pTrade->HedgeFlag)) { //持仓明细中trade与pTrade比较：交易日不相同、合约代码相同、投保标志相同
+				((*itor)->HedgeFlag == pTrade->HedgeFlag) &&
+				((*itor)->Direction != pTrade->Direction)) { //持仓明细中trade与pTrade比较：交易日不相同、合约代码相同、投保标志相同
 				if (pTrade->Volume == (*itor)->Volume)
 				{
 					delete (*itor);
@@ -3725,9 +3727,10 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 			USER_PRINT(pOrder->VolumeTradedBatch);
 			
 
-			if ((!strcmp((*itor)->TradingDay, pOrder->TradingDay)) 
+			if ((!strcmp((*itor)->InsertDate, pOrder->InsertDate)) 
 				&& (!strcmp((*itor)->InstrumentID, pOrder->InstrumentID)) 
-				&& ((*itor)->CombHedgeFlag[0] == pOrder->CombHedgeFlag[0])) { // 日期,合约代码,投保标志相同
+				&& ((*itor)->CombHedgeFlag[0] == pOrder->CombHedgeFlag[0])
+				&& ((*itor)->Direction != pOrder->Direction)) { // 日期,合约代码,投保标志相同
 
 				if (pOrder->VolumeTradedBatch == (*itor)->VolumeTradedBatch) { // order_new的VolumeTradedBatch等于持仓列表首个满足条件的order的VolumeTradedBatch
 					USER_PRINT("order_new的VolumeTradedBatch等于持仓列表首个满足条件的order的VolumeTradedBatch");
@@ -3760,9 +3763,10 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 		for (itor = this->stg_list_position_detail_from_order->begin();
 			itor != this->stg_list_position_detail_from_order->end();)
 		{
-			if ((strcmp((*itor)->TradingDay, pOrder->TradingDay))
+			if ((strcmp((*itor)->InsertDate, pOrder->InsertDate))
 				&& (!strcmp((*itor)->InstrumentID, pOrder->InstrumentID))
-				&& ((*itor)->CombHedgeFlag[0] == pOrder->CombHedgeFlag[0])) { // 日期,合约代码,投保标志相同
+				&& ((*itor)->CombHedgeFlag[0] == pOrder->CombHedgeFlag[0])
+				&& ((*itor)->Direction != pOrder->Direction)) { // 日期,合约代码,投保标志相同
 
 				if (pOrder->VolumeTradedBatch == (*itor)->VolumeTradedBatch) { // order_new的VolumeTradedBatch等于持仓列表首个满足条件的order的VolumeTradedBatch
 					delete (*itor);
@@ -4490,9 +4494,6 @@ void Strategy::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 //成交通知
 void Strategy::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 	USER_PRINT("Strategy::OnRtnTrade");
-
-
-
 	this->ExEc_OnRtnTrade(pTrade);
 }
 
