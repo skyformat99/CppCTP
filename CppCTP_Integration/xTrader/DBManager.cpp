@@ -1056,6 +1056,7 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 			cout << "sell_close_on_off = " << p.getIntField("sell_close_on_off") << ", ";
 			cout << "buy_open_on_off = " << p.getIntField("buy_open_on_off") << ", ";
 			cout << "trading_day = " << p.getStringField("trading_day") << ", ";
+			cout << "update_position_detail_record_time = " << p.getStringField("update_position_detail_record_time") << ", ";
 
 			stg->setStgAWaitPriceTick(p.getField("a_wait_price_tick").Double());
 			stg->setStgBWaitPriceTick(p.getField("b_wait_price_tick").Double());
@@ -1087,6 +1088,7 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 			stg->setStgALimitPriceShift(p.getIntField("a_limit_price_shift"));
 			stg->setStgBLimitPriceShift(p.getIntField("b_limit_price_shift"));
 			stg->setStgTradingDay(p.getStringField("trading_day"));
+			stg->setStgUpdatePositionDetailRecordTime(p.getStringField("update_position_detail_record_time"));
 
 			/*std::cout << "\tafter stg->setStgTradingDay = " << stg->getStgTradingDay() << std::endl;
 			std::cout << "\taddress stg = " << stg << std::endl;*/

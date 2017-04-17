@@ -849,6 +849,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 
 		/*新增字段*/
 		info_object.AddMember("trade_model", rapidjson::StringRef((*stg_itor)->getStgTradeModel().c_str()), allocator3);
+		info_object.AddMember("update_position_detail_record_time", rapidjson::StringRef((*stg_itor)->getStgUpdatePositionDetailRecordTime().c_str()), allocator3);
 		info_object.AddMember("hold_profit", (*stg_itor)->getStgHoldProfit(), allocator3);
 		info_object.AddMember("close_profit", (*stg_itor)->getStgCloseProfit(), allocator3);
 		info_object.AddMember("commission", (*stg_itor)->getStgCommission(), allocator3);
@@ -1431,6 +1432,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 					/*新增字段*/
 					info_object.AddMember("trade_model", rapidjson::StringRef((*stg_itor)->getStgTradeModel().c_str()), allocator);
+					info_object.AddMember("update_position_detail_record_time", rapidjson::StringRef((*stg_itor)->getStgUpdatePositionDetailRecordTime().c_str()), allocator);
 					info_object.AddMember("hold_profit", (*stg_itor)->getStgHoldProfit(), allocator);
 					info_object.AddMember("close_profit", (*stg_itor)->getStgCloseProfit(), allocator);
 					info_object.AddMember("commission", (*stg_itor)->getStgCommission(), allocator);
