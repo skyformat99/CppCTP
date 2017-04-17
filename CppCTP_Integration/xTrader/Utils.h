@@ -21,6 +21,7 @@ public:
 	static bool compareTradingDaySeconds(const char *compare_day, const char *today);
 	static long long strtolonglong(string str);
 	static string longlongtostr(long long num);
+	static string getDate();
 };
 
 #endif

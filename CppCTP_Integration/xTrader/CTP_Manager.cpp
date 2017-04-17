@@ -2855,6 +2855,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									}
 									(*stg_itor)->setStgPositionBSellToday(object["position_b_sell_today"].GetInt());
 
+									// 最新修改时间
+									(*stg_itor)->setStgUpdatePositionDetailRecordTime(Utils::getDate());
+
 									static_dbm->UpdateStrategy((*stg_itor));
 
 									/************************************************************************/

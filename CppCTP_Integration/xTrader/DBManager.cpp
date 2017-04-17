@@ -748,13 +748,12 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 	USER_PRINT("DBManager::UpdateStrategy()");
 	int count_number = 0;
 
-	std::cout << "DBManager::UpdateStrategy" << std::endl;
+	std::cout << "DBManager::UpdateStrategy()" << std::endl;
 
 
 	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
 		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
 
-	std::cout << "DBManager::UpdateStrategy()" << std::endl;
 	std::cout << "\tcount_number = " << count_number << std::endl;
 
 	if (count_number > 0) {

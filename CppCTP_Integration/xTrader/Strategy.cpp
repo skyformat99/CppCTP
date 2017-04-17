@@ -32,6 +32,7 @@ Strategy::Strategy(User *stg_user) {
 	this->buy_close_on_off = 1;				//买平-开关
 	this->buy_open_on_off = 1;				//买开-开关
 	this->sell_close_on_off = 1;			//卖平-开关
+	this->is_position_right = true;			//仓位是否正确,默认正确
 
 	this->stg_position_a_sell = 0;			//持仓A卖
 	this->stg_position_b_buy = 0;			//持仓B买
@@ -1869,6 +1870,16 @@ void Strategy::setStgUpdatePositionDetailRecordTime(string stg_update_position_d
 }
 string Strategy::getStgUpdatePositionDetailRecordTime() {
 	return this->stg_update_position_detail_record_time;
+}
+
+
+//仓位是否正确,是否需要调整仓位
+void Strategy::setStgIsPositionRight(bool is_position_right) {
+	this->is_position_right = is_position_right;
+}
+
+bool Strategy::getStgIsPositionRight() {
+	return this->is_position_right;
 }
 
 // 获取持仓明细

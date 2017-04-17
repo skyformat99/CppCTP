@@ -450,6 +450,10 @@ public:
 	void setStgUpdatePositionDetailRecordTime(string stg_update_position_detail_record_time);
 	string getStgUpdatePositionDetailRecordTime();
 
+	//仓位是否正确,是否需要调整仓位
+	void setStgIsPositionRight(bool is_position_right);
+	bool getStgIsPositionRight();
+
 private:
 	Trader *trader;
 	User *user;
@@ -556,6 +560,7 @@ private:
 	int sell_close_on_off;				//卖平-开关
 	
 	bool init_finished;
+	bool is_position_right;				//仓位是否正确,是否需要调整仓位
 
 };
 

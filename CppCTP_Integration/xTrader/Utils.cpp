@@ -243,3 +243,15 @@ string Utils::longlongtostr(long long num) {
 	is >> result;
 	return result;
 }
+
+string Utils::getDate() {
+	std::cout << "Utils::getDate()" << std::endl;
+	time_t rawtime;
+	time(&rawtime);
+	char time_char[20];
+	string time_str; //
+	strftime(time_char, 20, "%Y%m%d%X", localtime(&rawtime));
+	cout << "\t当前日期 = " << time_char << endl;
+	time_str = time_char;
+	return time_str;
+}
