@@ -207,7 +207,7 @@ void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		//sem_post(&login_sem);
 		//std::cout << "=================================================================================" << endl;
-		std::cout << "\t||TdAPI 交易日:" << this->tdapi->GetTradingDay() << ", ";
+		std::cout << "\t*TdAPI 交易日:" << this->tdapi->GetTradingDay() << ", ";
 		///交易日
 		//std::cout << "CThostFtdcRspUserLoginField 交易日:" << pRspUserLogin->TradingDay << ", ";
 		///登录成功时间
@@ -303,25 +303,25 @@ void TdSpi::OnRspQrySettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *
 				USER_PRINT(this->isConfirmSettlement);
 				if (this->isConfirmSettlement) {
 					USER_PRINT("Already Confirm!");
-					std::cout << "|==确认结算信息==|" << endl;
-					std::cout << "|经纪公司" << this->current_user->getBrokerID() << "|" << endl;
-					std::cout << "|结算客户" << this->current_user->getUserID() << "|" << endl;
-					std::cout << "|确认日期" << this->getCharTradingDate() << "|" << endl;
-					std::cout << "|交易时间" << this->tdapi->GetTradingDay() << "|" << endl;
-					std::cout << "|================|" << endl;
+					std::cout << "\t|==确认结算信息==|" << endl;
+					std::cout << "\t|经纪公司" << this->current_user->getBrokerID() << "|" << endl;
+					std::cout << "\t|结算客户" << this->current_user->getUserID() << "|" << endl;
+					std::cout << "\t|确认日期" << this->getCharTradingDate() << "|" << endl;
+					std::cout << "\t|交易时间" << this->tdapi->GetTradingDay() << "|" << endl;
+					std::cout << "\t|================|" << endl;
 				} else {
 					sleep(1);
 					this->QrySettlementInfo(this->current_user);
 				}
 			} else {
 				USER_PRINT("今天已经确认结算!");
-				std::cout << "|==确认结算信息==|" << endl;
-				std::cout << "|经纪公司代码" << pSettlementInfoConfirm->BrokerID << "|" << endl;
-				std::cout << "|投资者代码" << pSettlementInfoConfirm->InvestorID << "|" << endl;
-				std::cout << "|确认日期" << pSettlementInfoConfirm->ConfirmDate << "|" << endl;
-				std::cout << "|确认时间" << pSettlementInfoConfirm->ConfirmTime << "|" << endl;
-				std::cout << "|交易时间" << this->tdapi->GetTradingDay() << "|" << endl;
-				std::cout << "|================|" << endl;
+				std::cout << "\t|==确认结算信息==|" << endl;
+				std::cout << "\t|经纪公司代码" << pSettlementInfoConfirm->BrokerID << "|" << endl;
+				std::cout << "\t|投资者代码" << pSettlementInfoConfirm->InvestorID << "|" << endl;
+				std::cout << "\t|确认日期" << pSettlementInfoConfirm->ConfirmDate << "|" << endl;
+				std::cout << "\t|确认时间" << pSettlementInfoConfirm->ConfirmTime << "|" << endl;
+				std::cout << "\t|交易时间" << this->tdapi->GetTradingDay() << "|" << endl;
+				std::cout << "\t|================|" << endl;
 				//std::chrono::milliseconds sleepDuration(15 * 1000);
 				//sleep(1);
 			}
@@ -1210,13 +1210,13 @@ void TdSpi::QryInvestorPositionDetail() {
 
 ///请求查询投资者持仓明细响应
 void TdSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-	std::cout << "TdSpi::OnRspQryInvestorPositionDetail() bIsLast = " << bIsLast << ", 当前期货账户 = " << this->current_user->getUserID() << " 查询投资者持仓明细 In Thread = " << std::this_thread::get_id() << std::endl;
+	std::cout << "TdSpi::OnRspQryInvestorPositionDetail()" << std::endl;
 	USER_PRINT("TdSpi::OnRspQryInvestorPositionDetail");
 	if (!this->IsErrorRspInfo(pRspInfo)) {
 		if (pInvestorPositionDetail) {
 			//cout << "=================================================================================" << endl;
 			///合约代码
-			cout << "\t||合约代码:" << pInvestorPositionDetail->InstrumentID << ", ";
+			cout << "\t*合约代码:" << pInvestorPositionDetail->InstrumentID << ", ";
 			///经纪公司代码
 			cout << "经纪公司代码:" << pInvestorPositionDetail->BrokerID << ", ";
 			///投资者代码
@@ -1285,13 +1285,13 @@ void TdSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField
 //请求查询投资者持仓响应
 void TdSpi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition,
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-	std::cout << "TdSpi::OnRspQryInvestorPosition() bIsLast = " << bIsLast << ", 当前期货账户 = " << this->current_user->getUserID() << " 查询投资者持仓 In Thread = " << std::this_thread::get_id() << std::endl;
+	std::cout << "TdSpi::OnRspQryInvestorPosition()" << std::endl;
 	USER_PRINT("TdSpi::OnRspQryInvestorPosition");
 	if (!this->IsErrorRspInfo(pRspInfo)) {
 		if (pInvestorPosition) {
 			//std::cout << "=================================================================================" << endl;
 			///合约代码
-			std::cout << "\t||合约代码:" << pInvestorPosition->InstrumentID << ", ";
+			std::cout << "\t*合约代码:" << pInvestorPosition->InstrumentID << ", ";
 			///经纪公司代码
 			std::cout << "经纪公司代码:" << pInvestorPosition->BrokerID << ", ";
 			///投资者代码
@@ -2070,7 +2070,7 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 		
 		//std::cout << "=================================================================================" << endl;
 		//经纪公司代码
-		std::cout << "\t||经纪公司代码:" << pOrder->BrokerID << ", ";
+		std::cout << "\t*经纪公司代码:" << pOrder->BrokerID << ", ";
 		//投资者代码
 		std::cout << "投资者代码:" << pOrder->InvestorID << ", ";
 		//合约代码
@@ -2233,7 +2233,7 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 	if (pTrade) {
 		//std::cout << "===========================TdSpi::OnRtnTrade()===================================" << std::endl;
 		///经纪公司代码
-		cout << "\t||经纪公司代码:" << pTrade->BrokerID << ", ";
+		cout << "\t*经纪公司代码:" << pTrade->BrokerID << ", ";
 		///投资者代码
 		cout << "投资者代码:" << pTrade->InvestorID << ", ";
 		///合约代码

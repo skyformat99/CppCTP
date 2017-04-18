@@ -1105,6 +1105,7 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 
 			stg->setStgAOrderActionTiresLimit(p.getIntField("a_order_action_limit"));
 			stg->setStgBOrderActionTiresLimit(p.getIntField("b_order_action_limit"));
+
 			stg->setStgPositionABuy(p.getIntField("position_a_buy"));
 			stg->setStgPositionABuyToday(p.getIntField("position_a_buy_today"));
 			stg->setStgPositionABuyYesterday(p.getIntField("position_a_buy_yesterday"));
@@ -1117,6 +1118,7 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 			stg->setStgPositionBSell(p.getIntField("position_b_sell"));
 			stg->setStgPositionBSellToday(p.getIntField("position_b_sell_today"));
 			stg->setStgPositionBSellYesterday(p.getIntField("position_b_sell_yesterday"));
+
 			stg->setStgSellClose(p.getField("sell_close").Double());
 			stg->setStgSellOpen(p.getField("sell_open").Double());
 			stg->setStgSpreadShift(p.getField("spread_shift").Double());

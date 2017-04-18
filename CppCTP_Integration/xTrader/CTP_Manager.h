@@ -127,7 +127,9 @@ public:
 	void saveStrategy();
 
 	/// 保存所有策略持仓明细
-	void saveStrategyPositionDetail();
+	void saveAllStrategyPositionDetail();
+	/// 保存一个策略持仓明细
+	void saveStrategyPositionDetail(Strategy *stg);
 
 	/// 保存position_detail
 	void savePositionDetail();
