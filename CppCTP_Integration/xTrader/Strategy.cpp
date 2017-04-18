@@ -1882,6 +1882,25 @@ bool Strategy::getStgIsPositionRight() {
 	return this->is_position_right;
 }
 
+//清空持仓明细
+void Strategy::clearStgPositionDetail() {
+	std::cout << "Strategy::clearStgPositionDetail()" << std::endl;
+	list<USER_CThostFtdcOrderField *>::iterator order_itor;
+	for (order_itor = this->stg_list_position_detail_from_order->begin();
+		order_itor != this->stg_list_position_detail_from_order->end();)
+	{
+		delete *order_itor;
+		order_itor = this->stg_list_position_detail_from_order->erase(order_itor);
+	}
+
+	list<USER_CThostFtdcTradeField *>::iterator trade_itor;
+	for (trade_itor = this->stg_list_position_detail_from_trade->begin(); trade_itor != this->stg_list_position_detail_from_trade->end();) {
+		delete *trade_itor;
+		trade_itor = this->stg_list_position_detail_from_trade->erase(trade_itor);
+	}
+
+}
+
 // 获取持仓明细
 list<USER_CThostFtdcOrderField *> *Strategy::getStg_List_Position_Detail_From_Order() {
 	return this->stg_list_position_detail_from_order;

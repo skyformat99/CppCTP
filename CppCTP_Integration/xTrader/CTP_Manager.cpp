@@ -2090,10 +2090,11 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 						// 退订删除的合约
 						ctp_m->UnSubmarketData(ctp_m->getMdSpi(), (*stg_itor)->getStgInstrumentIdA(), ctp_m->getL_UnsubInstrument());
-
 						sleep(1);
-
 						ctp_m->UnSubmarketData(ctp_m->getMdSpi(), (*stg_itor)->getStgInstrumentIdB(), ctp_m->getL_UnsubInstrument());
+
+						// 清空策略对应的持仓明细(order, trade)
+						(*stg_itor)->clearStgPositionDetail();
 
 						// 删除策略
 						//delete (*stg_itor);

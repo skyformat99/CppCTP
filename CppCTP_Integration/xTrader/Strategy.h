@@ -454,6 +454,9 @@ public:
 	void setStgIsPositionRight(bool is_position_right);
 	bool getStgIsPositionRight();
 
+	//Çå¿Õ³Ö²ÖÃ÷Ï¸
+	void clearStgPositionDetail();
+
 private:
 	Trader *trader;
 	User *user;
