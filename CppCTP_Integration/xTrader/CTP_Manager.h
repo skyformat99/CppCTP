@@ -200,6 +200,10 @@ public:
 	/// 策略删除后同步到Users
 	bool syncStrategyDeleteToUsers(string traderid, string userid, string strategyid);
 
+	//休盘
+	void setIsMarketClose(bool is_market_close);
+	bool getIsMarketClose();
+
 private:
 	//Login *login;
 	list<string> *l_instrument;
@@ -214,6 +218,7 @@ private:
 	list<Strategy *> *l_strategys_yesterday;
 	MdSpi *mdspi;
 	int on_off; //开关
+	bool is_market_close; //休盘
 	string trading_day;
 	bool isClosingSaved;
 	bool isMdLogin;

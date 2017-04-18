@@ -48,6 +48,16 @@ string stop_trading_time = "14:59:55";
 string close_time = "15:00:00";
 string stopsave_time = "15:01:00";
 
+
+string morning_open_time = "09:00:00"; // 早上开盘时间
+string moring_break_time = "10:15:00"; // 中午休盘
+string morning_continue_time = "10:30:00"; // 中午休盘结束时间
+string morning_close_time = "11:30:00"; // 中午收盘
+string afternoon_open_time = "13:30:00"; // 下午开盘
+string afternoon_close_time = "15:00:00"; // 下午收盘
+string night_open_time = "21:00:00"; // 夜盘开始
+string night_close_time = ""; //夜盘收盘
+
 /*信号处理*/
 void sig_handler(int signo) {
 
@@ -314,6 +324,29 @@ void timer_handler() {
 		一旦时间超过14：59：55，不开始新的交易任务。
 		*/
 	/************************************************************************/
+	/************************************************************************/
+	/*	09:00:00，开盘
+		10:15:00，中午休盘
+		10:30:00，中午休盘结束时间
+		11:30:00，中午收盘
+		13:30:00，下午开盘
+		15:00:00，下午收盘
+		21:00:00，夜盘                                                                    */
+	/************************************************************************/
+
+
+	//if (ctp_m->getCalTimer()->running()) //定时器在运行中
+	//{
+	//	string nowtime = Utils::getNowTime();
+	//	std::cout << "\t开始比较，现在时间 = " << nowtime << std::endl;
+
+	//}
+
+
+
+
+
+
 
 	if (ctp_m->getCalTimer()->running()) {
 
@@ -337,6 +370,7 @@ void timer_handler() {
 
 							// 保存最后策略参数,更新运行状态正常收盘
 							//ctp_m->saveStrategy();
+
 							ctp_m->saveAllStrategyPositionDetail();
 							ctp_m->updateSystemFlag();
 

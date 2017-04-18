@@ -42,6 +42,7 @@ CTP_Manager::CTP_Manager() {
 	this->trading_day = "";
 	this->isMdLogin = false;
 	this->isCTPFinishedPositionInit = false;
+	this->is_market_close = true;
 	//this->ten_min_flag = false;
 	//this->one_min_flag = false;
 	//this->one_second_flag = false;
@@ -4111,6 +4112,15 @@ bool CTP_Manager::syncStrategyDeleteToUsers(string d_traderid, string d_userid, 
 		std::cout << "\t删除策略 未 同步到期货账户!" << std::endl;
 		return false;
 	}
+}
+
+//休盘
+void CTP_Manager::setIsMarketClose(bool is_market_close) {
+	this->is_market_close = is_market_close;
+}
+
+bool CTP_Manager::getIsMarketClose() {
+	return this->is_market_close;
 }
 
 ///// 初始化昨仓明细
