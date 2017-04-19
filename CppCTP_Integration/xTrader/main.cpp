@@ -306,8 +306,8 @@ void printFutureAccountOperateMenu() {
 
 void timer_handler() {
 
-	time_t tt = system_clock::to_time_t(system_clock::now()); 
-	std::string nowt(std::ctime(&tt));
+	/*time_t tt = system_clock::to_time_t(system_clock::now()); 
+	std::string nowt(std::ctime(&tt));*/
 	//std::cout << "main.cpp timer_handler()" << std::endl;
 	//std::cout << "\t定时器输出" << std::endl;
 	//std::cout << "\t现在时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
@@ -337,42 +337,65 @@ void timer_handler() {
 
 	// 默认是休盘
 	bool market_close_flag = true;
-
+	string nowtime = Utils::getNowTime();
+	string ymd_date = Utils::getYMDDate();
+	//std::cout << "现在时间 = " << nowtime << std::endl;
 	if (ctp_m->getCalTimer()->running()) //定时器在运行中
 	{
-		string nowtime = Utils::getNowTime();
 		//std::cout << "\t开始比较，现在时间 = " << nowtime << std::endl;
 
 		//时间大于早上开盘时间
-		if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + morning_open_time).c_str()))
+		if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + morning_open_time).c_str()))
 		{
 			market_close_flag = false;
 
 			//时间大于中午休盘
-			if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + moring_break_time).c_str()))
+			if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + moring_break_time).c_str()))
 			{
 				market_close_flag = true;
 
 				//时间大于中午休盘结束时间
-				if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + morning_continue_time).c_str()))
+				if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + morning_continue_time).c_str()))
 				{
 					market_close_flag = false;
 
 					//时间大于中午收盘
-					if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + morning_close_time).c_str()))
+					if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + morning_close_time).c_str()))
 					{
 						market_close_flag = true;
 
 						//时间大于下午开盘
-						if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + afternoon_open_time).c_str()))
+						if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + afternoon_open_time).c_str()))
 						{
 							market_close_flag = false;
 
 							//时间大于下午收盘
-							if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + afternoon_close_time).c_str()))
+							if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + afternoon_close_time).c_str()))
 							{
 								market_close_flag = true;
 
+								//时间大于15:00:00
+								if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + close_time).c_str())) { // 时间大于15:01:00
+									market_close_flag = true;
+									
+									//时间大于15:01:00
+									if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + stopsave_time).c_str())) { // 时间大于15:01:00
+										ctp_m->getCalTimer()->stop();
+									}
+									
+									std::cout << "\t\033[32m收盘工作:保存策略参数,更新运行状态,停止计时器.\033[0m" << std::endl;
+
+									// 保存最后策略参数,更新运行状态正常收盘
+									//ctp_m->saveStrategy();
+
+									ctp_m->saveAllStrategyPositionDetail();
+									ctp_m->updateSystemFlag();
+
+									// 保存策略参数,关闭定时器
+									ctp_m->getCalTimer()->stop();
+									std::cout << "\t\033[32m系统收盘工作正常结束.\033[0m" << std::endl;
+
+								}
 							}
 						}
 					}
@@ -380,6 +403,7 @@ void timer_handler() {
 			}
 		}
 		else {
+			std::cout << "\t现在时间:" << nowtime << std::endl;
 			std::cout << "\t非盘中交易时间." << std::endl;
 			market_close_flag = true;
 		}
@@ -388,6 +412,7 @@ void timer_handler() {
 
 	if (ctp_m->getIsMarketClose() != market_close_flag)
 	{
+		std::cout << "\t现在时间:" << nowtime << std::endl;
 		ctp_m->setIsMarketClose(market_close_flag);
 	}
 
