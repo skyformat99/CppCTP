@@ -381,7 +381,7 @@ void timer_handler() {
 									market_close_flag = true;
 									is_need_save_data_afternoon = true;
 									
-									if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + stopsave_time).c_str())) { // 时间大于15:01:00
+									if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + stopsave_time).c_str())) { // 时间大于15:01:00
 										market_close_flag = true;
 										is_need_save_data_afternoon = false;
 
