@@ -46,7 +46,7 @@ string one_min_time = "14:50:00";
 string one_sec_time = "14:58:00";
 string stop_trading_time = "14:59:55";
 string close_time = "15:00:00";
-string stopsave_time = "15:01:00";
+string stopsave_time = "15:00:02";
 
 
 string morning_open_time = "08:59:55"; // 早上开盘时间
@@ -337,6 +337,8 @@ void timer_handler() {
 
 	// 默认是休盘
 	bool market_close_flag = true;
+	// 15:00:00是否需要执行收盘工作
+	bool is_need_save_data_afternoon = false;
 	string nowtime = Utils::getNowTime();
 	string ymd_date = Utils::getYMDDate();
 	//std::cout << "现在时间 = " << nowtime << std::endl;
@@ -377,24 +379,25 @@ void timer_handler() {
 								//时间大于15:00:00
 								if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + close_time).c_str())) { // 时间大于15:01:00
 									market_close_flag = true;
+									is_need_save_data_afternoon = true;
 									
-									//时间大于15:01:00
-									if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + stopsave_time).c_str())) { // 时间大于15:01:00
-										ctp_m->getCalTimer()->stop();
+									if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + stopsave_time).c_str())) { // 时间大于15:01:00
+										market_close_flag = true;
+										is_need_save_data_afternoon = false;
+
+										//时间大于20:59:55
+										if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + night_open_time).c_str())) { // 时间大于20:59:55
+											
+											market_close_flag = false;
+											is_need_save_data_afternoon = false;
+										}
+										else {
+											std::cout << "\t现在时间:" << nowtime << std::endl;
+											std::cout << "\t非盘中交易时间." << std::endl;
+											market_close_flag = true;
+										}
+
 									}
-									
-									std::cout << "\t\033[32m收盘工作:保存策略参数,更新运行状态,停止计时器.\033[0m" << std::endl;
-
-									// 保存最后策略参数,更新运行状态正常收盘
-									//ctp_m->saveStrategy();
-
-									ctp_m->saveAllStrategyPositionDetail();
-									ctp_m->updateSystemFlag();
-
-									// 保存策略参数,关闭定时器
-									ctp_m->getCalTimer()->stop();
-									std::cout << "\t\033[32m系统收盘工作正常结束.\033[0m" << std::endl;
-
 								}
 							}
 						}
@@ -407,13 +410,27 @@ void timer_handler() {
 			std::cout << "\t非盘中交易时间." << std::endl;
 			market_close_flag = true;
 		}
-
 	}
 
 	if (ctp_m->getIsMarketClose() != market_close_flag)
 	{
 		std::cout << "\t现在时间:" << nowtime << std::endl;
 		ctp_m->setIsMarketClose(market_close_flag);
+	}
+
+	if (is_need_save_data_afternoon)
+	{
+		std::cout << "\t\033[32m收盘工作:保存策略参数,更新运行状态,停止计时器.\033[0m" << std::endl;
+
+		// 保存最后策略参数,更新运行状态正常收盘
+		//ctp_m->saveStrategy();
+
+		ctp_m->saveAllStrategyPositionDetail();
+		ctp_m->updateSystemFlag();
+
+		// 保存策略参数,关闭定时器
+		ctp_m->getCalTimer()->stop();
+		std::cout << "\t\033[32m系统收盘工作正常结束.\033[0m" << std::endl;
 	}
 
 #if 0
