@@ -1169,6 +1169,7 @@ void Strategy::UpdateStrategy(Strategy *stg) {
 			<< "a_wait_price_tick" << stg->getStgAWaitPriceTick()
 			<< "b_wait_price_tick" << stg->getStgBWaitPriceTick()
 			<< "trading_day" << stg->getStgTradingDay()
+			<< "update_position_detail_record_time" << stg->getStgUpdatePositionDetailRecordTime()
 			<< "list_instrument_id" << BSON_ARRAY(stg->getStgInstrumentIdA() << stg->getStgInstrumentIdB()))));
 
 		USER_PRINT("Strategy::UpdateStrategy ok");
@@ -2881,6 +2882,7 @@ void Strategy::Exec_OrderInsert(CThostFtdcInputOrderField *insert_order) {
 // 报单录入请求
 void Strategy::Exec_OnRspOrderInsert() {
 	USER_PRINT("Exec_OnRspOrderInsert()");
+	std::cout << "Strategy::Exec_OnRspOrderInsert()" << std::endl;
 	this->setStgSelectOrderAlgorithmFlag("Strategy::Exec_OnRspOrderInsert()", false);
 }
 
@@ -4565,7 +4567,8 @@ void Strategy::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder) {
 
 ///报单录入请求响应
 void Strategy::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder) {
-	USER_PRINT("Strategy::OnRspOrderInsert");
+	USER_PRINT("Strategy::OnRspOrderInsert()");
+	std::cout << "Strategy::OnRspOrderInsert()" << std::endl;
 	this->Exec_OnRspOrderInsert();
 }
 
