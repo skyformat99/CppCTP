@@ -2006,6 +2006,14 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		this->Exec_OnTickComing(pDepthMarketData);
 	}
 	else { /// 如果没有交易任务，那么选择开始新的交易任务
+
+		if (this->stg_user->getCTP_Manager()->getIsMarketClose())
+		{
+			std::cout << "Strategy::OnRtnDepthMarketData()" << std::endl;
+			std::cout << "\t休盘状态,不能交易" << std::endl;
+			return;
+		}
+
 		if (!stg_select_order_algorithm_flag) {
 			//this->setStgSelectOrderAlgorithmFlag("Strategy::OnRtnDepthMarketData()", true); // 开启下单锁
 			this->Select_Order_Algorithm(this->getStgOrderAlgorithm());

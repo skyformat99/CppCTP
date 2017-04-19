@@ -4116,7 +4116,15 @@ bool CTP_Manager::syncStrategyDeleteToUsers(string d_traderid, string d_userid, 
 
 //休盘
 void CTP_Manager::setIsMarketClose(bool is_market_close) {
+	std::cout << "CTP_Manager::setIsMarketClose()" << std::endl;
 	this->is_market_close = is_market_close;
+	if (is_market_close)
+	{
+		std::cout << "\t设置为休盘状态" << std::endl;
+	}
+	else {
+		std::cout << "\t设置为盘中状态" << std::endl;
+	}
 }
 
 bool CTP_Manager::getIsMarketClose() {

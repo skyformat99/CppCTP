@@ -49,14 +49,14 @@ string close_time = "15:00:00";
 string stopsave_time = "15:01:00";
 
 
-string morning_open_time = "09:00:00"; // 早上开盘时间
-string moring_break_time = "10:15:00"; // 中午休盘
-string morning_continue_time = "10:30:00"; // 中午休盘结束时间
-string morning_close_time = "11:30:00"; // 中午收盘
-string afternoon_open_time = "13:30:00"; // 下午开盘
-string afternoon_close_time = "15:00:00"; // 下午收盘
-string night_open_time = "21:00:00"; // 夜盘开始
-string night_close_time = ""; //夜盘收盘
+string morning_open_time = "08:59:55"; // 早上开盘时间
+string moring_break_time = "10:14:55"; // 中午休盘
+string morning_continue_time = "10:29:55"; // 中午休盘结束时间
+string morning_close_time = "11:29:55"; // 中午收盘
+string afternoon_open_time = "13:29:55"; // 下午开盘
+string afternoon_close_time = "14:59:55"; // 下午收盘
+string night_open_time = "20:59:55"; // 夜盘开始
+string night_close_time = "22:59:55"; //夜盘收盘
 
 /*信号处理*/
 void sig_handler(int signo) {
@@ -325,29 +325,73 @@ void timer_handler() {
 		*/
 	/************************************************************************/
 	/************************************************************************/
-	/*	09:00:00，开盘
-		10:15:00，中午休盘
-		10:30:00，中午休盘结束时间
-		11:30:00，中午收盘
-		13:30:00，下午开盘
-		15:00:00，下午收盘
-		21:00:00，夜盘                                                                    */
+	/*	string morning_open_time = "08:59:55"; // 早上开盘时间
+		string moring_break_time = "10:14:55"; // 中午休盘
+		string morning_continue_time = "10:29:55"; // 中午休盘结束时间
+		string morning_close_time =	"11:29:55"; // 中午收盘
+		string afternoon_open_time = "13:29:55"; // 下午开盘
+		string afternoon_close_time = "14:59:55"; // 下午收盘
+		string night_open_time = "20:59:55"; // 夜盘开始
+		string night_close_time = "22:59:55"; //夜盘收盘                                                                    */
 	/************************************************************************/
 
+	// 默认是休盘
+	bool market_close_flag = true;
 
-	//if (ctp_m->getCalTimer()->running()) //定时器在运行中
-	//{
-	//	string nowtime = Utils::getNowTime();
-	//	std::cout << "\t开始比较，现在时间 = " << nowtime << std::endl;
+	if (ctp_m->getCalTimer()->running()) //定时器在运行中
+	{
+		string nowtime = Utils::getNowTime();
+		//std::cout << "\t开始比较，现在时间 = " << nowtime << std::endl;
 
-	//}
+		//时间大于早上开盘时间
+		if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + morning_open_time).c_str()))
+		{
+			market_close_flag = false;
 
+			//时间大于中午休盘
+			if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + moring_break_time).c_str()))
+			{
+				market_close_flag = true;
 
+				//时间大于中午休盘结束时间
+				if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + morning_continue_time).c_str()))
+				{
+					market_close_flag = false;
 
+					//时间大于中午收盘
+					if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + morning_close_time).c_str()))
+					{
+						market_close_flag = true;
 
+						//时间大于下午开盘
+						if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + afternoon_open_time).c_str()))
+						{
+							market_close_flag = false;
 
+							//时间大于下午收盘
+							if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ctp_m->getTradingDay() + afternoon_close_time).c_str()))
+							{
+								market_close_flag = true;
 
+							}
+						}
+					}
+				}
+			}
+		}
+		else {
+			std::cout << "\t非盘中交易时间." << std::endl;
+			market_close_flag = true;
+		}
 
+	}
+
+	if (ctp_m->getIsMarketClose() != market_close_flag)
+	{
+		ctp_m->setIsMarketClose(market_close_flag);
+	}
+
+#if 0
 	if (ctp_m->getCalTimer()->running()) {
 
 		string nowtime = Utils::getNowTime();
@@ -421,6 +465,7 @@ void timer_handler() {
 			}
 		}
 	}
+#endif
 	
 }
 
@@ -478,17 +523,18 @@ int main(int argc, char *argv[]) {
 	//CTPManager设置定时器
 	ctp_m->setCalTimer(&tHello);
 
-	// 程序入口，初始化资源
-	if (!ctp_m->init(init_flag)) {
-		std::cout << "系统初始化失败!" << std::endl;
-		exit(1);
-	}
 
 	//开启定时器
 	tHello.setSingleShot(false);
 	//tHello.setInterval(Timer::Interval(1000 * 60 * 10));
 	tHello.setInterval(Timer::Interval(1000));
 	tHello.start(true);
+
+	// 程序入口，初始化资源
+	if (!ctp_m->init(init_flag)) {
+		std::cout << "系统初始化失败!" << std::endl;
+		exit(1);
+	}
 
 	/*while (true)
 	{
