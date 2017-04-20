@@ -23,6 +23,8 @@ public:
 	static string longlongtostr(long long num);
 	static string getDate();
 	static string getYMDDate();
+	static void printGreenColor(string text);
+	static void printRedColor(string text);
 };
 
 #endif

@@ -267,3 +267,11 @@ string Utils::getYMDDate() {
 	time_str = time_char;
 	return time_str;
 }
+
+void Utils::printGreenColor(string text) {
+	std::cout << "\t\033[32m" << text << "\033[0m" << std::endl;
+}
+
+void Utils::printRedColor(string text) {
+	std::cout << "\t\033[31m" << text << "\033[0m" << std::endl;
+}

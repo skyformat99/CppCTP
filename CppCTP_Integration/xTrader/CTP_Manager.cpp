@@ -2533,6 +2533,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									if ((*stg_itor)->isStgTradeTasking())
 									{
 										USER_PRINT("处于交易中...");
+										Utils::printRedColor("处于交易中无法修改持仓");
 										isStgTradeTasking = true;
 										break;
 									}
