@@ -2802,7 +2802,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 									int num_need_to_delete = 0; //可以被删掉的数量
 									int count = 0;				//计数
-
+									
+									std::cout << "\t修改之前的仓位:" << std::endl;
 									std::cout << "\tA卖(" << (*stg_itor)->getStgPositionASell() << ", " << (*stg_itor)->getStgPositionASellYesterday() << ")" << std::endl;
 									std::cout << "\tB买(" << (*stg_itor)->getStgPositionBBuy() << ", " << (*stg_itor)->getStgPositionBBuyYesterday() << ")" << std::endl;
 									std::cout << "\tA买(" << (*stg_itor)->getStgPositionABuy() << ", " << (*stg_itor)->getStgPositionABuyYesterday() << ")" << std::endl;
@@ -3177,11 +3178,21 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									}
 									(*stg_itor)->setStgPositionBSellToday(object["position_b_sell_today"].GetInt());
 
+
+									std::cout << "\t修改之后的仓位:" << std::endl;
+									std::cout << "\tA卖(" << (*stg_itor)->getStgPositionASell() << ", " << (*stg_itor)->getStgPositionASellYesterday() << ")" << std::endl;
+									std::cout << "\tB买(" << (*stg_itor)->getStgPositionBBuy() << ", " << (*stg_itor)->getStgPositionBBuyYesterday() << ")" << std::endl;
+									std::cout << "\tA买(" << (*stg_itor)->getStgPositionABuy() << ", " << (*stg_itor)->getStgPositionABuyYesterday() << ")" << std::endl;
+									std::cout << "\tB卖(" << (*stg_itor)->getStgPositionBSell() << ", " << (*stg_itor)->getStgPositionBSellYesterday() << ")" << std::endl;
+
 									// 最新修改时间
 									(*stg_itor)->setStgUpdatePositionDetailRecordTime(Utils::getDate());
 									(*stg_itor)->setStgIsPositionRight(false);
 
 									//static_dbm->UpdateStrategy((*stg_itor));
+									// 存储之前先清空集合
+									ctp_m->getDBManager()->DropPositionDetail();
+									ctp_m->getDBManager()->DropPositionDetailTrade();
 									ctp_m->saveStrategyPositionDetail((*stg_itor));
 
 									/************************************************************************/
