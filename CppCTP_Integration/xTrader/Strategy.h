@@ -337,7 +337,6 @@ public:
 	/// 拷贝结构体USER_CThostFtdcOrderField
 	void CopyNewOrderData(USER_CThostFtdcOrderField *dst, USER_CThostFtdcOrderField *src);
 
-	
 
 	/// 拷贝结构体CThostFtdcTradeField
 	void CopyTradeData(CThostFtdcTradeField *dst, CThostFtdcTradeField *src);
@@ -350,8 +349,13 @@ public:
 	/// 收盘保存数据
 	void DropPositionDetail();
 
+	/// 根据持仓明细进行统计持仓量(order)
+	void calPosition();
+
 	/// 更新策略
 	void UpdateStrategy(Strategy *stg);
+
+	
 
 	/// 创建持仓明细
 	void CreatePositionDetail(USER_CThostFtdcOrderField *posd);

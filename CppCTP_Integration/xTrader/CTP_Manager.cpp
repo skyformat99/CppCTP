@@ -586,6 +586,7 @@ void CTP_Manager::saveStrategyPositionDetail(Strategy *stg) {
 		std::cout << "\t\tlimitprice = " << (*posd_itor)->LimitPrice << std::endl;
 		std::cout << "\t\tvolumetotaloriginal = " << (*posd_itor)->VolumeTotalOriginal << std::endl;
 		std::cout << "\t\ttradingday = " << (*posd_itor)->TradingDay << std::endl;
+		strcpy((*posd_itor)->TradingDayRecord, this->getTradingDay().c_str());
 		std::cout << "\t\ttradingdayrecord = " << (*posd_itor)->TradingDayRecord << std::endl;
 		std::cout << "\t\torderstatus = " << (*posd_itor)->OrderStatus << std::endl;
 		std::cout << "\t\tvolumetraded = " << (*posd_itor)->VolumeTraded << std::endl;
@@ -617,6 +618,7 @@ void CTP_Manager::saveStrategyPositionDetail(Strategy *stg) {
 		std::cout << "\t\thedgeflag = " << (*posd_itor_trade)->HedgeFlag << std::endl;
 		std::cout << "\t\tprice = " << (*posd_itor_trade)->Price << std::endl;
 		std::cout << "\t\ttradingday = " << (*posd_itor_trade)->TradingDay << std::endl;
+		strcpy((*posd_itor_trade)->TradingDayRecord, this->getTradingDay().c_str());
 		std::cout << "\t\ttradingdayrecord = " << (*posd_itor_trade)->TradingDayRecord << std::endl;
 		std::cout << "\t\ttradingdate = " << (*posd_itor_trade)->TradeDate << std::endl;
 		std::cout << "\t\tstrategyid = " << (*posd_itor_trade)->StrategyID << std::endl;
@@ -2553,6 +2555,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 										|| ((*stg_itor)->getStgPositionBSellYesterday() < object["position_b_sell_yesterday"].GetInt()))
 									{
 										USER_PRINT("界面发送的修改数量大于系统中的数量,出错...");
+										Utils::printRedColor("界面发送的修改数量大于系统中的数量,出错...");
 										isPositionMeetChanged = false;
 										break;
 									}
@@ -2573,6 +2576,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									USER_PRINT("循环判断删除最早的仓位 position_a_buy_yesterday...");
 									//循环判断删除最早的仓位 position_a_buy_yesterday
 									num_need_to_delete = (*stg_itor)->getStgPositionABuyYesterday() - object["position_a_buy_yesterday"].GetInt();
+									std::cout << "\tA昨买需要删除数量 = " << num_need_to_delete << std::endl;
 									// order
 									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
 										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
@@ -2614,6 +2618,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									//循环判断删除最早的仓位 position_a_buy_today
 									USER_PRINT("循环判断删除最早的仓位 position_a_buy_today...");
 									num_need_to_delete = (*stg_itor)->getStgPositionABuyToday() - object["position_a_buy_today"].GetInt();
+									std::cout << "\tA今买需要删除数量 = " << num_need_to_delete << std::endl;
 									// order
 									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
 										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
@@ -2660,6 +2665,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									USER_PRINT((*stg_itor)->getStgPositionBBuyYesterday());
 									USER_PRINT(object["position_b_buy_yesterday"].GetInt());
 									num_need_to_delete = (*stg_itor)->getStgPositionBBuyYesterday() - object["position_b_buy_yesterday"].GetInt();
+									std::cout << "\tB昨买需要删除数量 = " << num_need_to_delete << std::endl;
 									USER_PRINT("order recursive...");
 									USER_PRINT("(*stg_itor)->getStg_List_Position_Detail_From_Order()");
 									USER_PRINT((*stg_itor)->getStg_List_Position_Detail_From_Order()->size());
@@ -2709,6 +2715,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									//循环判断删除最早的仓位 position_b_buy_today
 									USER_PRINT("循环判断删除最早的仓位 position_b_buy_today...");
 									num_need_to_delete = (*stg_itor)->getStgPositionBBuyToday() - object["position_b_buy_today"].GetInt();
+									std::cout << "\tB今买需要删除数量 = " << num_need_to_delete << std::endl;
 									// order
 									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
 										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
@@ -2764,6 +2771,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									//循环判断删除最早的仓位 position_a_sell_yesterday
 									USER_PRINT("循环判断删除最早的仓位 position_a_sell_yesterday")
 									num_need_to_delete = (*stg_itor)->getStgPositionASellYesterday() - object["position_a_sell_yesterday"].GetInt();
+									std::cout << "\tA昨卖需要删除数量 = " << num_need_to_delete << std::endl;
 									// order
 									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
 										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
@@ -2805,6 +2813,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									//循环判断删除最早的仓位 position_a_sell_today
 									USER_PRINT("循环判断删除最早的仓位 position_a_sell_today")
 									num_need_to_delete = (*stg_itor)->getStgPositionASellToday() - object["position_a_sell_today"].GetInt();
+									std::cout << "\tA今卖需要删除数量 = " << num_need_to_delete << std::endl;
 									// order
 									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
 										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
@@ -2850,6 +2859,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									//循环判断删除最早的仓位 position_b_sell_yesterday
 									USER_PRINT("循环判断删除最早的仓位 position_b_sell_yesterday");
 									num_need_to_delete = (*stg_itor)->getStgPositionBSellYesterday() - object["position_b_sell_yesterday"].GetInt();
+									std::cout << "\tB昨卖需要删除数量 = " << num_need_to_delete << std::endl;
 									// order
 									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
 										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
@@ -2891,6 +2901,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									//循环判断删除最早的仓位 position_b_sell_today
 									USER_PRINT("循环判断删除最早的仓位 position_b_sell_today");
 									num_need_to_delete = (*stg_itor)->getStgPositionBSellToday() - object["position_b_sell_today"].GetInt();
+									std::cout << "\tB今卖需要删除数量 = " << num_need_to_delete << std::endl;
 									// order
 									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
 										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
@@ -2992,14 +3003,15 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					}
 					else {
 
-						if (!isPositionMeetChanged)
+						if (!isPositionMeetChanged) //数量不满足
 						{
 							build_doc.AddMember("MsgResult", 1, allocator);
 							build_doc.AddMember("MsgErrorReason", "修改持仓数量大于当前持仓数量!", allocator);
 						}
-
-						build_doc.AddMember("MsgResult", 0, allocator);
-						build_doc.AddMember("MsgErrorReason", "", allocator);
+						else {
+							build_doc.AddMember("MsgResult", 0, allocator);
+							build_doc.AddMember("MsgErrorReason", "", allocator);
+						}
 					}
 				}
 				else {
@@ -3851,6 +3863,10 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 		}
 	}
 
+	//统计每个策略的持仓量
+	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
+		(*stg_itor)->calPosition();
+	}
 
 	USER_PRINT("finish CTP_Manager::initStrategyAndFutureAccount()");
 

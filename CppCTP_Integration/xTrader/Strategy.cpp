@@ -1104,6 +1104,81 @@ void Strategy::DropPositionDetail() {
 	this->stg_save_strategy_conn->dropCollection("CTP.positiondetail");
 }
 
+/// 根据持仓明细进行统计持仓量
+void Strategy::calPosition() {
+	std::cout << "Strategy::calPosition()" << std::endl;
+	this->stg_position_a_sell = 0;			//持仓A卖
+	this->stg_position_b_buy = 0;			//持仓B买
+	this->stg_position_a_buy = 0;			//持仓A买
+	this->stg_position_b_sell = 0;			//持仓B卖
+	this->stg_position_a_sell_yesterday = 0;//
+	this->stg_position_a_buy_yesterday = 0; //
+	this->stg_position_a_sell_today = 0;	//
+	this->stg_position_a_buy_today = 0;		//
+	this->stg_position_b_sell_yesterday = 0;//
+	this->stg_position_b_buy_yesterday = 0; //
+	this->stg_position_b_sell_today = 0;	//
+	this->stg_position_b_buy_today = 0;		//
+
+
+	list<USER_CThostFtdcOrderField *>::iterator itor;
+	for (itor = this->stg_list_position_detail_from_order->begin();
+		itor != this->stg_list_position_detail_from_order->end(); itor++) {
+		if (!strcmp((*itor)->TradingDay, this->getStgTradingDay().c_str())) // 交易日相同,今仓
+		{
+			// 等于A合约
+			if (!strcmp((*itor)->InstrumentID, this->getStgInstrumentIdA().c_str()))
+			{
+				if ((*itor)->Direction == '0') //买
+				{
+					this->stg_position_a_buy_today += (*itor)->VolumeTradedBatch;
+				}
+				else { //卖
+					this->stg_position_a_sell_today += (*itor)->VolumeTradedBatch;
+				}
+			}
+			// 等于B合约
+			else {
+				if ((*itor)->Direction == '0') //买
+				{
+					this->stg_position_b_buy_today += (*itor)->VolumeTradedBatch;
+				}
+				else { //卖
+					this->stg_position_b_sell_today += (*itor)->VolumeTradedBatch;
+				}
+			}
+		}
+		else { // 交易日不同，属于昨仓
+			// 等于A合约
+			if (!strcmp((*itor)->InstrumentID, this->getStgInstrumentIdA().c_str()))
+			{
+				if ((*itor)->Direction == '0') //买
+				{
+					this->stg_position_a_buy_yesterday += (*itor)->VolumeTradedBatch;
+				}
+				else { //卖
+					this->stg_position_a_sell_yesterday += (*itor)->VolumeTradedBatch;
+				}
+			}
+			// 等于B合约
+			else {
+				if ((*itor)->Direction == '0') //买
+				{
+					this->stg_position_b_buy_yesterday += (*itor)->VolumeTradedBatch;
+				}
+				else { //卖
+					this->stg_position_b_sell_yesterday += (*itor)->VolumeTradedBatch;
+				}
+			}
+		}
+	}
+	this->stg_position_a_buy = this->stg_position_a_buy_today + this->stg_position_a_buy_yesterday;
+	this->stg_position_a_sell = this->stg_position_a_sell_today + this->stg_position_a_sell_yesterday;
+	this->stg_position_b_buy = this->stg_position_b_buy_today + this->stg_position_b_buy_yesterday;
+	this->stg_position_b_sell = this->stg_position_b_sell_today + this->stg_position_b_sell_yesterday;
+	this->stg_position = this->stg_position_b_buy + this->stg_position_b_sell;
+}
+
 /// 更新策略
 void Strategy::UpdateStrategy(Strategy *stg) {
 	int count_number = 0;
