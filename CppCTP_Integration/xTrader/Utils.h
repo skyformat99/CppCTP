@@ -25,6 +25,8 @@ public:
 	static string getYMDDate();
 	static void printGreenColor(string text);
 	static void printRedColor(string text);
+	static void printGreenColorWithKV(string key, string value);
+	static void printRedColorWithKV(string key, string value);
 };
 
 #endif

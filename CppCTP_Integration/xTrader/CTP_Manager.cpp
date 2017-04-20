@@ -3202,10 +3202,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									c:更新tick锁stg_select_order_algorithm_flag为释放*/
 									/************************************************************************/
 									(*stg_itor)->getStgUser()->setOn_Off(1);
-									(*stg_itor)->update_task_status();
+									(*stg_itor)->setStgTradeTaskingRecovery();
 									(*stg_itor)->setStgSelectOrderAlgorithmFlag("CTP_Manager::HandleMessage() msgtype == 12", false);
 
-									std::cout << "Strategy修改持仓完成!" << std::endl;
+									std::cout << "\tStrategy修改持仓完成!" << std::endl;
 
 									/*构造内容json*/
 									rapidjson::Value create_info_object(rapidjson::kObjectType);
@@ -3231,7 +3231,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 								}
 								else {
-									std::cout << "未能找到修改的Strategy" << std::endl;
+									std::cout << "\t未能找到修改的Strategy" << std::endl;
 								}
 							}
 						}
@@ -3239,7 +3239,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				}
 				else {
 					USER_PRINT("infoArray.Is Not Array()");
-					std::cout << "未收到修改策略信息" << std::endl;
+					std::cout << "\t未收到修改策略信息" << std::endl;
 				}
 				
 				/// 如果找到修改的策略

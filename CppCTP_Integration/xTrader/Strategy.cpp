@@ -4519,6 +4519,15 @@ void Strategy::setStgTradeTasking(bool stgTradeTasking) {
 	std::cout << "\tstg_trade_tasking = " << stgTradeTasking << std::endl;
 }
 
+void Strategy::setStgTradeTaskingRecovery() {
+	std::cout << "Strategy::setStgTradeTaskingRecovery()" << std::endl;
+	this->stg_trade_tasking = false;
+	std::cout << "\t期货账号 = " << this->getStgUserId() << std::endl;
+	std::cout << "\t策略编号 = " << this->getStgStrategyId() << std::endl;
+	std::cout << "\tstg_select_order_algorithm_flag = " << this->stg_select_order_algorithm_flag << std::endl;
+	std::cout << "\tstg_trade_tasking = " << this->stg_trade_tasking << std::endl;
+}
+
 string Strategy::getStgTraderId() {
 	return stg_trader_id;
 }

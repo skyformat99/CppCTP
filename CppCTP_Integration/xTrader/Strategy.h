@@ -212,6 +212,7 @@ public:
 
 	bool isStgTradeTasking();
 	void setStgTradeTasking(bool stgTradeTasking);
+	void setStgTradeTaskingRecovery();
 
 	string getStgTraderId();
 	void setStgTraderId(string stgTraderId);
