@@ -2147,14 +2147,10 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 				
 
 			}
-			
-
 		}
 
 		//一把锁测试
 		//this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
-
-		
 	}
 	this->CopyTickData(this->stg_instrument_Last_tick, pDepthMarketData);
 	this->stg_tick_systime_record = new_time;

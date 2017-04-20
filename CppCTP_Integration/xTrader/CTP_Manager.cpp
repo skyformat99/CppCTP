@@ -2046,6 +2046,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								create_info_object.AddMember("trade_volume", (*stg_itor)->getStgTradeVolume(), allocator);
 								create_info_object.AddMember("amount", (*stg_itor)->getStgAmount(), allocator);
 								create_info_object.AddMember("average_shift", (*stg_itor)->getStgAverageShift(), allocator);
+								create_info_object.AddMember("update_position_detail_record_time", rapidjson::StringRef((*stg_itor)->getStgUpdatePositionDetailRecordTime().c_str()), allocator);
 
 								/*rapidjson::Value instrument_array(rapidjson::kArrayType);
 								for (int j = 0; j < 2; j++) {
