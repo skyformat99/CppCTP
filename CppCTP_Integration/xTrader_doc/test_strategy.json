@@ -104,3 +104,10 @@ CTP行情断线通知(MsgResult(Integer):0正常 1断开连接)
 msgtype = 19
 CTP交易断线通知(MsgResult(Integer):0正常 1断开连接)
 	主动推送:{"MsgRef":1,"MsgSendFlag":1,"MsgType":19,"UserID":"058176","MsgSrc":1, "MsgResult":1,"MsgErrorReason":"CTP交易已断开连接"}
+	
+msgtype = 20
+查询期货账户昨日持仓明细(order)("UserID"值如果为空返回所有昨仓持仓明细，如果为某个期货账户，只返回对应期货账户的昨持仓明细):
+	
+
+msgtype = 21
+查询期货账户昨日持仓明细(trade)("UserID"值如果为空返回所有昨仓持仓明细，如果为某个期货账户，只返回对应期货账户的昨持仓明细):
