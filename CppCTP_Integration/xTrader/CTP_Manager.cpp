@@ -2277,6 +2277,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							create_info_object.AddMember("b_order_action_limit", new_stg->getStgBOrderActionTiresLimit(), allocator);
 							create_info_object.AddMember("sell_close", new_stg->getStgSellClose(), allocator);
 							create_info_object.AddMember("buy_open", new_stg->getStgBuyOpen(), allocator);
+							create_info_object.AddMember("update_position_detail_record_time", rapidjson::StringRef(new_stg->getStgUpdatePositionDetailRecordTime().c_str()), allocator);
+
 
 							create_info_object.AddMember("only_close", new_stg->isStgOnlyClose(), allocator);
 							create_info_object.AddMember("strategy_on_off", new_stg->getOn_Off(), allocator);
