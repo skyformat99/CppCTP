@@ -3740,6 +3740,7 @@ void Strategy::update_position_detail(CThostFtdcTradeField *pTrade_cal) {
 /// 更新持仓明细
 void Strategy::update_position_detail(USER_CThostFtdcTradeField *pTrade) {
 	USER_PRINT("Strategy::update_position_detail");
+	std::cout << "Strategy::update_position_detail() trade" << std::endl;
 	/************************************************************************/
 	/* """
 	order中的CombOffsetFlag 或 trade中的OffsetFlag值枚举：
@@ -3754,6 +3755,12 @@ void Strategy::update_position_detail(USER_CThostFtdcTradeField *pTrade) {
 	/*USER_PRINT(pOrder->VolumeTraded);*/
 
 	
+	std::cout << "\tpTrade->OffsetFlag = " << pTrade->OffsetFlag << std::endl;
+	std::cout << "\tpTrade->InstrumentID = " << pTrade->InstrumentID << std::endl;
+	std::cout << "\tpTrade->HedgeFlag = " << pTrade->HedgeFlag << std::endl;
+	std::cout << "\tpTrade->Direction = " << pTrade->Direction << std::endl;
+	std::cout << "\tpTrade->Volume = " << pTrade->Volume << std::endl;
+
 	if (pTrade->OffsetFlag == '0') // pTrade中"OffsetFlag"值 = "0"为开仓，不用考虑全部成交还是部分成交，开仓trade直接添加到持仓明细列表里
 	{
 		if (!strcmp(pTrade->InstrumentID, this->stg_instrument_id_A.c_str())) { //A合约
@@ -3772,6 +3779,19 @@ void Strategy::update_position_detail(USER_CThostFtdcTradeField *pTrade) {
 	else if (pTrade->OffsetFlag == '3') { //pTrade中"OffsetFlag"值 = "3"为平今
 		list<USER_CThostFtdcTradeField *>::iterator itor;
 		for (itor = this->stg_list_position_detail_from_trade->begin(); itor != this->stg_list_position_detail_from_trade->end();) {
+
+			USER_PRINT((*itor)->TradeDate);
+			USER_PRINT(pTrade->TradeDate);
+
+			USER_PRINT((*itor)->InstrumentID);
+			USER_PRINT(pTrade->InstrumentID);
+
+			USER_PRINT((*itor)->HedgeFlag);
+			USER_PRINT(pTrade->HedgeFlag);
+
+			USER_PRINT((*itor)->Volume);
+			USER_PRINT(pTrade->Volume);
+
 			if ((!strcmp((*itor)->TradeDate, pTrade->TradeDate)) &&
 				(!strcmp((*itor)->InstrumentID, pTrade->InstrumentID)) &&
 				((*itor)->HedgeFlag == pTrade->HedgeFlag) &&
@@ -3835,7 +3855,7 @@ void Strategy::update_position_detail(USER_CThostFtdcTradeField *pTrade) {
 
 /// 更新持仓明细(Order)
 void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
-	std::cout << "Strategy::update_position_detail()" << std::endl;
+	std::cout << "Strategy::update_position_detail() order" << std::endl;
 	USER_PRINT("Strategy::update_position_detail");
 	/************************************************************************/
 	/* """
@@ -3847,11 +3867,13 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 		"""
 		# 跳过无成交的order记录                                                                     */
 	/************************************************************************/
+	std::cout << "\tpOrder->CombOffsetFlag[0] = " << pOrder->CombOffsetFlag[0] << std::endl;
+	std::cout << "\tpOrder->InstrumentID = " << pOrder->InstrumentID << std::endl;
+	std::cout << "\tpOrder->CombHedgeFlag[0] = " << pOrder->CombHedgeFlag[0] << std::endl;
+	std::cout << "\tpOrder->Direction = " << pOrder->Direction << std::endl;
+	std::cout << "\tpOrder->VolumeTradedBatch = " << pOrder->VolumeTradedBatch << std::endl;
 
-	USER_PRINT(pOrder->VolumeTraded);
-	
-
-	if (pOrder->VolumeTraded == 0) {
+	if (pOrder->VolumeTradedBatch == 0) {
 		return;
 	}
 	USER_PRINT(pOrder->CombOffsetFlag[0]);
@@ -3873,8 +3895,8 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 		for (itor = this->stg_list_position_detail_from_order->begin(); 
 			itor != this->stg_list_position_detail_from_order->end();)
 		{
-			USER_PRINT((*itor)->TradingDay);
-			USER_PRINT(pOrder->TradingDay);
+			USER_PRINT((*itor)->InsertDate);
+			USER_PRINT(pOrder->InsertDate);
 
 			USER_PRINT((*itor)->InstrumentID);
 			USER_PRINT(pOrder->InstrumentID);
@@ -3922,6 +3944,19 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 		for (itor = this->stg_list_position_detail_from_order->begin();
 			itor != this->stg_list_position_detail_from_order->end();)
 		{
+
+			USER_PRINT((*itor)->TradingDay);
+			USER_PRINT(pOrder->TradingDay);
+
+			USER_PRINT((*itor)->InstrumentID);
+			USER_PRINT(pOrder->InstrumentID);
+
+			USER_PRINT((*itor)->CombHedgeFlag[0]);
+			USER_PRINT(pOrder->CombHedgeFlag[0]);
+
+			USER_PRINT((*itor)->VolumeTradedBatch);
+			USER_PRINT(pOrder->VolumeTradedBatch);
+
 			if ((strcmp((*itor)->InsertDate, pOrder->InsertDate))
 				&& (!strcmp((*itor)->InstrumentID, pOrder->InstrumentID))
 				&& ((*itor)->CombHedgeFlag[0] == pOrder->CombHedgeFlag[0])

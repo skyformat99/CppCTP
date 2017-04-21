@@ -217,12 +217,12 @@ bool Utils::compareTradingDaySeconds(const char *compare_day, const char *today)
 
 
 	if (l_time1 >= l_time2) {
-		USER_PRINT("日期相等");
+		//USER_PRINT("日期相等");
 		//std::cout << "\t对比结果 = " << true << std::endl;
 		return true; // 等于当前日期
 	}
 	else {
-		USER_PRINT("日期偏小了");
+		//USER_PRINT("日期偏小了");
 		//std::cout << "\t对比结果 = " << false << std::endl;
 		return false; // 小于当前日期
 	}
@@ -251,7 +251,7 @@ string Utils::getDate() {
 	char time_char[20];
 	string time_str; //
 	strftime(time_char, 20, "%Y%m%d%X", localtime(&rawtime));
-	cout << "\t当前日期 = " << time_char << endl;
+	//cout << "\t当前日期 = " << time_char << endl;
 	time_str = time_char;
 	return time_str;
 }

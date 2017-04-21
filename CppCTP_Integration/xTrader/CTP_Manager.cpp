@@ -2809,129 +2809,138 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									std::cout << "\tB卖(" << (*stg_itor)->getStgPositionBSell() << ", " << (*stg_itor)->getStgPositionBSellYesterday() << ")" << std::endl;
 
 									//A昨卖
+									Utils::printGreenColor("A昨卖");
 									// Order
 									USER_CThostFtdcOrderField *order_ASellYesterdayClose = new USER_CThostFtdcOrderField();
 									(*stg_itor)->createFakeOrderPositionDetail(order_ASellYesterdayClose, Utils::getYMDYesterdayDate(), 
 										(*stg_itor)->getStgInstrumentIdA(), '1', '0', '4',
-										(*stg_itor)->getStgPositionASell() - object["position_a_sell_yesterday"].GetInt());
+										(*stg_itor)->getStgPositionASellYesterday() - object["position_a_sell_yesterday"].GetInt());
 
 									// Trade
 									USER_CThostFtdcTradeField *trade_ASellYesterdayClose = new USER_CThostFtdcTradeField();
 									(*stg_itor)->createFakeTradePositionDetail(trade_ASellYesterdayClose, Utils::getYMDYesterdayDate(),
 										(*stg_itor)->getStgInstrumentIdA(), '1', '0', '4',
-										(*stg_itor)->getStgPositionASell() - object["position_a_sell_yesterday"].GetInt());
+										(*stg_itor)->getStgPositionASellYesterday() - object["position_a_sell_yesterday"].GetInt());
 
 									(*stg_itor)->update_position_detail(order_ASellYesterdayClose);
 									(*stg_itor)->update_position_detail(trade_ASellYesterdayClose);
 
 									//A昨买
+									Utils::printGreenColor("A昨买");
+									// Order
 									USER_CThostFtdcOrderField *order_ABuyYesterdayClose = new USER_CThostFtdcOrderField();
 									(*stg_itor)->createFakeOrderPositionDetail(order_ABuyYesterdayClose, Utils::getYMDYesterdayDate(),
 										(*stg_itor)->getStgInstrumentIdA(), '1', '1', '4',
-										(*stg_itor)->getStgPositionABuy() - object["position_a_buy_yesterday"].GetInt());
+										(*stg_itor)->getStgPositionABuyYesterday() - object["position_a_buy_yesterday"].GetInt());
 
 									// Trade
 									USER_CThostFtdcTradeField *trade_ABuyYesterdayClose = new USER_CThostFtdcTradeField();
 									(*stg_itor)->createFakeTradePositionDetail(trade_ABuyYesterdayClose, Utils::getYMDYesterdayDate(),
 										(*stg_itor)->getStgInstrumentIdA(), '1', '1', '4',
-										(*stg_itor)->getStgPositionABuy() - object["position_a_buy_yesterday"].GetInt());
+										(*stg_itor)->getStgPositionABuyYesterday() - object["position_a_buy_yesterday"].GetInt());
 
 									(*stg_itor)->update_position_detail(order_ABuyYesterdayClose);
 									(*stg_itor)->update_position_detail(trade_ABuyYesterdayClose);
 
 									//B昨卖
+									Utils::printGreenColor("B昨卖");
 									// Order
 									USER_CThostFtdcOrderField *order_BSellYesterdayClose = new USER_CThostFtdcOrderField();
 									(*stg_itor)->createFakeOrderPositionDetail(order_BSellYesterdayClose, Utils::getYMDYesterdayDate(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '0', '4',
-										(*stg_itor)->getStgPositionBSell() - object["position_b_sell_yesterday"].GetInt());
+										(*stg_itor)->getStgPositionBSellYesterday() - object["position_b_sell_yesterday"].GetInt());
 
 									// Trade
 									USER_CThostFtdcTradeField *trade_BSellYesterdayClose = new USER_CThostFtdcTradeField();
 									(*stg_itor)->createFakeTradePositionDetail(trade_ASellYesterdayClose, Utils::getYMDYesterdayDate(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '0', '4',
-										(*stg_itor)->getStgPositionBSell() - object["position_b_sell_yesterday"].GetInt());
+										(*stg_itor)->getStgPositionBSellYesterday() - object["position_b_sell_yesterday"].GetInt());
 
 									(*stg_itor)->update_position_detail(order_BSellYesterdayClose);
 									(*stg_itor)->update_position_detail(trade_ASellYesterdayClose);
 
 
 									//B昨买
+									Utils::printGreenColor("B昨买");
 									USER_CThostFtdcOrderField *order_BBuyYesterdayClose = new USER_CThostFtdcOrderField();
 									(*stg_itor)->createFakeOrderPositionDetail(order_BBuyYesterdayClose, Utils::getYMDYesterdayDate(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '1', '4',
-										(*stg_itor)->getStgPositionBBuy() - object["position_b_buy_yesterday"].GetInt());
+										(*stg_itor)->getStgPositionBBuyYesterday() - object["position_b_buy_yesterday"].GetInt());
 
 									// Trade
 									USER_CThostFtdcTradeField *trade_BBuyYesterdayClose = new USER_CThostFtdcTradeField();
 									(*stg_itor)->createFakeTradePositionDetail(trade_BBuyYesterdayClose, Utils::getYMDYesterdayDate(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '1', '4',
-										(*stg_itor)->getStgPositionBBuy() - object["position_b_buy_yesterday"].GetInt());
+										(*stg_itor)->getStgPositionBBuyYesterday() - object["position_b_buy_yesterday"].GetInt());
 
 									(*stg_itor)->update_position_detail(order_BBuyYesterdayClose);
 									(*stg_itor)->update_position_detail(trade_BBuyYesterdayClose);
 
 
 									//A今卖
+									Utils::printGreenColor("A今卖");
 									// Order
 									USER_CThostFtdcOrderField *order_ASellTodayClose = new USER_CThostFtdcOrderField();
 									(*stg_itor)->createFakeOrderPositionDetail(order_ASellTodayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdA(), '1', '0', '3',
-										(*stg_itor)->getStgPositionASell() - object["position_a_sell_today"].GetInt());
+										(*stg_itor)->getStgPositionASellToday() - object["position_a_sell_today"].GetInt());
 
 									// Trade
 									USER_CThostFtdcTradeField *trade_ASellTodayClose = new USER_CThostFtdcTradeField();
 									(*stg_itor)->createFakeTradePositionDetail(trade_ASellTodayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdA(), '1', '0', '3',
-										(*stg_itor)->getStgPositionASell() - object["position_a_sell_today"].GetInt());
+										(*stg_itor)->getStgPositionASellToday() - object["position_a_sell_today"].GetInt());
 
 									(*stg_itor)->update_position_detail(order_ASellTodayClose);
 									(*stg_itor)->update_position_detail(trade_ASellTodayClose);
 
 									//A今买
+									Utils::printGreenColor("A今买");
 									// Order
 									USER_CThostFtdcOrderField *order_ABuyTodayClose = new USER_CThostFtdcOrderField();
 									(*stg_itor)->createFakeOrderPositionDetail(order_ABuyTodayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdA(), '1', '1', '3',
-										(*stg_itor)->getStgPositionABuy() - object["position_a_buy_today"].GetInt());
+										(*stg_itor)->getStgPositionABuyToday() - object["position_a_buy_today"].GetInt());
 
 									// Trade
 									USER_CThostFtdcTradeField *trade_ABuyTodayClose = new USER_CThostFtdcTradeField();
 									(*stg_itor)->createFakeTradePositionDetail(trade_ABuyTodayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdA(), '1', '1', '3',
-										(*stg_itor)->getStgPositionABuy() - object["position_a_buy_today"].GetInt());
+										(*stg_itor)->getStgPositionABuyToday() - object["position_a_buy_today"].GetInt());
 
 									(*stg_itor)->update_position_detail(order_ABuyTodayClose);
 									(*stg_itor)->update_position_detail(trade_ABuyTodayClose);
 
 									//B今卖
+									Utils::printGreenColor("B今卖");
 									// Order
 									USER_CThostFtdcOrderField *order_BSellTodayClose = new USER_CThostFtdcOrderField();
 									(*stg_itor)->createFakeOrderPositionDetail(order_BSellTodayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '0', '3',
-										(*stg_itor)->getStgPositionBSell() - object["position_b_sell_today"].GetInt());
+										(*stg_itor)->getStgPositionBSellToday() - object["position_b_sell_today"].GetInt());
 
 									// Trade
 									USER_CThostFtdcTradeField *trade_BSellTodayClose = new USER_CThostFtdcTradeField();
 									(*stg_itor)->createFakeTradePositionDetail(trade_BSellTodayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '0', '3',
-										(*stg_itor)->getStgPositionBSell() - object["position_b_sell_today"].GetInt());
+										(*stg_itor)->getStgPositionBSellToday() - object["position_b_sell_today"].GetInt());
 
 									(*stg_itor)->update_position_detail(order_BSellTodayClose);
 									(*stg_itor)->update_position_detail(trade_BSellTodayClose);
 
 									//B今买
+									Utils::printGreenColor("B今买");
 									// Order
 									USER_CThostFtdcOrderField *order_BBuyTodayClose = new USER_CThostFtdcOrderField();
 									(*stg_itor)->createFakeOrderPositionDetail(order_BBuyTodayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '1', '3',
-										(*stg_itor)->getStgPositionBBuy() - object["position_b_buy_today"].GetInt());
+										(*stg_itor)->getStgPositionBBuyToday() - object["position_b_buy_today"].GetInt());
 
 									// Trade
 									USER_CThostFtdcTradeField *trade_BBuyTodayClose = new USER_CThostFtdcTradeField();
 									(*stg_itor)->createFakeTradePositionDetail(trade_BBuyTodayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '1', '3',
-										(*stg_itor)->getStgPositionBBuy() - object["position_b_buy_today"].GetInt());
+										(*stg_itor)->getStgPositionBBuyToday() - object["position_b_buy_today"].GetInt());
 
 									(*stg_itor)->update_position_detail(order_BBuyTodayClose);
 									(*stg_itor)->update_position_detail(trade_BBuyTodayClose);
@@ -2965,7 +2974,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									// 存储之前先清空集合
 									ctp_m->getDBManager()->DropPositionDetail();
 									ctp_m->getDBManager()->DropPositionDetailTrade();
-									ctp_m->saveStrategyPositionDetail((*stg_itor));
+									//ctp_m->saveStrategyPositionDetail((*stg_itor));
+									ctp_m->saveAllStrategyPositionDetail();
 
 									/************************************************************************/
 									/* 校准仓位之后,更新所有的运行标志位
