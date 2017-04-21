@@ -1979,7 +1979,7 @@ void Strategy::clearStgPositionDetail() {
 
 //构造模拟平仓order
 void Strategy::createFakeOrderPositionDetail(USER_CThostFtdcOrderField *order, string date, string instrumentID, char CombHedgeFlag, char Direction, char CombOffsetFlag, int VolumeTradedBatch) {
-	strcpy(order->InsertDate, date.c_str()); // 日期
+	strcpy(order->TradingDay, date.c_str()); // 日期
 	strcpy(order->InstrumentID, instrumentID.c_str()); // A合约ID
 	order->CombHedgeFlag[0] = CombHedgeFlag; // 1投机 2套利 3保值
 	order->Direction = Direction; // '0'买 '1'卖
@@ -1989,7 +1989,7 @@ void Strategy::createFakeOrderPositionDetail(USER_CThostFtdcOrderField *order, s
 
 //构造模拟平仓trade
 void Strategy::createFakeTradePositionDetail(USER_CThostFtdcTradeField *trade, string date, string instrumentID, char HedgeFlag, char Direction, char OffsetFlag, int Volume) {
-	strcpy(trade->TradeDate, date.c_str()); // 日期
+	strcpy(trade->TradingDay, date.c_str()); // 日期
 	strcpy(trade->InstrumentID, instrumentID.c_str()); // A合约ID
 	trade->HedgeFlag = HedgeFlag; // 1投机 2套利 3保值
 	trade->Direction = Direction; // '0'买 '1'卖
@@ -3792,7 +3792,7 @@ void Strategy::update_position_detail(USER_CThostFtdcTradeField *pTrade) {
 			USER_PRINT((*itor)->Volume);
 			USER_PRINT(pTrade->Volume);
 
-			if ((!strcmp((*itor)->TradeDate, pTrade->TradeDate)) &&
+			if ((!strcmp((*itor)->TradingDay, pTrade->TradingDay)) &&
 				(!strcmp((*itor)->InstrumentID, pTrade->InstrumentID)) &&
 				((*itor)->HedgeFlag == pTrade->HedgeFlag) &&
 				((*itor)->Direction != pTrade->Direction)) { //持仓明细中trade与pTrade比较：交易日相同、合约代码相同、投保标志相同
@@ -3822,7 +3822,7 @@ void Strategy::update_position_detail(USER_CThostFtdcTradeField *pTrade) {
 	else if (pTrade->OffsetFlag == '4') { //pTrade中"OffsetFlag"值 = "4"为平昨
 		list<USER_CThostFtdcTradeField *>::iterator itor;
 		for (itor = this->stg_list_position_detail_from_trade->begin(); itor != this->stg_list_position_detail_from_trade->end();) {
-			if ((strcmp((*itor)->TradeDate, pTrade->TradeDate)) &&
+			if ((strcmp((*itor)->TradingDay, pTrade->TradingDay)) &&
 				(!strcmp((*itor)->InstrumentID, pTrade->InstrumentID)) &&
 				((*itor)->HedgeFlag == pTrade->HedgeFlag) &&
 				((*itor)->Direction != pTrade->Direction)) { //持仓明细中trade与pTrade比较：交易日不相同、合约代码相同、投保标志相同
@@ -3908,7 +3908,7 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 			USER_PRINT(pOrder->VolumeTradedBatch);
 			
 
-			if ((!strcmp((*itor)->InsertDate, pOrder->InsertDate)) 
+			if ((!strcmp((*itor)->TradingDay, pOrder->TradingDay))
 				&& (!strcmp((*itor)->InstrumentID, pOrder->InstrumentID)) 
 				&& ((*itor)->CombHedgeFlag[0] == pOrder->CombHedgeFlag[0])
 				&& ((*itor)->Direction != pOrder->Direction)) { // 日期,合约代码,投保标志相同
@@ -3957,7 +3957,7 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 			USER_PRINT((*itor)->VolumeTradedBatch);
 			USER_PRINT(pOrder->VolumeTradedBatch);
 
-			if ((strcmp((*itor)->InsertDate, pOrder->InsertDate))
+			if ((strcmp((*itor)->TradingDay, pOrder->TradingDay))
 				&& (!strcmp((*itor)->InstrumentID, pOrder->InstrumentID))
 				&& ((*itor)->CombHedgeFlag[0] == pOrder->CombHedgeFlag[0])
 				&& ((*itor)->Direction != pOrder->Direction)) { // 日期,合约代码,投保标志相同
