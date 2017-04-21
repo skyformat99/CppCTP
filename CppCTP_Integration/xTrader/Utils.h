@@ -23,6 +23,7 @@ public:
 	static string longlongtostr(long long num);
 	static string getDate();
 	static string getYMDDate();
+	static string getYMDYesterdayDate();
 	static void printGreenColor(string text);
 	static void printRedColor(string text);
 	static void printGreenColorWithKV(string key, string value);

@@ -43,6 +43,7 @@ CTP_Manager::CTP_Manager() {
 	this->isMdLogin = false;
 	this->isCTPFinishedPositionInit = false;
 	this->is_market_close = true;
+	this->is_start_end_task = false;
 	//this->ten_min_flag = false;
 	//this->one_min_flag = false;
 	//this->one_second_flag = false;
@@ -2810,6 +2811,42 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									std::cout << "\tA买(" << (*stg_itor)->getStgPositionABuy() << ", " << (*stg_itor)->getStgPositionABuyYesterday() << ")" << std::endl;
 									std::cout << "\tB卖(" << (*stg_itor)->getStgPositionBSell() << ", " << (*stg_itor)->getStgPositionBSellYesterday() << ")" << std::endl;
 
+									//A昨卖
+									// Order
+									USER_CThostFtdcOrderField *order_ASellYesterdayClose = new USER_CThostFtdcOrderField();
+									strcpy(order_ASellYesterdayClose->InsertDate, Utils::getYMDYesterdayDate().c_str()); // 昨天日期
+									strcpy(order_ASellYesterdayClose->InstrumentID, (*stg_itor)->getStgInstrumentIdA().c_str()); // A合约ID
+									order_ASellYesterdayClose->CombHedgeFlag[0] = '1'; // 1投机 2套利 3保值
+									order_ASellYesterdayClose->Direction = '0'; // '0'买 '1'卖
+									order_ASellYesterdayClose->VolumeTradedBatch = (*stg_itor)->getStgPositionASell() - object["position_a_sell_yesterday"].GetInt(); // 成交量
+									// Trade
+									USER_CThostFtdcTradeField *trade_ASellYesterdayClose = new USER_CThostFtdcTradeField();
+									strcpy(trade_ASellYesterdayClose->TradeDate, Utils::getYMDYesterdayDate().c_str()); // 昨天日期
+									strcpy(trade_ASellYesterdayClose->InstrumentID, (*stg_itor)->getStgInstrumentIdA().c_str()); // A合约ID
+									trade_ASellYesterdayClose->HedgeFlag = '1'; // 1投机 2套利 3保值
+									trade_ASellYesterdayClose->Direction = '0'; // '0'买 '1'卖
+									trade_ASellYesterdayClose->Volume = (*stg_itor)->getStgPositionASell() - object["position_a_sell_yesterday"].GetInt(); // 成交量
+
+									(*stg_itor)->update_position_detail(order_ASellYesterdayClose);
+									(*stg_itor)->update_position_detail(trade_ASellYesterdayClose);
+
+
+
+									//A昨买
+
+									//B昨卖
+
+									//B昨买
+
+									//A今卖
+
+									//A今买
+
+									//B今卖
+
+									//B今买
+
+
 									(*stg_itor)->setStgPositionABuy(object["position_a_buy"].GetInt());
 
 									USER_PRINT("循环判断删除最早的仓位 position_a_buy_yesterday...");
@@ -4617,6 +4654,15 @@ void CTP_Manager::setIsMarketClose(bool is_market_close) {
 
 bool CTP_Manager::getIsMarketClose() {
 	return this->is_market_close;
+}
+
+//系统收盘最后5秒内要完成的收尾工作标志位
+void CTP_Manager::setIsStartEndTask(bool is_start_end_task) {
+	this->is_start_end_task = is_start_end_task;
+}
+
+bool CTP_Manager::getIsStartEndTask() {
+	return this->is_start_end_task;
 }
 
 ///// 初始化昨仓明细

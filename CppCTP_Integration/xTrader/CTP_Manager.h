@@ -204,6 +204,10 @@ public:
 	void setIsMarketClose(bool is_market_close);
 	bool getIsMarketClose();
 
+	//系统收盘最后5秒内要完成的收尾工作标志位
+	void setIsStartEndTask(bool is_start_end_task);
+	bool getIsStartEndTask();
+
 private:
 	//Login *login;
 	list<string> *l_instrument;
@@ -218,7 +222,9 @@ private:
 	list<Strategy *> *l_strategys_yesterday;
 	MdSpi *mdspi;
 	int on_off; //开关
-	bool is_market_close; //休盘
+	bool is_market_close; //休盘开始标志
+	bool is_start_end_task; //系统收盘最后5秒内要完成的收尾工作标志位
+
 	string trading_day;
 	bool isClosingSaved;
 	bool isMdLogin;

@@ -216,7 +216,7 @@ bool Utils::compareTradingDaySeconds(const char *compare_day, const char *today)
 	time_t l_time2 = mktime(&tm_time2);
 
 
-	if (l_time1 > l_time2) {
+	if (l_time1 >= l_time2) {
 		USER_PRINT("日期相等");
 		//std::cout << "\t对比结果 = " << true << std::endl;
 		return true; // 等于当前日期
@@ -265,6 +265,19 @@ string Utils::getYMDDate() {
 	strftime(time_char, 20, "%Y%m%d", localtime(&rawtime));
 	//cout << "\t当前日期 = " << time_char << endl;
 	time_str = time_char;
+	return time_str;
+}
+
+string Utils::getYMDYesterdayDate() {
+	time_t now;
+	struct tm *ts;
+	char yearchar[80];
+	now = time(NULL);
+	ts = localtime(&now);
+	ts->tm_mday--;
+	mktime(ts); /* Normalise ts */
+	strftime(yearchar, sizeof(yearchar), "%Y%m%d", ts);
+	string time_str = yearchar;
 	return time_str;
 }
 

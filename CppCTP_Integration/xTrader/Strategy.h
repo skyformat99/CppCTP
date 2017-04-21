@@ -305,9 +305,11 @@ public:
 	/// 更新持仓明细(Trade)
 	void update_position_detail(CThostFtdcTradeField *pTrade);
 
-	/// 更新持仓明细(Order)
+	/// 更新自定义持仓明细结构(Order)
 	void update_position_detail(USER_CThostFtdcOrderField *pOrder);
-	void update_position_detail(USER_CThostFtdcTradeField *pTrade_cal);
+
+	/// 更新自定义持仓明细结构(Trade)
+	void update_position_detail(USER_CThostFtdcTradeField *pTrade);
 
 	/// 更新交易状态
 	void update_task_status();
@@ -317,9 +319,6 @@ public:
 
 	/// 添加字段本次成交量至order构体中
 	void add_VolumeTradedBatch(CThostFtdcOrderField *pOrder, USER_CThostFtdcOrderField *new_Order);
-
-	
-
 
 	/// 得到三个数最小值
 	int getMinNum(int num1, int num2, int num3);

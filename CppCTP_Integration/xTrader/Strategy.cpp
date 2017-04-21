@@ -2080,13 +2080,19 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		std::cout << "\t(有交易任务,进入交易任务执行)" << std::endl;
 		std::cout << "\t(stg_trade_tasking):(" << this->stg_trade_tasking << ")" << std::endl;*/
 		this->Exec_OnTickComing(pDepthMarketData);
+		
+		//收到最后5秒开始强制处理挂单列表命令
+		if (this->stg_user->getCTP_Manager()->getIsStartEndTask()) {
+
+		}
+
 	}
 	else { /// 如果没有交易任务，那么选择开始新的交易任务
 
 		if (this->stg_user->getCTP_Manager()->getIsMarketClose())
 		{
 			std::cout << "Strategy::OnRtnDepthMarketData()" << std::endl;
-			std::cout << "\t休盘状态,不能交易" << std::endl;
+			std::cout << "\t最后5秒停止新的任务!" << std::endl;
 			return;
 		}
 
