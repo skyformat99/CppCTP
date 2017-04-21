@@ -1977,6 +1977,26 @@ void Strategy::clearStgPositionDetail() {
 
 }
 
+//构造模拟平仓order
+void Strategy::createFakeOrderPositionDetail(USER_CThostFtdcOrderField *order, string date, string instrumentID, char CombHedgeFlag, char Direction, char CombOffsetFlag, int VolumeTradedBatch) {
+	strcpy(order->InsertDate, date.c_str()); // 日期
+	strcpy(order->InstrumentID, instrumentID.c_str()); // A合约ID
+	order->CombHedgeFlag[0] = CombHedgeFlag; // 1投机 2套利 3保值
+	order->Direction = Direction; // '0'买 '1'卖
+	order->VolumeTradedBatch = VolumeTradedBatch; // 成交量
+	order->CombOffsetFlag[0] = CombOffsetFlag; // '3'平今 '4'平昨
+}
+
+//构造模拟平仓trade
+void Strategy::createFakeTradePositionDetail(USER_CThostFtdcTradeField *trade, string date, string instrumentID, char HedgeFlag, char Direction, char OffsetFlag, int Volume) {
+	strcpy(trade->TradeDate, date.c_str()); // 日期
+	strcpy(trade->InstrumentID, instrumentID.c_str()); // A合约ID
+	trade->HedgeFlag = HedgeFlag; // 1投机 2套利 3保值
+	trade->Direction = Direction; // '0'买 '1'卖
+	trade->Volume = Volume; // 成交量
+	trade->OffsetFlag = OffsetFlag; // '3'平今 '4'平昨
+}
+
 // 获取持仓明细
 list<USER_CThostFtdcOrderField *> *Strategy::getStg_List_Position_Detail_From_Order() {
 	return this->stg_list_position_detail_from_order;

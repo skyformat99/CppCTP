@@ -2814,406 +2814,143 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									//A昨卖
 									// Order
 									USER_CThostFtdcOrderField *order_ASellYesterdayClose = new USER_CThostFtdcOrderField();
-									strcpy(order_ASellYesterdayClose->InsertDate, Utils::getYMDYesterdayDate().c_str()); // 昨天日期
-									strcpy(order_ASellYesterdayClose->InstrumentID, (*stg_itor)->getStgInstrumentIdA().c_str()); // A合约ID
-									order_ASellYesterdayClose->CombHedgeFlag[0] = '1'; // 1投机 2套利 3保值
-									order_ASellYesterdayClose->Direction = '0'; // '0'买 '1'卖
-									order_ASellYesterdayClose->VolumeTradedBatch = (*stg_itor)->getStgPositionASell() - object["position_a_sell_yesterday"].GetInt(); // 成交量
+									(*stg_itor)->createFakeOrderPositionDetail(order_ASellYesterdayClose, Utils::getYMDYesterdayDate(), 
+										(*stg_itor)->getStgInstrumentIdA(), '1', '0', '4',
+										(*stg_itor)->getStgPositionASell() - object["position_a_sell_yesterday"].GetInt());
+
 									// Trade
 									USER_CThostFtdcTradeField *trade_ASellYesterdayClose = new USER_CThostFtdcTradeField();
-									strcpy(trade_ASellYesterdayClose->TradeDate, Utils::getYMDYesterdayDate().c_str()); // 昨天日期
-									strcpy(trade_ASellYesterdayClose->InstrumentID, (*stg_itor)->getStgInstrumentIdA().c_str()); // A合约ID
-									trade_ASellYesterdayClose->HedgeFlag = '1'; // 1投机 2套利 3保值
-									trade_ASellYesterdayClose->Direction = '0'; // '0'买 '1'卖
-									trade_ASellYesterdayClose->Volume = (*stg_itor)->getStgPositionASell() - object["position_a_sell_yesterday"].GetInt(); // 成交量
+									(*stg_itor)->createFakeTradePositionDetail(trade_ASellYesterdayClose, Utils::getYMDYesterdayDate(),
+										(*stg_itor)->getStgInstrumentIdA(), '1', '0', '4',
+										(*stg_itor)->getStgPositionASell() - object["position_a_sell_yesterday"].GetInt());
 
 									(*stg_itor)->update_position_detail(order_ASellYesterdayClose);
 									(*stg_itor)->update_position_detail(trade_ASellYesterdayClose);
 
-
-
 									//A昨买
+									USER_CThostFtdcOrderField *order_ABuyYesterdayClose = new USER_CThostFtdcOrderField();
+									(*stg_itor)->createFakeOrderPositionDetail(order_ABuyYesterdayClose, Utils::getYMDYesterdayDate(),
+										(*stg_itor)->getStgInstrumentIdA(), '1', '1', '4',
+										(*stg_itor)->getStgPositionABuy() - object["position_a_buy_yesterday"].GetInt());
+
+									// Trade
+									USER_CThostFtdcTradeField *trade_ABuyYesterdayClose = new USER_CThostFtdcTradeField();
+									(*stg_itor)->createFakeTradePositionDetail(trade_ABuyYesterdayClose, Utils::getYMDYesterdayDate(),
+										(*stg_itor)->getStgInstrumentIdA(), '1', '1', '4',
+										(*stg_itor)->getStgPositionABuy() - object["position_a_buy_yesterday"].GetInt());
+
+									(*stg_itor)->update_position_detail(order_ABuyYesterdayClose);
+									(*stg_itor)->update_position_detail(trade_ABuyYesterdayClose);
 
 									//B昨卖
+									// Order
+									USER_CThostFtdcOrderField *order_BSellYesterdayClose = new USER_CThostFtdcOrderField();
+									(*stg_itor)->createFakeOrderPositionDetail(order_BSellYesterdayClose, Utils::getYMDYesterdayDate(),
+										(*stg_itor)->getStgInstrumentIdB(), '1', '0', '4',
+										(*stg_itor)->getStgPositionBSell() - object["position_b_sell_yesterday"].GetInt());
+
+									// Trade
+									USER_CThostFtdcTradeField *trade_ASellYesterdayClose = new USER_CThostFtdcTradeField();
+									(*stg_itor)->createFakeTradePositionDetail(trade_ASellYesterdayClose, Utils::getYMDYesterdayDate(),
+										(*stg_itor)->getStgInstrumentIdB(), '1', '0', '4',
+										(*stg_itor)->getStgPositionBSell() - object["position_b_sell_yesterday"].GetInt());
+
+									(*stg_itor)->update_position_detail(order_BSellYesterdayClose);
+									(*stg_itor)->update_position_detail(trade_ASellYesterdayClose);
+
 
 									//B昨买
+									USER_CThostFtdcOrderField *order_BBuyYesterdayClose = new USER_CThostFtdcOrderField();
+									(*stg_itor)->createFakeOrderPositionDetail(order_BBuyYesterdayClose, Utils::getYMDYesterdayDate(),
+										(*stg_itor)->getStgInstrumentIdB(), '1', '1', '4',
+										(*stg_itor)->getStgPositionBBuy() - object["position_b_buy_yesterday"].GetInt());
+
+									// Trade
+									USER_CThostFtdcTradeField *trade_BBuyYesterdayClose = new USER_CThostFtdcTradeField();
+									(*stg_itor)->createFakeTradePositionDetail(trade_BBuyYesterdayClose, Utils::getYMDYesterdayDate(),
+										(*stg_itor)->getStgInstrumentIdB(), '1', '1', '4',
+										(*stg_itor)->getStgPositionBBuy() - object["position_b_buy_yesterday"].GetInt());
+
+									(*stg_itor)->update_position_detail(order_BBuyYesterdayClose);
+									(*stg_itor)->update_position_detail(trade_BBuyYesterdayClose);
+
 
 									//A今卖
+									// Order
+									USER_CThostFtdcOrderField *order_ASellTodayClose = new USER_CThostFtdcOrderField();
+									(*stg_itor)->createFakeOrderPositionDetail(order_ASellTodayClose, ctp_m->getTradingDay(),
+										(*stg_itor)->getStgInstrumentIdA(), '1', '0', '3',
+										(*stg_itor)->getStgPositionASell() - object["position_a_sell_today"].GetInt());
+
+									// Trade
+									USER_CThostFtdcTradeField *trade_ASellTodayClose = new USER_CThostFtdcTradeField();
+									(*stg_itor)->createFakeTradePositionDetail(trade_ASellTodayClose, ctp_m->getTradingDay(),
+										(*stg_itor)->getStgInstrumentIdA(), '1', '0', '3',
+										(*stg_itor)->getStgPositionASell() - object["position_a_sell_today"].GetInt());
+
+									(*stg_itor)->update_position_detail(order_ASellTodayClose);
+									(*stg_itor)->update_position_detail(trade_ASellTodayClose);
 
 									//A今买
+									// Order
+									USER_CThostFtdcOrderField *order_ABuyTodayClose = new USER_CThostFtdcOrderField();
+									(*stg_itor)->createFakeOrderPositionDetail(order_ABuyTodayClose, ctp_m->getTradingDay(),
+										(*stg_itor)->getStgInstrumentIdA(), '1', '1', '3',
+										(*stg_itor)->getStgPositionABuy() - object["position_a_buy_today"].GetInt());
+
+									// Trade
+									USER_CThostFtdcTradeField *trade_ABuyTodayClose = new USER_CThostFtdcTradeField();
+									(*stg_itor)->createFakeTradePositionDetail(trade_ABuyTodayClose, ctp_m->getTradingDay(),
+										(*stg_itor)->getStgInstrumentIdA(), '1', '1', '3',
+										(*stg_itor)->getStgPositionABuy() - object["position_a_buy_today"].GetInt());
+
+									(*stg_itor)->update_position_detail(order_ABuyTodayClose);
+									(*stg_itor)->update_position_detail(trade_ABuyTodayClose);
 
 									//B今卖
+									// Order
+									USER_CThostFtdcOrderField *order_BSellTodayClose = new USER_CThostFtdcOrderField();
+									(*stg_itor)->createFakeOrderPositionDetail(order_BSellTodayClose, ctp_m->getTradingDay(),
+										(*stg_itor)->getStgInstrumentIdB(), '1', '0', '3',
+										(*stg_itor)->getStgPositionBSell() - object["position_b_sell_today"].GetInt());
+
+									// Trade
+									USER_CThostFtdcTradeField *trade_BSellTodayClose = new USER_CThostFtdcTradeField();
+									(*stg_itor)->createFakeTradePositionDetail(trade_BSellTodayClose, ctp_m->getTradingDay(),
+										(*stg_itor)->getStgInstrumentIdB(), '1', '0', '3',
+										(*stg_itor)->getStgPositionBSell() - object["position_b_sell_today"].GetInt());
+
+									(*stg_itor)->update_position_detail(order_BSellTodayClose);
+									(*stg_itor)->update_position_detail(trade_BSellTodayClose);
 
 									//B今买
+									// Order
+									USER_CThostFtdcOrderField *order_BBuyTodayClose = new USER_CThostFtdcOrderField();
+									(*stg_itor)->createFakeOrderPositionDetail(order_BBuyTodayClose, ctp_m->getTradingDay(),
+										(*stg_itor)->getStgInstrumentIdB(), '1', '1', '3',
+										(*stg_itor)->getStgPositionBBuy() - object["position_b_buy_today"].GetInt());
 
+									// Trade
+									USER_CThostFtdcTradeField *trade_BBuyTodayClose = new USER_CThostFtdcTradeField();
+									(*stg_itor)->createFakeTradePositionDetail(trade_BBuyTodayClose, ctp_m->getTradingDay(),
+										(*stg_itor)->getStgInstrumentIdB(), '1', '1', '3',
+										(*stg_itor)->getStgPositionBBuy() - object["position_b_buy_today"].GetInt());
 
+									(*stg_itor)->update_position_detail(order_BBuyTodayClose);
+									(*stg_itor)->update_position_detail(trade_BBuyTodayClose);
+
+									// 赋值
 									(*stg_itor)->setStgPositionABuy(object["position_a_buy"].GetInt());
-
-									USER_PRINT("循环判断删除最早的仓位 position_a_buy_yesterday...");
-									//循环判断删除最早的仓位 position_a_buy_yesterday
-									num_need_to_delete = (*stg_itor)->getStgPositionABuyYesterday() - object["position_a_buy_yesterday"].GetInt();
-									std::cout << "\tA昨买需要删除数量 = " << num_need_to_delete << std::endl;
-									// order
-									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
-										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
-										)
-									{
-
-										if ((!strcmp((*position_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdA().c_str()))
-											&& (strcmp((*position_itor)->InsertDate, ctp_m->getTradingDay().c_str()))
-											&& (*position_itor)->Direction == '0') //合约id相同，日期不相同删除,方向为买
-										{
-											delete (*position_itor);
-											position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->erase(position_itor); //移除
-											count++;
-										}
-										else {
-											position_itor++;
-										}
-									}
-									// trade
-									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
-										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end() && (count < num_need_to_delete);
-										)
-									{
-
-										if ((!strcmp((*position_trade_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdA().c_str()))
-											&& (strcmp((*position_trade_itor)->TradeDate, ctp_m->getTradingDay().c_str()))
-											&& (*position_trade_itor)->Direction == '0') //合约id相同，日期不相同删除，方向为买
-										{
-											delete (*position_trade_itor);
-											position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->erase(position_trade_itor); //移除
-											count++;
-										}
-										else {
-											position_trade_itor++;
-										}
-									}
 									(*stg_itor)->setStgPositionABuyYesterday(object["position_a_buy_yesterday"].GetInt());
-									
-									//循环判断删除最早的仓位 position_a_buy_today
-									USER_PRINT("循环判断删除最早的仓位 position_a_buy_today...");
-									num_need_to_delete = (*stg_itor)->getStgPositionABuyToday() - object["position_a_buy_today"].GetInt();
-									std::cout << "\tA今买需要删除数量 = " << num_need_to_delete << std::endl;
-									// order
-									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
-										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
-										) 
-									{
-										
-										if ((!strcmp((*position_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdA().c_str()))
-											&& (!strcmp((*position_itor)->InsertDate, ctp_m->getTradingDay().c_str()))
-											&& (*position_itor)->Direction == '0') //合约id相同，日期相同，方向为买
-										{
-											delete (*position_itor);
-											position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->erase(position_itor); //移除
-											count++;
-										}
-										else {
-											position_itor++;
-										}
-									}
-									// trade
-									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
-										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end() && (count < num_need_to_delete);
-										)
-									{
-
-										if ((!strcmp((*position_trade_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdA().c_str()))
-											&& (!strcmp((*position_trade_itor)->TradeDate, ctp_m->getTradingDay().c_str()))
-											&& (*position_trade_itor)->Direction == '0') //合约id相同，日期相同删除
-										{
-											delete (*position_trade_itor);
-											position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->erase(position_trade_itor); //移除
-											count++;
-										}
-										else {
-											position_trade_itor++;
-										}
-									}
 									(*stg_itor)->setStgPositionABuyToday(object["position_a_buy_today"].GetInt());
-
 									(*stg_itor)->setStgPositionBBuy(object["position_b_buy"].GetInt());
-
-									//循环判断删除最早的仓位 position_b_buy_yesterday
-									USER_PRINT("循环判断删除最早的仓位 position_b_buy_yesterday...");
-									USER_PRINT("(*stg_itor)->getStgPositionBBuyYesterday()");
-									USER_PRINT((*stg_itor)->getStgPositionBBuyYesterday());
-									USER_PRINT(object["position_b_buy_yesterday"].GetInt());
-									num_need_to_delete = (*stg_itor)->getStgPositionBBuyYesterday() - object["position_b_buy_yesterday"].GetInt();
-									std::cout << "\tB昨买需要删除数量 = " << num_need_to_delete << std::endl;
-									USER_PRINT("order recursive...");
-									USER_PRINT("(*stg_itor)->getStg_List_Position_Detail_From_Order()");
-									USER_PRINT((*stg_itor)->getStg_List_Position_Detail_From_Order()->size());
-									// order
-									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
-										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
-										)
-									{
-										std::cout << "\t(*position_itor)->InstrumentID = " << (*position_itor)->InstrumentID << std::endl;
-										std::cout << "\t(*stg_itor)->getStgInstrumentIdB = " << (*stg_itor)->getStgInstrumentIdB() << std::endl;
-										std::cout << "\t(*position_itor)->InsertDate = " << (*position_itor)->InsertDate << std::endl;
-										std::cout << "\tctp_m->getTradingDay().c_str = " << ctp_m->getTradingDay().c_str() << std::endl;
-										std::cout << "\t(*position_itor)->Direction = " << (*position_itor)->Direction << std::endl;
-										if ((!strcmp((*position_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdB().c_str()))
-											&& (strcmp((*position_itor)->InsertDate, ctp_m->getTradingDay().c_str()))
-											&& (*position_itor)->Direction == '0') //合约id相同，日期不相同删除,方向为买
-										{
-											delete (*position_itor);
-											position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->erase(position_itor); //移除
-											count++;
-										}
-										else {
-											position_itor++;
-										}
-									}
-									USER_PRINT("trade recursive...");
-									// trade
-									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
-										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end() && (count < num_need_to_delete);
-										)
-									{
-
-										if ((!strcmp((*position_trade_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdB().c_str()))
-											&& (strcmp((*position_trade_itor)->TradeDate, ctp_m->getTradingDay().c_str()))
-											&& (*position_trade_itor)->Direction == '0') //合约id相同，日期不相同删除，方向为买
-										{
-											delete (*position_trade_itor);
-											position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->erase(position_trade_itor); //移除
-											count++;
-										}
-										else {
-											position_trade_itor++;
-										}
-									}
 									(*stg_itor)->setStgPositionBBuyYesterday(object["position_b_buy_yesterday"].GetInt());
-
-									//循环判断删除最早的仓位 position_b_buy_today
-									USER_PRINT("循环判断删除最早的仓位 position_b_buy_today...");
-									num_need_to_delete = (*stg_itor)->getStgPositionBBuyToday() - object["position_b_buy_today"].GetInt();
-									std::cout << "\tB今买需要删除数量 = " << num_need_to_delete << std::endl;
-									// order
-									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
-										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
-										)
-									{
-
-										if ((!strcmp((*position_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdB().c_str()))
-											&& (!strcmp((*position_itor)->InsertDate, ctp_m->getTradingDay().c_str()))
-											&& (*position_itor)->Direction == '0') //合约id相同，日期相同，方向为买
-										{
-											delete (*position_itor);
-											position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->erase(position_itor); //移除
-											count++;
-										}
-										else {
-											position_itor++;
-										}
-									}
-									// trade
-									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
-										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end() && (count < num_need_to_delete);
-										)
-									{
-
-										if ((!strcmp((*position_trade_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdB().c_str()))
-											&& (!strcmp((*position_trade_itor)->TradeDate, ctp_m->getTradingDay().c_str()))
-											&& (*position_trade_itor)->Direction == '0') //合约id相同，日期相同删除
-										{
-											delete (*position_trade_itor);
-											position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->erase(position_trade_itor); //移除
-											count++;
-										}
-										else {
-											position_trade_itor++;
-										}
-									}
 									(*stg_itor)->setStgPositionBBuyToday(object["position_b_buy_today"].GetInt());
-
-
-
-
-									/*(*stg_itor)->setStgPositionASell(object["position_a_sell"].GetInt());
-									(*stg_itor)->setStgPositionASellToday(object["position_a_sell_today"].GetInt());
-									(*stg_itor)->setStgPositionASellYesterday(object["position_a_sell_yesterday"].GetInt());
-
-
-									(*stg_itor)->setStgPositionBSell(object["position_b_sell"].GetInt());
-									(*stg_itor)->setStgPositionBSellToday(object["position_b_sell_today"].GetInt());
-									(*stg_itor)->setStgPositionBSellYesterday(object["position_b_sell_yesterday"].GetInt());*/
-
 									(*stg_itor)->setStgPositionASell(object["position_a_sell"].GetInt());
-
-									//循环判断删除最早的仓位 position_a_sell_yesterday
-									USER_PRINT("循环判断删除最早的仓位 position_a_sell_yesterday")
-									num_need_to_delete = (*stg_itor)->getStgPositionASellYesterday() - object["position_a_sell_yesterday"].GetInt();
-									std::cout << "\tA昨卖需要删除数量 = " << num_need_to_delete << std::endl;
-									// order
-									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
-										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
-										)
-									{
-
-										if ((!strcmp((*position_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdA().c_str()))
-											&& (strcmp((*position_itor)->InsertDate, ctp_m->getTradingDay().c_str()))
-											&& (*position_itor)->Direction == '1') //合约id相同，日期不相同删除,方向为卖
-										{
-											delete (*position_itor);
-											position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->erase(position_itor); //移除
-											count++;
-										}
-										else {
-											position_itor++;
-										}
-									}
-									// trade
-									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
-										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end() && (count < num_need_to_delete);
-										)
-									{
-
-										if ((!strcmp((*position_trade_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdA().c_str()))
-											&& (strcmp((*position_trade_itor)->TradeDate, ctp_m->getTradingDay().c_str()))
-											&& (*position_trade_itor)->Direction == '1') //合约id相同，日期不相同删除，方向为卖
-										{
-											delete (*position_trade_itor);
-											position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->erase(position_trade_itor); //移除
-											count++;
-										}
-										else {
-											position_trade_itor++;
-										}
-									}
 									(*stg_itor)->setStgPositionASellYesterday(object["position_a_sell_yesterday"].GetInt());
-
-									//循环判断删除最早的仓位 position_a_sell_today
-									USER_PRINT("循环判断删除最早的仓位 position_a_sell_today")
-									num_need_to_delete = (*stg_itor)->getStgPositionASellToday() - object["position_a_sell_today"].GetInt();
-									std::cout << "\tA今卖需要删除数量 = " << num_need_to_delete << std::endl;
-									// order
-									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
-										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
-										)
-									{
-
-										if ((!strcmp((*position_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdA().c_str()))
-											&& (!strcmp((*position_itor)->InsertDate, ctp_m->getTradingDay().c_str()))
-											&& (*position_itor)->Direction == '1') //合约id相同，日期相同，方向为卖
-										{
-											delete (*position_itor);
-											position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->erase(position_itor); //移除
-											count++;
-										}
-										else {
-											position_itor++;
-										}
-									}
-									// trade
-									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
-										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end() && (count < num_need_to_delete);
-										)
-									{
-
-										if ((!strcmp((*position_trade_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdA().c_str()))
-											&& (!strcmp((*position_trade_itor)->TradeDate, ctp_m->getTradingDay().c_str()))
-											&& (*position_trade_itor)->Direction == '1') //合约id相同，日期相同删除，方向为卖
-										{
-											delete (*position_trade_itor);
-											position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->erase(position_trade_itor); //移除
-											count++;
-										}
-										else {
-											position_trade_itor++;
-										}
-									}
 									(*stg_itor)->setStgPositionASellToday(object["position_a_sell_today"].GetInt());
-
-
-
 									(*stg_itor)->setStgPositionBSell(object["position_b_sell"].GetInt());
-
-									//循环判断删除最早的仓位 position_b_sell_yesterday
-									USER_PRINT("循环判断删除最早的仓位 position_b_sell_yesterday");
-									num_need_to_delete = (*stg_itor)->getStgPositionBSellYesterday() - object["position_b_sell_yesterday"].GetInt();
-									std::cout << "\tB昨卖需要删除数量 = " << num_need_to_delete << std::endl;
-									// order
-									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
-										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
-										)
-									{
-
-										if ((!strcmp((*position_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdB().c_str()))
-											&& (strcmp((*position_itor)->InsertDate, ctp_m->getTradingDay().c_str()))
-											&& (*position_itor)->Direction == '1') //合约id相同，日期不相同删除,方向为卖
-										{
-											delete (*position_itor);
-											position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->erase(position_itor); //移除
-											count++;
-										}
-										else {
-											position_itor++;
-										}
-									}
-									// trade
-									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
-										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end() && (count < num_need_to_delete);
-										)
-									{
-
-										if ((!strcmp((*position_trade_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdB().c_str()))
-											&& (strcmp((*position_trade_itor)->TradeDate, ctp_m->getTradingDay().c_str()))
-											&& (*position_trade_itor)->Direction == '1') //合约id相同，日期不相同删除，方向为卖
-										{
-											delete (*position_trade_itor);
-											position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->erase(position_trade_itor); //移除
-											count++;
-										}
-										else {
-											position_trade_itor++;
-										}
-									}
 									(*stg_itor)->setStgPositionBSellYesterday(object["position_b_sell_yesterday"].GetInt());
-
-									//循环判断删除最早的仓位 position_b_sell_today
-									USER_PRINT("循环判断删除最早的仓位 position_b_sell_today");
-									num_need_to_delete = (*stg_itor)->getStgPositionBSellToday() - object["position_b_sell_today"].GetInt();
-									std::cout << "\tB今卖需要删除数量 = " << num_need_to_delete << std::endl;
-									// order
-									for (count = 0, position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
-										position_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end() && (count < num_need_to_delete);
-										)
-									{
-
-										if ((!strcmp((*position_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdB().c_str()))
-											&& (!strcmp((*position_itor)->InsertDate, ctp_m->getTradingDay().c_str()))
-											&& (*position_itor)->Direction == '1') //合约id相同，日期相同，方向为卖
-										{
-											delete (*position_itor);
-											position_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->erase(position_itor); //移除
-											count++;
-										}
-										else {
-											position_itor++;
-										}
-									}
-									// trade
-									for (count = 0, position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin();
-										position_trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end() && (count < num_need_to_delete);
-										)
-									{
-
-										if ((!strcmp((*position_trade_itor)->InstrumentID, (*stg_itor)->getStgInstrumentIdB().c_str()))
-											&& (!strcmp((*position_trade_itor)->TradeDate, ctp_m->getTradingDay().c_str()))
-											&& (*position_trade_itor)->Direction == '1') //合约id相同，日期相同删除，方向为卖
-										{
-											delete (*position_trade_itor);
-											position_trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->erase(position_trade_itor); //移除
-											count++;
-										}
-										else {
-											position_trade_itor++;
-										}
-									}
 									(*stg_itor)->setStgPositionBSellToday(object["position_b_sell_today"].GetInt());
 
 

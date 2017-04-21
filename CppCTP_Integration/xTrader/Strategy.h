@@ -461,6 +461,12 @@ public:
 	//清空持仓明细
 	void clearStgPositionDetail();
 
+	//构造模拟平仓order
+	void createFakeOrderPositionDetail(USER_CThostFtdcOrderField *order, string date, string instrumentID, char CombHedgeFlag, char Direction, char CombOffsetFlag, int VolumeTradedBatch);
+
+	//构造模拟平仓trade
+	void createFakeTradePositionDetail(USER_CThostFtdcTradeField *trade, string date, string instrumentID, char HedgeFlag, char Direction, char OffsetFlag, int Volume);
+
 private:
 	Trader *trader;
 	User *user;
