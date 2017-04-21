@@ -2801,9 +2801,6 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 									list<USER_CThostFtdcOrderField *>::iterator position_itor;			//order持仓明细
 									list<USER_CThostFtdcTradeField *>::iterator position_trade_itor;	//trade持仓明细
-
-									int num_need_to_delete = 0; //可以被删掉的数量
-									int count = 0;				//计数
 									
 									std::cout << "\t修改之前的仓位:" << std::endl;
 									std::cout << "\tA卖(" << (*stg_itor)->getStgPositionASell() << ", " << (*stg_itor)->getStgPositionASellYesterday() << ")" << std::endl;
@@ -2850,7 +2847,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 										(*stg_itor)->getStgPositionBSell() - object["position_b_sell_yesterday"].GetInt());
 
 									// Trade
-									USER_CThostFtdcTradeField *trade_ASellYesterdayClose = new USER_CThostFtdcTradeField();
+									USER_CThostFtdcTradeField *trade_BSellYesterdayClose = new USER_CThostFtdcTradeField();
 									(*stg_itor)->createFakeTradePositionDetail(trade_ASellYesterdayClose, Utils::getYMDYesterdayDate(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '0', '4',
 										(*stg_itor)->getStgPositionBSell() - object["position_b_sell_yesterday"].GetInt());
@@ -3003,6 +3000,27 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									create_info_object.AddMember("position_b_sell_yesterday", (*stg_itor)->getStgPositionBSellYesterday(), allocator);
 
 									create_info_array.PushBack(create_info_object, allocator);
+
+									//析构
+									delete order_ASellYesterdayClose;
+									delete trade_ASellYesterdayClose;
+									delete order_ABuyYesterdayClose;
+									delete trade_ABuyYesterdayClose;
+
+									delete order_BSellYesterdayClose;
+									delete trade_BSellYesterdayClose;
+									delete order_BBuyYesterdayClose;
+									delete trade_BBuyYesterdayClose;
+
+									delete order_ASellTodayClose;
+									delete trade_ASellTodayClose;
+									delete order_ABuyTodayClose;
+									delete trade_ABuyTodayClose;
+
+									delete order_BSellTodayClose;
+									delete trade_BSellTodayClose;
+									delete order_BBuyTodayClose;
+									delete trade_BBuyTodayClose;
 
 								}
 								else {
