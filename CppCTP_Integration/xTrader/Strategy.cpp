@@ -1120,7 +1120,6 @@ void Strategy::calPosition() {
 	this->stg_position_b_sell_today = 0;	//持仓B今卖
 	this->stg_position_b_buy_today = 0;		//持仓B今买
 
-
 	list<USER_CThostFtdcOrderField *>::iterator itor;
 	for (itor = this->stg_list_position_detail_from_order->begin();
 		itor != this->stg_list_position_detail_from_order->end(); itor++) {

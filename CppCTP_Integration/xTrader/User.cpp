@@ -766,8 +766,6 @@ void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *
 	USER_PRINT("User::DB_OnRtnOrder DB Connection!");
 	USER_PRINT(conn);
 	BSONObjBuilder b;
-	/// 交易员id
-	b.append("OperatorID", this->getTraderID());
 	///经纪公司代码
 	b.append("BrokerID", pOrder->BrokerID);
 	///投资者代码
@@ -1336,7 +1334,11 @@ void User::DB_OnErrRtnOrderAction(mongo::DBClientConnection *conn, CThostFtdcOrd
 	///用户代码
 	b.append("UserID", pOrderAction->UserID);
 	///状态信息
-	b.append("StatusMsg", pOrderAction->StatusMsg);
+	codeDst_2[90] = { 0 };
+	Utils::Gb2312ToUtf8(codeDst_2, 90, pOrderAction->StatusMsg, strlen(pOrderAction->StatusMsg)); // Gb2312ToUtf8
+	b.append("StatusMsg", codeDst_2);
+	/*///状态信息
+	b.append("StatusMsg", pOrderAction->StatusMsg);*/
 	///合约代码
 	b.append("InstrumentID", pOrderAction->InstrumentID);
 	///营业部编号

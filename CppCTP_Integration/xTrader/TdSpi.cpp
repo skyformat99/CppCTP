@@ -2036,9 +2036,9 @@ void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcR
 			string temp(pInputOrder->OrderRef);
 			string result = temp.substr(0, 1);
 			int len_order_ref = temp.length();
-			string strategyid = temp.substr(len_order_ref - 2, 2);
-			if (temp.length() == 12 && result == "1") {
-
+			string strategyid = "";
+			if (len_order_ref == 12 && result == "1") {
+				strategyid = temp.substr(len_order_ref - 2, 2);
 				list<Strategy *>::iterator itor;
 				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 					if ((*itor)->getStgStrategyId() == strategyid) {
@@ -2200,7 +2200,6 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 		string temp(pOrder->OrderRef);
 		std::cout << "\t报单引用 = " << temp << std::endl;
 		int len_order_ref = temp.length();
-		
 		string result = temp.substr(0, 1);
 		//std::cout << "\tafter substr temp = " << temp << std::endl;
 		string strategyid = "";
@@ -2334,9 +2333,9 @@ void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFt
 			string temp(pInputOrder->OrderRef);
 			string result = temp.substr(0, 1);
 			int len_order_ref = temp.length();
-			string strategyid = temp.substr(len_order_ref - 2, 2);
-			if (temp.length() == 12 && result == "1") {
-
+			string strategyid = "";
+			if (len_order_ref == 12 && result == "1") {
+				strategyid = temp.substr(len_order_ref - 2, 2);
 				list<Strategy *>::iterator itor;
 				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 					if ((*itor)->getStgStrategyId() == strategyid) {
@@ -2375,12 +2374,12 @@ void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction,
 			string temp(pInputOrderAction->OrderRef);
 			string result = temp.substr(0, 1);
 			int len_order_ref = temp.length();
-			string strategyid = temp.substr(len_order_ref - 2, 2);
+			string strategyid = "";
 
-			if (temp.length() == 12 && result == "1") { // 通过本交易系统发出去的order长度12,首位字符为1
+			if (len_order_ref == 12 && result == "1") { // 通过本交易系统发出去的order长度12,首位字符为1
 				//this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pInputOrderAction);
 				//delete[] codeDst;
-
+				strategyid = temp.substr(len_order_ref - 2, 2);
 				list<Strategy *>::iterator itor;
 				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 					if ((*itor)->getStgStrategyId() == strategyid) {
@@ -2404,12 +2403,12 @@ void TdSpi::OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction, CThost
 			string temp(pOrderAction->OrderRef);
 			string result = temp.substr(0, 1);
 			int len_order_ref = temp.length();
-			string strategyid = temp.substr(len_order_ref - 2, 2);
+			string strategyid = "";
 
-			if (temp.length() == 12 && result == "1") { // 通过本交易系统发出去的order长度12,首位字符为1
+			if (len_order_ref == 12 && result == "1") { // 通过本交易系统发出去的order长度12,首位字符为1
 				//this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pInputOrderAction);
 				//delete[] codeDst;
-
+				strategyid = temp.substr(len_order_ref - 2, 2);
 				list<Strategy *>::iterator itor;
 				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 					if ((*itor)->getStgStrategyId() == strategyid) {
