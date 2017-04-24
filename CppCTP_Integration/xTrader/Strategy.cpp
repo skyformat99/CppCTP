@@ -1111,14 +1111,14 @@ void Strategy::calPosition() {
 	this->stg_position_b_buy = 0;			//持仓B买
 	this->stg_position_a_buy = 0;			//持仓A买
 	this->stg_position_b_sell = 0;			//持仓B卖
-	this->stg_position_a_sell_yesterday = 0;//
-	this->stg_position_a_buy_yesterday = 0; //
-	this->stg_position_a_sell_today = 0;	//
-	this->stg_position_a_buy_today = 0;		//
-	this->stg_position_b_sell_yesterday = 0;//
-	this->stg_position_b_buy_yesterday = 0; //
-	this->stg_position_b_sell_today = 0;	//
-	this->stg_position_b_buy_today = 0;		//
+	this->stg_position_a_sell_yesterday = 0;//持仓A昨卖
+	this->stg_position_a_buy_yesterday = 0; //持仓A今买
+	this->stg_position_a_sell_today = 0;	//持仓A今卖
+	this->stg_position_a_buy_today = 0;		//持仓A今买
+	this->stg_position_b_sell_yesterday = 0;//持仓B昨卖
+	this->stg_position_b_buy_yesterday = 0; //持仓B昨买
+	this->stg_position_b_sell_today = 0;	//持仓B今卖
+	this->stg_position_b_buy_today = 0;		//持仓B今买
 
 
 	list<USER_CThostFtdcOrderField *>::iterator itor;
@@ -2018,14 +2018,36 @@ void Strategy::finish_pending_order_list() {
 			/// A合约撤单
 			this->stg_user->getUserTradeSPI()->OrderAction((*itor)->ExchangeID, (*itor)->OrderRef, (*itor)->OrderSysID);
 		}
-		else if (!strcmp((*itor)->InstrumentID, this->stg_instrument_id_B.c_str())) //B合约
+		//B合约
+		else if (!strcmp((*itor)->InstrumentID, this->stg_instrument_id_B.c_str()))
 		{
-			//先撤单
+			//1:先撤单
 			this->stg_user->getUserTradeSPI()->OrderAction((*itor)->ExchangeID, (*itor)->OrderRef, (*itor)->OrderSysID);
-			//再超价发单
+			
+			//2:再超价发单
+			// B合约报单参数
+			// 合约代码
+			std::strcpy(this->stg_b_order_insert_args->InstrumentID, this->stg_instrument_id_B.c_str());
+			// 限价
+			this->stg_b_order_insert_args->LimitPrice = this->stg_instrument_B_tick->AskPrice1 + this->stg_b_limit_price_shift * this->stg_b_price_tick;
+			// 数量
+			//this->stg_b_order_insert_args->VolumeTotalOriginal = order_volume;
+			// 买卖方向
+			this->stg_b_order_insert_args->Direction = (*itor)->Direction; // 0买 1卖
+			// 组合开平标志
+			this->stg_b_order_insert_args->CombOffsetFlag[0] = (*itor)->CombOffsetFlag[0]; //组合开平标志0开仓 上期所3平今、4平昨，其他交易所1平仓
+			// 组合投机套保标志
+			this->stg_b_order_insert_args->CombHedgeFlag[0] = '1'; // 1投机 2套利 3保值
+			// 发单手数
+			this->stg_b_order_insert_args->VolumeTotalOriginal = (*itor)->VolumeTotalOriginal - (*itor)->VolumeTraded;
+			// 报单引用
+			this->stg_order_ref_b = this->Generate_Order_Ref();
+			this->stg_order_ref_last = this->stg_order_ref_b;
+			strcpy(this->stg_b_order_insert_args->OrderRef, this->stg_order_ref_b.c_str());
 
+			// 调用发单方法
+			this->Exec_OrderInsert(this->stg_b_order_insert_args);
 		}
-		
 	}
 }
 

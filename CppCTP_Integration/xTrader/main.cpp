@@ -183,127 +183,6 @@ void *th_fn(void *arg) {
 	return (void *)0;
 }
 
-void printMenuEN() {
-	cout << "|==========================|" << endl;
-	cout << "|Please Input Your Choice: |" << endl;
-	cout << "|i:Order Insert            |" << endl;
-	cout << "|a:Order Action            |" << endl;
-	cout << "|b:Break                   |" << endl;
-	cout << "|e:Qry Exchange            |" << endl;
-	cout << "|s:Qry Instrument          |" << endl;
-	cout << "|o:Qry Order               |" << endl;
-	cout << "|t:Qry Trading Account     |" << endl;
-	cout << "|u:Qry Investor            |" << endl;
-	cout << "|d:Qry Trade               |" << endl;
-	cout << "|h:Qry Investor Position   |" << endl;
-	cout << "|==========================|" << endl;
-}
-
-void printMenu() {
-	cout << "|==============================|" << endl;
-	cout << "|请输入您的操作编号:           |" << endl;
-	cout << "|【1】:交易员登陆              |" << endl;
-	cout << "|【2】:管理员登陆              |" << endl;
-	cout << "|【q】:退出                    |" << endl;
-	cout << "|==============================|" << endl;
-}
-
-void printContinue() {
-	cout << "|======================|" << endl;
-	cout << "|请输入【c】继续操作   |" << endl;
-	cout << "|======================|" << endl;
-}
-
-void printContinueEN() {
-	cout << "|======================|" << endl;
-	cout << "|Input 'c' to Continue:|" << endl;
-	cout << "|======================|" << endl;
-}
-
-void printLoginSuccessMenu() {
-	cout << "|=============|" << endl;
-	printf("|\033[47;30m【登陆成功!】\033[0m|\n");
-	cout << "|=============|" << endl;
-}
-
-void printLoginFailedMenu() {
-	cout << "|========================|" << endl;
-	printf("|\033[47;31m【！！！登录失败！！！】\033[0m|\n");
-	cout << "|========================|" << endl;
-}
-
-void printErrorInputMenu() {
-	cout << "|========================|" << endl;
-	printf("|\033[47;31m【！！！重新输入！！！】\033[0m|\n");
-	cout << "|========================|" << endl;
-}
-
-void printWelcome() {
-	cout << "|===========================|" << endl;
-	//cout << "|欢迎登录期货多账户交易系统!|" << endl;
-	printf("|\033[47;30m欢迎登录期货多账户交易系统!\033[0m|\n");
-	cout << "|===========================|" << endl;
-}
-
-void printLoginTraderOperatorMenu() {
-	cout << "|==============================|" << endl;
-	cout << "|请输入您的操作编号:           |" << endl;
-	cout << "|【1】:账户查询                |" << endl;
-	cout << "|【2】:持仓查询                |" << endl;
-	cout << "|【3】:报单查询                |" << endl;
-	cout << "|【4】:成交查询                |" << endl;
-	cout << "|【5】:报单                    |" << endl;
-	cout << "|【6】:撤单                    |" << endl;
-	cout << "|【7】:订阅行情                |" << endl;
-	cout << "|【8】:退订行情                |" << endl;
-	cout << "|【q】:退出                    |" << endl;
-	cout << "|==============================|" << endl;
-}
-
-void printFutureAccountListMenu() {
-	cout << "|==============================|" << endl;
-	//cout << "|\033[40;32m当前您所管理的期货账户列表:   \033[0m|\n" << endl;
-	printf("|\033[47;30m当前您所管理的期货账户列表:   \033[0m|\n");
-	cout << "|==============================|" << endl;
-}
-
-void printTraderAccoutListMenu() {
-	cout << "|==============================|" << endl;
-	printf("|\033[47;30m当前您所管理的交易员列表:     \033[0m|\n");
-	cout << "|==============================|" << endl;
-}
-
-void printAdminOperateMenu() {
-	cout << "|==============================|" << endl;
-	cout << "|请输入您的操作编号:           |" << endl;
-	cout << "|【1】:交易员管理              |" << endl;
-	cout << "|【2】:期货账户管理            |" << endl;
-	cout << "|【q】:退出                    |" << endl;
-	cout << "|==============================|" << endl;
-}
-
-void printTraderOperateMenu() {
-	cout << "|==============================|" << endl;
-	cout << "|请输入您的操作编号:           |" << endl;
-	cout << "|【1】:查看所有交易员          |" << endl;
-	cout << "|【2】:增加交易员              |" << endl;
-	cout << "|【3】:删除交易员              |" << endl;
-	cout << "|【4】:修改交易员              |" << endl;
-	cout << "|【q】:退出                    |" << endl;
-	cout << "|==============================|" << endl;
-}
-
-void printFutureAccountOperateMenu() {
-	cout << "|==============================|" << endl;
-	cout << "|请输入您的操作编号:           |" << endl;
-	cout << "|【1】:查看所有期货账户        |" << endl;
-	cout << "|【2】:增加期货账户            |" << endl;
-	cout << "|【3】:删除期货账户            |" << endl;
-	cout << "|【4】:修改期货账户            |" << endl;
-	cout << "|【q】:退出                    |" << endl;
-	cout << "|==============================|" << endl;
-}
-
 void timer_handler() {
 
 	/*time_t tt = system_clock::to_time_t(system_clock::now()); 
@@ -393,8 +272,8 @@ void timer_handler() {
 											is_need_save_data_afternoon = false;
 										}
 										else {
-											std::cout << "\t现在时间:" << nowtime << std::endl;
-											std::cout << "\t非盘中交易时间." << std::endl;
+											//std::cout << "\t现在时间:" << nowtime << std::endl;
+											//std::cout << "\t非盘中交易时间." << std::endl;
 											market_close_flag = true;
 										}
 
@@ -407,8 +286,8 @@ void timer_handler() {
 			}
 		}
 		else {
-			std::cout << "\t现在时间:" << nowtime << std::endl;
-			std::cout << "\t非盘中交易时间." << std::endl;
+			//std::cout << "\t现在时间:" << nowtime << std::endl;
+			//std::cout << "\t非盘中交易时间." << std::endl;
 			market_close_flag = true;
 		}
 	}
