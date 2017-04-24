@@ -449,7 +449,7 @@ public:
 	list<USER_CThostFtdcTradeField *> * getStg_List_Position_Detail_From_Trade(); // 持仓明细(trade)
 
 	void printStrategyInfo(string message); //调试输出
-	void printStrategyInfoPosition();
+	void printStrategyInfoPosition(); //输出当前持仓明细
 
 	void setStgUpdatePositionDetailRecordTime(string stg_update_position_detail_record_time);
 	string getStgUpdatePositionDetailRecordTime();
@@ -466,6 +466,9 @@ public:
 
 	//构造模拟平仓trade
 	void createFakeTradePositionDetail(USER_CThostFtdcTradeField *trade, string date, string instrumentID, char HedgeFlag, char Direction, char OffsetFlag, int Volume);
+
+	//收盘前5秒处理挂单列表
+	void finish_pending_order_list();
 
 private:
 	Trader *trader;

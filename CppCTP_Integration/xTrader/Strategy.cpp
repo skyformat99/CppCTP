@@ -1918,27 +1918,32 @@ void Strategy::add_position_detail(USER_CThostFtdcOrderField *posd) {
 void Strategy::printStrategyInfo(string message) {
 	time_t tt = system_clock::to_time_t(system_clock::now()); 
 	std::string nowt(std::ctime(&tt)); 
-	/*std::cout << "====策略状态信息====" << std::endl;
-	std::cout << "时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
-	std::cout << "期货账户:" << this->stg_user_id << std::endl;
-	std::cout << "策略编号:" << this->stg_strategy_id << std::endl;
-	std::cout << "调试信息:" << message << std::endl;*/
+	std::cout << "Strategy::printStrategyInfo()" << std::endl;
+	std::cout << "\t时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
+	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
+	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
+	std::cout << "\t调试信息:" << message << std::endl;
+	std::cout << "\t系统总开关:" << this->stg_user->getCTP_Manager()->getOn_Off() << std::endl;
+	std::cout << "\t期货账户开关" << this->stg_user->getOn_Off() << std::endl;
+	std::cout << "\t交易员开关" << this->stg_user->GetTrader()->getOn_Off() << std::endl;
+	std::cout << "\t策略开关:" << this->getOn_Off() << std::endl;
 }
 
 void Strategy::printStrategyInfoPosition() {
-	/*std::cout << "A合约今买 = " << this->stg_position_a_buy_today << ", "
-		<< "A合约昨买 = " << this->stg_position_a_buy_yesterday << ", "
-		<< "A合约总买 = " << this->stg_position_a_buy << ", "
-		<< "A合约今卖 = " << this->stg_position_a_sell_today << ", "
-		<< "A合约昨卖 = " << this->stg_position_a_buy_yesterday << ", "
-		<< "A合约总卖 = " << this->stg_position_a_sell << std::endl;
+	std::cout << "Strategy::printStrategyInfoPosition()" << std::endl;
+	std::cout << "\tA合约今买:" << this->stg_position_a_buy_today << ", "
+		<< "A合约昨买:" << this->stg_position_a_buy_yesterday << ", "
+		<< "A合约总买:" << this->stg_position_a_buy << ", "
+		<< "A合约今卖:" << this->stg_position_a_sell_today << ", "
+		<< "A合约昨卖:" << this->stg_position_a_buy_yesterday << ", "
+		<< "A合约总卖:" << this->stg_position_a_sell << std::endl;
 
-	std::cout << "B合约今买 = " << this->stg_position_b_buy_today << ", "
-		<< "B合约昨买 = " << this->stg_position_b_buy_yesterday << ", "
-		<< "B合约总买 = " << this->stg_position_b_buy << ", "
-		<< "B合约今卖 = " << this->stg_position_b_sell_today << ", "
-		<< "B合约昨卖 = " << this->stg_position_b_buy_yesterday << ", "
-		<< "B合约总卖 = " << this->stg_position_b_sell << std::endl;*/
+	std::cout << "\tB合约今买:" << this->stg_position_b_buy_today << ", "
+		<< "B合约昨买:" << this->stg_position_b_buy_yesterday << ", "
+		<< "B合约总买:" << this->stg_position_b_buy << ", "
+		<< "B合约今卖:" << this->stg_position_b_sell_today << ", "
+		<< "B合约昨卖:" << this->stg_position_b_buy_yesterday << ", "
+		<< "B合约总卖:" << this->stg_position_b_sell << std::endl;
 }
 
 void Strategy::setStgUpdatePositionDetailRecordTime(string stg_update_position_detail_record_time) {
@@ -1995,6 +2000,33 @@ void Strategy::createFakeTradePositionDetail(USER_CThostFtdcTradeField *trade, s
 	trade->Direction = Direction; // '0'买 '1'卖
 	trade->Volume = Volume; // 成交量
 	trade->OffsetFlag = OffsetFlag; // '3'平今 '4'平昨
+}
+
+//收盘前5秒处理挂单列表
+void Strategy::finish_pending_order_list() {
+	USER_PRINT("Strategy::finish_pending_order_list()");
+	std::cout << "Strategy::finish_pending_order_list()" << std::endl;
+	std::cout << "\t挂单列表长度:" << this->stg_list_order_pending->size() << std::endl;
+	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
+	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
+	
+	//遍历挂单列表,如果是A合约,立马撤单,如果是B合约,超价发单
+	list<CThostFtdcOrderField *>::iterator itor;
+	for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end(); itor++) {
+		//A合约
+		if (!strcmp((*itor)->InstrumentID, this->stg_instrument_id_A.c_str())) {
+			/// A合约撤单
+			this->stg_user->getUserTradeSPI()->OrderAction((*itor)->ExchangeID, (*itor)->OrderRef, (*itor)->OrderSysID);
+		}
+		else if (!strcmp((*itor)->InstrumentID, this->stg_instrument_id_B.c_str())) //B合约
+		{
+			//先撤单
+			this->stg_user->getUserTradeSPI()->OrderAction((*itor)->ExchangeID, (*itor)->OrderRef, (*itor)->OrderSysID);
+			//再超价发单
+
+		}
+		
+	}
 }
 
 // 获取持仓明细
@@ -2103,7 +2135,7 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		
 		//收到最后5秒开始强制处理挂单列表命令
 		if (this->stg_user->getCTP_Manager()->getIsStartEndTask()) {
-
+			this->finish_pending_order_list();
 		}
 
 	}
@@ -2346,55 +2378,6 @@ void Strategy::Order_Algorithm_One() {
 	}
 
 	//std::cout << "策略开关,期货账户开关,总开关22222" << std::endl;
-	/*USER_PRINT("**********************");
-	USER_PRINT("价差多头卖平");
-	USER_PRINT(this->sell_close_on_off);
-	USER_PRINT(this->stg_spread_long);
-	USER_PRINT(this->stg_sell_close);
-	USER_PRINT(this->stg_position_a_sell);
-	USER_PRINT(this->stg_position_b_buy);
-	USER_PRINT(this->stg_position_a_sell);
-	USER_PRINT("*满足条件：");
-	USER_PRINT(this->sell_close_on_off);
-	USER_PRINT((this->stg_spread_long >= this->stg_sell_close));
-	USER_PRINT((this->stg_position_a_sell == this->stg_position_b_buy));
-	USER_PRINT((this->stg_position_a_sell > 0));
-	USER_PRINT("**********************");
-
-	USER_PRINT("######################");
-	USER_PRINT("价差空头买平");
-	USER_PRINT(this->buy_close_on_off);
-	USER_PRINT(this->stg_position_a_sell);
-	USER_PRINT(this->stg_position_b_buy);
-	USER_PRINT(this->stg_position_a_sell);
-	USER_PRINT("#满足条件：");
-	USER_PRINT(this->buy_close_on_off);
-	USER_PRINT((this->stg_position_a_sell == this->stg_position_b_buy));
-	USER_PRINT((this->stg_position_a_sell > 0));
-	USER_PRINT((this->stg_spread_short <= this->stg_buy_close));
-	USER_PRINT("######################");
-
-	USER_PRINT("$$$$$$$$$$$$$$$$$$$$$$");
-	USER_PRINT("价差多头卖开");
-	USER_PRINT(this->sell_open_on_off);
-	USER_PRINT(this->stg_position_a_buy);
-	USER_PRINT(this->stg_position_a_sell);
-	USER_PRINT(this->stg_lots);
-	USER_PRINT("$满足条件：");
-	USER_PRINT(this->sell_open_on_off);
-	USER_PRINT(((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots));
-	USER_PRINT("$$$$$$$$$$$$$$$$$$$$$$");
-
-	USER_PRINT("&&&&&&&&&&&&&&&&&&&&&&");
-	USER_PRINT("价差空头买开");
-	USER_PRINT(this->buy_open_on_off);
-	USER_PRINT(this->stg_position_a_buy);
-	USER_PRINT(this->stg_position_a_sell);
-	USER_PRINT(this->stg_lots);
-	USER_PRINT("&满足条件：");
-	USER_PRINT(this->buy_open_on_off);
-	USER_PRINT(((this->stg_position_a_buy + this->stg_position_a_sell) < this->stg_lots));
-	USER_PRINT("&&&&&&&&&&&&&&&&&&&&&&");*/
 	
 	/*this->printStrategyInfo("价差卖开参数");
 	std::cout << "this->stg_spread_long = " << this->stg_spread_long << std::endl;
