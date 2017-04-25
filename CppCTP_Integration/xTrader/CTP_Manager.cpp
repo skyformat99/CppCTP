@@ -4209,7 +4209,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 
 				if ((!strcmp((*stg_itor)->getStgStrategyId().c_str(), (*position_itor)->StrategyID)) &&
 					(!strcmp((*stg_itor)->getStgUserId().c_str(), (*position_itor)->UserID))) { //策略id相同 && 用户ID相同
-
+					strcpy((*position_itor)->TradingDayRecord, this->getTradingDay().c_str());
 					//添加到对应策略的持仓明细列表里
 					(*stg_itor)->getStg_List_Position_Detail_From_Order()->push_back((*position_itor));
 				}
@@ -4222,6 +4222,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 
 				if ((!strcmp((*stg_itor)->getStgStrategyId().c_str(), (*position_itor)->StrategyID)) &&
 					(!strcmp((*stg_itor)->getStgUserId().c_str(), (*position_itor)->UserID))) { //策略id相同 && 用户ID相同
+					strcpy((*position_itor)->TradingDayRecord, this->getTradingDay().c_str());
 					USER_PRINT("将昨持仓明细添加到策略的持仓明细里(order)_2");
 					//添加到对应策略的持仓明细列表里
 					(*stg_itor)->getStg_List_Position_Detail_From_Order()->push_back((*position_itor));
@@ -4283,7 +4284,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 
 				if ((!strcmp((*stg_itor)->getStgStrategyId().c_str(), (*position_trade_itor)->StrategyID)) &&
 					(!strcmp((*stg_itor)->getStgUserId().c_str(), (*position_trade_itor)->UserID))) { //策略id相同 && 用户ID相同
-
+					strcpy((*position_trade_itor)->TradingDayRecord, this->getTradingDay().c_str());
 					//添加到对应策略的持仓明细列表里
 					(*stg_itor)->getStg_List_Position_Detail_From_Trade()->push_back((*position_trade_itor));
 
@@ -4299,7 +4300,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 
 				if ((!strcmp((*stg_itor)->getStgStrategyId().c_str(), (*position_trade_itor)->StrategyID)) &&
 					(!strcmp((*stg_itor)->getStgUserId().c_str(), (*position_trade_itor)->UserID))) { //策略id相同 && 用户ID相同
-
+					strcpy((*position_trade_itor)->TradingDayRecord, this->getTradingDay().c_str());
 					//添加到对应策略的持仓明细列表里
 					(*stg_itor)->getStg_List_Position_Detail_From_Trade()->push_back((*position_trade_itor));
 

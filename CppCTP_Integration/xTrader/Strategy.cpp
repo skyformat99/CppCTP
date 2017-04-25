@@ -3653,7 +3653,7 @@ void Strategy::update_position(CThostFtdcTradeField *pTrade) {
 		<< "B合约昨卖 = " << this->stg_position_b_buy_yesterday << ", "
 		<< "B合约总卖 = " << this->stg_position_b_sell << std::endl;*/
 
-	USER_PRINT("A合约今买");
+	/*USER_PRINT("A合约今买");
 	USER_PRINT(this->stg_position_a_buy_today);
 	USER_PRINT("A合约昨买");
 	USER_PRINT(this->stg_position_a_buy_yesterday);
@@ -3677,7 +3677,7 @@ void Strategy::update_position(CThostFtdcTradeField *pTrade) {
 	USER_PRINT("B合约昨卖");
 	USER_PRINT(this->stg_position_b_sell_yesterday);
 	USER_PRINT("B合约总卖");
-	USER_PRINT(this->stg_position_b_sell);
+	USER_PRINT(this->stg_position_b_sell);*/
 
 }
 
