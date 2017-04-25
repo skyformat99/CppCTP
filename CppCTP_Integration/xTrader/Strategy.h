@@ -470,6 +470,9 @@ public:
 	//收盘前5秒处理挂单列表
 	void finish_pending_order_list();
 
+	//校准持仓量
+	void calibrate_position();
+
 private:
 	Trader *trader;
 	User *user;

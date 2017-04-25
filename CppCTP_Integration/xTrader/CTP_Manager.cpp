@@ -2781,19 +2781,22 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 										break;
 									}
 
+									// 如果持仓量有小于0的置为0
+									//(*stg_itor)->calibrate_position();
+
 									/// 判断仓位数量,界面发送的修改数量大于系统中的数量,判断为出错
-									if (((*stg_itor)->getStgPositionABuy() < object["position_a_buy"].GetInt()) 
-										|| ((*stg_itor)->getStgPositionABuyYesterday() < object["position_a_buy_yesterday"].GetInt())
-										|| ((*stg_itor)->getStgPositionABuyToday() < object["position_a_buy_today"].GetInt())
-										|| ((*stg_itor)->getStgPositionBBuy() < object["position_b_buy"].GetInt())
-										|| ((*stg_itor)->getStgPositionBBuyToday() < object["position_b_buy_today"].GetInt())
-										|| ((*stg_itor)->getStgPositionBBuyYesterday() < object["position_b_buy_yesterday"].GetInt())
-										|| ((*stg_itor)->getStgPositionASell() < object["position_a_sell"].GetInt())
-										|| ((*stg_itor)->getStgPositionASellToday() < object["position_a_sell_today"].GetInt())
-										|| ((*stg_itor)->getStgPositionASellYesterday() < object["position_a_sell_yesterday"].GetInt())
-										|| ((*stg_itor)->getStgPositionBSell() < object["position_b_sell"].GetInt())
-										|| ((*stg_itor)->getStgPositionBSellToday() < object["position_b_sell_today"].GetInt())
-										|| ((*stg_itor)->getStgPositionBSellYesterday() < object["position_b_sell_yesterday"].GetInt()))
+									if ((((*stg_itor)->getStgPositionABuy() < object["position_a_buy"].GetInt()) && (object["position_a_buy"].GetInt() != 0))
+										|| (((*stg_itor)->getStgPositionABuyYesterday() < object["position_a_buy_yesterday"].GetInt()) && (object["position_a_buy"].GetInt() != 0))
+										|| (((*stg_itor)->getStgPositionABuyToday() < object["position_a_buy_today"].GetInt()) && (object["position_a_buy_today"].GetInt() != 0))
+										|| (((*stg_itor)->getStgPositionBBuy() < object["position_b_buy"].GetInt()) && (object["position_b_buy"].GetInt() != 0))
+										|| (((*stg_itor)->getStgPositionBBuyToday() < object["position_b_buy_today"].GetInt()) && (object["position_b_buy_today"].GetInt() != 0))
+										|| (((*stg_itor)->getStgPositionBBuyYesterday() < object["position_b_buy_yesterday"].GetInt()) && (object["position_b_buy_yesterday"].GetInt() != 0))
+										|| (((*stg_itor)->getStgPositionASell() < object["position_a_sell"].GetInt()) && (object["position_a_sell"].GetInt() != 0))
+										|| (((*stg_itor)->getStgPositionASellToday() < object["position_a_sell_today"].GetInt()) && (object["position_a_sell_today"].GetInt() != 0))
+										|| (((*stg_itor)->getStgPositionASellYesterday() < object["position_a_sell_yesterday"].GetInt()) && (object["position_a_sell_yesterday"].GetInt() != 0))
+										|| (((*stg_itor)->getStgPositionBSell() < object["position_b_sell"].GetInt()) && (object["position_b_sell"].GetInt() != 0))
+										|| (((*stg_itor)->getStgPositionBSellToday() < object["position_b_sell_today"].GetInt()) && (object["position_b_sell_today"].GetInt() != 0))
+										|| (((*stg_itor)->getStgPositionBSellYesterday() < object["position_b_sell_yesterday"].GetInt())) && (object["position_b_sell_yesterday"].GetInt() != 0))
 									{
 										USER_PRINT("界面发送的修改数量大于系统中的数量,出错...");
 										Utils::printRedColor("界面发送的修改数量大于系统中的数量,出错...");

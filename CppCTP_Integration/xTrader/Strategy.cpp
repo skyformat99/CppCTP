@@ -2050,6 +2050,62 @@ void Strategy::finish_pending_order_list() {
 	}
 }
 
+//校准持仓量
+void Strategy::calibrate_position() {
+
+	if (this->stg_position_a_sell < 0)
+	{
+		this->stg_position_a_sell = 0;			//持仓A卖
+	}
+
+	if (this->stg_position_b_buy < 0)
+	{
+		this->stg_position_b_buy = 0;			//持仓B买
+	}
+
+	if (this->stg_position_a_buy < 0)
+	{
+		this->stg_position_a_buy = 0;			//持仓A买
+	}
+
+	if (this->stg_position_b_sell < 0)
+	{
+		this->stg_position_b_sell = 0;			//持仓B卖
+	}
+	if (this->stg_position_a_sell_yesterday < 0)
+	{
+		this->stg_position_a_sell_yesterday = 0;//持仓A昨卖
+	}
+	if (this->stg_position_a_buy_yesterday < 0)
+	{
+		this->stg_position_a_buy_yesterday = 0; //持仓A今买
+	}
+	if (this->stg_position_a_sell_today < 0)
+	{
+		this->stg_position_a_sell_today = 0;	//持仓A今卖
+	}
+	if (this->stg_position_a_buy_today < 0)
+	{
+		this->stg_position_a_buy_today = 0;		//持仓A今买
+	}
+	if (this->stg_position_b_sell_yesterday < 0)
+	{
+		this->stg_position_b_sell_yesterday = 0;//持仓B昨卖
+	}
+	if (this->stg_position_b_buy_yesterday < 0)
+	{
+		this->stg_position_b_buy_yesterday = 0; //持仓B昨买
+	}
+	if (this->stg_position_b_sell_today < 0)
+	{
+		this->stg_position_b_sell_today = 0;	//持仓B今卖
+	}
+	if (this->stg_position_b_buy_today < 0)
+	{
+		this->stg_position_b_buy_today = 0;		//持仓B今买
+	}
+}
+
 // 获取持仓明细
 list<USER_CThostFtdcOrderField *> *Strategy::getStg_List_Position_Detail_From_Order() {
 	return this->stg_list_position_detail_from_order;
