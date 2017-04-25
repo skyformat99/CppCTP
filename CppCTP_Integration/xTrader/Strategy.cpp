@@ -2212,7 +2212,7 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		
 		//收到最后5秒开始强制处理挂单列表命令
 		if (this->stg_user->getCTP_Manager()->getIsStartEndTask()) {
-			this->finish_pending_order_list();
+			//this->finish_pending_order_list();
 		}
 
 	}
