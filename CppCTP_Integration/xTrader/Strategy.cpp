@@ -1934,14 +1934,14 @@ void Strategy::printStrategyInfoPosition() {
 		<< "A合约昨买:" << this->stg_position_a_buy_yesterday << ", "
 		<< "A合约总买:" << this->stg_position_a_buy << ", "
 		<< "A合约今卖:" << this->stg_position_a_sell_today << ", "
-		<< "A合约昨卖:" << this->stg_position_a_buy_yesterday << ", "
+		<< "A合约昨卖:" << this->stg_position_a_sell_yesterday << ", "
 		<< "A合约总卖:" << this->stg_position_a_sell << std::endl;
 
 	std::cout << "\tB合约今买:" << this->stg_position_b_buy_today << ", "
 		<< "B合约昨买:" << this->stg_position_b_buy_yesterday << ", "
 		<< "B合约总买:" << this->stg_position_b_buy << ", "
 		<< "B合约今卖:" << this->stg_position_b_sell_today << ", "
-		<< "B合约昨卖:" << this->stg_position_b_buy_yesterday << ", "
+		<< "B合约昨卖:" << this->stg_position_b_sell_yesterday << ", "
 		<< "B合约总卖:" << this->stg_position_b_sell << std::endl;
 }
 
