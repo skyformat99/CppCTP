@@ -1137,7 +1137,7 @@ void Strategy::calPosition() {
 				}
 			}
 			// 等于B合约
-			else {
+			else if (!strcmp((*itor)->InstrumentID, this->getStgInstrumentIdB().c_str())) {
 				if ((*itor)->Direction == '0') //买
 				{
 					this->stg_position_b_buy_today += (*itor)->VolumeTradedBatch;
@@ -1160,7 +1160,7 @@ void Strategy::calPosition() {
 				}
 			}
 			// 等于B合约
-			else {
+			else if (!strcmp((*itor)->InstrumentID, this->getStgInstrumentIdB().c_str())) {
 				if ((*itor)->Direction == '0') //买
 				{
 					this->stg_position_b_buy_yesterday += (*itor)->VolumeTradedBatch;

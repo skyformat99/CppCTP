@@ -1698,6 +1698,7 @@ bool User::ComparePositionTotal() {
 		return is_same_flag;
 	}
 
+
 	
 
 
@@ -1791,8 +1792,8 @@ bool User::ComparePositionTotal() {
 	
 	for (ctp_itor = this->l_position_detail_from_ctp->begin(); ctp_itor != this->l_position_detail_from_ctp->end(); ctp_itor++)
 	{
-		std::cout << "\t检查CTP = " << (*ctp_itor)->InstrumentID << std::endl;
-		std::cout << "\t检查CTP的标志位 = " << (*ctp_itor)->Is_Same << std::endl;
+		std::cout << "\t对比CTP与Order的合约ID = " << (*ctp_itor)->InstrumentID << std::endl;
+		std::cout << "\t对比结果(0:错误 1:正确) = " << (*ctp_itor)->Is_Same << std::endl;
 		if (!(*ctp_itor)->Is_Same)
 		{
 			is_same_flag = false;
