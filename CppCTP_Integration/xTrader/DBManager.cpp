@@ -596,14 +596,15 @@ void DBManager::getAllFutureAccount(list<User *> *l_user) {
 }
 
 int DBManager::CreateStrategy(Strategy *stg) {
+	std::cout << "DBManager::CreateStrategy()" << std::endl;
 	int count_number = 0;
 	int flag = 0;
 
 	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
-		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str()) << "is_active" << true));
+		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str()) << "trading_day" << (stg->getStgTradingDay().c_str())));
 
 	if (count_number > 0) {
-		cout << "Strategy Already Exists!" << endl;
+		cout << "\t策略已经存在!!" << endl;
 		flag = 1;
 	}
 	else {

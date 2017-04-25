@@ -47,6 +47,7 @@ string one_sec_time = "14:58:00";
 string stop_trading_time = "14:59:55";
 string close_time = "15:00:00";
 string stopsave_time = "15:00:02";
+string stop_start_from_today_position_time = "20:00:00";
 
 
 string morning_open_time = "08:59:55"; // 早上开盘时间
@@ -261,21 +262,33 @@ void timer_handler() {
 									market_close_flag = true;
 									is_need_save_data_afternoon = true;
 									
-									if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + stopsave_time).c_str())) { // 时间大于15:01:00
+									if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + stopsave_time).c_str())) { // 时间大于15:00:00小于15:00:02
 										market_close_flag = true;
 										is_need_save_data_afternoon = false;
-
-										//时间大于20:59:55
-										if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + night_open_time).c_str())) { // 时间大于20:59:55
-											
-											market_close_flag = false;
-											is_need_save_data_afternoon = false;
-										}
-										else {
-											//std::cout << "\t现在时间:" << nowtime << std::endl;
-											//std::cout << "\t非盘中交易时间." << std::endl;
+										ctp_m->setIsMarketCloseDone(true);
+										
+										if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + stop_start_from_today_position_time).c_str())) //时间大于15:00:02小于18:00:00
+										{
+											ctp_m->setIsMarketCloseDone(false);
 											market_close_flag = true;
+											is_need_save_data_afternoon = false;
+
+											//时间大于20:59:55
+											if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + night_open_time).c_str())) { // 时间大于20:59:55
+
+												market_close_flag = false;
+												is_need_save_data_afternoon = false;
+											}
+											else {
+												//std::cout << "\t现在时间:" << nowtime << std::endl;
+												//std::cout << "\t非盘中交易时间." << std::endl;
+												market_close_flag = true;
+											}
+
 										}
+
+
+										
 
 									}
 								}

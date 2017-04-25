@@ -44,6 +44,7 @@ CTP_Manager::CTP_Manager() {
 	this->isCTPFinishedPositionInit = false;
 	this->is_market_close = true;
 	this->is_start_end_task = false;
+	this->is_market_close_done = false;
 	//this->ten_min_flag = false;
 	//this->one_min_flag = false;
 	//this->one_second_flag = false;
@@ -2232,6 +2233,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								std::cout << "Strategy已存在无需新建!" << std::endl;
 								build_doc.AddMember("MsgResult", 1, allocator);
 								build_doc.AddMember("MsgErrorReason", "策略已存在,不能重复创建!", allocator);
+								delete new_stg;
 							}
 							else {
 								std::cout << "Strategy新建完成!" << std::endl;
@@ -4224,8 +4226,8 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 
 	// 将昨持仓明细添加到策略的持仓明细里(order)
 	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
-		// 一旦有策略修改过持仓变量，从今持仓明细初始化
-		if (!(*stg_itor)->getStgIsPositionRight())
+		// 一旦有策略修改过持仓变量 或者 已经收盘，从今持仓明细初始化
+		if (!(*stg_itor)->getStgIsPositionRight() || (this->getIsMarketCloseDone()))
 		{
 			for (position_itor = this->l_posdetail->begin(); position_itor != this->l_posdetail->end(); position_itor++) {
 
@@ -4298,8 +4300,8 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 
 	// 将昨持仓明细添加到策略的持仓明细里(trade)
 	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
-		
-		if (!(*stg_itor)->getStgIsPositionRight()) {
+		// 如果仓位被修改过 或者 已经收盘，从今持仓明细初始化
+		if ((!(*stg_itor)->getStgIsPositionRight()) || (this->getIsMarketCloseDone())) {
 			for (position_trade_itor = this->l_posdetail_trade->begin();
 				position_trade_itor != this->l_posdetail_trade->end();
 				position_trade_itor++) {
@@ -4626,6 +4628,15 @@ void CTP_Manager::setIsStartEndTask(bool is_start_end_task) {
 
 bool CTP_Manager::getIsStartEndTask() {
 	return this->is_start_end_task;
+}
+
+//已经收盘标志位
+void CTP_Manager::setIsMarketCloseDone(bool is_market_close_done) {
+	this->is_market_close_done = is_market_close_done;
+}
+
+bool CTP_Manager::getIsMarketCloseDone() {
+	return this->is_market_close_done;
 }
 
 ///// 初始化昨仓明细

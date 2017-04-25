@@ -3179,6 +3179,7 @@ void Strategy::ExEc_OnRtnTrade(CThostFtdcTradeField *pTrade) {
 	//this->update_position_detail(pTrade); 
 	//this->update_position(pTrade);
 	//this->update_task_status();
+
 	if (!this->is_position_right) //如果有修改持仓,开始过滤,从修改时间后开始接收
 	{
 		string compare_date = pTrade->TradeDate; //报单日期
@@ -4749,6 +4750,10 @@ void Strategy::OrderInsert(User *user, char *InstrumentID, char CombOffsetFlag, 
 //下单响应
 void Strategy::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	USER_PRINT("Strategy::OnRtnOrder");
+	//如果已经收盘,不再接收
+	if (this->getStgUser()->getCTP_Manager()->getIsMarketCloseDone()) {
+		return;
+	}
 	/// 如果合约在撤单维护列表里，那么撤单次数增加1
 	this->stg_user->add_instrument_id_action_counter(pOrder);
 	this->Exec_OnRtnOrder(pOrder);
@@ -4757,18 +4762,30 @@ void Strategy::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 //成交通知
 void Strategy::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 	USER_PRINT("Strategy::OnRtnTrade");
+	//如果已经收盘,不再接收
+	if (this->getStgUser()->getCTP_Manager()->getIsMarketCloseDone()) {
+		return;
+	}
 	this->ExEc_OnRtnTrade(pTrade);
 }
 
 //下单错误响应
 void Strategy::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder) {
 	USER_PRINT("Strategy::OnErrRtnOrderInsert");
+	//如果已经收盘,不再接收
+	if (this->getStgUser()->getCTP_Manager()->getIsMarketCloseDone()) {
+		return;
+	}
 	this->Exec_OnErrRtnOrderInsert();
 }
 
 ///报单录入请求响应
 void Strategy::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder) {
 	USER_PRINT("Strategy::OnRspOrderInsert()");
+	//如果已经收盘,不再接收
+	if (this->getStgUser()->getCTP_Manager()->getIsMarketCloseDone()) {
+		return;
+	}
 	std::cout << "Strategy::OnRspOrderInsert()" << std::endl;
 	this->Exec_OnRspOrderInsert();
 }
