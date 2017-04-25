@@ -2151,6 +2151,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							new_stg->setStgInstrumentIdA(object["a_instrument_id"].GetString());
 							new_stg->setStgInstrumentIdB(object["b_instrument_id"].GetString());
 							new_stg->setStgTradingDay(ctp_m->getTradingDay());
+							// 最新修改时间
+							new_stg->setStgUpdatePositionDetailRecordTime(Utils::getDate());
+							new_stg->setStgIsPositionRight(false);
 
 							//new_stg->setStgPositionASellToday(object["position_a_sell_today"].GetInt());
 							//new_stg->setStgPositionBSell(object["position_b_sell"].GetInt());
@@ -2407,7 +2410,25 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						sleep(1);
 						ctp_m->UnSubmarketData(ctp_m->getMdSpi(), (*stg_itor)->getStgInstrumentIdB(), ctp_m->getL_UnsubInstrument());
 
-						// 清空策略对应的持仓明细(order, trade)
+						//从数据库删除
+						list<USER_CThostFtdcOrderField *>::iterator order_itor;
+						for (order_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
+							order_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end();
+							order_itor++)
+						{
+							ctp_m->getDBManager()->DeletePositionDetail((*order_itor));
+							ctp_m->getDBManager()->DeletePositionDetailYesterday((*order_itor));
+						}
+
+						list<USER_CThostFtdcTradeField *>::iterator trade_itor;
+						for (trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin(); 
+							trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end();
+							trade_itor++) {
+							ctp_m->getDBManager()->DeletePositionDetailTrade((*trade_itor));
+							ctp_m->getDBManager()->DeletePositionDetailTradeYesterday((*trade_itor));
+						}
+
+						// 析构策略对应的持仓明细(order, trade)
 						(*stg_itor)->clearStgPositionDetail();
 
 						// 删除策略

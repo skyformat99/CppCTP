@@ -155,7 +155,7 @@ public:
 	/************************************************************************/
 	//void CreatePositionDetail(PositionDetail *posd);
 	//void CreatePositionDetail(USER_CThostFtdcOrderField *posd);
-	//void DeletePositionDetail(PositionDetail *posd);
+	void DeletePositionDetail(USER_CThostFtdcOrderField *posd);
 	void UpdatePositionDetail(USER_CThostFtdcOrderField *posd);
 	void getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, string trader_id = "", string userid = "");
 	void DropPositionDetail();
@@ -173,6 +173,7 @@ public:
 	删除持仓明细(trade)
 	更新持仓明细(trade)*/
 	/************************************************************************/
+	void DeletePositionDetailTrade(USER_CThostFtdcTradeField *posd);
 	void UpdatePositionDetailTrade(USER_CThostFtdcTradeField *posd);
 	void getAllPositionDetailTrade(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id = "", string userid = "");
 	void DropPositionDetailTrade();

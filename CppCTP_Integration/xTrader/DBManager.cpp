@@ -1779,7 +1779,6 @@ void DBManager::getAllStrategyYesterdayByActiveUser(list<Strategy *> *l_strategy
 			stg->setStgTraderId(p.getStringField("trader_id"));
 			stg->setStgUserId(p.getStringField("user_id"));
 
-
 			vector<BSONElement> elements = p["list_instrument_id"].Array();
 			if (elements.size() > 1) {
 				stg->setStgInstrumentIdA(elements[0].String());
@@ -2226,24 +2225,25 @@ void DBManager::CreatePositionDetail(USER_CThostFtdcOrderField *posd) {
 	}
 	USER_PRINT("DBManager::CreatePositionDetail OK");
 }
+#endif
 
-void DBManager::DeletePositionDetail(PositionDetail *posd) {
+void DBManager::DeletePositionDetail(USER_CThostFtdcOrderField *posd) {
 	USER_PRINT("DBManager::DeletePositionDetail");
 	int count_number = 0;
 
 	count_number = this->conn->count(DB_POSITIONDETAIL_COLLECTION,
-		BSON("userid" << posd->getUserID() << "strategyid" << posd->getStrategyID() << "tradingday" << posd->getTradingDay() << "is_active" << ISACTIVE));
+		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
-		this->conn->update(DB_POSITIONDETAIL_COLLECTION, BSON("userid" << posd->getUserID() << "strategyid" << posd->getStrategyID() << "tradingday" << posd->getTradingDay()), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
+		this->conn->update(DB_POSITIONDETAIL_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
 		USER_PRINT("DBManager::DeletePositionDetail ok");
 	}
 	else {
-		cout << "PositionDetail Not Exists!" << endl;
+		cout << "删除order持仓明细,持仓明细不存在!" << endl;
 	}
 	USER_PRINT("DBManager::DeletePositionDetail OK");
 }
-#endif
+
 
 void DBManager::UpdatePositionDetail(USER_CThostFtdcOrderField *posd) {
 	USER_PRINT("DBManager::UpdatePositionDetail");
@@ -2544,6 +2544,23 @@ void DBManager::DropPositionDetailYesterday() {
 	USER_PRINT("DBManager::DropPositionDetailYesterday");
 	this->conn->dropCollection(DB_POSITIONDETAIL_YESTERDAY_COLLECTION);
 	USER_PRINT("DBManager::DropPositionDetailYesterday ok");
+}
+
+void DBManager::DeletePositionDetailTrade(USER_CThostFtdcTradeField *posd) {
+	USER_PRINT("DBManager::DeletePositionDetailTrade");
+	int count_number = 0;
+
+	count_number = this->conn->count(DB_POSITIONDETAIL_TRADE_COLLECTION,
+		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
+
+	if (count_number > 0) {
+		this->conn->update(DB_POSITIONDETAIL_TRADE_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
+		USER_PRINT("DBManager::DeletePositionDetailTrade ok");
+	}
+	else {
+		cout << "删除trade持仓明细,持仓明细不存在!" << endl;
+	}
+	USER_PRINT("DBManager::DeletePositionDetailTrade OK");
 }
 
 void DBManager::UpdatePositionDetailTrade(USER_CThostFtdcTradeField *posd) {
