@@ -68,16 +68,16 @@ int main() {
 	
 	string broker_id = "9999";
 	//string user_id = "058176";
-	//string password = "669822";
+	//string password = "";
 	string user_id = "078681";
-	string password = "123456";
+	string password = "";
 #else
 	/*真实*/
 	//string frontAddr = "tcp://101.95.8.190:41205"; //实盘
 	//string frontAddr = "tcp://101.95.8.190:61205";
 	//string broker_id = "0187";
 	//string user_id = "800692";
-	//string password = "255026";
+	//string password = "";
 #endif
 
 
@@ -105,8 +105,8 @@ int main() {
 	tdspi->Login(const_cast<char *>(broker_id.c_str()), const_cast<char *>(user_id.c_str()), const_cast<char *>(password.c_str()));
 
 	//sleep(2);
-	//tdspi->Login("9999", "063802", "123456");
-	//tdspi->Login("9999", "063802", "123456");
+	//tdspi->Login("9999", "", "");
+	//tdspi->Login("9999", "", "");
 
 	/**
 	实盘
@@ -115,8 +115,8 @@ int main() {
 	//tdspi->Connect("tcp://220.248.44.146:41205");
 	//sleep(1);
 	//登录
-	//tdspi->Login("0187", "86001525", "206029");
-	//tdspi->Login("0187", "801859", "162860");
+	//tdspi->Login("0187", "86001525", "");
+	//tdspi->Login("0187", "801859", "");
 	//sleep(1);
 	//查询交易结算确认
 	//tdspi->QrySettlementInfoConfirm(const_cast<char *>(tdspi->getBrokerID().c_str()), const_cast<char *>(tdspi->getUserID().c_str()), tdspi->getRequestID());

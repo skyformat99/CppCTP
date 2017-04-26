@@ -318,8 +318,8 @@ void timer_handler() {
 		// 保存最后策略参数,更新运行状态正常收盘
 		//ctp_m->saveStrategy();
 
-		ctp_m->saveAllStrategyPositionDetail();
-		ctp_m->updateSystemFlag();
+		/*ctp_m->saveAllStrategyPositionDetail();
+		ctp_m->updateSystemFlag();*/
 
 		// 保存策略参数,关闭定时器
 		ctp_m->getCalTimer()->stop();
