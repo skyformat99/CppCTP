@@ -1162,7 +1162,7 @@ int DBManager::CreateStrategyYesterday(Strategy *stg) {
 	int flag = 0;
 
 	count_number = this->conn->count(DB_STRATEGY_YESTERDAY_COLLECTION,
-		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str()) << "is_active" << true));
+		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str()) << "trading_day" << (stg->getStgTradingDay().c_str())));
 
 	if (count_number > 0) {
 		cout << "Strategy Already Exists!" << endl;
