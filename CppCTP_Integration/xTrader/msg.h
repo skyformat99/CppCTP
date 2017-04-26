@@ -2,7 +2,7 @@
 #define __MSG_H__
 #include <sys/types.h>
 
-#define MAX_BUFFER_SIZE	30*1024
+#define MAX_BUFFER_SIZE	60*1024
 
 typedef struct {
 	//协议头部
