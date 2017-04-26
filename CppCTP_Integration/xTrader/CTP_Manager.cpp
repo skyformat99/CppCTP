@@ -3006,6 +3006,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									//ctp_m->getDBManager()->DropPositionDetailTrade();
 									//ctp_m->saveStrategyPositionDetail((*stg_itor));
 									//ctp_m->saveAllStrategyPositionDetail();
+									ctp_m->getDBManager()->DeletePositionDetailByStrategy((*stg_itor));
 									ctp_m->saveStrategyPositionDetail((*stg_itor));
 
 									/************************************************************************/

@@ -166,6 +166,8 @@ public:
 	void getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> *l_posd, string trader_id = "", string userid = "");
 	void DropPositionDetailYesterday();
 
+	//根据策略,删除策略对应的order,trade持仓明细
+	bool DeletePositionDetailByStrategy(Strategy *stg);
 
 	/************************************************************************/
 	/*

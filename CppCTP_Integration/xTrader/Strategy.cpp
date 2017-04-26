@@ -1330,10 +1330,8 @@ void Strategy::Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
 			<< "direction" << posd->Direction
 			/*<< "comboffsetflag" << string(1, posd->CombOffsetFlag[0])
 			<< "combhedgeflag" << string(1, posd->CombHedgeFlag[0])*/
-
 			<< "comboffsetflag" << posd->CombOffsetFlag
 			<< "combhedgeflag" << posd->CombHedgeFlag
-
 			<< "limitprice" << posd->LimitPrice
 			<< "volumetotaloriginal" << posd->VolumeTotalOriginal
 			<< "tradingday" << posd->TradingDay

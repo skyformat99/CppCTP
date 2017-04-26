@@ -23,7 +23,9 @@ using std::unique_ptr;
 #define DB_SESSIONS_COLLECTION					"CTP.sessions"
 #define DB_ADMIN_COLLECTION						"CTP.admin"
 #define DB_STRATEGY_COLLECTION					"CTP.strategy"
+#define DB_STRATEGY_CHANGED_COLLECTION			"CTP.strategy_changed"
 #define DB_POSITIONDETAIL_COLLECTION			"CTP.positiondetail"
+#define DB_POSITIONDETAIL_CHANGED_COLLECTION	"CTP.positiondetail_changed"
 #define DB_POSITIONMODIFYRECORD_COLLECTION		"CTP.positionmodifyrecord"
 #define DB_POSITIONDETAIL_YESTERDAY_COLLECTION	"CTP.positiondetail_yesterday"
 #define DB_POSITIONDETAIL_TRADE_COLLECTION		"CTP.positiondetail_trade"
@@ -2545,6 +2547,31 @@ void DBManager::DropPositionDetailYesterday() {
 	USER_PRINT("DBManager::DropPositionDetailYesterday");
 	this->conn->dropCollection(DB_POSITIONDETAIL_YESTERDAY_COLLECTION);
 	USER_PRINT("DBManager::DropPositionDetailYesterday ok");
+}
+
+//根据策略,删除策略对应的order,trade持仓明细
+bool DBManager::DeletePositionDetailByStrategy(Strategy *stg) {
+	USER_PRINT("DBManager::DeletePositionDetailByStrategy");
+	std::cout << "DBManager::DeletePositionDetailByStrategy()" << std::endl;
+	bool flag = true;
+	int count_number = this->conn->count(DB_STRATEGY_COLLECTION,
+		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str()) << "trading_day" << (stg->getStgTradingDay().c_str()) << "is_active" << true));
+
+	if (count_number > 0) {
+		std::cout << "\t策略存在,开始删除对应策略持仓明细" << std::endl;
+		std::cout << "\t策略存在,开始删除持仓明细order" << std::endl;
+		this->conn->remove(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("strategyid" << stg->getStgStrategyId().c_str() << "userid" << stg->getStgUserId().c_str() << "is_active" << ISACTIVE));
+		std::cout << "\t策略存在,开始删除持仓明细trade" << std::endl;
+		this->conn->remove(DB_POSITIONDETAIL_TRADE_COLLECTION, MONGO_QUERY("strategyid" << stg->getStgStrategyId().c_str() << "userid" << stg->getStgUserId().c_str() << "is_active" << ISACTIVE));
+		flag = true;
+	}
+	else {
+		cout << "\t策略不存在!!" << endl;
+		flag = false;
+	}
+
+	USER_PRINT("DBManager::DeletePositionDetailByStrategy ok");
+	return flag;
 }
 
 void DBManager::DeletePositionDetailTrade(USER_CThostFtdcTradeField *posd) {
