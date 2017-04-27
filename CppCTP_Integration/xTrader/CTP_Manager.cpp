@@ -572,6 +572,8 @@ void CTP_Manager::saveStrategyPositionDetail(Strategy *stg) {
 	stg->UpdateStrategy(stg);
 	std::cout << "\t保存期货账户 = " << stg->getStgUserId() << std::endl;
 	std::cout << "\t保存策略ID = " << stg->getStgStrategyId() << std::endl;
+	std::cout << "\t保存策略order持仓明细长度 = " << stg->getStg_List_Position_Detail_From_Order()->size() << std::endl;
+	std::cout << "\t保存策略trade持仓明细长度 = " << stg->getStg_List_Position_Detail_From_Trade()->size() << std::endl;
 
 	// 遍历strategy持仓明细并保存
 	for (posd_itor = stg->getStg_List_Position_Detail_From_Order()->begin();
@@ -579,7 +581,6 @@ void CTP_Manager::saveStrategyPositionDetail(Strategy *stg) {
 		posd_itor++) {
 
 		//this->dbm->CreatePositionDetail((*posd_itor));
-		std::cout << "\t\t================持仓明细输出(trade)BEGIN===================" << std::endl;
 		std::cout << "\t\tinstrumentid = " << (*posd_itor)->InstrumentID << std::endl;
 		std::cout << "\t\torderref = " << (*posd_itor)->OrderRef << std::endl;
 		std::cout << "\t\tuserid = " << (*posd_itor)->UserID << std::endl;
@@ -601,7 +602,6 @@ void CTP_Manager::saveStrategyPositionDetail(Strategy *stg) {
 		std::cout << "\t\tinserttime = " << (*posd_itor)->InsertTime << std::endl;
 		std::cout << "\t\tstrategyid = " << (*posd_itor)->StrategyID << std::endl;
 		std::cout << "\t\tvolumetradedbatch = " << (*posd_itor)->VolumeTradedBatch << std::endl;
-		std::cout << "\t\t================持仓明细输出(order)END ===================" << std::endl;
 
 		stg->Update_Position_Detail_To_DB((*posd_itor));
 	}
@@ -612,7 +612,6 @@ void CTP_Manager::saveStrategyPositionDetail(Strategy *stg) {
 		posd_itor_trade++) {
 
 		//this->dbm->CreatePositionDetail((*posd_itor));
-		std::cout << "\t\t================持仓明细输出(trade)BEGIN===================" << std::endl;
 		std::cout << "\t\tinstrumentid = " << (*posd_itor_trade)->InstrumentID << std::endl;
 		std::cout << "\t\torderref = " << (*posd_itor_trade)->OrderRef << std::endl;
 		std::cout << "\t\tuserid = " << (*posd_itor_trade)->UserID << std::endl;
@@ -629,7 +628,6 @@ void CTP_Manager::saveStrategyPositionDetail(Strategy *stg) {
 		std::cout << "\t\ttradingdate = " << (*posd_itor_trade)->TradeDate << std::endl;
 		std::cout << "\t\tstrategyid = " << (*posd_itor_trade)->StrategyID << std::endl;
 		std::cout << "\t\tvolume = " << (*posd_itor_trade)->Volume << std::endl;
-		std::cout << "\t\t================持仓明细输出(trade)END ===================" << std::endl;
 
 		stg->Update_Position_Trade_Detail_To_DB((*posd_itor_trade));
 	}
@@ -639,14 +637,16 @@ void CTP_Manager::saveStrategyPositionDetail(Strategy *stg) {
 void CTP_Manager::saveStrategyChangedPositionDetail(Strategy *stg) {
 	list<USER_CThostFtdcOrderField *>::iterator posd_itor;
 	list<USER_CThostFtdcTradeField *>::iterator posd_itor_trade;
-	USER_PRINT("CTP_Manager::saveStrategyPositionDetail()");
+	USER_PRINT("CTP_Manager::saveStrategyChangedPositionDetail()");
 	std::cout << "CTP_Manager::saveStrategyChangedPositionDetail()" << std::endl;
 	//this->dbm->UpdateStrategy((*stg_itor));
 	stg->setStgUpdatePositionDetailRecordTime(Utils::getDate());
 	//stg->setStgLastSavedTime(Utils::getDate());
 	stg->UpdateStrategy(stg);
-	std::cout << "\t保存期货账户 = " << stg->getStgUserId() << std::endl;
-	std::cout << "\t保存策略ID = " << stg->getStgStrategyId() << std::endl;
+	std::cout << "\t保存 修改的策略 期货账户 = " << stg->getStgUserId() << std::endl;
+	std::cout << "\t保存 修改的策略 ID = " << stg->getStgStrategyId() << std::endl;
+	std::cout << "\t保存 修改的策略 order持仓明细长度 = " << stg->getStg_List_Position_Detail_From_Order()->size() << std::endl;
+	std::cout << "\t保存 修改的策略 trade持仓明细长度 = " << stg->getStg_List_Position_Detail_From_Trade()->size() << std::endl;
 
 	// 遍历strategy持仓明细并保存
 	for (posd_itor = stg->getStg_List_Position_Detail_From_Order()->begin();
@@ -654,7 +654,6 @@ void CTP_Manager::saveStrategyChangedPositionDetail(Strategy *stg) {
 		posd_itor++) {
 
 		//this->dbm->CreatePositionDetail((*posd_itor));
-		std::cout << "\t\t================持仓明细输出(trade)BEGIN===================" << std::endl;
 		std::cout << "\t\tinstrumentid = " << (*posd_itor)->InstrumentID << std::endl;
 		std::cout << "\t\torderref = " << (*posd_itor)->OrderRef << std::endl;
 		std::cout << "\t\tuserid = " << (*posd_itor)->UserID << std::endl;
@@ -676,7 +675,6 @@ void CTP_Manager::saveStrategyChangedPositionDetail(Strategy *stg) {
 		std::cout << "\t\tinserttime = " << (*posd_itor)->InsertTime << std::endl;
 		std::cout << "\t\tstrategyid = " << (*posd_itor)->StrategyID << std::endl;
 		std::cout << "\t\tvolumetradedbatch = " << (*posd_itor)->VolumeTradedBatch << std::endl;
-		std::cout << "\t\t================持仓明细输出(order)END ===================" << std::endl;
 
 		stg->Update_Position_Changed_Detail_To_DB((*posd_itor));
 	}
@@ -687,7 +685,6 @@ void CTP_Manager::saveStrategyChangedPositionDetail(Strategy *stg) {
 		posd_itor_trade++) {
 
 		//this->dbm->CreatePositionDetail((*posd_itor));
-		std::cout << "\t\t================持仓明细输出(trade)BEGIN===================" << std::endl;
 		std::cout << "\t\tinstrumentid = " << (*posd_itor_trade)->InstrumentID << std::endl;
 		std::cout << "\t\torderref = " << (*posd_itor_trade)->OrderRef << std::endl;
 		std::cout << "\t\tuserid = " << (*posd_itor_trade)->UserID << std::endl;
@@ -704,7 +701,6 @@ void CTP_Manager::saveStrategyChangedPositionDetail(Strategy *stg) {
 		std::cout << "\t\ttradingdate = " << (*posd_itor_trade)->TradeDate << std::endl;
 		std::cout << "\t\tstrategyid = " << (*posd_itor_trade)->StrategyID << std::endl;
 		std::cout << "\t\tvolume = " << (*posd_itor_trade)->Volume << std::endl;
-		std::cout << "\t\t================持仓明细输出(trade)END ===================" << std::endl;
 
 		stg->Update_Position_Trade_Changed_Detail_To_DB((*posd_itor_trade));
 	}
@@ -2914,13 +2910,13 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									Utils::printGreenColor("A昨卖");
 									// Order
 									USER_CThostFtdcOrderField *order_ASellYesterdayClose = new USER_CThostFtdcOrderField();
-									(*stg_itor)->createFakeOrderPositionDetail(order_ASellYesterdayClose, Utils::getYMDYesterdayDate(), 
+									(*stg_itor)->createFakeOrderPositionDetail(order_ASellYesterdayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdA(), '1', '0', '4',
 										(*stg_itor)->getStgPositionASellYesterday() - object["position_a_sell_yesterday"].GetInt());
 
 									// Trade
 									USER_CThostFtdcTradeField *trade_ASellYesterdayClose = new USER_CThostFtdcTradeField();
-									(*stg_itor)->createFakeTradePositionDetail(trade_ASellYesterdayClose, Utils::getYMDYesterdayDate(),
+									(*stg_itor)->createFakeTradePositionDetail(trade_ASellYesterdayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdA(), '1', '0', '4',
 										(*stg_itor)->getStgPositionASellYesterday() - object["position_a_sell_yesterday"].GetInt());
 
@@ -2931,13 +2927,13 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									Utils::printGreenColor("A昨买");
 									// Order
 									USER_CThostFtdcOrderField *order_ABuyYesterdayClose = new USER_CThostFtdcOrderField();
-									(*stg_itor)->createFakeOrderPositionDetail(order_ABuyYesterdayClose, Utils::getYMDYesterdayDate(),
+									(*stg_itor)->createFakeOrderPositionDetail(order_ABuyYesterdayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdA(), '1', '1', '4',
 										(*stg_itor)->getStgPositionABuyYesterday() - object["position_a_buy_yesterday"].GetInt());
 
 									// Trade
 									USER_CThostFtdcTradeField *trade_ABuyYesterdayClose = new USER_CThostFtdcTradeField();
-									(*stg_itor)->createFakeTradePositionDetail(trade_ABuyYesterdayClose, Utils::getYMDYesterdayDate(),
+									(*stg_itor)->createFakeTradePositionDetail(trade_ABuyYesterdayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdA(), '1', '1', '4',
 										(*stg_itor)->getStgPositionABuyYesterday() - object["position_a_buy_yesterday"].GetInt());
 
@@ -2948,13 +2944,13 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									Utils::printGreenColor("B昨卖");
 									// Order
 									USER_CThostFtdcOrderField *order_BSellYesterdayClose = new USER_CThostFtdcOrderField();
-									(*stg_itor)->createFakeOrderPositionDetail(order_BSellYesterdayClose, Utils::getYMDYesterdayDate(),
+									(*stg_itor)->createFakeOrderPositionDetail(order_BSellYesterdayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '0', '4',
 										(*stg_itor)->getStgPositionBSellYesterday() - object["position_b_sell_yesterday"].GetInt());
 
 									// Trade
 									USER_CThostFtdcTradeField *trade_BSellYesterdayClose = new USER_CThostFtdcTradeField();
-									(*stg_itor)->createFakeTradePositionDetail(trade_ASellYesterdayClose, Utils::getYMDYesterdayDate(),
+									(*stg_itor)->createFakeTradePositionDetail(trade_ASellYesterdayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '0', '4',
 										(*stg_itor)->getStgPositionBSellYesterday() - object["position_b_sell_yesterday"].GetInt());
 
@@ -2965,13 +2961,13 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									//B昨买
 									Utils::printGreenColor("B昨买");
 									USER_CThostFtdcOrderField *order_BBuyYesterdayClose = new USER_CThostFtdcOrderField();
-									(*stg_itor)->createFakeOrderPositionDetail(order_BBuyYesterdayClose, Utils::getYMDYesterdayDate(),
+									(*stg_itor)->createFakeOrderPositionDetail(order_BBuyYesterdayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '1', '4',
 										(*stg_itor)->getStgPositionBBuyYesterday() - object["position_b_buy_yesterday"].GetInt());
 
 									// Trade
 									USER_CThostFtdcTradeField *trade_BBuyYesterdayClose = new USER_CThostFtdcTradeField();
-									(*stg_itor)->createFakeTradePositionDetail(trade_BBuyYesterdayClose, Utils::getYMDYesterdayDate(),
+									(*stg_itor)->createFakeTradePositionDetail(trade_BBuyYesterdayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '1', '4',
 										(*stg_itor)->getStgPositionBBuyYesterday() - object["position_b_buy_yesterday"].GetInt());
 
@@ -3084,8 +3080,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									/************************************************************************/
 									ctp_m->getDBManager()->DeletePositionDetailByStrategy((*stg_itor));
 									ctp_m->getDBManager()->DeletePositionDetailChangedByStrategy((*stg_itor));
-									ctp_m->saveStrategyPositionDetail((*stg_itor));
-									ctp_m->saveStrategyChangedPositionDetail((*stg_itor));
+									/*ctp_m->saveStrategyPositionDetail((*stg_itor));
+									ctp_m->saveStrategyChangedPositionDetail((*stg_itor));*/
 									
 
 									/************************************************************************/
@@ -4237,14 +4233,17 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 			(*stg_itor)->setStgPositionBSellToday(0);
 			(*stg_itor)->setStgPositionBSellYesterday((*stg_itor)->getStgPositionBSell());
 
-			// 更新今仓最新交易时间
-			(*stg_itor)->setStgTradingDay(this->getTradingDay());
+			
+			// 新的交易日，把曾经的记录时间清掉
 			(*stg_itor)->setStgUpdatePositionDetailRecordTime("");
+			(*stg_itor)->setStgLastSavedTime("");
+			this->getDBManager()->DeletePositionDetailChangedByStrategy((*stg_itor));
 			(*stg_itor)->setStgIsPositionRight(true);
 
+			// 更新今仓最新交易时间
+			(*stg_itor)->setStgTradingDay(this->getTradingDay());
 			// 更新今仓到数据库
 			this->dbm->UpdateStrategy((*stg_itor));
-
 			// 更新对应期货账户报单引用
 			this->dbm->UpdateFutureAccountOrderRef(this->dbm->getConn(), (*stg_itor)->getStgUser(), "1000000001");
 
@@ -4291,25 +4290,13 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 			}
 		}
 	}
-	
-
-	//// 遍历策略，如果策略有修改过持仓变量，那么从今持仓明细初始化
-	//for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
-	//	// 一旦有策略修改过持仓变量,跳出循环，从今持仓明细初始化
-	//	if (!(*stg_itor)->getStgIsPositionRight())
-	//	{
-	//		is_position_right = false;
-	//		break;
-	//	}
-	//}
 
 	// 获取昨持仓明细
 	this->dbm->getAllPositionDetailYesterday(this->l_posdetail_yesterday);
 
-
 	// 将昨持仓明细添加到策略的持仓明细里(order)
 	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
-		// 一旦有策略修改过持仓变量 或者 已经收盘，从今持仓明细初始化
+		// 一旦有策略当天有保存过,那么从今持仓明细开始初始化
 		if ((*stg_itor)->getStgLastSavedTime() != "")
 		{
 			for (position_itor = this->l_posdetail->begin(); position_itor != this->l_posdetail->end(); position_itor++) {
@@ -4383,7 +4370,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 
 	// 将昨持仓明细添加到策略的持仓明细里(trade)
 	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
-		// 如果仓位被修改过 或者 已经收盘，从今持仓明细初始化
+		// 一旦有策略当天有保存过,那么从今持仓明细开始初始化
 		if ((*stg_itor)->getStgLastSavedTime() != "") {
 			for (position_trade_itor = this->l_posdetail_trade->begin();
 				position_trade_itor != this->l_posdetail_trade->end();

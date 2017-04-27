@@ -1312,7 +1312,7 @@ void Strategy::CreatePositionDetail(USER_CThostFtdcOrderField *posd) {
 /// 数据库更新策略持仓明细
 void Strategy::Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
 	USER_PRINT("Strategy::Update_Position_Detail_To_DB");
-
+	std::cout << "Strategy::Update_Position_Detail_To_DB()" << std::endl;
 	int count_number = 0;
 
 	count_number = this->stg_save_strategy_conn->count(DB_POSITIONDETAIL_COLLECTION,
@@ -1379,7 +1379,7 @@ void Strategy::Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
 		create_position_detail_mtx.lock();
 		this->stg_save_strategy_conn->insert(DB_POSITIONDETAIL_COLLECTION, p);
 		create_position_detail_mtx.unlock();
-		USER_PRINT("DBManager::CreatePositionTradeDetail ok");
+		USER_PRINT("Strategy::Update_Position_Detail_To_DB ok");
 	}
 
 	USER_PRINT("Strategy::Update_Position_Detail_To_DB OK");
@@ -1387,15 +1387,15 @@ void Strategy::Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
 
 /// 数据库更新策略持仓明细(order changed)
 void Strategy::Update_Position_Changed_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
-	USER_PRINT("Strategy::Update_Position_Detail_To_DB");
-
+	USER_PRINT("Strategy::Update_Position_Changed_Detail_To_DB");
+	std::cout << "Strategy::Update_Position_Changed_Detail_To_DB()" << std::endl;
 	int count_number = 0;
 
 	count_number = this->stg_save_strategy_conn->count(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
-		std::cout << "Strategy::Update_Position_Detail_To_DB()" << std::endl;
+		std::cout << "Strategy::Update_Position_Changed_Detail_To_DB()" << std::endl;
 		std::cout << "\t收盘保存持仓明细 找到(Order)!" << std::endl;
 		this->stg_save_strategy_conn->update(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, BSON(
 			"userid" << posd->UserID
@@ -1423,7 +1423,7 @@ void Strategy::Update_Position_Changed_Detail_To_DB(USER_CThostFtdcOrderField *p
 			<< "strategyid" << posd->StrategyID
 			<< "volumetradedbatch" << posd->VolumeTradedBatch
 			)));
-		USER_PRINT("Strategy::Update_Position_Detail_To_DB ok");
+		USER_PRINT("Strategy::Update_Position_Changed_Detail_To_DB ok");
 	}
 	else {
 		std::cout << "Strategy::Update_Position_Detail_To_DB()" << std::endl;
@@ -1455,10 +1455,10 @@ void Strategy::Update_Position_Changed_Detail_To_DB(USER_CThostFtdcOrderField *p
 		create_position_detail_mtx.lock();
 		this->stg_save_strategy_conn->insert(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, p);
 		create_position_detail_mtx.unlock();
-		USER_PRINT("DBManager::CreatePositionTradeDetail ok");
+		USER_PRINT("DBManager::Update_Position_Changed_Detail_To_DB ok");
 	}
 
-	USER_PRINT("Strategy::Update_Position_Detail_To_DB OK");
+	USER_PRINT("Strategy::Update_Position_Changed_Detail_To_DB OK");
 }
 
 /// 创建持仓明细
@@ -1510,7 +1510,7 @@ void Strategy::CreatePositionTradeDetail(USER_CThostFtdcTradeField *posd) {
 /// 数据库更新策略持仓明细(Trade)
 void Strategy::Update_Position_Trade_Detail_To_DB(USER_CThostFtdcTradeField *posd) {
 	USER_PRINT("Strategy::Update_Position_Trade_Detail_To_DB");
-
+	std::cout << "Strategy::Update_Position_Trade_Detail_To_DB()" << std::endl;
 	int count_number = 0;
 
 	count_number = this->stg_save_strategy_conn->count(DB_POSITIONDETAIL_TRADE_COLLECTION,
@@ -1569,15 +1569,15 @@ void Strategy::Update_Position_Trade_Detail_To_DB(USER_CThostFtdcTradeField *pos
 
 /// 数据库更新策略持仓明细(trade changed)
 void Strategy::Update_Position_Trade_Changed_Detail_To_DB(USER_CThostFtdcTradeField *posd) {
-	USER_PRINT("Strategy::Update_Position_Trade_Detail_To_DB");
-
+	USER_PRINT("Strategy::Update_Position_Trade_Changed_Detail_To_DB");
+	std::cout << "Strategy::Update_Position_Trade_Changed_Detail_To_DB()" << std::endl;
 	int count_number = 0;
 
 	count_number = this->stg_save_strategy_conn->count(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
-		std::cout << "Strategy::Update_Position_Trade_Detail_To_DB()" << std::endl;
+		std::cout << "Strategy::Update_Position_Trade_Changed_Detail_To_DB()" << std::endl;
 		std::cout << "\t收盘保存持仓明细 已 找到(Trade)!" << std::endl;
 		this->stg_save_strategy_conn->update(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON(
 			"instrumentid" << posd->InstrumentID
@@ -1595,10 +1595,10 @@ void Strategy::Update_Position_Trade_Changed_Detail_To_DB(USER_CThostFtdcTradeFi
 			<< "strategyid" << posd->StrategyID
 			<< "volume" << posd->Volume
 			)));
-		USER_PRINT("Strategy::Update_Position_Trade_Detail_To_DB ok");
+		USER_PRINT("Strategy::Update_Position_Trade_Changed_Detail_To_DB ok");
 	}
 	else {
-		std::cout << "Strategy::Update_Position_Trade_Detail_To_DB()" << std::endl;
+		std::cout << "Strategy::Update_Position_Trade_Changed_Detail_To_DB()" << std::endl;
 		std::cout << "\t收盘保存持仓明细 未 找到(Trade)!" << std::endl;
 		std::cout << "\t开始新建持仓明细(Trade)!" << std::endl;
 
@@ -1624,7 +1624,7 @@ void Strategy::Update_Position_Trade_Changed_Detail_To_DB(USER_CThostFtdcTradeFi
 		create_position_detail_mtx.unlock();
 	}
 
-	USER_PRINT("Strategy::Update_Position_Trade_Detail_To_DB OK");
+	USER_PRINT("Strategy::Update_Position_Trade_Changed_Detail_To_DB OK");
 }
 
 /// 设置开关
@@ -4097,7 +4097,8 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 			USER_PRINT((*itor)->VolumeTradedBatch);
 			USER_PRINT(pOrder->VolumeTradedBatch);
 
-			if ((strcmp((*itor)->TradingDay, pOrder->TradingDay))
+			// 日期不相等
+			if ((strcmp((*itor)->TradingDay, pOrder->TradingDay)) 
 				&& (!strcmp((*itor)->InstrumentID, pOrder->InstrumentID))
 				&& ((*itor)->CombHedgeFlag[0] == pOrder->CombHedgeFlag[0])
 				&& ((*itor)->Direction != pOrder->Direction)) { // 日期,合约代码,投保标志相同
