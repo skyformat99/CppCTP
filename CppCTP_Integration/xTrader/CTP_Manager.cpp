@@ -3080,8 +3080,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									/************************************************************************/
 									ctp_m->getDBManager()->DeletePositionDetailByStrategy((*stg_itor));
 									ctp_m->getDBManager()->DeletePositionDetailChangedByStrategy((*stg_itor));
-									/*ctp_m->saveStrategyPositionDetail((*stg_itor));
-									ctp_m->saveStrategyChangedPositionDetail((*stg_itor));*/
+									ctp_m->saveStrategyPositionDetail((*stg_itor));
+									ctp_m->saveStrategyChangedPositionDetail((*stg_itor));
 									
 
 									/************************************************************************/
