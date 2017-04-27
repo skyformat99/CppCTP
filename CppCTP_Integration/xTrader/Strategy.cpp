@@ -3895,12 +3895,13 @@ void Strategy::update_position_detail(USER_CThostFtdcTradeField *pTrade) {
 
 	/*USER_PRINT(pOrder->VolumeTraded);*/
 
-	
 	std::cout << "\tpTrade->OffsetFlag = " << pTrade->OffsetFlag << std::endl;
 	std::cout << "\tpTrade->InstrumentID = " << pTrade->InstrumentID << std::endl;
 	std::cout << "\tpTrade->HedgeFlag = " << pTrade->HedgeFlag << std::endl;
 	std::cout << "\tpTrade->Direction = " << pTrade->Direction << std::endl;
 	std::cout << "\tpTrade->Volume = " << pTrade->Volume << std::endl;
+	std::cout << "\tpTrade->TradingDay = " << pTrade->TradingDay << std::endl;
+
 
 	if (pTrade->OffsetFlag == '0') // pTrade中"OffsetFlag"值 = "0"为开仓，不用考虑全部成交还是部分成交，开仓trade直接添加到持仓明细列表里
 	{
@@ -4012,6 +4013,8 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 	std::cout << "\tpOrder->InstrumentID = " << pOrder->InstrumentID << std::endl;
 	std::cout << "\tpOrder->CombHedgeFlag[0] = " << pOrder->CombHedgeFlag[0] << std::endl;
 	std::cout << "\tpOrder->Direction = " << pOrder->Direction << std::endl;
+	std::cout << "\tpOrder->VolumeTradedBatch = " << pOrder->VolumeTradedBatch << std::endl;
+	std::cout << "\tpOrder->TradingDay = " << pOrder->TradingDay << std::endl;
 	std::cout << "\tpOrder->VolumeTradedBatch = " << pOrder->VolumeTradedBatch << std::endl;
 
 	if (pOrder->VolumeTradedBatch == 0) {

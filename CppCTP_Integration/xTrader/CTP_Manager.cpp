@@ -2305,6 +2305,84 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								std::cout << "Strategy已存在无需新建!" << std::endl;
 								build_doc.AddMember("MsgResult", 1, allocator);
 								build_doc.AddMember("MsgErrorReason", "策略已存在,不能重复创建!", allocator);
+
+								/*构造内容json*/
+								rapidjson::Value create_info_object(rapidjson::kObjectType);
+								create_info_object.SetObject();
+								create_info_object.AddMember("position_a_sell_today", new_stg->getStgPositionASellToday(), allocator);
+								create_info_object.AddMember("position_b_sell", new_stg->getStgPositionBSell(), allocator);
+								create_info_object.AddMember("spread_shift", new_stg->getStgSpreadShift(), allocator);
+								create_info_object.AddMember("a_limit_price_shift", new_stg->getStgALimitPriceShift(), allocator);
+								create_info_object.AddMember("b_limit_price_shift", new_stg->getStgBLimitPriceShift(), allocator);
+								create_info_object.AddMember("position_b_sell_today", new_stg->getStgPositionBSellToday(), allocator);
+								create_info_object.AddMember("position_b_buy_today", new_stg->getStgPositionBBuyToday(), allocator);
+								create_info_object.AddMember("position_a_sell", new_stg->getStgPositionASell(), allocator);
+								create_info_object.AddMember("buy_close", new_stg->getStgBuyClose(), allocator);
+								create_info_object.AddMember("stop_loss", new_stg->getStgStopLoss(), allocator);
+								create_info_object.AddMember("position_b_buy_yesterday", new_stg->getStgPositionBBuyYesterday(), allocator);
+								//create_info_object.AddMember("is_active", new_stg->isStgIsActive(), allocator);
+								create_info_object.AddMember("position_b_sell_yesterday", new_stg->getStgPositionBSellYesterday(), allocator);
+								create_info_object.AddMember("strategy_id", rapidjson::StringRef(new_stg->getStgStrategyId().c_str()), allocator);
+								create_info_object.AddMember("position_b_buy", new_stg->getStgPositionBBuy(), allocator);
+								create_info_object.AddMember("lots_batch", new_stg->getStgLotsBatch(), allocator);
+								create_info_object.AddMember("position_a_buy", new_stg->getStgPositionABuy(), allocator);
+								create_info_object.AddMember("sell_open", new_stg->getStgSellOpen(), allocator);
+								create_info_object.AddMember("order_algorithm", rapidjson::StringRef(new_stg->getStgOrderAlgorithm().c_str()), allocator);
+								create_info_object.AddMember("trader_id", rapidjson::StringRef(new_stg->getStgTraderId().c_str()), allocator);
+								create_info_object.AddMember("a_order_action_limit", new_stg->getStgAOrderActionTiresLimit(), allocator);
+								create_info_object.AddMember("b_order_action_limit", new_stg->getStgBOrderActionTiresLimit(), allocator);
+								create_info_object.AddMember("sell_close", new_stg->getStgSellClose(), allocator);
+								create_info_object.AddMember("buy_open", new_stg->getStgBuyOpen(), allocator);
+								create_info_object.AddMember("update_position_detail_record_time", rapidjson::StringRef(new_stg->getStgUpdatePositionDetailRecordTime().c_str()), allocator);
+
+
+								create_info_object.AddMember("only_close", new_stg->isStgOnlyClose(), allocator);
+								create_info_object.AddMember("strategy_on_off", new_stg->getOn_Off(), allocator);
+								create_info_object.AddMember("sell_open_on_off", new_stg->getStgSellOpenOnOff(), allocator);
+								create_info_object.AddMember("buy_close_on_off", new_stg->getStgBuyCloseOnOff(), allocator);
+								create_info_object.AddMember("sell_close_on_off", new_stg->getStgSellCloseOnOff(), allocator);
+								create_info_object.AddMember("buy_open_on_off", new_stg->getStgBuyOpenOnOff(), allocator);
+
+
+								create_info_object.AddMember("trade_model", rapidjson::StringRef(new_stg->getStgTradeModel().c_str()), allocator);
+
+								create_info_object.AddMember("hold_profit", new_stg->getStgHoldProfit(), allocator);
+								create_info_object.AddMember("close_profit", new_stg->getStgCloseProfit(), allocator);
+								create_info_object.AddMember("commission", new_stg->getStgCommission(), allocator);
+								create_info_object.AddMember("position", new_stg->getStgPosition(), allocator);
+								create_info_object.AddMember("position_buy", new_stg->getStgPositionBuy(), allocator);
+								create_info_object.AddMember("position_sell", new_stg->getStgPositionSell(), allocator);
+								create_info_object.AddMember("trade_volume", new_stg->getStgTradeVolume(), allocator);
+								create_info_object.AddMember("amount", new_stg->getStgAmount(), allocator);
+								create_info_object.AddMember("average_shift", new_stg->getStgAverageShift(), allocator);
+
+								create_info_object.AddMember("a_instrument_id", rapidjson::StringRef(new_stg->getStgInstrumentIdA().c_str()), allocator);
+								create_info_object.AddMember("b_instrument_id", rapidjson::StringRef(new_stg->getStgInstrumentIdB().c_str()), allocator);
+
+								/*rapidjson::Value instrument_array(rapidjson::kArrayType);
+								for (int j = 0; j < 2; j++) {
+								rapidjson::Value instrument_object(rapidjson::kObjectType);
+								instrument_object.SetObject();
+								if (j == 0) {
+								instrument_object.SetString(rapidjson::StringRef(new_stg->getStgInstrumentIdA().c_str()));
+								}
+								else if (j == 1) {
+								instrument_object.SetString(rapidjson::StringRef(new_stg->getStgInstrumentIdB().c_str()));
+								}
+
+								instrument_array.PushBack(instrument_object, allocator);
+								}
+								create_info_object.AddMember("list_instrument_id", instrument_array, allocator);*/
+								create_info_object.AddMember("position_a_buy_yesterday", new_stg->getStgPositionABuyYesterday(), allocator);
+								create_info_object.AddMember("user_id", rapidjson::StringRef(new_stg->getStgUserId().c_str()), allocator);
+								create_info_object.AddMember("position_a_buy_today", new_stg->getStgPositionABuyToday(), allocator);
+								create_info_object.AddMember("position_a_sell_yesterday", new_stg->getStgPositionASellYesterday(), allocator);
+								create_info_object.AddMember("lots", new_stg->getStgLots(), allocator);
+								create_info_object.AddMember("a_wait_price_tick", new_stg->getStgAWaitPriceTick(), allocator);
+								create_info_object.AddMember("b_wait_price_tick", new_stg->getStgBWaitPriceTick(), allocator);
+
+								create_info_array.PushBack(create_info_object, allocator);
+
 								delete new_stg;
 							}
 							else {
@@ -2324,85 +2402,84 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								std::cout << "CTP_Manager包含策略个数 = " << ctp_m->getListStrategy()->size() << std::endl;
 								build_doc.AddMember("MsgResult", 0, allocator);
 								build_doc.AddMember("MsgErrorReason", "", allocator);
-							}
+
+								/*构造内容json*/
+								rapidjson::Value create_info_object(rapidjson::kObjectType);
+								create_info_object.SetObject();
+								create_info_object.AddMember("position_a_sell_today", new_stg->getStgPositionASellToday(), allocator);
+								create_info_object.AddMember("position_b_sell", new_stg->getStgPositionBSell(), allocator);
+								create_info_object.AddMember("spread_shift", new_stg->getStgSpreadShift(), allocator);
+								create_info_object.AddMember("a_limit_price_shift", new_stg->getStgALimitPriceShift(), allocator);
+								create_info_object.AddMember("b_limit_price_shift", new_stg->getStgBLimitPriceShift(), allocator);
+								create_info_object.AddMember("position_b_sell_today", new_stg->getStgPositionBSellToday(), allocator);
+								create_info_object.AddMember("position_b_buy_today", new_stg->getStgPositionBBuyToday(), allocator);
+								create_info_object.AddMember("position_a_sell", new_stg->getStgPositionASell(), allocator);
+								create_info_object.AddMember("buy_close", new_stg->getStgBuyClose(), allocator);
+								create_info_object.AddMember("stop_loss", new_stg->getStgStopLoss(), allocator);
+								create_info_object.AddMember("position_b_buy_yesterday", new_stg->getStgPositionBBuyYesterday(), allocator);
+								//create_info_object.AddMember("is_active", new_stg->isStgIsActive(), allocator);
+								create_info_object.AddMember("position_b_sell_yesterday", new_stg->getStgPositionBSellYesterday(), allocator);
+								create_info_object.AddMember("strategy_id", rapidjson::StringRef(new_stg->getStgStrategyId().c_str()), allocator);
+								create_info_object.AddMember("position_b_buy", new_stg->getStgPositionBBuy(), allocator);
+								create_info_object.AddMember("lots_batch", new_stg->getStgLotsBatch(), allocator);
+								create_info_object.AddMember("position_a_buy", new_stg->getStgPositionABuy(), allocator);
+								create_info_object.AddMember("sell_open", new_stg->getStgSellOpen(), allocator);
+								create_info_object.AddMember("order_algorithm", rapidjson::StringRef(new_stg->getStgOrderAlgorithm().c_str()), allocator);
+								create_info_object.AddMember("trader_id", rapidjson::StringRef(new_stg->getStgTraderId().c_str()), allocator);
+								create_info_object.AddMember("a_order_action_limit", new_stg->getStgAOrderActionTiresLimit(), allocator);
+								create_info_object.AddMember("b_order_action_limit", new_stg->getStgBOrderActionTiresLimit(), allocator);
+								create_info_object.AddMember("sell_close", new_stg->getStgSellClose(), allocator);
+								create_info_object.AddMember("buy_open", new_stg->getStgBuyOpen(), allocator);
+								create_info_object.AddMember("update_position_detail_record_time", rapidjson::StringRef(new_stg->getStgUpdatePositionDetailRecordTime().c_str()), allocator);
 
 
-							/*构造内容json*/
-							rapidjson::Value create_info_object(rapidjson::kObjectType);
-							create_info_object.SetObject();
-							create_info_object.AddMember("position_a_sell_today", new_stg->getStgPositionASellToday(), allocator);
-							create_info_object.AddMember("position_b_sell", new_stg->getStgPositionBSell(), allocator);
-							create_info_object.AddMember("spread_shift", new_stg->getStgSpreadShift(), allocator);
-							create_info_object.AddMember("a_limit_price_shift", new_stg->getStgALimitPriceShift(), allocator);
-							create_info_object.AddMember("b_limit_price_shift", new_stg->getStgBLimitPriceShift(), allocator);
-							create_info_object.AddMember("position_b_sell_today", new_stg->getStgPositionBSellToday(), allocator);
-							create_info_object.AddMember("position_b_buy_today", new_stg->getStgPositionBBuyToday(), allocator);
-							create_info_object.AddMember("position_a_sell", new_stg->getStgPositionASell(), allocator);
-							create_info_object.AddMember("buy_close", new_stg->getStgBuyClose(), allocator);
-							create_info_object.AddMember("stop_loss", new_stg->getStgStopLoss(), allocator);
-							create_info_object.AddMember("position_b_buy_yesterday", new_stg->getStgPositionBBuyYesterday(), allocator);
-							//create_info_object.AddMember("is_active", new_stg->isStgIsActive(), allocator);
-							create_info_object.AddMember("position_b_sell_yesterday", new_stg->getStgPositionBSellYesterday(), allocator);
-							create_info_object.AddMember("strategy_id", rapidjson::StringRef(new_stg->getStgStrategyId().c_str()), allocator);
-							create_info_object.AddMember("position_b_buy", new_stg->getStgPositionBBuy(), allocator);
-							create_info_object.AddMember("lots_batch", new_stg->getStgLotsBatch(), allocator);
-							create_info_object.AddMember("position_a_buy", new_stg->getStgPositionABuy(), allocator);
-							create_info_object.AddMember("sell_open", new_stg->getStgSellOpen(), allocator);
-							create_info_object.AddMember("order_algorithm", rapidjson::StringRef(new_stg->getStgOrderAlgorithm().c_str()), allocator);
-							create_info_object.AddMember("trader_id", rapidjson::StringRef(new_stg->getStgTraderId().c_str()), allocator);
-							create_info_object.AddMember("a_order_action_limit", new_stg->getStgAOrderActionTiresLimit(), allocator);
-							create_info_object.AddMember("b_order_action_limit", new_stg->getStgBOrderActionTiresLimit(), allocator);
-							create_info_object.AddMember("sell_close", new_stg->getStgSellClose(), allocator);
-							create_info_object.AddMember("buy_open", new_stg->getStgBuyOpen(), allocator);
-							create_info_object.AddMember("update_position_detail_record_time", rapidjson::StringRef(new_stg->getStgUpdatePositionDetailRecordTime().c_str()), allocator);
+								create_info_object.AddMember("only_close", new_stg->isStgOnlyClose(), allocator);
+								create_info_object.AddMember("strategy_on_off", new_stg->getOn_Off(), allocator);
+								create_info_object.AddMember("sell_open_on_off", new_stg->getStgSellOpenOnOff(), allocator);
+								create_info_object.AddMember("buy_close_on_off", new_stg->getStgBuyCloseOnOff(), allocator);
+								create_info_object.AddMember("sell_close_on_off", new_stg->getStgSellCloseOnOff(), allocator);
+								create_info_object.AddMember("buy_open_on_off", new_stg->getStgBuyOpenOnOff(), allocator);
 
 
-							create_info_object.AddMember("only_close", new_stg->isStgOnlyClose(), allocator);
-							create_info_object.AddMember("strategy_on_off", new_stg->getOn_Off(), allocator);
-							create_info_object.AddMember("sell_open_on_off", new_stg->getStgSellOpenOnOff(), allocator);
-							create_info_object.AddMember("buy_close_on_off", new_stg->getStgBuyCloseOnOff(), allocator);
-							create_info_object.AddMember("sell_close_on_off", new_stg->getStgSellCloseOnOff(), allocator);
-							create_info_object.AddMember("buy_open_on_off", new_stg->getStgBuyOpenOnOff(), allocator);
+								create_info_object.AddMember("trade_model", rapidjson::StringRef(new_stg->getStgTradeModel().c_str()), allocator);
 
+								create_info_object.AddMember("hold_profit", new_stg->getStgHoldProfit(), allocator);
+								create_info_object.AddMember("close_profit", new_stg->getStgCloseProfit(), allocator);
+								create_info_object.AddMember("commission", new_stg->getStgCommission(), allocator);
+								create_info_object.AddMember("position", new_stg->getStgPosition(), allocator);
+								create_info_object.AddMember("position_buy", new_stg->getStgPositionBuy(), allocator);
+								create_info_object.AddMember("position_sell", new_stg->getStgPositionSell(), allocator);
+								create_info_object.AddMember("trade_volume", new_stg->getStgTradeVolume(), allocator);
+								create_info_object.AddMember("amount", new_stg->getStgAmount(), allocator);
+								create_info_object.AddMember("average_shift", new_stg->getStgAverageShift(), allocator);
 
-							create_info_object.AddMember("trade_model", rapidjson::StringRef(new_stg->getStgTradeModel().c_str()), allocator);
+								create_info_object.AddMember("a_instrument_id", rapidjson::StringRef(new_stg->getStgInstrumentIdA().c_str()), allocator);
+								create_info_object.AddMember("b_instrument_id", rapidjson::StringRef(new_stg->getStgInstrumentIdB().c_str()), allocator);
 
-							create_info_object.AddMember("hold_profit", new_stg->getStgHoldProfit(), allocator);
-							create_info_object.AddMember("close_profit", new_stg->getStgCloseProfit(), allocator);
-							create_info_object.AddMember("commission", new_stg->getStgCommission(), allocator);
-							create_info_object.AddMember("position", new_stg->getStgPosition(), allocator);
-							create_info_object.AddMember("position_buy", new_stg->getStgPositionBuy(), allocator);
-							create_info_object.AddMember("position_sell", new_stg->getStgPositionSell(), allocator);
-							create_info_object.AddMember("trade_volume", new_stg->getStgTradeVolume(), allocator);
-							create_info_object.AddMember("amount", new_stg->getStgAmount(), allocator);
-							create_info_object.AddMember("average_shift", new_stg->getStgAverageShift(), allocator);
-
-							create_info_object.AddMember("a_instrument_id", rapidjson::StringRef(new_stg->getStgInstrumentIdA().c_str()), allocator);
-							create_info_object.AddMember("b_instrument_id", rapidjson::StringRef(new_stg->getStgInstrumentIdB().c_str()), allocator);
-
-							/*rapidjson::Value instrument_array(rapidjson::kArrayType);
-							for (int j = 0; j < 2; j++) {
+								/*rapidjson::Value instrument_array(rapidjson::kArrayType);
+								for (int j = 0; j < 2; j++) {
 								rapidjson::Value instrument_object(rapidjson::kObjectType);
 								instrument_object.SetObject();
 								if (j == 0) {
-									instrument_object.SetString(rapidjson::StringRef(new_stg->getStgInstrumentIdA().c_str()));
+								instrument_object.SetString(rapidjson::StringRef(new_stg->getStgInstrumentIdA().c_str()));
 								}
 								else if (j == 1) {
-									instrument_object.SetString(rapidjson::StringRef(new_stg->getStgInstrumentIdB().c_str()));
+								instrument_object.SetString(rapidjson::StringRef(new_stg->getStgInstrumentIdB().c_str()));
 								}
 
 								instrument_array.PushBack(instrument_object, allocator);
-							}
-							create_info_object.AddMember("list_instrument_id", instrument_array, allocator);*/
-							create_info_object.AddMember("position_a_buy_yesterday", new_stg->getStgPositionABuyYesterday(), allocator);
-							create_info_object.AddMember("user_id", rapidjson::StringRef(new_stg->getStgUserId().c_str()), allocator);
-							create_info_object.AddMember("position_a_buy_today", new_stg->getStgPositionABuyToday(), allocator);
-							create_info_object.AddMember("position_a_sell_yesterday", new_stg->getStgPositionASellYesterday(), allocator);
-							create_info_object.AddMember("lots", new_stg->getStgLots(), allocator);
-							create_info_object.AddMember("a_wait_price_tick", new_stg->getStgAWaitPriceTick(), allocator);
-							create_info_object.AddMember("b_wait_price_tick", new_stg->getStgBWaitPriceTick(), allocator);
+								}
+								create_info_object.AddMember("list_instrument_id", instrument_array, allocator);*/
+								create_info_object.AddMember("position_a_buy_yesterday", new_stg->getStgPositionABuyYesterday(), allocator);
+								create_info_object.AddMember("user_id", rapidjson::StringRef(new_stg->getStgUserId().c_str()), allocator);
+								create_info_object.AddMember("position_a_buy_today", new_stg->getStgPositionABuyToday(), allocator);
+								create_info_object.AddMember("position_a_sell_yesterday", new_stg->getStgPositionASellYesterday(), allocator);
+								create_info_object.AddMember("lots", new_stg->getStgLots(), allocator);
+								create_info_object.AddMember("a_wait_price_tick", new_stg->getStgAWaitPriceTick(), allocator);
+								create_info_object.AddMember("b_wait_price_tick", new_stg->getStgBWaitPriceTick(), allocator);
 
-							create_info_array.PushBack(create_info_object, allocator);
+								create_info_array.PushBack(create_info_object, allocator);
+							}
 						}
 						else
 						{
@@ -2908,6 +2985,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									std::cout << "\tA买(" << (*stg_itor)->getStgPositionABuy() << ", " << (*stg_itor)->getStgPositionABuyYesterday() << ")" << std::endl;
 									std::cout << "\tB卖(" << (*stg_itor)->getStgPositionBSell() << ", " << (*stg_itor)->getStgPositionBSellYesterday() << ")" << std::endl;
 
+									std::cout << "\t构造假的order,trade平仓单" << std::endl;
 									//A昨卖
 									Utils::printGreenColor("A昨卖");
 									// Order
