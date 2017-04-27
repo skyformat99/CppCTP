@@ -477,8 +477,9 @@ public:
 	//收盘前5秒处理挂单列表
 	void finish_pending_order_list();
 
-	//校准持仓量
-	void calibrate_position();
+	//策略最后一次保存的时间
+	void setStgLastSavedTime(string stg_last_saved_time);
+	string getStgLastSavedTime();
 
 private:
 	Trader *trader;
@@ -528,6 +529,7 @@ private:
 	double stg_average_shift;			// 平均滑点
 	string stg_trading_day;				// 交易日
 	string stg_update_position_detail_record_time; // 策略持仓明细修改记录时间
+	string stg_last_saved_time;			// 策略最后一次保存的时间
 
 	int stg_position_a_buy_today;		// A合约买持仓今仓
 	int stg_position_a_buy_yesterday;	// A合约买持仓昨仓

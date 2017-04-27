@@ -2186,60 +2186,12 @@ void Strategy::finish_pending_order_list() {
 	}
 }
 
-//校准持仓量
-void Strategy::calibrate_position() {
-
-	if (this->stg_position_a_sell < 0)
-	{
-		this->stg_position_a_sell = 0;			//持仓A卖
-	}
-
-	if (this->stg_position_b_buy < 0)
-	{
-		this->stg_position_b_buy = 0;			//持仓B买
-	}
-
-	if (this->stg_position_a_buy < 0)
-	{
-		this->stg_position_a_buy = 0;			//持仓A买
-	}
-
-	if (this->stg_position_b_sell < 0)
-	{
-		this->stg_position_b_sell = 0;			//持仓B卖
-	}
-	if (this->stg_position_a_sell_yesterday < 0)
-	{
-		this->stg_position_a_sell_yesterday = 0;//持仓A昨卖
-	}
-	if (this->stg_position_a_buy_yesterday < 0)
-	{
-		this->stg_position_a_buy_yesterday = 0; //持仓A今买
-	}
-	if (this->stg_position_a_sell_today < 0)
-	{
-		this->stg_position_a_sell_today = 0;	//持仓A今卖
-	}
-	if (this->stg_position_a_buy_today < 0)
-	{
-		this->stg_position_a_buy_today = 0;		//持仓A今买
-	}
-	if (this->stg_position_b_sell_yesterday < 0)
-	{
-		this->stg_position_b_sell_yesterday = 0;//持仓B昨卖
-	}
-	if (this->stg_position_b_buy_yesterday < 0)
-	{
-		this->stg_position_b_buy_yesterday = 0; //持仓B昨买
-	}
-	if (this->stg_position_b_sell_today < 0)
-	{
-		this->stg_position_b_sell_today = 0;	//持仓B今卖
-	}
-	if (this->stg_position_b_buy_today < 0)
-	{
-		this->stg_position_b_buy_today = 0;		//持仓B今买
-	}
+//策略最后一次保存的时间
+void Strategy::setStgLastSavedTime(string stg_last_saved_time) {
+	this->stg_last_saved_time = stg_last_saved_time;
+}
+string Strategy::getStgLastSavedTime() {
+	return this->stg_last_saved_time;
 }
 
 // 获取持仓明细
@@ -3192,7 +3144,7 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	string compare_date = pOrder->InsertDate; //报单日期
 	string compare_time = pOrder->InsertTime; //报单时间
 	// 如果pOrder的时间在修改持仓之前 return
-	if (!Utils::compareTradingDaySeconds((compare_date + compare_time).c_str(), this->stg_update_position_detail_record_time.c_str())) {
+	if (!Utils::compareTradingDaySeconds((compare_date + compare_time).c_str(), this->getStgLastSavedTime().c_str())) {
 		return;
 	}
 
@@ -3314,7 +3266,7 @@ void Strategy::ExEc_OnRtnTrade(CThostFtdcTradeField *pTrade) {
 	string compare_time = pTrade->TradeTime; //报单时间
 
 	// 如果pTrade的时间在修改持仓之前 return
-	if (!Utils::compareTradingDaySeconds((compare_date + compare_time).c_str(), this->stg_update_position_detail_record_time.c_str())) {
+	if (!Utils::compareTradingDaySeconds((compare_date + compare_time).c_str(), this->getStgLastSavedTime().c_str())) {
 		return;
 	}
 

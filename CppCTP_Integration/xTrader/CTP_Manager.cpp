@@ -566,7 +566,8 @@ void CTP_Manager::saveStrategyPositionDetail(Strategy *stg) {
 	USER_PRINT("CTP_Manager::saveStrategyPositionDetail()");
 	std::cout << "CTP_Manager::saveStrategyPositionDetail()" << std::endl;
 	//this->dbm->UpdateStrategy((*stg_itor));
-	stg->setStgUpdatePositionDetailRecordTime(Utils::getDate());
+	//stg->setStgUpdatePositionDetailRecordTime(Utils::getDate());
+	stg->setStgLastSavedTime(Utils::getDate());
 	stg->UpdateStrategy(stg);
 	std::cout << "\t保存期货账户 = " << stg->getStgUserId() << std::endl;
 	std::cout << "\t保存策略ID = " << stg->getStgStrategyId() << std::endl;
@@ -640,7 +641,8 @@ void CTP_Manager::saveStrategyChangedPositionDetail(Strategy *stg) {
 	USER_PRINT("CTP_Manager::saveStrategyPositionDetail()");
 	std::cout << "CTP_Manager::saveStrategyChangedPositionDetail()" << std::endl;
 	//this->dbm->UpdateStrategy((*stg_itor));
-	stg->setStgUpdatePositionDetailRecordTime(Utils::getDate());
+	//stg->setStgUpdatePositionDetailRecordTime(Utils::getDate());
+	stg->setStgLastSavedTime(Utils::getDate());
 	stg->UpdateStrategy(stg);
 	std::cout << "\t保存期货账户 = " << stg->getStgUserId() << std::endl;
 	std::cout << "\t保存策略ID = " << stg->getStgStrategyId() << std::endl;
@@ -4312,7 +4314,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 	// 将昨持仓明细添加到策略的持仓明细里(order)
 	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
 		// 一旦有策略修改过持仓变量 或者 已经收盘，从今持仓明细初始化
-		if (!(*stg_itor)->getStgIsPositionRight())
+		if ((*stg_itor)->getStgLastSavedTime() != "")
 		{
 			for (position_itor = this->l_posdetail->begin(); position_itor != this->l_posdetail->end(); position_itor++) {
 
@@ -4386,7 +4388,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 	// 将昨持仓明细添加到策略的持仓明细里(trade)
 	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
 		// 如果仓位被修改过 或者 已经收盘，从今持仓明细初始化
-		if ((!(*stg_itor)->getStgIsPositionRight())) {
+		if ((*stg_itor)->getStgLastSavedTime() != "") {
 			for (position_trade_itor = this->l_posdetail_trade->begin();
 				position_trade_itor != this->l_posdetail_trade->end();
 				position_trade_itor++) {

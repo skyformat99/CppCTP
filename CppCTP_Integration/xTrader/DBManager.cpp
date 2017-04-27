@@ -657,6 +657,7 @@ int DBManager::CreateStrategy(Strategy *stg) {
 		b.append("a_limit_price_shift", stg->getStgALimitPriceShift());
 		b.append("b_limit_price_shift", stg->getStgBLimitPriceShift());
 		b.append("update_position_detail_record_time", stg->getStgUpdatePositionDetailRecordTime());
+		b.append("last_save_time", stg->getStgLastSavedTime());
 
 
 		// 创建一个数组对象
@@ -814,6 +815,7 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 			<< "b_wait_price_tick" << stg->getStgBWaitPriceTick()
 			<< "trading_day" << stg->getStgTradingDay()
 			<< "update_position_detail_record_time" << stg->getStgUpdatePositionDetailRecordTime()
+			<< "last_save_time" << stg->getStgLastSavedTime()
 			<< "list_instrument_id" << BSON_ARRAY(stg->getStgInstrumentIdA() << stg->getStgInstrumentIdB()))));
 
 		USER_PRINT("DBManager::UpdateStrategy ok");
@@ -958,6 +960,8 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 		stg->setStgStrategyId(p.getStringField("strategy_id"));
 		stg->setStgTraderId(p.getStringField("trader_id"));
 		stg->setStgUserId(p.getStringField("user_id"));
+		stg->setStgUpdatePositionDetailRecordTime(p.getStringField("update_position_detail_record_time"));
+		stg->setStgLastSavedTime(p.getStringField("last_save_time"));
 
 
 		vector<BSONElement> elements = p["list_instrument_id"].Array();
@@ -1061,6 +1065,8 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 			cout << "buy_open_on_off = " << p.getIntField("buy_open_on_off") << ", ";
 			cout << "trading_day = " << p.getStringField("trading_day") << ", ";
 			cout << "update_position_detail_record_time = " << p.getStringField("update_position_detail_record_time") << ", ";
+			cout << "last_save_time = " << p.getStringField("last_save_time") << ", ";
+			
 
 			stg->setStgAWaitPriceTick(p.getField("a_wait_price_tick").Double());
 			stg->setStgBWaitPriceTick(p.getField("b_wait_price_tick").Double());
@@ -1094,6 +1100,7 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 			stg->setStgTradingDay(p.getStringField("trading_day"));
 			// 设置是否有修改过持仓
 			stg->setStgUpdatePositionDetailRecordTime(p.getStringField("update_position_detail_record_time"));
+			stg->setStgLastSavedTime(p.getStringField("last_save_time"));
 			// 当持仓修改时间不为空，说明曾经有修改
 			if (stg->getStgUpdatePositionDetailRecordTime() != "")
 			{
@@ -1212,6 +1219,7 @@ int DBManager::CreateStrategyYesterday(Strategy *stg) {
 		b.append("a_limit_price_shift", stg->getStgALimitPriceShift());
 		b.append("b_limit_price_shift", stg->getStgBLimitPriceShift());
 		b.append("update_position_detail_record_time", stg->getStgUpdatePositionDetailRecordTime());
+		b.append("last_save_time", stg->getStgLastSavedTime());
 
 
 		// 创建一个数组对象
@@ -1316,6 +1324,8 @@ void DBManager::UpdateStrategyYesterday(Strategy *stg) {
 			<< "b_wait_price_tick" << stg->getStgBWaitPriceTick()
 			<< "StrategyOnoff" << stg->getOn_Off()
 			<< "trading_day" << stg->getStgTradingDay()
+			<< "update_position_detail_record_time" << stg->getStgUpdatePositionDetailRecordTime()
+			<< "last_save_time" << stg->getStgLastSavedTime()
 			<< "list_instrument_id" << BSON_ARRAY(stg->getStgInstrumentIdA() << stg->getStgInstrumentIdB()))));
 
 		USER_PRINT("DBManager::UpdateStrategy ok");
@@ -1459,6 +1469,8 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 		stg->setStgStrategyId(p.getStringField("strategy_id"));
 		stg->setStgTraderId(p.getStringField("trader_id"));
 		stg->setStgUserId(p.getStringField("user_id"));
+		stg->setStgUpdatePositionDetailRecordTime(p.getStringField("update_position_detail_record_time"));
+		stg->setStgLastSavedTime(p.getStringField("last_save_time"));
 
 
 		vector<BSONElement> elements = p["list_instrument_id"].Array();
@@ -1618,6 +1630,8 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 		stg->setStgTraderId(p.getStringField("trader_id"));
 		stg->setStgUserId(p.getStringField("user_id"));
 		stg->setOn_Off(p.getField("StrategyOnoff").Int());
+		stg->setStgUpdatePositionDetailRecordTime(p.getStringField("update_position_detail_record_time"));
+		stg->setStgLastSavedTime(p.getStringField("last_save_time"));
 
 
 		vector<BSONElement> elements = p["list_instrument_id"].Array();
@@ -1746,6 +1760,7 @@ void DBManager::getAllStrategyYesterdayByActiveUser(list<Strategy *> *l_strategy
 			stg->setStgALimitPriceShift(p.getIntField("a_limit_price_shift"));
 			stg->setStgBLimitPriceShift(p.getIntField("b_limit_price_shift"));
 			stg->setStgTradingDay(p.getStringField("trading_day"));
+			stg->setStgLastSavedTime(p.getStringField("last_save_time"));
 
 			// 设置是否有修改过持仓
 			stg->setStgUpdatePositionDetailRecordTime(p.getStringField("update_position_detail_record_time"));
