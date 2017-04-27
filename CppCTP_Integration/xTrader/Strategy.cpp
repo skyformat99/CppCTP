@@ -2063,6 +2063,7 @@ void Strategy::printStrategyInfo(string message) {
 	std::cout << "\t期货账户开关:" << this->stg_user->getOn_Off() << std::endl;
 	std::cout << "\t交易员开关:" << this->stg_user->GetTrader()->getOn_Off() << std::endl;
 	std::cout << "\t策略开关:" << this->getOn_Off() << std::endl;
+	std::cout << "\t撤单次数:" << this->getStgUser() << std::endl;
 }
 
 void Strategy::printStrategyInfoPosition() {
