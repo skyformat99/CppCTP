@@ -363,10 +363,17 @@ public:
 	/// 数据库更新策略持仓明细
 	void Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd);
 
+	/// 数据库更新策略持仓明细(order changed)
+	void Update_Position_Changed_Detail_To_DB(USER_CThostFtdcOrderField *posd);
+
 	/// 创建持仓明细
 	void CreatePositionTradeDetail(USER_CThostFtdcTradeField *posd);
+
 	/// 数据库更新策略持仓明细
 	void Update_Position_Trade_Detail_To_DB(USER_CThostFtdcTradeField *posd);
+
+	/// 数据库更新策略持仓明细(trade changed)
+	void Update_Position_Trade_Changed_Detail_To_DB(USER_CThostFtdcTradeField *posd);
 
 	/// 设置开关
 	int getOn_Off();

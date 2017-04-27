@@ -23,6 +23,8 @@ std::mutex create_position_detail_mtx;
 #define DB_POSITIONDETAIL_YESTERDAY_COLLECTION	"CTP.positiondetail_yesterday"
 #define DB_POSITIONDETAIL_TRADE_COLLECTION	"CTP.positiondetail_trade"
 #define DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION	"CTP.positiondetail_trade_yesterday"
+#define DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION	"CTP.positiondetail_changed"
+#define DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION	"CTP.positiondetail_trade_changed"
 
 Strategy::Strategy(User *stg_user) {
 
@@ -1382,6 +1384,82 @@ void Strategy::Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
 	USER_PRINT("Strategy::Update_Position_Detail_To_DB OK");
 }
 
+/// 数据库更新策略持仓明细(order changed)
+void Strategy::Update_Position_Changed_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
+	USER_PRINT("Strategy::Update_Position_Detail_To_DB");
+
+	int count_number = 0;
+
+	count_number = this->stg_save_strategy_conn->count(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION,
+		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
+
+	if (count_number > 0) {
+		std::cout << "Strategy::Update_Position_Detail_To_DB()" << std::endl;
+		std::cout << "\t收盘保存持仓明细 找到(Order)!" << std::endl;
+		this->stg_save_strategy_conn->update(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, BSON(
+			"userid" << posd->UserID
+			<< "strategyid" << posd->StrategyID
+			<< "tradingday" << posd->TradingDay
+			<< "orderref" << posd->OrderRef
+			<< "is_active" << ISACTIVE), BSON("$set" << BSON(
+			"instrumentid" << posd->InstrumentID
+			<< "orderref" << posd->OrderRef
+			<< "userid" << posd->UserID
+			<< "direction" << posd->Direction
+			/*<< "comboffsetflag" << string(1, posd->CombOffsetFlag[0])
+			<< "combhedgeflag" << string(1, posd->CombHedgeFlag[0])*/
+			<< "comboffsetflag" << posd->CombOffsetFlag
+			<< "combhedgeflag" << posd->CombHedgeFlag
+			<< "limitprice" << posd->LimitPrice
+			<< "volumetotaloriginal" << posd->VolumeTotalOriginal
+			<< "tradingday" << posd->TradingDay
+			<< "tradingdayrecord" << posd->TradingDayRecord
+			<< "orderstatus" << posd->OrderStatus
+			<< "volumetraded" << posd->VolumeTraded
+			<< "volumetotal" << posd->VolumeTotal
+			<< "insertdate" << posd->InsertDate
+			<< "inserttime" << posd->InsertTime
+			<< "strategyid" << posd->StrategyID
+			<< "volumetradedbatch" << posd->VolumeTradedBatch
+			)));
+		USER_PRINT("Strategy::Update_Position_Detail_To_DB ok");
+	}
+	else {
+		std::cout << "Strategy::Update_Position_Detail_To_DB()" << std::endl;
+		std::cout << "\t收盘保存持仓明细 未 找到(Order)!" << std::endl;
+		std::cout << "\t开始新建持仓明细(Order)!" << std::endl;
+
+		BSONObjBuilder b;
+
+		b.append("userid", posd->UserID);
+		b.append("tradingday", posd->TradingDay);
+		b.append("orderref", posd->OrderRef);
+		b.append("is_active", ISACTIVE);
+		b.append("instrumentid", posd->InstrumentID);
+		b.append("direction", posd->Direction);
+		b.append("comboffsetflag", posd->CombOffsetFlag);
+		b.append("combhedgeflag", posd->CombHedgeFlag);
+		b.append("limitprice", posd->LimitPrice);
+		b.append("volumetotaloriginal", posd->VolumeTotalOriginal);
+		b.append("tradingdayrecord", posd->TradingDayRecord);
+		b.append("orderstatus", posd->OrderStatus);
+		b.append("volumetraded", posd->VolumeTraded);
+		b.append("volumetotal", posd->VolumeTotal);
+		b.append("insertdate", posd->InsertDate);
+		b.append("inserttime", posd->InsertTime);
+		b.append("strategyid", posd->StrategyID);
+		b.append("volumetradedbatch", posd->VolumeTradedBatch);
+
+		BSONObj p = b.obj();
+		create_position_detail_mtx.lock();
+		this->stg_save_strategy_conn->insert(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, p);
+		create_position_detail_mtx.unlock();
+		USER_PRINT("DBManager::CreatePositionTradeDetail ok");
+	}
+
+	USER_PRINT("Strategy::Update_Position_Detail_To_DB OK");
+}
+
 /// 创建持仓明细
 void Strategy::CreatePositionTradeDetail(USER_CThostFtdcTradeField *posd) {
 	USER_PRINT("Strategy::CreatePositionTradeDetail");
@@ -1482,6 +1560,66 @@ void Strategy::Update_Position_Trade_Detail_To_DB(USER_CThostFtdcTradeField *pos
 		BSONObj p = b.obj();
 		create_position_detail_mtx.lock();
 		this->stg_save_strategy_conn->insert(DB_POSITIONDETAIL_TRADE_COLLECTION, p);
+		create_position_detail_mtx.unlock();
+	}
+
+	USER_PRINT("Strategy::Update_Position_Trade_Detail_To_DB OK");
+}
+
+/// 数据库更新策略持仓明细(trade changed)
+void Strategy::Update_Position_Trade_Changed_Detail_To_DB(USER_CThostFtdcTradeField *posd) {
+	USER_PRINT("Strategy::Update_Position_Trade_Detail_To_DB");
+
+	int count_number = 0;
+
+	count_number = this->stg_save_strategy_conn->count(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION,
+		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
+
+	if (count_number > 0) {
+		std::cout << "Strategy::Update_Position_Trade_Detail_To_DB()" << std::endl;
+		std::cout << "\t收盘保存持仓明细 已 找到(Trade)!" << std::endl;
+		this->stg_save_strategy_conn->update(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON(
+			"instrumentid" << posd->InstrumentID
+			<< "orderref" << posd->OrderRef
+			<< "userid" << posd->UserID
+			<< "direction" << posd->Direction
+			/*<< "comboffsetflag" << string(1, posd->CombOffsetFlag[0])
+			<< "combhedgeflag" << string(1, posd->CombHedgeFlag[0])*/
+			<< "offsetflag" << posd->OffsetFlag
+			<< "hedgeflag" << posd->HedgeFlag
+			<< "price" << posd->Price
+			<< "tradingday" << posd->TradingDay
+			<< "tradingdayrecord" << posd->TradingDayRecord
+			<< "tradedate" << posd->TradeDate
+			<< "strategyid" << posd->StrategyID
+			<< "volume" << posd->Volume
+			)));
+		USER_PRINT("Strategy::Update_Position_Trade_Detail_To_DB ok");
+	}
+	else {
+		std::cout << "Strategy::Update_Position_Trade_Detail_To_DB()" << std::endl;
+		std::cout << "\t收盘保存持仓明细 未 找到(Trade)!" << std::endl;
+		std::cout << "\t开始新建持仓明细(Trade)!" << std::endl;
+
+		BSONObjBuilder b;
+
+		b.append("userid", posd->UserID);
+		b.append("strategyid", posd->StrategyID);
+		b.append("tradingday", posd->TradingDay);
+		b.append("orderref", posd->OrderRef);
+		b.append("is_active", ISACTIVE);
+		b.append("instrumentid", posd->InstrumentID);
+		b.append("direction", posd->Direction);
+		b.append("offsetflag", posd->OffsetFlag);
+		b.append("hedgeflag", posd->HedgeFlag);
+		b.append("price", posd->Price);
+		b.append("tradingdayrecord", posd->TradingDayRecord);
+		b.append("tradedate", posd->TradeDate);
+		b.append("volume", posd->Volume);
+
+		BSONObj p = b.obj();
+		create_position_detail_mtx.lock();
+		this->stg_save_strategy_conn->insert(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, p);
 		create_position_detail_mtx.unlock();
 	}
 
@@ -3051,17 +3189,11 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	std::cout << "Strategy::Exec_OnRtnOrder()" << std::endl;
 	USER_PRINT("Exec_OnRtnOrder");
 
-	if (!this->is_position_right) //如果有修改持仓,开始过滤,从修改时间后开始接收
-	{
-		string compare_date = pOrder->InsertDate; //报单日期
-		string compare_time = pOrder->InsertTime; //报单时间
-		// 如果pOrder的时间在修改持仓之后
-		if (Utils::compareTradingDaySeconds((compare_date + compare_time).c_str(), this->stg_update_position_detail_record_time.c_str())) {
-			this->setStgIsPositionRight(true);
-		}
-		else {
-			return;
-		}
+	string compare_date = pOrder->InsertDate; //报单日期
+	string compare_time = pOrder->InsertTime; //报单时间
+	// 如果pOrder的时间在修改持仓之前 return
+	if (!Utils::compareTradingDaySeconds((compare_date + compare_time).c_str(), this->stg_update_position_detail_record_time.c_str())) {
+		return;
 	}
 
 	// 添加字段,本次成交量
@@ -3178,18 +3310,14 @@ void Strategy::ExEc_OnRtnTrade(CThostFtdcTradeField *pTrade) {
 	//this->update_position(pTrade);
 	//this->update_task_status();
 
-	if (!this->is_position_right) //如果有修改持仓,开始过滤,从修改时间后开始接收
-	{
-		string compare_date = pTrade->TradeDate; //报单日期
-		string compare_time = pTrade->TradeTime; //报单时间
-		// 如果pOrder的时间在修改持仓之后
-		if (Utils::compareTradingDaySeconds((compare_date + compare_time).c_str(), this->stg_update_position_detail_record_time.c_str())) {
-			this->setStgIsPositionRight(true);
-		}
-		else {
-			return;
-		}
+	string compare_date = pTrade->TradeDate; //报单日期
+	string compare_time = pTrade->TradeTime; //报单时间
+
+	// 如果pTrade的时间在修改持仓之前 return
+	if (!Utils::compareTradingDaySeconds((compare_date + compare_time).c_str(), this->stg_update_position_detail_record_time.c_str())) {
+		return;
 	}
+
 	USER_CThostFtdcTradeField *new_trade = new USER_CThostFtdcTradeField();
 	this->CopyTradeDataToNew(new_trade, pTrade);
 	this->update_position_detail(new_trade);
@@ -4749,9 +4877,9 @@ void Strategy::OrderInsert(User *user, char *InstrumentID, char CombOffsetFlag, 
 void Strategy::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	USER_PRINT("Strategy::OnRtnOrder");
 	//如果已经收盘,不再接收
-	if (this->getStgUser()->getCTP_Manager()->getIsMarketCloseDone()) {
+	/*if (this->getStgUser()->getCTP_Manager()->getIsMarketCloseDone()) {
 		return;
-	}
+	}*/
 	/// 如果合约在撤单维护列表里，那么撤单次数增加1
 	this->stg_user->add_instrument_id_action_counter(pOrder);
 	this->Exec_OnRtnOrder(pOrder);
@@ -4760,30 +4888,30 @@ void Strategy::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 //成交通知
 void Strategy::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 	USER_PRINT("Strategy::OnRtnTrade");
-	//如果已经收盘,不再接收
-	if (this->getStgUser()->getCTP_Manager()->getIsMarketCloseDone()) {
-		return;
-	}
+	////如果已经收盘,不再接收
+	//if (this->getStgUser()->getCTP_Manager()->getIsMarketCloseDone()) {
+	//	return;
+	//}
 	this->ExEc_OnRtnTrade(pTrade);
 }
 
 //下单错误响应
 void Strategy::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder) {
 	USER_PRINT("Strategy::OnErrRtnOrderInsert");
-	//如果已经收盘,不再接收
-	if (this->getStgUser()->getCTP_Manager()->getIsMarketCloseDone()) {
-		return;
-	}
+	////如果已经收盘,不再接收
+	//if (this->getStgUser()->getCTP_Manager()->getIsMarketCloseDone()) {
+	//	return;
+	//}
 	this->Exec_OnErrRtnOrderInsert();
 }
 
 ///报单录入请求响应
 void Strategy::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder) {
 	USER_PRINT("Strategy::OnRspOrderInsert()");
-	//如果已经收盘,不再接收
-	if (this->getStgUser()->getCTP_Manager()->getIsMarketCloseDone()) {
-		return;
-	}
+	////如果已经收盘,不再接收
+	//if (this->getStgUser()->getCTP_Manager()->getIsMarketCloseDone()) {
+	//	return;
+	//}
 	std::cout << "Strategy::OnRspOrderInsert()" << std::endl;
 	this->Exec_OnRspOrderInsert();
 }

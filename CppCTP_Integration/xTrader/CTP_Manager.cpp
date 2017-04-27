@@ -633,6 +633,80 @@ void CTP_Manager::saveStrategyPositionDetail(Strategy *stg) {
 	}
 }
 
+/// 保存一个策略持仓明细修改过的
+void CTP_Manager::saveStrategyChangedPositionDetail(Strategy *stg) {
+	list<USER_CThostFtdcOrderField *>::iterator posd_itor;
+	list<USER_CThostFtdcTradeField *>::iterator posd_itor_trade;
+	USER_PRINT("CTP_Manager::saveStrategyPositionDetail()");
+	std::cout << "CTP_Manager::saveStrategyChangedPositionDetail()" << std::endl;
+	//this->dbm->UpdateStrategy((*stg_itor));
+	stg->setStgUpdatePositionDetailRecordTime(Utils::getDate());
+	stg->UpdateStrategy(stg);
+	std::cout << "\t保存期货账户 = " << stg->getStgUserId() << std::endl;
+	std::cout << "\t保存策略ID = " << stg->getStgStrategyId() << std::endl;
+
+	// 遍历strategy持仓明细并保存
+	for (posd_itor = stg->getStg_List_Position_Detail_From_Order()->begin();
+		posd_itor != stg->getStg_List_Position_Detail_From_Order()->end();
+		posd_itor++) {
+
+		//this->dbm->CreatePositionDetail((*posd_itor));
+		std::cout << "\t\t================持仓明细输出(trade)BEGIN===================" << std::endl;
+		std::cout << "\t\tinstrumentid = " << (*posd_itor)->InstrumentID << std::endl;
+		std::cout << "\t\torderref = " << (*posd_itor)->OrderRef << std::endl;
+		std::cout << "\t\tuserid = " << (*posd_itor)->UserID << std::endl;
+		std::cout << "\t\tdirection = " << (*posd_itor)->Direction << std::endl;
+		/*std::cout << "\tcomboffsetflag = " << string(1, (*posd_itor)->CombOffsetFlag[0]) << std::endl;
+		std::cout << "\tcombhedgeflag = " << string(1, (*posd_itor)->CombHedgeFlag[0]) << std::endl;*/
+
+		std::cout << "\t\tcomboffsetflag = " << (*posd_itor)->CombOffsetFlag << std::endl;
+		std::cout << "\t\tcombhedgeflag = " << (*posd_itor)->CombHedgeFlag << std::endl;
+		std::cout << "\t\tlimitprice = " << (*posd_itor)->LimitPrice << std::endl;
+		std::cout << "\t\tvolumetotaloriginal = " << (*posd_itor)->VolumeTotalOriginal << std::endl;
+		std::cout << "\t\ttradingday = " << (*posd_itor)->TradingDay << std::endl;
+		strcpy((*posd_itor)->TradingDayRecord, this->getTradingDay().c_str());
+		std::cout << "\t\ttradingdayrecord = " << (*posd_itor)->TradingDayRecord << std::endl;
+		std::cout << "\t\torderstatus = " << (*posd_itor)->OrderStatus << std::endl;
+		std::cout << "\t\tvolumetraded = " << (*posd_itor)->VolumeTraded << std::endl;
+		std::cout << "\t\tvolumetotal = " << (*posd_itor)->VolumeTotal << std::endl;
+		std::cout << "\t\tinsertdate = " << (*posd_itor)->InsertDate << std::endl;
+		std::cout << "\t\tinserttime = " << (*posd_itor)->InsertTime << std::endl;
+		std::cout << "\t\tstrategyid = " << (*posd_itor)->StrategyID << std::endl;
+		std::cout << "\t\tvolumetradedbatch = " << (*posd_itor)->VolumeTradedBatch << std::endl;
+		std::cout << "\t\t================持仓明细输出(order)END ===================" << std::endl;
+
+		stg->Update_Position_Changed_Detail_To_DB((*posd_itor));
+	}
+
+	// 遍历strategy持仓明细并保存
+	for (posd_itor_trade = stg->getStg_List_Position_Detail_From_Trade()->begin();
+		posd_itor_trade != stg->getStg_List_Position_Detail_From_Trade()->end();
+		posd_itor_trade++) {
+
+		//this->dbm->CreatePositionDetail((*posd_itor));
+		std::cout << "\t\t================持仓明细输出(trade)BEGIN===================" << std::endl;
+		std::cout << "\t\tinstrumentid = " << (*posd_itor_trade)->InstrumentID << std::endl;
+		std::cout << "\t\torderref = " << (*posd_itor_trade)->OrderRef << std::endl;
+		std::cout << "\t\tuserid = " << (*posd_itor_trade)->UserID << std::endl;
+		std::cout << "\t\tdirection = " << (*posd_itor_trade)->Direction << std::endl;
+		/*std::cout << "\tcomboffsetflag = " << string(1, (*posd_itor)->CombOffsetFlag[0]) << std::endl;
+		std::cout << "\tcombhedgeflag = " << string(1, (*posd_itor)->CombHedgeFlag[0]) << std::endl;*/
+
+		std::cout << "\t\toffsetflag = " << (*posd_itor_trade)->OffsetFlag << std::endl;
+		std::cout << "\t\thedgeflag = " << (*posd_itor_trade)->HedgeFlag << std::endl;
+		std::cout << "\t\tprice = " << (*posd_itor_trade)->Price << std::endl;
+		std::cout << "\t\ttradingday = " << (*posd_itor_trade)->TradingDay << std::endl;
+		strcpy((*posd_itor_trade)->TradingDayRecord, this->getTradingDay().c_str());
+		std::cout << "\t\ttradingdayrecord = " << (*posd_itor_trade)->TradingDayRecord << std::endl;
+		std::cout << "\t\ttradingdate = " << (*posd_itor_trade)->TradeDate << std::endl;
+		std::cout << "\t\tstrategyid = " << (*posd_itor_trade)->StrategyID << std::endl;
+		std::cout << "\t\tvolume = " << (*posd_itor_trade)->Volume << std::endl;
+		std::cout << "\t\t================持仓明细输出(trade)END ===================" << std::endl;
+
+		stg->Update_Position_Trade_Changed_Detail_To_DB((*posd_itor_trade));
+	}
+}
+
 /// 保存position_detail
 void CTP_Manager::savePositionDetail() {
 
@@ -1253,7 +1327,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	rapidjson::Writer<StringBuffer> writer20(buffer20);
 
 	bFind = false;
-	static_dbm->getAllPositionDetail(&l_posd, s_TraderID, s_UserID);
+	static_dbm->getAllPositionDetailChanged(&l_posd, s_TraderID, s_UserID);
 
 	/*构建策略昨仓Json*/
 	build_doc20.SetObject();
@@ -1353,7 +1427,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	rapidjson::StringBuffer buffer21;
 	rapidjson::Writer<StringBuffer> writer21(buffer21);
 
-	static_dbm->getAllPositionDetailTrade(&l_posd_trade, s_TraderID, s_UserID);
+	static_dbm->getAllPositionDetailTradeChanged(&l_posd_trade, s_TraderID, s_UserID);
 
 	/*构建策略昨仓Json*/
 	build_doc21.SetObject();
@@ -3006,8 +3080,15 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									//ctp_m->getDBManager()->DropPositionDetailTrade();
 									//ctp_m->saveStrategyPositionDetail((*stg_itor));
 									//ctp_m->saveAllStrategyPositionDetail();
+									/************************************************************************/
+									/* 删除今日持仓明细(order,trade)，今日持仓明细changed(order,trade)
+									   保存修改的策略到今日持仓明细，今日持仓明细changed*/
+									/************************************************************************/
 									ctp_m->getDBManager()->DeletePositionDetailByStrategy((*stg_itor));
+									ctp_m->getDBManager()->DeletePositionDetailChangedByStrategy((*stg_itor));
 									ctp_m->saveStrategyPositionDetail((*stg_itor));
+									ctp_m->saveStrategyChangedPositionDetail((*stg_itor));
+									
 
 									/************************************************************************/
 									/* 校准仓位之后,更新所有的运行标志位
@@ -3570,7 +3651,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				std::cout << "\t收到期货账户ID = " << s_UserID << std::endl;
 
 				list<USER_CThostFtdcOrderField *> l_posd;
-				static_dbm->getAllPositionDetail(&l_posd, s_TraderID, s_UserID);
+				static_dbm->getAllPositionDetailChanged(&l_posd, s_TraderID, s_UserID);
 
 				/*构建策略昨仓Json*/
 				build_doc.SetObject();
@@ -3661,7 +3742,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				std::cout << "\t收到期货账户ID = " << s_UserID << std::endl;
 
 				list<USER_CThostFtdcTradeField *> l_posd;
-				static_dbm->getAllPositionDetailTrade(&l_posd, s_TraderID, s_UserID);
+				static_dbm->getAllPositionDetailTradeChanged(&l_posd, s_TraderID, s_UserID);
 
 				/*构建策略昨仓Json*/
 				build_doc.SetObject();
@@ -4231,7 +4312,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 	// 将昨持仓明细添加到策略的持仓明细里(order)
 	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
 		// 一旦有策略修改过持仓变量 或者 已经收盘，从今持仓明细初始化
-		if (!(*stg_itor)->getStgIsPositionRight() || (this->getIsMarketCloseDone()))
+		if (!(*stg_itor)->getStgIsPositionRight())
 		{
 			for (position_itor = this->l_posdetail->begin(); position_itor != this->l_posdetail->end(); position_itor++) {
 
@@ -4305,7 +4386,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 	// 将昨持仓明细添加到策略的持仓明细里(trade)
 	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
 		// 如果仓位被修改过 或者 已经收盘，从今持仓明细初始化
-		if ((!(*stg_itor)->getStgIsPositionRight()) || (this->getIsMarketCloseDone())) {
+		if ((!(*stg_itor)->getStgIsPositionRight())) {
 			for (position_trade_itor = this->l_posdetail_trade->begin();
 				position_trade_itor != this->l_posdetail_trade->end();
 				position_trade_itor++) {

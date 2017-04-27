@@ -160,12 +160,24 @@ public:
 	void getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, string trader_id = "", string userid = "");
 	void DropPositionDetail();
 
+
+	/************************************************************************/
+	/* 修改过仓位的策略的持仓明细(order) CRUD                                   */
+	/************************************************************************/
+	void CreatePositionDetailChanged(USER_CThostFtdcOrderField *posd);
+	void DeletePositionDetailChanged(USER_CThostFtdcOrderField *posd);
+	void UpdatePositionDetailChanged(USER_CThostFtdcOrderField *posd);
+	void getAllPositionDetailChanged(list<USER_CThostFtdcOrderField *> *l_posd, string trader_id = "", string userid = "");
+	void DropPositionDetailChanged();
+	//根据策略,删除策略对应的order,trade持仓明细
+	bool DeletePositionDetailChangedByStrategy(Strategy *stg);
+
+
 	void CreatePositionDetailYesterday(USER_CThostFtdcOrderField *posd);
 	void DeletePositionDetailYesterday(USER_CThostFtdcOrderField *posd);
 	void UpdatePositionDetailYesterday(USER_CThostFtdcOrderField *posd);
 	void getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> *l_posd, string trader_id = "", string userid = "");
 	void DropPositionDetailYesterday();
-
 	//根据策略,删除策略对应的order,trade持仓明细
 	bool DeletePositionDetailByStrategy(Strategy *stg);
 
@@ -182,9 +194,18 @@ public:
 
 
 	/************************************************************************/
-	/* 更新修改持仓明细记录                                                    */
+	/* 修改过仓位的策略的持仓明细(trade) CRUD                                   */
 	/************************************************************************/
-	bool UpdatePositionModifyRecord(Strategy *stg, string recordtime);
+	void CreatePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd);
+	void DeletePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd);
+	void UpdatePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd);
+	void getAllPositionDetailTradeChanged(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id = "", string userid = "");
+	void DropPositionDetailTradeChanged();
+
+	///************************************************************************/
+	///* 更新修改持仓明细记录                                                    */
+	///************************************************************************/
+	//bool UpdatePositionModifyRecord(Strategy *stg, string recordtime);
 
 	void CreatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *posd);
 	void DeletePositionDetailTradeYesterday(USER_CThostFtdcTradeField *posd);
