@@ -493,7 +493,8 @@ void CTP_Manager::saveAllStrategyPositionDetail() {
 		stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
 
 		//this->dbm->UpdateStrategy((*stg_itor));
-		(*stg_itor)->setStgUpdatePositionDetailRecordTime(Utils::getDate());
+		//(*stg_itor)->setStgUpdatePositionDetailRecordTime(Utils::getDate());
+		(*stg_itor)->setStgLastSavedTime(Utils::getDate());
 		(*stg_itor)->UpdateStrategy((*stg_itor));
 		std::cout << "\t关闭服务端,保存期货账户 = " << (*stg_itor)->getStgUserId() << std::endl;
 		std::cout << "\t关闭服务端,保存策略ID = " << (*stg_itor)->getStgStrategyId() << std::endl;
@@ -566,8 +567,8 @@ void CTP_Manager::saveStrategyPositionDetail(Strategy *stg) {
 	USER_PRINT("CTP_Manager::saveStrategyPositionDetail()");
 	std::cout << "CTP_Manager::saveStrategyPositionDetail()" << std::endl;
 	//this->dbm->UpdateStrategy((*stg_itor));
-	//stg->setStgUpdatePositionDetailRecordTime(Utils::getDate());
-	stg->setStgLastSavedTime(Utils::getDate());
+	stg->setStgUpdatePositionDetailRecordTime(Utils::getDate());
+	//stg->setStgLastSavedTime(Utils::getDate());
 	stg->UpdateStrategy(stg);
 	std::cout << "\t保存期货账户 = " << stg->getStgUserId() << std::endl;
 	std::cout << "\t保存策略ID = " << stg->getStgStrategyId() << std::endl;
@@ -641,8 +642,8 @@ void CTP_Manager::saveStrategyChangedPositionDetail(Strategy *stg) {
 	USER_PRINT("CTP_Manager::saveStrategyPositionDetail()");
 	std::cout << "CTP_Manager::saveStrategyChangedPositionDetail()" << std::endl;
 	//this->dbm->UpdateStrategy((*stg_itor));
-	//stg->setStgUpdatePositionDetailRecordTime(Utils::getDate());
-	stg->setStgLastSavedTime(Utils::getDate());
+	stg->setStgUpdatePositionDetailRecordTime(Utils::getDate());
+	//stg->setStgLastSavedTime(Utils::getDate());
 	stg->UpdateStrategy(stg);
 	std::cout << "\t保存期货账户 = " << stg->getStgUserId() << std::endl;
 	std::cout << "\t保存策略ID = " << stg->getStgStrategyId() << std::endl;
@@ -707,11 +708,6 @@ void CTP_Manager::saveStrategyChangedPositionDetail(Strategy *stg) {
 
 		stg->Update_Position_Trade_Changed_Detail_To_DB((*posd_itor_trade));
 	}
-}
-
-/// 保存position_detail
-void CTP_Manager::savePositionDetail() {
-
 }
 
 /// 设置mdspi

@@ -1246,6 +1246,7 @@ void Strategy::UpdateStrategy(Strategy *stg) {
 			<< "b_wait_price_tick" << stg->getStgBWaitPriceTick()
 			<< "trading_day" << stg->getStgTradingDay()
 			<< "update_position_detail_record_time" << stg->getStgUpdatePositionDetailRecordTime()
+			<< "last_save_time" << stg->getStgLastSavedTime()
 			<< "list_instrument_id" << BSON_ARRAY(stg->getStgInstrumentIdA() << stg->getStgInstrumentIdB()))));
 
 		USER_PRINT("Strategy::UpdateStrategy ok");

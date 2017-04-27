@@ -135,9 +135,6 @@ public:
 	/// 保存一个策略持仓明细修改过的
 	void saveStrategyChangedPositionDetail(Strategy *stg);
 
-	/// 保存position_detail
-	void savePositionDetail();
-
 	/// 设置mdspi
 	void setMdSpi(MdSpi *mdspi);
 
