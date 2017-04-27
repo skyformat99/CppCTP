@@ -683,22 +683,22 @@ void CTP_Manager::saveStrategyChangedPositionDetail(Strategy *stg) {
 		posd_itor_trade++) {
 
 		//this->dbm->CreatePositionDetail((*posd_itor));
-		//std::cout << "\t\tinstrumentid = " << (*posd_itor_trade)->InstrumentID << std::endl;
-		//std::cout << "\t\torderref = " << (*posd_itor_trade)->OrderRef << std::endl;
-		//std::cout << "\t\tuserid = " << (*posd_itor_trade)->UserID << std::endl;
-		//std::cout << "\t\tdirection = " << (*posd_itor_trade)->Direction << std::endl;
-		///*std::cout << "\tcomboffsetflag = " << string(1, (*posd_itor)->CombOffsetFlag[0]) << std::endl;
-		//std::cout << "\tcombhedgeflag = " << string(1, (*posd_itor)->CombHedgeFlag[0]) << std::endl;*/
+		std::cout << "\t\tinstrumentid = " << (*posd_itor_trade)->InstrumentID << std::endl;
+		std::cout << "\t\torderref = " << (*posd_itor_trade)->OrderRef << std::endl;
+		std::cout << "\t\tuserid = " << (*posd_itor_trade)->UserID << std::endl;
+		std::cout << "\t\tdirection = " << (*posd_itor_trade)->Direction << std::endl;
+		/*std::cout << "\tcomboffsetflag = " << string(1, (*posd_itor)->CombOffsetFlag[0]) << std::endl;
+		std::cout << "\tcombhedgeflag = " << string(1, (*posd_itor)->CombHedgeFlag[0]) << std::endl;*/
 
-		//std::cout << "\t\toffsetflag = " << (*posd_itor_trade)->OffsetFlag << std::endl;
-		//std::cout << "\t\thedgeflag = " << (*posd_itor_trade)->HedgeFlag << std::endl;
-		//std::cout << "\t\tprice = " << (*posd_itor_trade)->Price << std::endl;
-		//std::cout << "\t\ttradingday = " << (*posd_itor_trade)->TradingDay << std::endl;
-		//strcpy((*posd_itor_trade)->TradingDayRecord, this->getTradingDay().c_str());
-		//std::cout << "\t\ttradingdayrecord = " << (*posd_itor_trade)->TradingDayRecord << std::endl;
-		//std::cout << "\t\ttradingdate = " << (*posd_itor_trade)->TradeDate << std::endl;
-		//std::cout << "\t\tstrategyid = " << (*posd_itor_trade)->StrategyID << std::endl;
-		//std::cout << "\t\tvolume = " << (*posd_itor_trade)->Volume << std::endl;
+		std::cout << "\t\toffsetflag = " << (*posd_itor_trade)->OffsetFlag << std::endl;
+		std::cout << "\t\thedgeflag = " << (*posd_itor_trade)->HedgeFlag << std::endl;
+		std::cout << "\t\tprice = " << (*posd_itor_trade)->Price << std::endl;
+		std::cout << "\t\ttradingday = " << (*posd_itor_trade)->TradingDay << std::endl;
+		strcpy((*posd_itor_trade)->TradingDayRecord, this->getTradingDay().c_str());
+		std::cout << "\t\ttradingdayrecord = " << (*posd_itor_trade)->TradingDayRecord << std::endl;
+		std::cout << "\t\ttradingdate = " << (*posd_itor_trade)->TradeDate << std::endl;
+		std::cout << "\t\tstrategyid = " << (*posd_itor_trade)->StrategyID << std::endl;
+		std::cout << "\t\tvolume = " << (*posd_itor_trade)->Volume << std::endl;
 
 		stg->Update_Position_Trade_Changed_Detail_To_DB((*posd_itor_trade));
 	}
@@ -3029,7 +3029,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 									// Trade
 									USER_CThostFtdcTradeField *trade_BSellYesterdayClose = new USER_CThostFtdcTradeField();
-									(*stg_itor)->createFakeTradePositionDetail(trade_ASellYesterdayClose, ctp_m->getTradingDay(),
+									(*stg_itor)->createFakeTradePositionDetail(trade_BSellYesterdayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '0', '4',
 										(*stg_itor)->getStgPositionBSellYesterday() - object["position_b_sell_yesterday"].GetInt());
 
@@ -3159,6 +3159,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									/************************************************************************/
 									ctp_m->getDBManager()->DeletePositionDetailByStrategy((*stg_itor));
 									ctp_m->getDBManager()->DeletePositionDetailChangedByStrategy((*stg_itor));
+
 									ctp_m->saveStrategyPositionDetail((*stg_itor));
 									ctp_m->saveStrategyChangedPositionDetail((*stg_itor));
 
@@ -4460,6 +4461,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 
 				if ((!strcmp((*stg_itor)->getStgStrategyId().c_str(), (*position_trade_itor)->StrategyID)) &&
 					(!strcmp((*stg_itor)->getStgUserId().c_str(), (*position_trade_itor)->UserID))) { //策略id相同 && 用户ID相同
+					
 					strcpy((*position_trade_itor)->TradingDayRecord, this->getTradingDay().c_str());
 					//添加到对应策略的持仓明细列表里
 					(*stg_itor)->getStg_List_Position_Detail_From_Trade()->push_back((*position_trade_itor));

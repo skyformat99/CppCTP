@@ -2081,6 +2081,55 @@ void Strategy::printStrategyInfoPosition() {
 		<< "B合约今卖:" << this->stg_position_b_sell_today << ", "
 		<< "B合约昨卖:" << this->stg_position_b_sell_yesterday << ", "
 		<< "B合约总卖:" << this->stg_position_b_sell << std::endl;
+
+	list<USER_CThostFtdcTradeField *>::iterator posd_itor_trade;
+	// 遍历strategy持仓明细(trade)并保存
+	for (posd_itor_trade = this->getStg_List_Position_Detail_From_Trade()->begin();
+		posd_itor_trade != this->getStg_List_Position_Detail_From_Trade()->end();
+		posd_itor_trade++) {
+
+		//this->dbm->CreatePositionDetail((*posd_itor));
+		std::cout << "\tTrade 持仓明细:" << std::endl;
+		std::cout << "\t\tinstrumentid = " << (*posd_itor_trade)->InstrumentID << std::endl;
+		std::cout << "\t\torderref = " << (*posd_itor_trade)->OrderRef << std::endl;
+		std::cout << "\t\tuserid = " << (*posd_itor_trade)->UserID << std::endl;
+		std::cout << "\t\tdirection = " << (*posd_itor_trade)->Direction << std::endl;
+		std::cout << "\t\toffsetflag = " << (*posd_itor_trade)->OffsetFlag << std::endl;
+		std::cout << "\t\thedgeflag = " << (*posd_itor_trade)->HedgeFlag << std::endl;
+		std::cout << "\t\tprice = " << (*posd_itor_trade)->Price << std::endl;
+		std::cout << "\t\ttradingday = " << (*posd_itor_trade)->TradingDay << std::endl;
+		//strcpy((*posd_itor_trade)->TradingDayRecord, this->stg_user->getCTP_Manager()->getTradingDay().c_str());
+		std::cout << "\t\ttradingdayrecord = " << (*posd_itor_trade)->TradingDayRecord << std::endl;
+		std::cout << "\t\ttradingdate = " << (*posd_itor_trade)->TradeDate << std::endl;
+		std::cout << "\t\tstrategyid = " << (*posd_itor_trade)->StrategyID << std::endl;
+		std::cout << "\t\tvolume = " << (*posd_itor_trade)->Volume << std::endl;
+	}
+
+	list<USER_CThostFtdcOrderField *>::iterator posd_itor;
+	// 遍历strategy持仓明细(order)并保存
+	for (posd_itor = this->getStg_List_Position_Detail_From_Order()->begin();
+		posd_itor != this->getStg_List_Position_Detail_From_Order()->end();
+		posd_itor++) {
+
+		std::cout << "\tOrder 持仓明细:" << std::endl;
+		std::cout << "\t\tinstrumentid = " << (*posd_itor)->InstrumentID << std::endl;
+		std::cout << "\t\torderref = " << (*posd_itor)->OrderRef << std::endl;
+		std::cout << "\t\tuserid = " << (*posd_itor)->UserID << std::endl;
+		std::cout << "\t\tdirection = " << (*posd_itor)->Direction << std::endl;
+		std::cout << "\t\tcomboffsetflag = " << (*posd_itor)->CombOffsetFlag << std::endl;
+		std::cout << "\t\tcombhedgeflag = " << (*posd_itor)->CombHedgeFlag << std::endl;
+		std::cout << "\t\tlimitprice = " << (*posd_itor)->LimitPrice << std::endl;
+		std::cout << "\t\tvolumetotaloriginal = " << (*posd_itor)->VolumeTotalOriginal << std::endl;
+		std::cout << "\t\ttradingday = " << (*posd_itor)->TradingDay << std::endl;
+		std::cout << "\t\ttradingdayrecord = " << (*posd_itor)->TradingDayRecord << std::endl;
+		std::cout << "\t\torderstatus = " << (*posd_itor)->OrderStatus << std::endl;
+		std::cout << "\t\tvolumetraded = " << (*posd_itor)->VolumeTraded << std::endl;
+		std::cout << "\t\tvolumetotal = " << (*posd_itor)->VolumeTotal << std::endl;
+		std::cout << "\t\tinsertdate = " << (*posd_itor)->InsertDate << std::endl;
+		std::cout << "\t\tinserttime = " << (*posd_itor)->InsertTime << std::endl;
+		std::cout << "\t\tstrategyid = " << (*posd_itor)->StrategyID << std::endl;
+		std::cout << "\t\tvolumetradedbatch = " << (*posd_itor)->VolumeTradedBatch << std::endl;
+	}
 }
 
 void Strategy::setStgUpdatePositionDetailRecordTime(string stg_update_position_detail_record_time) {
@@ -3894,13 +3943,13 @@ void Strategy::update_position_detail(USER_CThostFtdcTradeField *pTrade) {
 	/************************************************************************/
 
 	/*USER_PRINT(pOrder->VolumeTraded);*/
-
-	std::cout << "\tpTrade->OffsetFlag = " << pTrade->OffsetFlag << std::endl;
-	std::cout << "\tpTrade->InstrumentID = " << pTrade->InstrumentID << std::endl;
-	std::cout << "\tpTrade->HedgeFlag = " << pTrade->HedgeFlag << std::endl;
-	std::cout << "\tpTrade->Direction = " << pTrade->Direction << std::endl;
-	std::cout << "\tpTrade->Volume = " << pTrade->Volume << std::endl;
-	std::cout << "\tpTrade->TradingDay = " << pTrade->TradingDay << std::endl;
+	std::cout << "\tTrade 更新持仓明细" << std::endl;
+	std::cout << "\t\tpTrade->OffsetFlag = " << pTrade->OffsetFlag << std::endl;
+	std::cout << "\t\tpTrade->InstrumentID = " << pTrade->InstrumentID << std::endl;
+	std::cout << "\t\tpTrade->HedgeFlag = " << pTrade->HedgeFlag << std::endl;
+	std::cout << "\t\tpTrade->Direction = " << pTrade->Direction << std::endl;
+	std::cout << "\t\tpTrade->Volume = " << pTrade->Volume << std::endl;
+	std::cout << "\t\tpTrade->TradingDay = " << pTrade->TradingDay << std::endl;
 
 
 	if (pTrade->OffsetFlag == '0') // pTrade中"OffsetFlag"值 = "0"为开仓，不用考虑全部成交还是部分成交，开仓trade直接添加到持仓明细列表里
@@ -4009,13 +4058,14 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 		"""
 		# 跳过无成交的order记录                                                                     */
 	/************************************************************************/
-	std::cout << "\tpOrder->CombOffsetFlag[0] = " << pOrder->CombOffsetFlag[0] << std::endl;
-	std::cout << "\tpOrder->InstrumentID = " << pOrder->InstrumentID << std::endl;
-	std::cout << "\tpOrder->CombHedgeFlag[0] = " << pOrder->CombHedgeFlag[0] << std::endl;
-	std::cout << "\tpOrder->Direction = " << pOrder->Direction << std::endl;
-	std::cout << "\tpOrder->VolumeTradedBatch = " << pOrder->VolumeTradedBatch << std::endl;
-	std::cout << "\tpOrder->TradingDay = " << pOrder->TradingDay << std::endl;
-	std::cout << "\tpOrder->VolumeTradedBatch = " << pOrder->VolumeTradedBatch << std::endl;
+	std::cout << "\tOrder 更新持仓明细" << std::endl;
+	std::cout << "\t\tpOrder->CombOffsetFlag[0] = " << pOrder->CombOffsetFlag[0] << std::endl;
+	std::cout << "\t\tpOrder->InstrumentID = " << pOrder->InstrumentID << std::endl;
+	std::cout << "\t\tpOrder->CombHedgeFlag[0] = " << pOrder->CombHedgeFlag[0] << std::endl;
+	std::cout << "\t\tpOrder->Direction = " << pOrder->Direction << std::endl;
+	std::cout << "\t\tpOrder->VolumeTradedBatch = " << pOrder->VolumeTradedBatch << std::endl;
+	std::cout << "\t\tpOrder->TradingDay = " << pOrder->TradingDay << std::endl;
+	std::cout << "\t\tpOrder->VolumeTradedBatch = " << pOrder->VolumeTradedBatch << std::endl;
 
 	if (pOrder->VolumeTradedBatch == 0) {
 		return;

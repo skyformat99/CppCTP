@@ -2580,8 +2580,8 @@ bool DBManager::DeletePositionDetailChangedByStrategy(Strategy *stg) {
 	if (count_number > 0) {
 		std::cout << "\t策略存在,开始删除对应策略持仓明细" << std::endl;
 		std::cout << "\t策略存在,开始删除持仓明细changed order" << std::endl;
-		std::cout << "\tstrategyid:" << stg->getStgStrategyId() << std::endl;
-		std::cout << "\tuserid:" << stg->getStgUserId() << std::endl;
+		std::cout << "\tstrategyid = " << stg->getStgStrategyId() << std::endl;
+		std::cout << "\tuserid = " << stg->getStgUserId() << std::endl;
 
 		this->conn->remove(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, MONGO_QUERY("strategyid" << stg->getStgStrategyId().c_str() << "userid" << stg->getStgUserId().c_str() << "is_active" << ISACTIVE));
 		std::cout << "\t策略存在,开始删除持仓明细changed trade" << std::endl;
