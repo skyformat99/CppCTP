@@ -2488,7 +2488,6 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							build_doc.AddMember("MsgErrorReason", "未找到策略对应账户信息!", allocator);
 							break;
 						}
-						
 					}
 				}
 				else {
@@ -3035,7 +3034,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 										(*stg_itor)->getStgPositionBSellYesterday() - object["position_b_sell_yesterday"].GetInt());
 
 									(*stg_itor)->update_position_detail(order_BSellYesterdayClose);
-									(*stg_itor)->update_position_detail(trade_ASellYesterdayClose);
+									(*stg_itor)->update_position_detail(trade_BSellYesterdayClose);
 
 
 									//B昨买
