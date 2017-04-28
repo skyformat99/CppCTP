@@ -1270,6 +1270,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 		//create_info_object.AddMember("OffsetFlag", (*pod_itor)->OffsetFlag, allocator5);
 		//create_info_object.AddMember("HedgeFlag", (*pod_itor)->HedgeFlag, allocator5);
 		create_info_object.AddMember("Price", (*pod_itor_trade)->Price, allocator5);
+		create_info_object.AddMember("ExchangeID", rapidjson::StringRef((*pod_itor_trade)->ExchangeID), allocator5);
 		create_info_object.AddMember("TradingDay", rapidjson::StringRef((*pod_itor_trade)->TradingDay), allocator5);
 		create_info_object.AddMember("TradingDayRecord", rapidjson::StringRef((*pod_itor_trade)->TradingDayRecord), allocator5);
 		create_info_object.AddMember("TradeDate", rapidjson::StringRef((*pod_itor_trade)->TradeDate), allocator5);
@@ -1512,6 +1513,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 		//create_info_object.AddMember("HedgeFlag", (*pod_itor)->HedgeFlag, allocator21);
 		create_info_object.AddMember("Price", (*pod_itor_trade)->Price, allocator21);
 		create_info_object.AddMember("TradingDay", rapidjson::StringRef((*pod_itor_trade)->TradingDay), allocator21);
+		create_info_object.AddMember("ExchangeID", rapidjson::StringRef((*pod_itor_trade)->ExchangeID), allocator21);
 		create_info_object.AddMember("TradingDayRecord", rapidjson::StringRef((*pod_itor_trade)->TradingDayRecord), allocator21);
 		create_info_object.AddMember("TradeDate", rapidjson::StringRef((*pod_itor_trade)->TradeDate), allocator21);
 		create_info_object.AddMember("StrategyID", rapidjson::StringRef((*pod_itor_trade)->StrategyID), allocator21);
@@ -3681,6 +3683,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//create_info_object.AddMember("OffsetFlag", (*pod_itor)->OffsetFlag, allocator);
 					//create_info_object.AddMember("HedgeFlag", (*pod_itor)->HedgeFlag, allocator);
 					create_info_object.AddMember("Price", (*pod_itor)->Price, allocator);
+					create_info_object.AddMember("ExchangeID", rapidjson::StringRef((*pod_itor)->ExchangeID), allocator);
 					create_info_object.AddMember("TradingDay", rapidjson::StringRef((*pod_itor)->TradingDay), allocator);
 					create_info_object.AddMember("TradingDayRecord", rapidjson::StringRef((*pod_itor)->TradingDayRecord), allocator);
 					create_info_object.AddMember("TradeDate", rapidjson::StringRef((*pod_itor)->TradeDate), allocator);
@@ -3906,6 +3909,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//create_info_object.AddMember("HedgeFlag", (*pod_itor)->HedgeFlag, allocator);
 					create_info_object.AddMember("Price", (*pod_itor)->Price, allocator);
 					create_info_object.AddMember("TradingDay", rapidjson::StringRef((*pod_itor)->TradingDay), allocator);
+					create_info_object.AddMember("ExchangeID", rapidjson::StringRef((*pod_itor)->ExchangeID), allocator);
 					create_info_object.AddMember("TradingDayRecord", rapidjson::StringRef((*pod_itor)->TradingDayRecord), allocator);
 					create_info_object.AddMember("TradeDate", rapidjson::StringRef((*pod_itor)->TradeDate), allocator);
 					create_info_object.AddMember("StrategyID", rapidjson::StringRef((*pod_itor)->StrategyID), allocator);

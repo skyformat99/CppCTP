@@ -2882,8 +2882,6 @@ void DBManager::getAllPositionDetailTrade(list<USER_CThostFtdcTradeField *> *l_p
 
 		USER_CThostFtdcTradeField *new_pos = new USER_CThostFtdcTradeField();
 
-		
-
 		strcpy(new_pos->InstrumentID, p.getStringField("instrumentid"));
 		strcpy(new_pos->OrderRef, p.getStringField("orderref"));
 		strcpy(new_pos->UserID, p.getStringField("userid"));
@@ -2891,6 +2889,7 @@ void DBManager::getAllPositionDetailTrade(list<USER_CThostFtdcTradeField *> *l_p
 		new_pos->OffsetFlag = p.getIntField("offsetflag");
 		new_pos->HedgeFlag = p.getIntField("hedgeflag");
 		new_pos->Price = p.getField("price").Double();
+		strcpy(new_pos->ExchangeID, p.getStringField("exchangeid"));
 		strcpy(new_pos->TradingDay, p.getStringField("tradingday"));
 		strcpy(new_pos->TradingDayRecord, p.getStringField("tradingdayrecord"));
 		strcpy(new_pos->TradeDate, p.getStringField("tradedate"));
@@ -2953,6 +2952,7 @@ void DBManager::CreatePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd
 			b.append("strategyid", posd->StrategyID);
 			b.append("volume", posd->Volume);
 			b.append("is_active", ISACTIVE);
+			b.append("exchangeid", posd->ExchangeID);
 
 			BSONObj p = b.obj();
 			conn->insert(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, p);
@@ -3052,6 +3052,7 @@ void DBManager::getAllPositionDetailTradeChanged(list<USER_CThostFtdcTradeField 
 		new_pos->OffsetFlag = p.getIntField("offsetflag");
 		new_pos->HedgeFlag = p.getIntField("hedgeflag");
 		new_pos->Price = p.getField("price").Double();
+		strcpy(new_pos->ExchangeID, p.getStringField("exchangeid"));
 		strcpy(new_pos->TradingDay, p.getStringField("tradingday"));
 		strcpy(new_pos->TradingDayRecord, p.getStringField("tradingdayrecord"));
 		strcpy(new_pos->TradeDate, p.getStringField("tradedate"));
@@ -3133,6 +3134,7 @@ void DBManager::CreatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *po
 			b.append("strategyid", posd->StrategyID);
 			b.append("volume", posd->Volume);
 			b.append("is_active", ISACTIVE);
+			b.append("exchangeid", posd->ExchangeID);
 
 			BSONObj p = b.obj();
 			conn->insert(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION, p);
@@ -3232,6 +3234,7 @@ void DBManager::getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeFiel
 		new_pos->OffsetFlag = p.getIntField("offsetflag");
 		new_pos->HedgeFlag = p.getIntField("hedgeflag");
 		new_pos->Price = p.getField("price").Double();
+		strcpy(new_pos->ExchangeID, p.getStringField("exchangeid"));
 		strcpy(new_pos->TradingDay, p.getStringField("tradingday"));
 		strcpy(new_pos->TradingDayRecord, p.getStringField("tradingdayrecord"));
 		strcpy(new_pos->TradeDate, p.getStringField("tradedate"));

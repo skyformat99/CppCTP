@@ -1556,6 +1556,7 @@ void Strategy::Update_Position_Trade_Detail_To_DB(USER_CThostFtdcTradeField *pos
 		b.append("hedgeflag", posd->HedgeFlag);
 		b.append("price", posd->Price);
 		b.append("tradingdayrecord", posd->TradingDayRecord);
+		b.append("exchangeid", posd->ExchangeID);
 		b.append("tradedate", posd->TradeDate);
 		b.append("volume", posd->Volume);
 
@@ -1616,6 +1617,7 @@ void Strategy::Update_Position_Trade_Changed_Detail_To_DB(USER_CThostFtdcTradeFi
 		b.append("hedgeflag", posd->HedgeFlag);
 		b.append("price", posd->Price);
 		b.append("tradingdayrecord", posd->TradingDayRecord);
+		b.append("exchangeid", posd->ExchangeID);
 		b.append("tradedate", posd->TradeDate);
 		b.append("volume", posd->Volume);
 
@@ -2113,7 +2115,6 @@ void Strategy::printStrategyInfoPosition() {
 	for (posd_itor = this->getStg_List_Position_Detail_From_Order()->begin();
 		posd_itor != this->getStg_List_Position_Detail_From_Order()->end();
 		posd_itor++) {
-
 		
 		std::cout << "\tinstrumentid = " << (*posd_itor)->InstrumentID 
 			<< ", orderref = " << (*posd_itor)->OrderRef 
