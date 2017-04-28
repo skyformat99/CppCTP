@@ -1313,15 +1313,15 @@ void Strategy::CreatePositionDetail(USER_CThostFtdcOrderField *posd) {
 /// 数据库更新策略持仓明细
 void Strategy::Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
 	USER_PRINT("Strategy::Update_Position_Detail_To_DB");
-	std::cout << "Strategy::Update_Position_Detail_To_DB()" << std::endl;
+	//std::cout << "Strategy::Update_Position_Detail_To_DB()" << std::endl;
 	int count_number = 0;
 
 	count_number = this->stg_save_strategy_conn->count(DB_POSITIONDETAIL_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
-		std::cout << "Strategy::Update_Position_Detail_To_DB()" << std::endl;
-		std::cout << "\t收盘保存持仓明细 找到(Order)!" << std::endl;
+		//std::cout << "Strategy::Update_Position_Detail_To_DB()" << std::endl;
+		//std::cout << "\t收盘保存持仓明细 找到(Order)!" << std::endl;
 		this->stg_save_strategy_conn->update(DB_POSITIONDETAIL_COLLECTION, BSON(
 			"userid" << posd->UserID 
 			<< "strategyid" << posd->StrategyID 
@@ -1351,9 +1351,9 @@ void Strategy::Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
 		USER_PRINT("Strategy::Update_Position_Detail_To_DB ok");
 	}
 	else {
-		std::cout << "Strategy::Update_Position_Detail_To_DB()" << std::endl;
-		std::cout << "\t收盘保存持仓明细 未 找到(Order)!" << std::endl;
-		std::cout << "\t开始新建持仓明细(Order)!" << std::endl;
+		//std::cout << "Strategy::Update_Position_Detail_To_DB()" << std::endl;
+		//std::cout << "\t收盘保存持仓明细 未 找到(Order)!" << std::endl;
+		//std::cout << "\t开始新建持仓明细(Order)!" << std::endl;
 		
 		BSONObjBuilder b;
 
@@ -1389,15 +1389,15 @@ void Strategy::Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
 /// 数据库更新策略持仓明细(order changed)
 void Strategy::Update_Position_Changed_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
 	USER_PRINT("Strategy::Update_Position_Changed_Detail_To_DB");
-	std::cout << "Strategy::Update_Position_Changed_Detail_To_DB()" << std::endl;
+	//std::cout << "Strategy::Update_Position_Changed_Detail_To_DB()" << std::endl;
 	int count_number = 0;
 
 	count_number = this->stg_save_strategy_conn->count(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
-		std::cout << "Strategy::Update_Position_Changed_Detail_To_DB()" << std::endl;
-		std::cout << "\t收盘保存持仓明细 找到(Order)!" << std::endl;
+		//std::cout << "Strategy::Update_Position_Changed_Detail_To_DB()" << std::endl;
+		//std::cout << "\t收盘保存持仓明细 找到(Order)!" << std::endl;
 		this->stg_save_strategy_conn->update(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, BSON(
 			"userid" << posd->UserID
 			<< "strategyid" << posd->StrategyID
@@ -1427,9 +1427,9 @@ void Strategy::Update_Position_Changed_Detail_To_DB(USER_CThostFtdcOrderField *p
 		USER_PRINT("Strategy::Update_Position_Changed_Detail_To_DB ok");
 	}
 	else {
-		std::cout << "Strategy::Update_Position_Detail_To_DB()" << std::endl;
-		std::cout << "\t收盘保存持仓明细 未 找到(Order)!" << std::endl;
-		std::cout << "\t开始新建持仓明细(Order)!" << std::endl;
+		//std::cout << "Strategy::Update_Position_Detail_To_DB()" << std::endl;
+		//std::cout << "\t收盘保存持仓明细 未 找到(Order)!" << std::endl;
+		//std::cout << "\t开始新建持仓明细(Order)!" << std::endl;
 
 		BSONObjBuilder b;
 
@@ -1511,15 +1511,15 @@ void Strategy::CreatePositionTradeDetail(USER_CThostFtdcTradeField *posd) {
 /// 数据库更新策略持仓明细(Trade)
 void Strategy::Update_Position_Trade_Detail_To_DB(USER_CThostFtdcTradeField *posd) {
 	USER_PRINT("Strategy::Update_Position_Trade_Detail_To_DB");
-	std::cout << "Strategy::Update_Position_Trade_Detail_To_DB()" << std::endl;
+	//std::cout << "Strategy::Update_Position_Trade_Detail_To_DB()" << std::endl;
 	int count_number = 0;
 
 	count_number = this->stg_save_strategy_conn->count(DB_POSITIONDETAIL_TRADE_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
-		std::cout << "Strategy::Update_Position_Trade_Detail_To_DB()" << std::endl;
-		std::cout << "\t收盘保存持仓明细 已 找到(Trade)!" << std::endl;
+		//std::cout << "Strategy::Update_Position_Trade_Detail_To_DB()" << std::endl;
+		//std::cout << "\t收盘保存持仓明细 已 找到(Trade)!" << std::endl;
 		this->stg_save_strategy_conn->update(DB_POSITIONDETAIL_TRADE_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON(
 			"instrumentid" << posd->InstrumentID
 			<< "orderref" << posd->OrderRef
@@ -1539,9 +1539,9 @@ void Strategy::Update_Position_Trade_Detail_To_DB(USER_CThostFtdcTradeField *pos
 		USER_PRINT("Strategy::Update_Position_Trade_Detail_To_DB ok");
 	}
 	else {
-		std::cout << "Strategy::Update_Position_Trade_Detail_To_DB()" << std::endl;
-		std::cout << "\t收盘保存持仓明细 未 找到(Trade)!" << std::endl;
-		std::cout << "\t开始新建持仓明细(Trade)!" << std::endl;
+		//std::cout << "Strategy::Update_Position_Trade_Detail_To_DB()" << std::endl;
+		//std::cout << "\t收盘保存持仓明细 未 找到(Trade)!" << std::endl;
+		//std::cout << "\t开始新建持仓明细(Trade)!" << std::endl;
 
 		BSONObjBuilder b;
 

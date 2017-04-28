@@ -280,13 +280,13 @@ int User::get_instrument_id_action_counter(string instrument_id) {
 	map<string, int>::iterator m_itor;
 	m_itor = this->stg_map_instrument_action_counter->find(instrument_id);
 	if (m_itor == (this->stg_map_instrument_action_counter->end())) {
-		cout << "撤单列表里不存在该合约 = " << instrument_id << endl;
+		//cout << "撤单列表里不存在该合约 = " << instrument_id << endl;
 		// this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0));
 		// this->init_instrument_id_action_counter(string(pOrder->InstrumentID));
 		return 0;
 	}
 	else {
-		cout << "撤单列表里找到该合约 = " << instrument_id << endl;
+		//cout << "撤单列表里找到该合约 = " << instrument_id << endl;
 		return m_itor->second;
 	}
 }
@@ -307,13 +307,13 @@ void User::add_instrument_id_action_counter(CThostFtdcOrderField *pOrder) {
 		map<string, int>::iterator m_itor;
 		m_itor = this->stg_map_instrument_action_counter->find(string(pOrder->InstrumentID));
 		if (m_itor == (this->stg_map_instrument_action_counter->end())) {
-			cout << "撤单列表里不存在该合约 = " << pOrder->InstrumentID << endl;
-			cout << "添加 " << pOrder->InstrumentID << " 合约到列表中..." << endl;
+			//cout << "撤单列表里不存在该合约 = " << pOrder->InstrumentID << endl;
+			//cout << "添加 " << pOrder->InstrumentID << " 合约到列表中..." << endl;
 			//this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0));
 			this->init_instrument_id_action_counter(string(pOrder->InstrumentID));
 		}
 		else {
-			cout << "撤单列表里找到该合约 = " << pOrder->InstrumentID << endl;
+			//cout << "撤单列表里找到该合约 = " << pOrder->InstrumentID << endl;
 			m_itor->second += 1;
 		}
 

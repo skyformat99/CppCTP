@@ -4346,7 +4346,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 	if (this->l_posdetail->size() > 0) { // 如果今持仓明细有记录
 		std::cout << "\tCTP_Manager::initStrategyAndFutureAccount() 今持仓明细有记录(order)" << std::endl;
 		for (position_itor = this->l_posdetail->begin(); position_itor != this->l_posdetail->end(); position_itor++) { // 遍历今持仓明细列表
-			std::cout << "\t(*position_itor)->TradingDayRecord = " << (*position_itor)->TradingDayRecord << std::endl;
+			//std::cout << "\t(*position_itor)->TradingDayRecord = " << (*position_itor)->TradingDayRecord << std::endl;
 			//日期不等,说明存在昨仓持仓明细
 			if (strcmp((*position_itor)->TradingDayRecord, this->getTradingDay().c_str())) {
 				is_own_yesterday_order_position_detail = true;
@@ -4360,7 +4360,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 		this->dbm->DropPositionDetailYesterday();
 
 		for (position_itor = this->l_posdetail->begin(); position_itor != this->l_posdetail->end(); position_itor++) { // 遍历今持仓明细列表
-			std::cout << "\t(*position_itor)->TradingDayRecord = " << (*position_itor)->TradingDayRecord << std::endl;
+			//std::cout << "\t(*position_itor)->TradingDayRecord = " << (*position_itor)->TradingDayRecord << std::endl;
 			//日期不等
 			if (strcmp((*position_itor)->TradingDayRecord, this->getTradingDay().c_str())) {
 				// 删除昨持仓明细对象,如果存在就删除,没有跳出
@@ -5128,7 +5128,7 @@ bool CTP_Manager::init(bool is_online) {
 	}
 
 
-
+#if 0
 	/// 查询投资者持仓
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
 		USER_PRINT((*user_itor)->getUserID());
@@ -5138,7 +5138,7 @@ bool CTP_Manager::init(bool is_online) {
 		(*user_itor)->getUserTradeSPI()->QryInvestorPositionDetail();
 		//sleep(2);
 	}
-	
+
 	/// 进行仓位数据核对
 
 	/// 统计本地仓位
@@ -5163,7 +5163,7 @@ bool CTP_Manager::init(bool is_online) {
 		}
 	}
 
-#if 0
+
 	/// 将仓位出现问题的user从列表里移出去
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end();) { // 遍历User
 		/// 仓位问题出错
