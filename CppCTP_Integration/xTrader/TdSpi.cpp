@@ -1212,12 +1212,12 @@ void TdSpi::QryInvestorPositionDetail() {
 ///请求查询投资者持仓明细响应
 void TdSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail, 
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-	std::cout << "TdSpi::OnRspQryInvestorPositionDetail()" << std::endl;
+	//std::cout << "TdSpi::OnRspQryInvestorPositionDetail()" << std::endl;
 	USER_PRINT("TdSpi::OnRspQryInvestorPositionDetail");
 	if (!this->IsErrorRspInfo(pRspInfo)) {
 		if (pInvestorPositionDetail) {
 			//cout << "=================================================================================" << endl;
-			///合约代码
+			/*///合约代码
 			cout << "\t*合约代码:" << pInvestorPositionDetail->InstrumentID << ", ";
 			///经纪公司代码
 			cout << "经纪公司代码:" << pInvestorPositionDetail->BrokerID << ", ";
@@ -1268,7 +1268,7 @@ void TdSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField
 			///平仓量
 			cout << "平仓量:" << pInvestorPositionDetail->CloseVolume << ", ";
 			///平仓金额
-			cout << "平仓金额:" << pInvestorPositionDetail->CloseAmount << endl;
+			cout << "平仓金额:" << pInvestorPositionDetail->CloseAmount << endl;*/
 			//cout << "=================================================================================" << endl;
 		
 			CThostFtdcInvestorPositionDetailField *tmp = new CThostFtdcInvestorPositionDetailField();
@@ -1279,20 +1279,21 @@ void TdSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField
 		}
 	}
 
-	
-	cv.notify_one();
-	
+	if (bIsLast)
+	{
+		cv.notify_one();
+	}
 }
 
 //请求查询投资者持仓响应
 void TdSpi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition,
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-	std::cout << "TdSpi::OnRspQryInvestorPosition()" << std::endl;
+	//std::cout << "TdSpi::OnRspQryInvestorPosition()" << std::endl;
 	USER_PRINT("TdSpi::OnRspQryInvestorPosition");
 	if (!this->IsErrorRspInfo(pRspInfo)) {
 		if (pInvestorPosition) {
 			//std::cout << "=================================================================================" << endl;
-			///合约代码
+			/*///合约代码
 			std::cout << "\t*合约代码:" << pInvestorPosition->InstrumentID << ", ";
 			///经纪公司代码
 			std::cout << "经纪公司代码:" << pInvestorPosition->BrokerID << ", ";
@@ -1377,7 +1378,7 @@ void TdSpi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorP
 			///执行冻结金额
 			std::cout << "执行冻结金额:" << pInvestorPosition->StrikeFrozenAmount << ", ";
 			///放弃执行冻结
-			std::cout << "放弃执行冻结:" << pInvestorPosition->AbandonFrozen << endl;
+			std::cout << "放弃执行冻结:" << pInvestorPosition->AbandonFrozen << endl;*/
 			//std::cout << "=================================================================================" << endl;
 			this->current_user->DB_OnRspQryInvestorPosition(this->current_user->GetPositionConn(), pInvestorPosition);
 		}
@@ -2058,7 +2059,7 @@ void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcR
 void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	USER_PRINT("TdSpi::OnRtnOrder");
 	//list<Session *>::iterator sid_itor;
-	std::cout << "TdSpi::OnRtnOrder()" << std::endl;
+	//std::cout << "TdSpi::OnRtnOrder()" << std::endl;
 	if (pOrder) {
 		/*std::cout << "pOrder->SessionID = " << pOrder->SessionID << endl;
 		std::cout << "this->SessionID = " << this->SessionID << endl;
@@ -2230,7 +2231,7 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 //成交通知
 void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 	USER_PRINT("TdSpi::OnRtnTrade");
-	std::cout << "TdSpi::OnRtnTrade()" << std::endl;
+	//std::cout << "TdSpi::OnRtnTrade()" << std::endl;
 	if (pTrade) {
 		//std::cout << "===========================TdSpi::OnRtnTrade()===================================" << std::endl;
 		/////经纪公司代码

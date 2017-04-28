@@ -3193,7 +3193,7 @@ void Strategy::Exec_OnRspOrderAction() {
 
 // 报单回报
 void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
-	std::cout << "Strategy::Exec_OnRtnOrder()" << std::endl;
+	//std::cout << "Strategy::Exec_OnRtnOrder()" << std::endl;
 	USER_PRINT("Exec_OnRtnOrder");
 
 	string compare_date = pOrder->InsertDate; //报单日期
