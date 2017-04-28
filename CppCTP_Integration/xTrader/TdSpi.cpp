@@ -17,7 +17,7 @@ char codeDst[90] = { 0 };
 std::condition_variable cv;
 std::mutex mtx;
 std::mutex position_add_mtx;
-#define RSP_TIMEOUT	120
+#define RSP_TIMEOUT	30
 
 
 
@@ -1210,7 +1210,8 @@ void TdSpi::QryInvestorPositionDetail() {
 }
 
 ///请求查询投资者持仓明细响应
-void TdSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+void TdSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail, 
+	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	std::cout << "TdSpi::OnRspQryInvestorPositionDetail()" << std::endl;
 	USER_PRINT("TdSpi::OnRspQryInvestorPositionDetail");
 	if (!this->IsErrorRspInfo(pRspInfo)) {
@@ -1278,9 +1279,9 @@ void TdSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField
 		}
 	}
 
-	if (bIsLast) {
-		cv.notify_one();
-	}
+	
+	cv.notify_one();
+	
 }
 
 //请求查询投资者持仓响应
@@ -2071,121 +2072,121 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 		
 		//std::cout << "=================================================================================" << endl;
 		//经纪公司代码
-		std::cout << "\t*经纪公司代码:" << pOrder->BrokerID << ", ";
-		//投资者代码
-		std::cout << "投资者代码:" << pOrder->InvestorID << ", ";
-		//合约代码
-		std::cout << "合约代码:" << pOrder->InstrumentID << ",       ";
-		//报单引用
-		std::cout << "报单引用:" << pOrder->OrderRef << ", ";
-		//用户代码
-		std::cout << "用户代码:" << pOrder->UserID << ", ";
-		//报单价格条件
-		std::cout << "报单价格条件:" << pOrder->OrderPriceType << ", ";
-		//买卖方向
-		std::cout << "买卖方向:" << pOrder->Direction << ", ";
-		//组合开平标志
-		std::cout << "组合开平标志:" << pOrder->CombOffsetFlag << ", ";
-		//组合投机套保标志
-		std::cout << "组合投机套保标志:" << pOrder->CombHedgeFlag << ", ";
-		//价格
-		std::cout << "价格:" << pOrder->LimitPrice << ", ";
-		//数量
-		std::cout << "数量:" << pOrder->VolumeTotalOriginal << ", ";
-		//有效期类型
-		std::cout << "有效期类型:" << pOrder->TimeCondition << ", ";
-		//GTD日期
-		std::cout << "GTD日期:" << pOrder->GTDDate << ", ";
-		//成交量类型
-		std::cout << "成交量类型:" << pOrder->VolumeCondition << ", ";
-		//最小成交量
-		std::cout << "最小成交量:" << pOrder->MinVolume << ", ";
-		//触发条件
-		std::cout << "触发条件:" << pOrder->ContingentCondition << ", ";
-		//止损价
-		std::cout << "止损价:" << pOrder->StopPrice << ", ";
-		//强平原因
-		std::cout << "强平原因:" << pOrder->ForceCloseReason << ", ";
-		//自动挂起标志
-		std::cout << "自动挂起标志:" << pOrder->IsAutoSuspend << ", ";
-		//业务单元
-		std::cout << "业务单元:" << pOrder->BusinessUnit << ", ";
-		//请求编号
-		std::cout << "请求编号:" << pOrder->RequestID << ", ";
-		//本地报单编号
-		std::cout << "本地报单编号:" << pOrder->OrderLocalID << ", ";
-		//交易所代码
-		std::cout << "交易所代码:" << pOrder->ExchangeID << ", ";
-		//会员代码
-		std::cout << "会员代码:" << pOrder->ParticipantID << ", ";
-		//客户代码
-		std::cout << "客户代码:" << pOrder->ClientID << ", ";
-		//合约在交易所的代码
-		std::cout << "合约在交易所的代码:" << pOrder->ExchangeInstID << ", ";
-		//交易所交易员代码
-		std::cout << "交易所交易员代码:" << pOrder->TraderID << ", ";
-		//安装编号
-		std::cout << "安装编号:" << pOrder->InstallID << ", ";
-		//报单提交状态
-		std::cout << "报单提交状态:" << pOrder->OrderSubmitStatus << ", ";
-		//报单提示序号
-		std::cout << "报单提示序号:" << pOrder->NotifySequence << ", ";
-		//交易日
-		std::cout << "交易日:" << pOrder->TradingDay << ", ";
-		//结算编号
-		std::cout << "结算编号:" << pOrder->SettlementID << ", ";
-		//报单编号
-		std::cout << "报单编号:" << pOrder->OrderSysID << ", ";
-		///报单来源
-		std::cout << "报单来源:" << pOrder->OrderSource << ", ";
-		///报单状态
-		std::cout << "报单状态:" << pOrder->OrderStatus << ", ";
-		///报单类型
-		std::cout << "报单类型:" << pOrder->OrderType << ", ";
-		///今成交数量
-		std::cout << "今成交数量:" << pOrder->VolumeTraded << ", ";
-		///剩余数量
-		std::cout << "剩余数量:" << pOrder->VolumeTotal << ", ";
-		///报单日期
-		std::cout << "报单日期:" << pOrder->InsertDate << ", ";
-		///委托时间
-		std::cout << "委托时间:" << pOrder->InsertTime << ", ";
-		///激活时间
-		std::cout << "激活时间:" << pOrder->ActiveTime << ", ";
-		///挂起时间
-		std::cout << "挂起时间:" << pOrder->SuspendTime << ", ";
-		///最后修改时间
-		std::cout << "最后修改时间:" << pOrder->UpdateTime << ", ";
-		///撤销时间
-		std::cout << "撤销时间:" << pOrder->CancelTime << ", ";
-		///最后修改交易所交易员代码
-		std::cout << "最后修改交易所交易员代码:" << pOrder->ActiveTraderID << ", ";
-		///结算会员编号
-		std::cout << "结算会员编号:" << pOrder->ClearingPartID << ", ";
-		///序号
-		std::cout << "序号:" << pOrder->SequenceNo << ", ";
-		///前置编号
-		std::cout << "前置编号:" << pOrder->FrontID << ", ";
-		///会话编号
-		std::cout << "会话编号:" << pOrder->SessionID << ", ";
-		///用户端产品信息
-		std::cout << "用户端产品信息:" << pOrder->UserProductInfo << ", ";
-		///状态信息
-		codeDst[90] = { 0 };
-		Utils::Gb2312ToUtf8(codeDst, 90, pOrder->StatusMsg, strlen(pOrder->StatusMsg)); // Gb2312ToUtf8
-		std::cout << "状态信息:" << codeDst << ", ";
-		///用户强评标志
-		std::cout << "用户强评标志:" << pOrder->UserForceClose << ", ";
-		///操作用户代码
-		std::cout << "操作用户代码:" << pOrder->ActiveUserID << ", ";
-		///经纪公司报单编号
-		std::cout << "经纪公司报单编号:" << pOrder->BrokerOrderSeq << ", ";
-		///相关报单
-		std::cout << "相关报单:" << pOrder->RelativeOrderSysID << ", ";
-		///郑商所成交数量
-		std::cout << "郑商所成交数量:" << pOrder->ZCETotalTradedVolume << ", ";
-		///互换单标志
-		std::cout << "互换单标志:" << pOrder->IsSwapOrder << endl;
+		//std::cout << "\t*经纪公司代码:" << pOrder->BrokerID << ", ";
+		////投资者代码
+		//std::cout << "投资者代码:" << pOrder->InvestorID << ", ";
+		////合约代码
+		//std::cout << "合约代码:" << pOrder->InstrumentID << ",       ";
+		////报单引用
+		//std::cout << "报单引用:" << pOrder->OrderRef << ", ";
+		////用户代码
+		//std::cout << "用户代码:" << pOrder->UserID << ", ";
+		////报单价格条件
+		//std::cout << "报单价格条件:" << pOrder->OrderPriceType << ", ";
+		////买卖方向
+		//std::cout << "买卖方向:" << pOrder->Direction << ", ";
+		////组合开平标志
+		//std::cout << "组合开平标志:" << pOrder->CombOffsetFlag << ", ";
+		////组合投机套保标志
+		//std::cout << "组合投机套保标志:" << pOrder->CombHedgeFlag << ", ";
+		////价格
+		//std::cout << "价格:" << pOrder->LimitPrice << ", ";
+		////数量
+		//std::cout << "数量:" << pOrder->VolumeTotalOriginal << ", ";
+		////有效期类型
+		//std::cout << "有效期类型:" << pOrder->TimeCondition << ", ";
+		////GTD日期
+		//std::cout << "GTD日期:" << pOrder->GTDDate << ", ";
+		////成交量类型
+		//std::cout << "成交量类型:" << pOrder->VolumeCondition << ", ";
+		////最小成交量
+		//std::cout << "最小成交量:" << pOrder->MinVolume << ", ";
+		////触发条件
+		//std::cout << "触发条件:" << pOrder->ContingentCondition << ", ";
+		////止损价
+		//std::cout << "止损价:" << pOrder->StopPrice << ", ";
+		////强平原因
+		//std::cout << "强平原因:" << pOrder->ForceCloseReason << ", ";
+		////自动挂起标志
+		//std::cout << "自动挂起标志:" << pOrder->IsAutoSuspend << ", ";
+		////业务单元
+		//std::cout << "业务单元:" << pOrder->BusinessUnit << ", ";
+		////请求编号
+		//std::cout << "请求编号:" << pOrder->RequestID << ", ";
+		////本地报单编号
+		//std::cout << "本地报单编号:" << pOrder->OrderLocalID << ", ";
+		////交易所代码
+		//std::cout << "交易所代码:" << pOrder->ExchangeID << ", ";
+		////会员代码
+		//std::cout << "会员代码:" << pOrder->ParticipantID << ", ";
+		////客户代码
+		//std::cout << "客户代码:" << pOrder->ClientID << ", ";
+		////合约在交易所的代码
+		//std::cout << "合约在交易所的代码:" << pOrder->ExchangeInstID << ", ";
+		////交易所交易员代码
+		//std::cout << "交易所交易员代码:" << pOrder->TraderID << ", ";
+		////安装编号
+		//std::cout << "安装编号:" << pOrder->InstallID << ", ";
+		////报单提交状态
+		//std::cout << "报单提交状态:" << pOrder->OrderSubmitStatus << ", ";
+		////报单提示序号
+		//std::cout << "报单提示序号:" << pOrder->NotifySequence << ", ";
+		////交易日
+		//std::cout << "交易日:" << pOrder->TradingDay << ", ";
+		////结算编号
+		//std::cout << "结算编号:" << pOrder->SettlementID << ", ";
+		////报单编号
+		//std::cout << "报单编号:" << pOrder->OrderSysID << ", ";
+		/////报单来源
+		//std::cout << "报单来源:" << pOrder->OrderSource << ", ";
+		/////报单状态
+		//std::cout << "报单状态:" << pOrder->OrderStatus << ", ";
+		/////报单类型
+		//std::cout << "报单类型:" << pOrder->OrderType << ", ";
+		/////今成交数量
+		//std::cout << "今成交数量:" << pOrder->VolumeTraded << ", ";
+		/////剩余数量
+		//std::cout << "剩余数量:" << pOrder->VolumeTotal << ", ";
+		/////报单日期
+		//std::cout << "报单日期:" << pOrder->InsertDate << ", ";
+		/////委托时间
+		//std::cout << "委托时间:" << pOrder->InsertTime << ", ";
+		/////激活时间
+		//std::cout << "激活时间:" << pOrder->ActiveTime << ", ";
+		/////挂起时间
+		//std::cout << "挂起时间:" << pOrder->SuspendTime << ", ";
+		/////最后修改时间
+		//std::cout << "最后修改时间:" << pOrder->UpdateTime << ", ";
+		/////撤销时间
+		//std::cout << "撤销时间:" << pOrder->CancelTime << ", ";
+		/////最后修改交易所交易员代码
+		//std::cout << "最后修改交易所交易员代码:" << pOrder->ActiveTraderID << ", ";
+		/////结算会员编号
+		//std::cout << "结算会员编号:" << pOrder->ClearingPartID << ", ";
+		/////序号
+		//std::cout << "序号:" << pOrder->SequenceNo << ", ";
+		/////前置编号
+		//std::cout << "前置编号:" << pOrder->FrontID << ", ";
+		/////会话编号
+		//std::cout << "会话编号:" << pOrder->SessionID << ", ";
+		/////用户端产品信息
+		//std::cout << "用户端产品信息:" << pOrder->UserProductInfo << ", ";
+		/////状态信息
+		//codeDst[90] = { 0 };
+		//Utils::Gb2312ToUtf8(codeDst, 90, pOrder->StatusMsg, strlen(pOrder->StatusMsg)); // Gb2312ToUtf8
+		//std::cout << "状态信息:" << codeDst << ", ";
+		/////用户强评标志
+		//std::cout << "用户强评标志:" << pOrder->UserForceClose << ", ";
+		/////操作用户代码
+		//std::cout << "操作用户代码:" << pOrder->ActiveUserID << ", ";
+		/////经纪公司报单编号
+		//std::cout << "经纪公司报单编号:" << pOrder->BrokerOrderSeq << ", ";
+		/////相关报单
+		//std::cout << "相关报单:" << pOrder->RelativeOrderSysID << ", ";
+		/////郑商所成交数量
+		//std::cout << "郑商所成交数量:" << pOrder->ZCETotalTradedVolume << ", ";
+		/////互换单标志
+		//std::cout << "互换单标志:" << pOrder->IsSwapOrder << endl;
 		//std::cout << "=================================================================================" << endl;
 
 		//		this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pOrder);
@@ -2199,7 +2200,7 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 		//}
 
 		string temp(pOrder->OrderRef);
-		std::cout << "\t报单引用 = " << temp << std::endl;
+		//std::cout << "\t报单引用 = " << temp << std::endl;
 		int len_order_ref = temp.length();
 		string result = temp.substr(0, 1);
 		//std::cout << "\tafter substr temp = " << temp << std::endl;
@@ -2210,10 +2211,10 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 			this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pOrder);
 			//delete[] codeDst;
 			strategyid = temp.substr(len_order_ref - 2, 2);
-			std::cout << "\t回报策略编号 = " << strategyid << std::endl;
+			//std::cout << "\t回报策略编号 = " << strategyid << std::endl;
 			list<Strategy *>::iterator itor;
 			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
-				std::cout << "\t系统策略编号 = " << (*itor)->getStgStrategyId() << std::endl;
+				//std::cout << "\t系统策略编号 = " << (*itor)->getStgStrategyId() << std::endl;
 				if ((*itor)->getStgStrategyId() == strategyid) {
 					(*itor)->OnRtnOrder(pOrder);
 					//break;
@@ -2232,73 +2233,73 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 	std::cout << "TdSpi::OnRtnTrade()" << std::endl;
 	if (pTrade) {
 		//std::cout << "===========================TdSpi::OnRtnTrade()===================================" << std::endl;
-		///经纪公司代码
-		cout << "\t*经纪公司代码:" << pTrade->BrokerID << ", ";
-		///投资者代码
-		cout << "投资者代码:" << pTrade->InvestorID << ", ";
-		///合约代码
-		cout << "合约代码:" << pTrade->InstrumentID << ", ";
-		///报单引用
-		cout << "报单引用:" << pTrade->OrderRef << ", ";
-		///用户代码
-		cout << "用户代码:" << pTrade->UserID << ", ";
-		///交易所代码
-		cout << "交易所代码:" << pTrade->ExchangeID << ", ";
-		///成交编号
-		cout << "成交编号:" << pTrade->TradeID << ", ";
-		///买卖方向
-		cout << "买卖方向:" << pTrade->Direction << ", ";
-		///报单编号
-		cout << "报单编号:" << pTrade->OrderSysID << ", ";
-		///会员代码
-		cout << "会员代码:" << pTrade->ParticipantID << ", ";
-		///客户代码
-		cout << "客户代码:" << pTrade->ClientID << ", ";
-		///交易角色
-		cout << "交易角色:" << pTrade->TradingRole << ", ";
-		///合约在交易所的代码
-		cout << "合约在交易所的代码:" << pTrade->ExchangeInstID << ", ";
-		///开平标志
-		cout << "开平标志:" << pTrade->OffsetFlag << ", ";
-		///投机套保标志
-		cout << "投机套保标志:" << pTrade->HedgeFlag << ", ";
-		///价格
-		cout << "价格:" << pTrade->Price << ", ";
-		///数量(本次成交数量，特指本次交易)
-		cout << "数量:" << pTrade->Volume << ", "; //本批成交量
-		///成交时期
-		cout << "成交时期:" << pTrade->TradeDate << ", ";
-		///成交时间
-		cout << "成交时间:" << pTrade->TradeTime << ", ";
-		///成交类型
-		cout << "成交类型:" << pTrade->TradeType << ", ";
-		///成交价来源
-		cout << "成交价来源:" << pTrade->PriceSource << ", ";
-		///交易所交易员代码
-		cout << "交易所交易员代码:" << pTrade->TraderID << ", ";
-		///本地报单编号
-		cout << "本地报单编号:" << pTrade->OrderLocalID << ", ";
-		///结算会员编号
-		cout << "结算会员编号:" << pTrade->ClearingPartID << ", ";
-		///业务单元
-		cout << "业务单元:" << pTrade->BusinessUnit << ", ";
-		///序号
-		cout << "序号:" << pTrade->SequenceNo << ", ";
-		///交易日
-		cout << "交易日:" << pTrade->TradingDay << ", ";
-		///结算编号
-		cout << "结算编号:" << pTrade->SettlementID << ", ";
-		///经纪公司报单编号
-		cout << "经纪公司报单编号:" << pTrade->BrokerOrderSeq << ", ";
-		///成交来源
-		cout << "成交来源:" << pTrade->TradeSource << ", ";
+		/////经纪公司代码
+		//cout << "\t*经纪公司代码:" << pTrade->BrokerID << ", ";
+		/////投资者代码
+		//cout << "投资者代码:" << pTrade->InvestorID << ", ";
+		/////合约代码
+		//cout << "合约代码:" << pTrade->InstrumentID << ", ";
+		/////报单引用
+		//cout << "报单引用:" << pTrade->OrderRef << ", ";
+		/////用户代码
+		//cout << "用户代码:" << pTrade->UserID << ", ";
+		/////交易所代码
+		//cout << "交易所代码:" << pTrade->ExchangeID << ", ";
+		/////成交编号
+		//cout << "成交编号:" << pTrade->TradeID << ", ";
+		/////买卖方向
+		//cout << "买卖方向:" << pTrade->Direction << ", ";
+		/////报单编号
+		//cout << "报单编号:" << pTrade->OrderSysID << ", ";
+		/////会员代码
+		//cout << "会员代码:" << pTrade->ParticipantID << ", ";
+		/////客户代码
+		//cout << "客户代码:" << pTrade->ClientID << ", ";
+		/////交易角色
+		//cout << "交易角色:" << pTrade->TradingRole << ", ";
+		/////合约在交易所的代码
+		//cout << "合约在交易所的代码:" << pTrade->ExchangeInstID << ", ";
+		/////开平标志
+		//cout << "开平标志:" << pTrade->OffsetFlag << ", ";
+		/////投机套保标志
+		//cout << "投机套保标志:" << pTrade->HedgeFlag << ", ";
+		/////价格
+		//cout << "价格:" << pTrade->Price << ", ";
+		/////数量(本次成交数量，特指本次交易)
+		//cout << "数量:" << pTrade->Volume << ", "; //本批成交量
+		/////成交时期
+		//cout << "成交时期:" << pTrade->TradeDate << ", ";
+		/////成交时间
+		//cout << "成交时间:" << pTrade->TradeTime << ", ";
+		/////成交类型
+		//cout << "成交类型:" << pTrade->TradeType << ", ";
+		/////成交价来源
+		//cout << "成交价来源:" << pTrade->PriceSource << ", ";
+		/////交易所交易员代码
+		//cout << "交易所交易员代码:" << pTrade->TraderID << ", ";
+		/////本地报单编号
+		//cout << "本地报单编号:" << pTrade->OrderLocalID << ", ";
+		/////结算会员编号
+		//cout << "结算会员编号:" << pTrade->ClearingPartID << ", ";
+		/////业务单元
+		//cout << "业务单元:" << pTrade->BusinessUnit << ", ";
+		/////序号
+		//cout << "序号:" << pTrade->SequenceNo << ", ";
+		/////交易日
+		//cout << "交易日:" << pTrade->TradingDay << ", ";
+		/////结算编号
+		//cout << "结算编号:" << pTrade->SettlementID << ", ";
+		/////经纪公司报单编号
+		//cout << "经纪公司报单编号:" << pTrade->BrokerOrderSeq << ", ";
+		/////成交来源
+		//cout << "成交来源:" << pTrade->TradeSource << ", ";
 		//cout << "=================================================================================" << endl;
 
 		//this->current_user->DB_OnRtnTrade(this->current_user->GetTradeConn(), pTrade);
 
 		
 		string temp(pTrade->OrderRef);
-		std::cout << "\t报单引用 = " << temp << std::endl;
+		//std::cout << "\t报单引用 = " << temp << std::endl;
 		int len_order_ref = temp.length();
 		//std::cout << "\t报单引用长度 = " << len_order_ref << std::endl;
 
@@ -2311,10 +2312,10 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 			//this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pOrder);
 			//delete[] codeDst;
 			strategyid = temp.substr(len_order_ref - 2, 2);
-			std::cout << "\t回报策略编号 = " << strategyid << std::endl;
+			//std::cout << "\t回报策略编号 = " << strategyid << std::endl;
 			list<Strategy *>::iterator itor;
 			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
-				std::cout << "\t系统策略编号 = " << (*itor)->getStgStrategyId() << std::endl;
+				//std::cout << "\t系统策略编号 = " << (*itor)->getStgStrategyId() << std::endl;
 				if ((*itor)->getStgStrategyId() == strategyid) {
 					(*itor)->OnRtnTrade(pTrade);
 					//break;
