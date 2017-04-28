@@ -28,6 +28,8 @@ public:
 	static void printRedColor(string text);
 	static void printGreenColorWithKV(string key, string value);
 	static void printRedColorWithKV(string key, string value);
+	static void printGreenColorWithKV(string key, int value);
+	static void printRedColorWithKV(string key, int value);
 };
 
 #endif

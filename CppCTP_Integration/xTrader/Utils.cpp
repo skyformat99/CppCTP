@@ -296,3 +296,11 @@ void Utils::printGreenColorWithKV(string key, string value) {
 void Utils::printRedColorWithKV(string key, string value) {
 	std::cout << "\t\033[31m" << key << " = " << value << "\033[0m" << std::endl;
 }
+
+void Utils::printGreenColorWithKV(string key, int value) {
+	std::cout << "\t\033[32m" << key << " = " << value << "\033[0m" << std::endl;
+}
+
+void Utils::printRedColorWithKV(string key, int value) {
+	std::cout << "\t\033[31m" << key << " = " << value << "\033[0m" << std::endl;
+}

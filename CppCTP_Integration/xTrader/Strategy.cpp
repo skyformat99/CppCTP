@@ -85,6 +85,7 @@ Strategy::Strategy(User *stg_user) {
 	this->stg_tick_systime_record = "";		// 系统接收tick的时间
 	this->stg_update_position_detail_record_time = ""; // 最后一次修改持仓明细记录时间
 	this->stg_save_strategy_conn = DBManager::getDBConnection();
+	this->stg_last_saved_time = "";	// 最后一次保存策略时间
 
 	this->stg_user = stg_user;					// 默认用户为空
 
@@ -2082,6 +2083,8 @@ void Strategy::printStrategyInfoPosition() {
 		<< "B合约昨卖:" << this->stg_position_b_sell_yesterday << ", "
 		<< "B合约总卖:" << this->stg_position_b_sell << std::endl;
 
+	Utils::printGreenColorWithKV("Trade持仓明细大小", this->getStg_List_Position_Detail_From_Trade()->size());
+
 	list<USER_CThostFtdcTradeField *>::iterator posd_itor_trade;
 	// 遍历strategy持仓明细(trade)并保存
 	for (posd_itor_trade = this->getStg_List_Position_Detail_From_Trade()->begin();
@@ -2089,8 +2092,8 @@ void Strategy::printStrategyInfoPosition() {
 		posd_itor_trade++) {
 
 		//this->dbm->CreatePositionDetail((*posd_itor));
-		std::cout << "\tTrade 持仓明细大小:" << this->getStg_List_Position_Detail_From_Trade()->size() << std::endl;
-		std::cout << "\t\tinstrumentid = " << (*posd_itor_trade)->InstrumentID 
+		
+		std::cout << "\tinstrumentid = " << (*posd_itor_trade)->InstrumentID 
 			<< ", orderref = " << (*posd_itor_trade)->OrderRef 
 			<< ", userid = " << (*posd_itor_trade)->UserID 
 			<< ", direction = " << (*posd_itor_trade)->Direction 
@@ -2104,14 +2107,15 @@ void Strategy::printStrategyInfoPosition() {
 			<< ", volume = " << (*posd_itor_trade)->Volume << std::endl;
 	}
 
+	Utils::printGreenColorWithKV("Order持仓明细大小", this->getStg_List_Position_Detail_From_Order()->size());
 	list<USER_CThostFtdcOrderField *>::iterator posd_itor;
 	// 遍历strategy持仓明细(order)并保存
 	for (posd_itor = this->getStg_List_Position_Detail_From_Order()->begin();
 		posd_itor != this->getStg_List_Position_Detail_From_Order()->end();
 		posd_itor++) {
 
-		std::cout << "\tOrder 持仓明细大小:" << this->getStg_List_Position_Detail_From_Order()->size() << std::endl;
-		std::cout << "\t\tinstrumentid = " << (*posd_itor)->InstrumentID 
+		
+		std::cout << "\tinstrumentid = " << (*posd_itor)->InstrumentID 
 			<< ", orderref = " << (*posd_itor)->OrderRef 
 			<< ", userid = " << (*posd_itor)->UserID 
 			<< ", direction = " << (*posd_itor)->Direction 
@@ -3943,7 +3947,7 @@ void Strategy::update_position_detail(USER_CThostFtdcTradeField *pTrade) {
 
 	/*USER_PRINT(pOrder->VolumeTraded);*/
 	std::cout << "\tTrade 更新持仓明细" << std::endl;
-	std::cout << "\t\tpTrade->OffsetFlag = " << pTrade->OffsetFlag 
+	std::cout << "\tpTrade->OffsetFlag = " << pTrade->OffsetFlag 
 		<< "， pTrade->InstrumentID = " << pTrade->InstrumentID
 		<< "， pTrade->HedgeFlag = " << pTrade->HedgeFlag 
 		<< "， pTrade->Direction = " << pTrade->Direction 
@@ -4058,7 +4062,7 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 		# 跳过无成交的order记录                                                                     */
 	/************************************************************************/
 	std::cout << "\tOrder 更新持仓明细" << std::endl;
-	std::cout << "\t\tpOrder->CombOffsetFlag[0] = " << pOrder->CombOffsetFlag[0] 
+	std::cout << "\tpOrder->CombOffsetFlag[0] = " << pOrder->CombOffsetFlag[0] 
 		<< ", pOrder->InstrumentID = " << pOrder->InstrumentID 
 		<< ", pOrder->CombHedgeFlag[0] = " << pOrder->CombHedgeFlag[0] 
 		<< ", pOrder->Direction = " << pOrder->Direction 
