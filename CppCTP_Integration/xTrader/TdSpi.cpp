@@ -1963,10 +1963,8 @@ void TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
 	//TThostFtdcMacAddressType	MacAddress;
 	//sleep(1);
 
-	this->tdapi->ReqOrderInsert(pInputOrder, 1);
-
-	std::cout << "TdSpi::OrderInsert() 报单参数:" << 
-		"BrokerID:"  << pInputOrder->BrokerID <<
+	std::cout << "TdSpi::OrderInsert() 报单参数:" <<
+		"BrokerID:" << pInputOrder->BrokerID <<
 		", InvestorID:" << pInputOrder->InvestorID <<
 		", OrderRef:" << pInputOrder->OrderRef <<
 		", InstrumentID:" << pInputOrder->InstrumentID <<
@@ -1976,6 +1974,8 @@ void TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
 		", CombOffsetFlag:" << pInputOrder->CombOffsetFlag[0] <<
 		", CombHedgeFlag:" << pInputOrder->CombHedgeFlag[0] <<
 		std::endl;
+
+	this->tdapi->ReqOrderInsert(pInputOrder, 1);
 
 	USER_PRINT(this->current_user);
 	USER_PRINT(user);
