@@ -3168,14 +3168,14 @@ string Strategy::Generate_Order_Ref() {
 
 // 报单
 void Strategy::Exec_OrderInsert(CThostFtdcInputOrderField *insert_order) {
-	/*std::cout << "====报单参数====" << std::endl;
-	std::cout << "OrderRef = " << insert_order->OrderRef << std::endl;
-	std::cout << "InstrumentID = " << insert_order->InstrumentID << std::endl;
-	std::cout << "LimitPrice = " << insert_order->LimitPrice << std::endl;
-	std::cout << "VolumeTotalOriginal = " << insert_order->VolumeTotalOriginal << std::endl;
-	std::cout << "Direction = " << insert_order->Direction << std::endl;
-	std::cout << "CombOffsetFlag = " << insert_order->CombOffsetFlag[0] << std::endl;
-	std::cout << "CombHedgeFlag = " << insert_order->CombHedgeFlag[0] << std::endl;*/
+	std::cout << "Strategy::Exec_OrderInsert()" << std::endl;
+	std::cout << "\tOrderRef = " << insert_order->OrderRef <<
+		", InstrumentID = " << insert_order->InstrumentID <<
+		", LimitPrice = " << insert_order->LimitPrice <<
+		", VolumeTotalOriginal = " << insert_order->VolumeTotalOriginal <<
+		", Direction = " << insert_order->Direction <<
+		", CombOffsetFlag = " << insert_order->CombOffsetFlag[0] <<
+		", CombHedgeFlag = " << insert_order->CombHedgeFlag[0] << std::endl;
 
 	//下单操作
 	this->stg_user->getUserTradeSPI()->OrderInsert(this->stg_user, insert_order);
