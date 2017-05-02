@@ -1535,6 +1535,7 @@ void Strategy::Update_Position_Trade_Detail_To_DB(USER_CThostFtdcTradeField *pos
 			<< "tradedate" << posd->TradeDate
 			<< "strategyid" << posd->StrategyID
 			<< "volume" << posd->Volume
+			<< "exchangeid" << posd->ExchangeID
 			)));
 		USER_PRINT("Strategy::Update_Position_Trade_Detail_To_DB ok");
 	}
@@ -1596,6 +1597,7 @@ void Strategy::Update_Position_Trade_Changed_Detail_To_DB(USER_CThostFtdcTradeFi
 			<< "tradedate" << posd->TradeDate
 			<< "strategyid" << posd->StrategyID
 			<< "volume" << posd->Volume
+			<< "exchangeid" << posd->ExchangeID
 			)));
 		USER_PRINT("Strategy::Update_Position_Trade_Changed_Detail_To_DB ok");
 	}

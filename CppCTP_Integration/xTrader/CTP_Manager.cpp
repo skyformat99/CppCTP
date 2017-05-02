@@ -3147,7 +3147,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 									// 最新修改时间
 									(*stg_itor)->setStgUpdatePositionDetailRecordTime(Utils::getDate());
-									(*stg_itor)->setStgIsPositionRight(false);
+									
 
 									//static_dbm->UpdateStrategy((*stg_itor));
 									// 存储之前先清空集合
@@ -3173,8 +3173,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									/************************************************************************/
 									(*stg_itor)->getStgUser()->setOn_Off(1);
 									(*stg_itor)->setStgTradeTaskingRecovery();
+									// tick锁归位
 									(*stg_itor)->setStgSelectOrderAlgorithmFlag("CTP_Manager::HandleMessage() msgtype == 12", false);
-
 									std::cout << "\tStrategy修改持仓完成!" << std::endl;
 
 									/*构造内容json*/
