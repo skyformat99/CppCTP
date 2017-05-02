@@ -1964,6 +1964,19 @@ void TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
 	//sleep(1);
 
 	this->tdapi->ReqOrderInsert(pInputOrder, 1);
+
+	std::cout << "TdSpi::OrderInsert() 报单参数:" << 
+		"BrokerID:"  << pInputOrder->BrokerID <<
+		", InvestorID:" << pInputOrder->InvestorID <<
+		", OrderRef:" << pInputOrder->OrderRef <<
+		", InstrumentID:" << pInputOrder->InstrumentID <<
+		", LimitPrice:" << pInputOrder->LimitPrice <<
+		", VolumeTotalOriginal:" << pInputOrder->VolumeTotalOriginal <<
+		", Direction:" << pInputOrder->Direction <<
+		", CombOffsetFlag:" << pInputOrder->CombOffsetFlag[0] <<
+		", CombHedgeFlag:" << pInputOrder->CombHedgeFlag[0] <<
+		std::endl;
+
 	USER_PRINT(this->current_user);
 	USER_PRINT(user);
 	//this->current_user->DB_OrderInsert(this->current_user->GetOrderConn(), pInputOrder);
