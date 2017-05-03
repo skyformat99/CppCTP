@@ -316,13 +316,11 @@ void timer_handler() {
 		std::cout << "\t\033[32m收盘工作:保存策略参数,更新运行状态,停止计时器.\033[0m" << std::endl;
 
 		// 保存最后策略参数,更新运行状态正常收盘
-		//ctp_m->saveStrategy();
-
-		/*ctp_m->saveAllStrategyPositionDetail();
-		ctp_m->updateSystemFlag();*/
+		ctp_m->saveAllStrategyPositionDetail();
+		ctp_m->updateSystemFlag();
 
 		// 保存策略参数,关闭定时器
-		ctp_m->getCalTimer()->stop();
+		//ctp_m->getCalTimer()->stop();
 		std::cout << "\t\033[32m系统收盘工作正常结束.\033[0m" << std::endl;
 	}
 

@@ -245,7 +245,7 @@ string Utils::longlongtostr(long long num) {
 }
 
 string Utils::getDate() {
-	std::cout << "Utils::getDate()" << std::endl;
+	//std::cout << "Utils::getDate()" << std::endl;
 	time_t rawtime;
 	time(&rawtime);
 	char time_char[20];

@@ -494,8 +494,13 @@ void CTP_Manager::saveAllStrategyPositionDetail() {
 
 		//this->dbm->UpdateStrategy((*stg_itor));
 		//(*stg_itor)->setStgUpdatePositionDetailRecordTime(Utils::getDate());
+		// 增加最后一次保存时间,并更新至数据库
 		(*stg_itor)->setStgLastSavedTime(Utils::getDate());
 		(*stg_itor)->UpdateStrategy((*stg_itor));
+
+		// 删除之前集合里的trade,order
+		this->getDBManager()->DeletePositionDetailByStrategy((*stg_itor));
+
 		std::cout << "\t关闭服务端,保存期货账户 = " << (*stg_itor)->getStgUserId() << std::endl;
 		std::cout << "\t关闭服务端,保存策略ID = " << (*stg_itor)->getStgStrategyId() << std::endl;
 		std::cout << "\t关闭服务端,Order明细长度 = " << (*stg_itor)->getStg_List_Position_Detail_From_Order()->size() << std::endl;
@@ -3172,7 +3177,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									c:更新tick锁stg_select_order_algorithm_flag为释放*/
 									/************************************************************************/
 									(*stg_itor)->getStgUser()->setOn_Off(1);
-									(*stg_itor)->setStgTradeTaskingRecovery();
+									// 更新trade_task标志位
+									(*stg_itor)->update_task_status();
+									//(*stg_itor)->setStgTradeTaskingRecovery();
 									// tick锁归位
 									(*stg_itor)->setStgSelectOrderAlgorithmFlag("CTP_Manager::HandleMessage() msgtype == 12", false);
 									std::cout << "\tStrategy修改持仓完成!" << std::endl;

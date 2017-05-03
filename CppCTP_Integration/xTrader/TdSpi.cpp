@@ -790,8 +790,8 @@ void TdSpi::CopyInstrumentInfo(CThostFtdcInstrumentField *dst, CThostFtdcInstrum
 ///合约交易状态通知
 void TdSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus) {
 	//USER_PRINT("TdSpi::OnRtnInstrumentStatus");
-	//if (pInstrumentStatus) {
-		/*std::cout << "|==================== " << endl;
+	if (pInstrumentStatus) {
+		std::cout << "|==================== " << endl;
 		///交易所代码
 		std::cout << "|交易所代码         = " << pInstrumentStatus->ExchangeID << endl;
 		///合约在交易所的代码
@@ -808,7 +808,7 @@ void TdSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentSt
 		std::cout << "|进入本状态时间     = " << pInstrumentStatus->EnterTime << endl;
 		///进入本状态原因
 		std::cout << "|进入本状态原因     = " << pInstrumentStatus->EnterReason << endl;
-		std::cout << "|==================== " << endl;*/
+		std::cout << "|==================== " << endl;
 
 		//string status_time(pInstrumentStatus->EnterTime);
 		//string real_status_time = this->getTradingDay() + status_time;
@@ -817,7 +817,7 @@ void TdSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentSt
 		//	USER_PRINT("收盘了...策略进行保存");
 		//	std::cout << "TdSpi::OnRtnInstrumentStatus() 收盘了开始策略保存" << std::endl;
 		//	this->current_user->getCTP_Manager()->saveStrategy();
-		//}
+		}
 		
 	//}
 }
