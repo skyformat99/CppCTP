@@ -307,13 +307,14 @@ void timer_handler() {
 
 	if (ctp_m->getIsMarketClose() != market_close_flag)
 	{
-		std::cout << "\t现在时间:" << nowtime << std::endl;
+		Utils::printGreenColorWithKV("现在时间:", nowtime);
 		ctp_m->setIsMarketClose(market_close_flag);
 	}
 
 	if (is_need_save_data_afternoon)
 	{
-		std::cout << "\t\033[32m收盘工作:保存策略参数,更新运行状态,停止计时器.\033[0m" << std::endl;
+		std::cout << "\t现在时间:" << nowtime << std::endl;
+		std::cout << "\t\033[32m收盘工作:保存策略参数,更新运行状态.\033[0m" << std::endl;
 
 		// 保存最后策略参数,更新运行状态正常收盘
 		ctp_m->saveAllStrategyPositionDetail();

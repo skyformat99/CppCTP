@@ -791,24 +791,22 @@ void TdSpi::CopyInstrumentInfo(CThostFtdcInstrumentField *dst, CThostFtdcInstrum
 void TdSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus) {
 	//USER_PRINT("TdSpi::OnRtnInstrumentStatus");
 	if (pInstrumentStatus) {
-		std::cout << "|==================== " << endl;
 		///交易所代码
-		std::cout << "|交易所代码         = " << pInstrumentStatus->ExchangeID << endl;
+		std::cout << "|交易所代码 = " << pInstrumentStatus->ExchangeID << ", ";
 		///合约在交易所的代码
-		std::cout << "|合约在交易所的代码 = " << pInstrumentStatus->ExchangeInstID << endl;
+		std::cout << "合约在交易所的代码 = " << pInstrumentStatus->ExchangeInstID << ", ";
 		///结算组代码
-		std::cout << "|结算组代码         = " << pInstrumentStatus->SettlementGroupID << endl;
+		std::cout << "结算组代码 = " << pInstrumentStatus->SettlementGroupID << ", ";
 		///合约代码
-		std::cout << "|合约代码           = " << pInstrumentStatus->InstrumentID << endl;
+		std::cout << "合约代码 = " << pInstrumentStatus->InstrumentID << ", ";
 		///合约交易状态
-		std::cout << "|合约交易状态       = " << pInstrumentStatus->InstrumentStatus << endl;
+		std::cout << "合约交易状态 = " << pInstrumentStatus->InstrumentStatus << ", ";
 		///交易阶段编号
-		std::cout << "|交易阶段编号       = " << pInstrumentStatus->TradingSegmentSN << endl;
+		std::cout << "交易阶段编号 = " << pInstrumentStatus->TradingSegmentSN << ", ";
 		///进入本状态时间
-		std::cout << "|进入本状态时间     = " << pInstrumentStatus->EnterTime << endl;
+		std::cout << "进入本状态时间 = " << pInstrumentStatus->EnterTime << ", ";
 		///进入本状态原因
-		std::cout << "|进入本状态原因     = " << pInstrumentStatus->EnterReason << endl;
-		std::cout << "|==================== " << endl;
+		std::cout << "进入本状态原因 = " << pInstrumentStatus->EnterReason << endl;
 
 		//string status_time(pInstrumentStatus->EnterTime);
 		//string real_status_time = this->getTradingDay() + status_time;
@@ -2489,7 +2487,9 @@ bool TdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 	if (bResult) {
 		codeDst[90] = { 0 };
 		Utils::Gb2312ToUtf8(codeDst, 90, pRspInfo->ErrorMsg, strlen(pRspInfo->ErrorMsg)); // Gb2312ToUtf8
-		cerr << "TdSpi::IsErrorRspInfo() ErrorID = " << pRspInfo->ErrorID << ", ErrorMsg=" << codeDst << endl;
+		//cerr << "TdSpi::IsErrorRspInfo() ErrorID = " << pRspInfo->ErrorID << ", ErrorMsg=" << codeDst << endl;
+		Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() ErrorID", pRspInfo->ErrorID);
+		Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() ErrorMsg", codeDst);
 	}
 	return bResult;
 }

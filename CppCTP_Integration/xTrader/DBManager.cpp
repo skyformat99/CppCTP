@@ -2746,7 +2746,7 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 		strcpy(new_pos->StrategyID, p.getStringField("strategyid"));
 		new_pos->VolumeTradedBatch = p.getIntField("volumetradedbatch");
 
-		cout << "\t*instrumentid = " << p.getStringField("instrumentid") << ", ";
+		/*cout << "\t*instrumentid = " << p.getStringField("instrumentid") << ", ";
 		cout << "orderref = " << p.getStringField("orderref") << ", ";
 		cout << "userid = " << p.getStringField("userid") << ", ";
 		cout << "direction = " << p.getIntField("direction") << ", ";
@@ -2762,7 +2762,7 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 		cout << "insertdate = " << p.getStringField("insertdate") << ", ";
 		cout << "inserttime = " << p.getStringField("inserttime") << ", ";
 		cout << "strategyid = " << p.getStringField("strategyid") << ", ";
-		cout << "volumetradedbatch = " << p.getIntField("volumetradedbatch") << std::endl;
+		cout << "volumetradedbatch = " << p.getIntField("volumetradedbatch") << std::endl;*/
 
 		l_posd->push_back(new_pos);
 	}
@@ -3241,7 +3241,7 @@ void DBManager::getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeFiel
 		strcpy(new_pos->StrategyID, p.getStringField("strategyid"));
 		new_pos->Volume = p.getIntField("volume");
 
-		cout << "\t*instrumentid = " << p.getStringField("instrumentid") << ", ";
+		/*cout << "\t*instrumentid = " << p.getStringField("instrumentid") << ", ";
 		cout << "orderref = " << p.getStringField("orderref") << ", ";
 		cout << "userid = " << p.getStringField("userid") << ", ";
 		cout << "direction = " << p.getIntField("direction") << ", ";
@@ -3252,7 +3252,7 @@ void DBManager::getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeFiel
 		cout << "tradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
 		cout << "tradedate = " << p.getIntField("tradedate") << ", ";
 		cout << "strategyid = " << p.getStringField("strategyid") << ", ";
-		cout << "volume = " << p.getIntField("volume") << std::endl;
+		cout << "volume = " << p.getIntField("volume") << std::endl;*/
 
 		l_posd->push_back(new_pos);
 	}
