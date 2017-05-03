@@ -114,7 +114,7 @@ User * CTP_Manager::CreateAccount(User *user, list<Strategy *> *l_strategys) {
 		/// 设置初始化状态完成
 		user->setThread_Init_Status(true);
 
-		std::cout << "In Thread = " << std::this_thread::get_id() << ", UserID = " << user->getUserID() << std::endl;
+		std::cout << "\t子线程ID = " << std::this_thread::get_id() << ", UserID = " << user->getUserID() << std::endl;
 
 		/// 等待结束
 		user->getUserTradeAPI()->Join();
@@ -4327,6 +4327,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 			// 新的交易日，把曾经的记录时间清掉
 			(*stg_itor)->setStgUpdatePositionDetailRecordTime("");
 			(*stg_itor)->setStgLastSavedTime("");
+			// 删除changed数据库保存的数据
 			this->getDBManager()->DeletePositionDetailChangedByStrategy((*stg_itor));
 			(*stg_itor)->setStgIsPositionRight(true);
 
@@ -5074,7 +5075,7 @@ bool CTP_Manager::init(bool is_online) {
 		//sleep(3);
 	}
 
-	std::cout << "\tIn Main Thread = " << std::this_thread::get_id() << std::endl;
+	std::cout << "\t主线程ID = " << std::this_thread::get_id() << std::endl;
 	std::cout << "\t主线程设置子线程分离..." << std::endl;
 	/// 设置线程分离
 	for (auto& t: this->user_threads)
@@ -5088,7 +5089,7 @@ bool CTP_Manager::init(bool is_online) {
 		/// 初始值为true,一旦有账户不满足初始化完成条件，置false操作
 		is_all_user_finished_init = true;
 		/// 检查USER初始化是否完成
-		std::cout << "\tIn Main Thread = " << std::this_thread::get_id() << std::endl;
+		std::cout << "\t主线程ID = " << std::this_thread::get_id() << std::endl;
 		std::cout << "\t检查期货账户登录状态" << std::endl;
 
 		for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
