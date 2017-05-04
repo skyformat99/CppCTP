@@ -2480,8 +2480,7 @@ void TdSpi::OnRspUserPasswordUpdate(CThostFtdcUserPasswordUpdateField *pUserPass
     }
 }
 
-bool TdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
-{
+bool TdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo) {
 	// 如果ErrorID != 0, 说明收到了错误的响应
 	bool bResult = ((pRspInfo) && (pRspInfo->ErrorID != 0));
 	if (bResult) {

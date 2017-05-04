@@ -2390,7 +2390,7 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		if (this->stg_user->getCTP_Manager()->getIsMarketClose())
 		{
 			std::cout << "Strategy::OnRtnDepthMarketData()" << std::endl;
-			std::cout << "\t最后5秒停止新的任务!" << std::endl;
+			Utils::printRedColor("已停止新的任务!");
 			return;
 		}
 
@@ -2447,17 +2447,16 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 				//<< ", 当日均价:" << pDepthMarketData->AveragePrice
 				//<< ", 本次结算价格:" << pDepthMarketData->SettlementPrice
 				//<< ", 成交金额:" << pDepthMarketData->Turnover << std::endl;
-
-				
-
 			}
 		}
 
 		//一把锁测试
 		//this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
 	}
+
 	this->CopyTickData(this->stg_instrument_Last_tick, pDepthMarketData);
 	this->stg_tick_systime_record = new_time;
+
 	USER_PRINT("Strategy::OnRtnDepthMarketData OUT");
 	//tick_mtx.unlock();
 }
@@ -2490,7 +2489,7 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 		//this->printStrategyInfo("有挂单,返回");
 		std::cout << "Strategy::Select_Order_Algorithm():" << std::endl;
 		std::cout << "\t(有挂单,返回)" << std::endl;
-		this->setStgSelectOrderAlgorithmFlag("Strategy::OnRtnDepthMarketData()_1", false); // 关闭下单锁
+		this->setStgSelectOrderAlgorithmFlag("Strategy::OnRtnDepthMarketData() 有挂单", false); // 关闭下单锁
 		return;
 	}
 
@@ -2505,7 +2504,7 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 			this->stg_position_b_buy << ")(" <<
 			this->stg_position_a_buy << ", " <<
 			this->stg_position_b_sell << ")" << std::endl;
-		this->setStgSelectOrderAlgorithmFlag("Strategy::OnRtnDepthMarketData()_2", false); // 关闭下单锁
+		this->setStgSelectOrderAlgorithmFlag("Strategy::OnRtnDepthMarketData() 有撇腿", false); // 关闭下单锁
 		return;
 	}
 
@@ -2654,7 +2653,7 @@ void Strategy::Order_Algorithm_One() {
 		this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One() 价差卖平", true); // 开启下单锁
 
 		//this->stg_trade_tasking = true;
-		this->printStrategyInfo("价差卖平");
+		//this->printStrategyInfo("价差卖平");
 		//this->update_task_status();
 
 		/// 市场多头价差大于触发参数， AB持仓量相等且大于0
@@ -2778,7 +2777,7 @@ void Strategy::Order_Algorithm_One() {
 		this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One() 价差买平", true); // 开启下单锁
 
 		//this->setStgTradeTasking(true);
-		this->printStrategyInfo("价差买平");
+		//this->printStrategyInfo("价差买平");
 		//this->update_task_status();
 
 		/// 市场空头价差小于等于触发参数， AB持仓量相等且大于0
@@ -3049,7 +3048,7 @@ void Strategy::Order_Algorithm_One() {
 		this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One() 价差买开", true); // 开启下单锁
 
 		//this->stg_trade_tasking = true;
-		this->printStrategyInfo("价差买开");
+		//this->printStrategyInfo("价差买开");
 		//this->update_task_status();
 
 		//std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买开" << endl;
@@ -3483,7 +3482,7 @@ void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketDat
 
 /// 更新挂单list
 void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
-	std::cout << "Strategy::update_pending_order_list()" << std::endl;
+	//std::cout << "Strategy::update_pending_order_list()" << std::endl;
 	USER_PRINT("Strategy::update_pending_order_list");
 	/************************************************************************/
 	/* 此处pOrder应该谨慎操作                                                  */
@@ -3494,10 +3493,10 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 
 	USER_PRINT(pOrder->OrderStatus);
 
-	std::cout << "Strategy::update_pending_order_list()" << std::endl;
+	/*std::cout << "Strategy::update_pending_order_list()" << std::endl;
 	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
 	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
-	std::cout << "\tBegin:this->stg_pending_a_open = " << this->stg_pending_a_open << std::endl;
+	std::cout << "\tBegin:this->stg_pending_a_open = " << this->stg_pending_a_open << std::endl;*/
 
 	if (strlen(pOrder->OrderSysID) != 0) { // 如果报单编号不为空，为交易所返回
 		if (pOrder->OrderStatus == '0') { // 全部成交
@@ -3598,7 +3597,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 		}
 
 		//std::cout << "Strategy::update_pending_order_list()" << std::endl;
-		std::cout << "\tEnd:this->stg_pending_a_open = " << this->stg_pending_a_open << std::endl;
+		//std::cout << "\tEnd:this->stg_pending_a_open = " << this->stg_pending_a_open << std::endl;
 	}
 	else { // 报单编号长度为0, CTP 直接返回的错误或者还未发到交易所
 		/************************************************************************/
@@ -3684,7 +3683,7 @@ void Strategy::update_position(USER_CThostFtdcOrderField *pOrder) {
 	USER_PRINT(this->stg_instrument_id_A);
 	USER_PRINT(this->stg_instrument_id_B);
 
-	this->printStrategyInfo("Strategy::update_position() 输出VolumeTradedBatch");
+	//this->printStrategyInfo("Strategy::update_position() 输出VolumeTradedBatch");
 	
 
 	// A成交
@@ -3779,7 +3778,7 @@ void Strategy::update_position(USER_CThostFtdcOrderField *pOrder) {
 	//std::cout << "B合约今买 = " << this->stg_position_b_buy_today << std::endl;
 	//std::cout << "B合约昨买 = " << this->stg_position_b_buy_yesterday << std::endl;
 
-	std::cout << "Strategy::update_position():" << std::endl;
+	/*std::cout << "Strategy::update_position():" << std::endl;
 	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
 	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
 	std::cout << "\tA卖(" << this->stg_position_a_sell << ", " << this->stg_position_a_sell_yesterday << ")" << std::endl;
@@ -3788,7 +3787,7 @@ void Strategy::update_position(USER_CThostFtdcOrderField *pOrder) {
 	std::cout << "\tB卖(" << this->stg_position_b_sell << ", " << this->stg_position_b_sell_yesterday << ")" << std::endl;
 	std::cout << "\t挂单列表长度 = " << this->stg_list_order_pending->size() << std::endl;
 	std::cout << "\t任务执行状态 = " << this->stg_trade_tasking << std::endl;
-	std::cout << "\t本次成交量 = " << pOrder->VolumeTradedBatch << ", 报单引用 = " << pOrder->OrderRef << std::endl;
+	std::cout << "\t本次成交量 = " << pOrder->VolumeTradedBatch << ", 报单引用 = " << pOrder->OrderRef << std::endl;*/
 
 }
 
@@ -3903,7 +3902,6 @@ void Strategy::update_position_detail(CThostFtdcTradeField *pTrade_cal) {
 	memset(pTrade, 0x00, sizeof(CThostFtdcTradeField));
 	this->CopyTradeData(pTrade, pTrade_cal);
 
-
 	// 开仓单,添加到list，添加到list尾部
 	if (pTrade->OffsetFlag == '0') {
 		CThostFtdcTradeField *pTrade_tmp = new CThostFtdcTradeField();
@@ -3960,7 +3958,7 @@ void Strategy::update_position_detail(CThostFtdcTradeField *pTrade_cal) {
 /// 更新持仓明细
 void Strategy::update_position_detail(USER_CThostFtdcTradeField *pTrade) {
 	USER_PRINT("Strategy::update_position_detail");
-	std::cout << "Strategy::update_position_detail() trade" << std::endl;
+	//std::cout << "Strategy::update_position_detail() trade" << std::endl;
 	/************************************************************************/
 	/* """
 	order中的CombOffsetFlag 或 trade中的OffsetFlag值枚举：
@@ -3973,13 +3971,13 @@ void Strategy::update_position_detail(USER_CThostFtdcTradeField *pTrade) {
 	/************************************************************************/
 
 	/*USER_PRINT(pOrder->VolumeTraded);*/
-	std::cout << "\tTrade 更新持仓明细" << std::endl;
-	std::cout << "\tpTrade->OffsetFlag = " << pTrade->OffsetFlag 
-		<< "， pTrade->InstrumentID = " << pTrade->InstrumentID
-		<< "， pTrade->HedgeFlag = " << pTrade->HedgeFlag 
-		<< "， pTrade->Direction = " << pTrade->Direction 
-		<< "， pTrade->Volume = " << pTrade->Volume 
-		<< "， pTrade->TradingDay = " << pTrade->TradingDay << std::endl;
+	/*std::cout << "\tTrade 更新持仓明细" << std::endl;
+	std::cout << "\tpTrade->OffsetFlag = " << pTrade->OffsetFlag
+	<< "， pTrade->InstrumentID = " << pTrade->InstrumentID
+	<< "， pTrade->HedgeFlag = " << pTrade->HedgeFlag
+	<< "， pTrade->Direction = " << pTrade->Direction
+	<< "， pTrade->Volume = " << pTrade->Volume
+	<< "， pTrade->TradingDay = " << pTrade->TradingDay << std::endl;*/
 
 
 	if (pTrade->OffsetFlag == '0') // pTrade中"OffsetFlag"值 = "0"为开仓，不用考虑全部成交还是部分成交，开仓trade直接添加到持仓明细列表里
@@ -4076,7 +4074,7 @@ void Strategy::update_position_detail(USER_CThostFtdcTradeField *pTrade) {
 
 /// 更新持仓明细(Order)
 void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
-	std::cout << "Strategy::update_position_detail() order" << std::endl;
+	//std::cout << "Strategy::update_position_detail() order" << std::endl;
 	USER_PRINT("Strategy::update_position_detail");
 	/************************************************************************/
 	/* """
@@ -4088,14 +4086,14 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 		"""
 		# 跳过无成交的order记录                                                                     */
 	/************************************************************************/
-	std::cout << "\tOrder 更新持仓明细" << std::endl;
-	std::cout << "\tpOrder->CombOffsetFlag[0] = " << pOrder->CombOffsetFlag[0] 
-		<< ", pOrder->InstrumentID = " << pOrder->InstrumentID 
-		<< ", pOrder->CombHedgeFlag[0] = " << pOrder->CombHedgeFlag[0] 
-		<< ", pOrder->Direction = " << pOrder->Direction 
-		<< ", pOrder->VolumeTradedBatch = " << pOrder->VolumeTradedBatch 
-		<< ", pOrder->TradingDay = " << pOrder->TradingDay 
-		<< ", pOrder->VolumeTradedBatch = " << pOrder->VolumeTradedBatch << std::endl;
+	/*std::cout << "\tOrder 更新持仓明细" << std::endl;
+	std::cout << "\tpOrder->CombOffsetFlag[0] = " << pOrder->CombOffsetFlag[0]
+	<< ", pOrder->InstrumentID = " << pOrder->InstrumentID
+	<< ", pOrder->CombHedgeFlag[0] = " << pOrder->CombHedgeFlag[0]
+	<< ", pOrder->Direction = " << pOrder->Direction
+	<< ", pOrder->VolumeTradedBatch = " << pOrder->VolumeTradedBatch
+	<< ", pOrder->TradingDay = " << pOrder->TradingDay
+	<< ", pOrder->VolumeTradedBatch = " << pOrder->VolumeTradedBatch << std::endl;*/
 
 	if (pOrder->VolumeTradedBatch == 0) {
 		return;
@@ -4281,10 +4279,11 @@ void Strategy::add_VolumeTradedBatch(CThostFtdcOrderField *pOrder, USER_CThostFt
 		std::cout << "\tnew_Order->OrderStatus不在系统范围内!" << std::endl;
 		new_Order->VolumeTradedBatch = 0;
 	}
-	std::cout << "Strategy::add_VolumeTradedBatch()" << std::endl;
+	/*std::cout << "Strategy::add_VolumeTradedBatch()" << std::endl;
 	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
 	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
 	std::cout << "\t合约 = " << new_Order->InstrumentID << ", 买卖 = " << new_Order->Direction << ", 开平 = " << new_Order->CombOffsetFlag[0] << ", 本次成交量 = " << new_Order->VolumeTradedBatch << ", 报单引用 = " << new_Order->OrderRef << std::endl;
+	*/
 	USER_PRINT(new_Order->VolumeTradedBatch);
 }
 

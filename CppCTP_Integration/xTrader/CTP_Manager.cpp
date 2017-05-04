@@ -233,11 +233,12 @@ list<string> * CTP_Manager::delSubInstrument(string instrumentID, list<string > 
 
 /// 统计合约数量
 int CTP_Manager::calInstrument(string instrumentID, list<string> *l_instrument) {
+	std::cout << "CTP_Manager::calInstrument()" << std::endl;
 	int count = 0;
 	if (l_instrument->size() > 0) {
 		list<string>::iterator itor;
 		for (itor = l_instrument->begin(); itor != l_instrument->end(); itor++) {
-			cout << *itor << endl;
+			cout << "\t存在合约 = " << *itor << endl;
 			if ((*itor) == instrumentID) {
 				count++;
 			}
@@ -1974,10 +1975,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						std::cout << "q_strategy_id = " << q_strategy_id << std::endl;
 						list<Strategy *>::iterator stg_itor;
 						for (stg_itor = ctp_m->getListStrategy()->begin(); stg_itor != ctp_m->getListStrategy()->end(); stg_itor++) {
-							std::cout << "(*stg_itor)->getStgUserId() = " << (*stg_itor)->getStgUserId() << std::endl;
-							std::cout << "(*stg_itor)->getStgStrategyId() = " << (*stg_itor)->getStgStrategyId() << std::endl;
+							std::cout << "\t存在UserID = " << (*stg_itor)->getStgUserId() << std::endl;
+							std::cout << "\t存在StrategyID = " << (*stg_itor)->getStgStrategyId() << std::endl;
 							if (((*stg_itor)->getStgUserId() == q_user_id) && ((*stg_itor)->getStgStrategyId() == q_strategy_id)) {
-								std::cout << "找到即将修改的Strategy" << std::endl;
+								std::cout << "\t找到即将修改的Strategy" << std::endl;
 
 								//(*stg_itor)->setStgPositionASellToday(object["position_a_sell_today"].GetInt());
 								//(*stg_itor)->setStgPositionBSell(object["position_b_sell"].GetInt());
@@ -2057,7 +2058,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								//(*stg_itor)->setStgPositionASellYesterday(object["position_a_sell_yesterday"].GetInt());
 								
 
-								std::cout << "Strategy修改完成!" << std::endl;
+								std::cout << "\tStrategy修改完成!" << std::endl;
 								static_dbm->UpdateStrategy((*stg_itor));
 
 								/*构造内容json*/
@@ -2155,13 +2156,13 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 							}
 							else {
-								std::cout << "未能找到修改的Strategy" << std::endl;
+								std::cout << "\t未能找到修改的Strategy" << std::endl;
 							}
 						}
 					}
 				}
 				else {
-					std::cout << "未收到修改策略信息" << std::endl;
+					std::cout << "\t未收到修改策略信息" << std::endl;
 				}
 
 				build_doc.AddMember("Info", create_info_array, allocator);
@@ -2543,21 +2544,21 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				list<Strategy *>::iterator stg_itor;
 				for (stg_itor = ctp_m->getListStrategy()->begin(); stg_itor != ctp_m->getListStrategy()->end();) {
 
-					std::cout << "(*stg_itor)->getStgUserId() = " << (*stg_itor)->getStgUserId() << std::endl;
-					std::cout << "(*stg_itor)->getStgStrategyId() = " << (*stg_itor)->getStgStrategyId() << std::endl;
+					std::cout << "\t存在UserID = " << (*stg_itor)->getStgUserId() << std::endl;
+					std::cout << "\t存在StrategyId = " << (*stg_itor)->getStgStrategyId() << std::endl;
 
 					if (((*stg_itor)->getStgUserId() == s_UserID) && ((*stg_itor)->getStgStrategyId() == s_StrategyID)) {
-						std::cout << "找到即将删除的Strategy" << std::endl;
+						std::cout << "\t找到即将删除的Strategy" << std::endl;
 						int flag = static_dbm->DeleteStrategy((*stg_itor));
 						int flag_1 = static_dbm->DeleteStrategyYesterday((*stg_itor));
 
 						if (flag || flag_1) {
-							std::cout << "Strategy未找到删除项!" << std::endl;
+							std::cout << "\tStrategy未找到删除项!" << std::endl;
 							build_doc.AddMember("MsgResult", 1, allocator);
 							build_doc.AddMember("MsgErrorReason", "未找到删除的策略!", allocator);
 						}
 						else {
-							std::cout << "Strategy删除完成!" << std::endl;
+							std::cout << "\tStrategy删除完成!" << std::endl;
 							build_doc.AddMember("MsgResult", 0, allocator);
 							build_doc.AddMember("MsgErrorReason", "", allocator);
 						}
@@ -2595,7 +2596,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						ctp_m->syncStrategyDeleteToUsers(s_TraderID, s_UserID, s_StrategyID);
 					}
 					else {
-						std::cout << "未能找到修改的Strategy" << std::endl;
+						std::cout << "\t未能找到修改的Strategy" << std::endl;
 						stg_itor++;
 					}
 				}
@@ -2621,7 +2622,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				bool bFind = false;
 
 				std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
-				std::cout << "收到交易员账户开关 = " << i_OnOff << std::endl;
+				std::cout << "\t收到交易员账户开关 = " << i_OnOff << std::endl;
 
 				/*构建交易员开关的Json*/
 				build_doc.SetObject();
@@ -2635,7 +2636,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				list<Trader *>::iterator trader_itor;
 				for (trader_itor = ctp_m->getL_Obj_Trader()->begin(); trader_itor != ctp_m->getL_Obj_Trader()->end(); trader_itor++) {
 					if ((*trader_itor)->getTraderID() == s_TraderID) {
-						std::cout << "找到需要开关的交易员ID" << std::endl;
+						std::cout << "\t找到需要开关的交易员ID" << std::endl;
 						(*trader_itor)->setOn_Off(i_OnOff);
 						bFind = true;
 						// 更新数据库
@@ -2676,7 +2677,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 				std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
 				std::cout << "\t收到期货账户ID = " << s_UserID << std::endl;
-				std::cout << "收到期货账户开关 = " << i_OnOff << std::endl;
+				std::cout << "\t收到期货账户开关 = " << i_OnOff << std::endl;
 
 				/*构建期货账户开关的Json*/
 				build_doc.SetObject();
@@ -2691,7 +2692,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				list<User *>::iterator user_itor;
 				for (user_itor = ctp_m->getL_User()->begin(); user_itor != ctp_m->getL_User()->end(); user_itor++) {
 					if ((*user_itor)->getUserID() == s_UserID) {
-						std::cout << "找到需要开关的期货账户ID" << std::endl;
+						std::cout << "\t找到需要开关的期货账户ID" << std::endl;
 						(*user_itor)->setOn_Off(i_OnOff);
 						bFind = true;
 						//更新数据库
@@ -2750,7 +2751,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				list<Strategy *>::iterator stg_itor;
 				for (stg_itor = l_strategys.begin(); stg_itor != l_strategys.end(); stg_itor++) {
 					if (((*stg_itor)->getStgTraderId() == s_TraderID)) {
-						std::cout << "找到需要查询的昨仓" << std::endl;
+						std::cout << "\t找到需要查询的昨仓" << std::endl;
 
 						/*构造内容json*/
 						rapidjson::Value create_info_object(rapidjson::kObjectType);
@@ -3312,20 +3313,20 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 					if (((*stg_itor)->getStgUserId() == s_UserID) && ((*stg_itor)->getStgStrategyId() == s_StrategyID)) {
 
-						std::cout << "找到即将更新的Strategy" << std::endl;
+						std::cout << "\t找到即将更新的Strategy" << std::endl;
 
 						(*stg_itor)->setOn_Off(i_OnOff);
 
 						int flag = static_dbm->UpdateStrategyOnOff((*stg_itor));
 
 						if (flag) {
-							std::cout << "策略未找到!" << std::endl;
+							std::cout << "\t策略未找到!" << std::endl;
 							build_doc.AddMember("MsgResult", 1, allocator);
 							build_doc.AddMember("MsgErrorReason", "未找到删除的策略!", allocator);
 
 						}
 						else {
-							std::cout << "策略开关更新完成!" << std::endl;
+							std::cout << "\t策略开关更新完成!" << std::endl;
 							build_doc.AddMember("MsgResult", 0, allocator);
 							build_doc.AddMember("MsgErrorReason", "", allocator);
 
@@ -3335,7 +3336,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						break;
 					}
 					else {
-						std::cout << "未能找到修改的Strategy" << std::endl;
+						std::cout << "\t未能找到修改的Strategy" << std::endl;
 						stg_itor++;
 					}
 				}
@@ -3384,20 +3385,20 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					std::cout << "(*stg_itor)->getStgStrategyId() = " << (*stg_itor)->getStgStrategyId() << std::endl;
 					if (((*stg_itor)->getStgUserId() == s_UserID) && ((*stg_itor)->getStgStrategyId() == s_StrategyID)) {
 						
-						std::cout << "找到即将更新的Strategy" << std::endl;
+						std::cout << "\t找到即将更新的Strategy" << std::endl;
 
 						(*stg_itor)->setStgOnlyClose(i_OnOff);
 
 						int flag = static_dbm->UpdateStrategyOnlyCloseOnOff((*stg_itor));
 
 						if (flag) {
-							std::cout << "策略未找到!" << std::endl;
+							std::cout << "\t策略未找到!" << std::endl;
 							build_doc.AddMember("MsgResult", 1, allocator);
 							build_doc.AddMember("MsgErrorReason", "未找到删除的策略!", allocator);
 
 						}
 						else {
-							std::cout << "策略开关更新完成!" << std::endl;
+							std::cout << "\t策略开关更新完成!" << std::endl;
 							build_doc.AddMember("MsgResult", 0, allocator);
 							build_doc.AddMember("MsgErrorReason", "", allocator);
 
@@ -3407,7 +3408,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						break;
 					}
 					else {
-						std::cout << "未能找到修改的Strategy" << std::endl;
+						std::cout << "\t未能找到修改的Strategy" << std::endl;
 						stg_itor++;
 					}
 				}
@@ -3522,7 +3523,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				int i_MsgSrc = MsgSrc.GetInt();
 
 				std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
-				std::cout << "收到UserID = " << s_UserID << std::endl;
+				std::cout << "\t收到UserID = " << s_UserID << std::endl;
 				
 				list<Session *>::iterator sid_itor;
 				list<User *>::iterator user_itor;
@@ -4352,7 +4353,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 	bool is_own_yesterday_order_position_detail = false;
 
 	if (this->l_posdetail->size() > 0) { // 如果今持仓明细有记录
-		std::cout << "\tCTP_Manager::initStrategyAndFutureAccount() 今持仓明细有记录(order)" << std::endl;
+		//std::cout << "\tCTP_Manager::initStrategyAndFutureAccount() 今持仓明细有记录(order)" << std::endl;
 		for (position_itor = this->l_posdetail->begin(); position_itor != this->l_posdetail->end(); position_itor++) { // 遍历今持仓明细列表
 			//std::cout << "\t(*position_itor)->TradingDayRecord = " << (*position_itor)->TradingDayRecord << std::endl;
 			//日期不等,说明存在昨仓持仓明细
