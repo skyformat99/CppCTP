@@ -1,6 +1,6 @@
-push.bat
+remote_push.bat
 local_commit.bat
-push.sh
+remote_push.sh
 FutureTools/Pycharm/Gather/.idea/*
 FutureTools/Pycharm/Gather/gui/.idea/*
 CppCTP_Integration/xTrader/conn/md/*

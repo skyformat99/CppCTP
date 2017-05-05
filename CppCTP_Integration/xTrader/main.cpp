@@ -327,7 +327,7 @@ void timer_handler() {
 						{
 							is_need_save_data_afternoon = false;
 							market_close_flag = true;
-							is_need_to_stop_timer = true;
+							is_need_to_stop_timer = false;
 						}
 					}
 

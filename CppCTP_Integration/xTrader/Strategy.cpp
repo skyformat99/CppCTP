@@ -2068,7 +2068,7 @@ void Strategy::printStrategyInfo(string message) {
 	std::cout << "\t期货账户开关:" << this->stg_user->getOn_Off() << std::endl;
 	std::cout << "\t交易员开关:" << this->stg_user->GetTrader()->getOn_Off() << std::endl;
 	std::cout << "\t策略开关:" << this->getOn_Off() << std::endl;
-	std::cout << "\t撤单次数:" << this->getStgUser() << std::endl;
+	//std::cout << "\t撤单次数:" << this->getStgUser()<< std::endl;
 }
 
 void Strategy::printStrategyInfoPosition() {
@@ -2226,26 +2226,34 @@ void Strategy::finish_pending_order_list() {
 	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
 	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
 	
-	//遍历挂单列表,如果是A合约,立马撤单,如果是B合约,超价发单
+	// 遍历挂单列表,如果是A合约,立马撤单,如果是B合约,超价发单
 	list<CThostFtdcOrderField *>::iterator itor;
 	for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end(); itor++) {
-		//A合约
+		// A合约
 		if (!strcmp((*itor)->InstrumentID, this->stg_instrument_id_A.c_str())) {
 			/// A合约撤单
 			this->stg_user->getUserTradeSPI()->OrderAction((*itor)->ExchangeID, (*itor)->OrderRef, (*itor)->OrderSysID);
 		}
-		//B合约
+		// B合约
 		else if (!strcmp((*itor)->InstrumentID, this->stg_instrument_id_B.c_str()))
 		{
-			//1:先撤单
+			// 1:先撤单
 			this->stg_user->getUserTradeSPI()->OrderAction((*itor)->ExchangeID, (*itor)->OrderRef, (*itor)->OrderSysID);
 			
-			//2:再超价发单
+			// 2:再超价发单
 			// B合约报单参数
 			// 合约代码
 			std::strcpy(this->stg_b_order_insert_args->InstrumentID, this->stg_instrument_id_B.c_str());
-			// 限价
-			this->stg_b_order_insert_args->LimitPrice = this->stg_instrument_B_tick->AskPrice1 + this->stg_b_limit_price_shift * this->stg_b_price_tick;
+			// 限价判断
+			// 如果是买,限价基础上加10个最小跳价格发单; 如果是卖,限价减10个最小跳发单
+			if ((*itor)->Direction = '0') { // 买
+				this->stg_b_order_insert_args->LimitPrice = (*itor)->LimitPrice + 10 * this->stg_b_price_tick;
+			}
+			else if ((*itor)->Direction = '1') // 卖
+			{
+				this->stg_b_order_insert_args->LimitPrice = (*itor)->LimitPrice - 10 * this->stg_b_price_tick;
+			}
+
 			// 数量
 			//this->stg_b_order_insert_args->VolumeTotalOriginal = order_volume;
 			// 买卖方向
@@ -2254,8 +2262,10 @@ void Strategy::finish_pending_order_list() {
 			this->stg_b_order_insert_args->CombOffsetFlag[0] = (*itor)->CombOffsetFlag[0]; //组合开平标志0开仓 上期所3平今、4平昨，其他交易所1平仓
 			// 组合投机套保标志
 			this->stg_b_order_insert_args->CombHedgeFlag[0] = '1'; // 1投机 2套利 3保值
-			// 发单手数
-			this->stg_b_order_insert_args->VolumeTotalOriginal = (*itor)->VolumeTotalOriginal - (*itor)->VolumeTraded;
+			
+			// 发单手数:(剩余的数量)
+			this->stg_b_order_insert_args->VolumeTotalOriginal = (*itor)->VolumeTotal;
+
 			// 报单引用
 			this->stg_order_ref_b = this->Generate_Order_Ref();
 			this->stg_order_ref_last = this->stg_order_ref_b;
@@ -2321,6 +2331,10 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 	
 	//tick_mtx.lock();
 
+	CThostFtdcDepthMarketDataField pDepthMarketData_tmp;
+	memset(&pDepthMarketData_tmp, 0x00, sizeof(CThostFtdcDepthMarketDataField));
+	this->CopyTickData(&pDepthMarketData_tmp, pDepthMarketData);
+
 	time_t tt = system_clock::to_time_t(system_clock::now());
 	std::string nowt(std::ctime(&tt));
 	string new_time = Utils::getNowTimeMs();
@@ -2377,7 +2391,9 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		/*std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
 		std::cout << "\t(有交易任务,进入交易任务执行)" << std::endl;
 		std::cout << "\t(stg_trade_tasking):(" << this->stg_trade_tasking << ")" << std::endl;*/
-		this->Exec_OnTickComing(pDepthMarketData);
+		// 有隐患，改为临时变量
+		//this->Exec_OnTickComing(pDepthMarketData);
+		this->Exec_OnTickComing(&pDepthMarketData_tmp);
 		
 		//收到最后5秒开始强制处理挂单列表命令
 		if (this->stg_user->getCTP_Manager()->getIsStartEndTask()) {
@@ -3229,17 +3245,17 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	}
 
 	// 添加字段,本次成交量
-	USER_CThostFtdcOrderField *order_new = new USER_CThostFtdcOrderField();
-	memset(order_new, 0x00, sizeof(USER_CThostFtdcOrderField));
+	USER_CThostFtdcOrderField order_new;
+	memset(&order_new, 0x00, sizeof(USER_CThostFtdcOrderField));
 	// 添加字段,本次成交量
-	USER_CThostFtdcOrderField *order_new_tmp = new USER_CThostFtdcOrderField();
-	memset(order_new_tmp, 0x00, sizeof(USER_CThostFtdcOrderField));
-	USER_PRINT(order_new);
+	USER_CThostFtdcOrderField order_new_tmp;
+	memset(&order_new_tmp, 0x00, sizeof(USER_CThostFtdcOrderField));
+	
 
 	// 添加本次成交字段VolumeTradedBatch
-	this->add_VolumeTradedBatch(pOrder, order_new);
+	this->add_VolumeTradedBatch(pOrder, &order_new);
 
-	this->CopyNewOrderData(order_new_tmp, order_new);
+	this->CopyNewOrderData(&order_new_tmp, &order_new);
 	
 	// 更新挂单列表，持仓信息
 	this->update_pending_order_list(pOrder);
@@ -3247,10 +3263,10 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	//std::auto_ptr<USER_CThostFtdcOrderField> order_new(new USER_CThostFtdcOrderField);
 
 	// 更新持仓明细列表
-	this->update_position_detail(order_new_tmp);
+	this->update_position_detail(&order_new_tmp);
 
 	// 更新持仓变量
-	this->update_position(order_new);
+	this->update_position(&order_new);
 
 	// 更新标志位
 	this->update_task_status();
@@ -3258,8 +3274,8 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	// 更新tick锁
 	//this->update_tick_lock_status(order_new);
 
-	delete order_new;
-	delete order_new_tmp;
+	//delete order_new;
+	//delete order_new_tmp;
 
 	/// A成交回报,B发送等量的报单
 	if ((!strcmp(pOrder->InstrumentID, this->stg_instrument_id_A.c_str())) && ((pOrder->OrderStatus == '0') || (pOrder->OrderStatus == '1')) && (strlen(pOrder->OrderSysID) != 0)) { //只有全部成交或者部分成交还在队列中
