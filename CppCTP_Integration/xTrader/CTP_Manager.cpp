@@ -1978,8 +1978,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							std::cout << "\t存在UserID = " << (*stg_itor)->getStgUserId() << std::endl;
 							std::cout << "\t存在StrategyID = " << (*stg_itor)->getStgStrategyId() << std::endl;
 							if (((*stg_itor)->getStgUserId() == q_user_id) && ((*stg_itor)->getStgStrategyId() == q_strategy_id)) {
-								std::cout << "\t找到即将修改的Strategy" << std::endl;
-
+								Utils::printGreenColor("找到即将修改的Strategy");
 								//(*stg_itor)->setStgPositionASellToday(object["position_a_sell_today"].GetInt());
 								//(*stg_itor)->setStgPositionBSell(object["position_b_sell"].GetInt());
 								//(*stg_itor)->setStgPositionBSellToday(object["position_b_sell_today"].GetInt());
@@ -2057,8 +2056,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								//(*stg_itor)->setStgPositionABuyToday(object["position_a_buy_today"].GetInt());
 								//(*stg_itor)->setStgPositionASellYesterday(object["position_a_sell_yesterday"].GetInt());
 								
-
-								std::cout << "\tStrategy修改完成!" << std::endl;
+								Utils::printGreenColor("Strategy修改完成!");
 								static_dbm->UpdateStrategy((*stg_itor));
 
 								/*构造内容json*/
@@ -2110,13 +2108,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								
 								//create_info_object.AddMember("position_a_buy", (*stg_itor)->getStgPositionABuy(), allocator);
 								
-								
 								create_info_object.AddMember("trader_id", rapidjson::StringRef((*stg_itor)->getStgTraderId().c_str()), allocator);
 								create_info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator);
-						
-								
-
-
 								/*新增字段*/
 								
 								create_info_object.AddMember("hold_profit", (*stg_itor)->getStgHoldProfit(), allocator);
@@ -2548,7 +2541,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					std::cout << "\t存在StrategyId = " << (*stg_itor)->getStgStrategyId() << std::endl;
 
 					if (((*stg_itor)->getStgUserId() == s_UserID) && ((*stg_itor)->getStgStrategyId() == s_StrategyID)) {
-						std::cout << "\t找到即将删除的Strategy" << std::endl;
+						//std::cout << "\t找到即将删除的Strategy" << std::endl;
+						Utils::printGreenColor("找到即将删除的Strategy");
 						int flag = static_dbm->DeleteStrategy((*stg_itor));
 						int flag_1 = static_dbm->DeleteStrategyYesterday((*stg_itor));
 
@@ -2558,7 +2552,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							build_doc.AddMember("MsgErrorReason", "未找到删除的策略!", allocator);
 						}
 						else {
-							std::cout << "\tStrategy删除完成!" << std::endl;
+							//std::cout << "\tStrategy删除完成!" << std::endl;
+							Utils::printGreenColor("Strategy删除完成!");
 							build_doc.AddMember("MsgResult", 0, allocator);
 							build_doc.AddMember("MsgErrorReason", "", allocator);
 						}
@@ -2948,17 +2943,18 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								std::cout << "\t(*stg_itor)->getStgUserId() = " << (*stg_itor)->getStgUserId() << std::endl;
 								std::cout << "\t(*stg_itor)->getStgStrategyId() = " << (*stg_itor)->getStgStrategyId() << std::endl;
 								if (((*stg_itor)->getStgUserId() == q_user_id) && ((*stg_itor)->getStgStrategyId() == q_strategy_id)) {
-									std::cout << "\t找到即将修改的Strategy" << std::endl;
+									//std::cout << "\t找到即将修改的Strategy" << std::endl;
+									Utils::printGreenColor("找到即将修改的Strategy");
 									isFindStrategy = true;
 									USER_PRINT("判断修改持仓...");
-									/// 交易执行中无法修改持仓
+									/*/// 交易执行中无法修改持仓
 									if ((*stg_itor)->isStgTradeTasking())
 									{
 										USER_PRINT("处于交易中...");
 										Utils::printRedColor("处于交易中无法修改持仓");
 										isStgTradeTasking = true;
 										break;
-									}
+									}*/
 
 									// 如果持仓量有小于0的置为0
 									//(*stg_itor)->calibrate_position();
@@ -3313,7 +3309,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 					if (((*stg_itor)->getStgUserId() == s_UserID) && ((*stg_itor)->getStgStrategyId() == s_StrategyID)) {
 
-						std::cout << "\t找到即将更新的Strategy" << std::endl;
+						//std::cout << "\t" << std::endl;
+						Utils::printGreenColor("找到即将更新的Strategy");
 
 						(*stg_itor)->setOn_Off(i_OnOff);
 
@@ -3326,7 +3323,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 						}
 						else {
-							std::cout << "\t策略开关更新完成!" << std::endl;
+							Utils::printGreenColor("策略开关更新完成!");
 							build_doc.AddMember("MsgResult", 0, allocator);
 							build_doc.AddMember("MsgErrorReason", "", allocator);
 

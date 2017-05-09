@@ -3,6 +3,7 @@
 #include <mutex>
 #include "DBManager.h"
 #include "Debug.h"
+#include "Utils.h"
 
 using namespace std;
 using mongo::BSONArray;
@@ -604,10 +605,10 @@ int DBManager::CreateStrategy(Strategy *stg) {
 	int flag = 0;
 
 	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
-		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str()) << "trading_day" << (stg->getStgTradingDay().c_str())));
+		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str()) << "trading_day" << (stg->getStgTradingDay().c_str()) << "is_active" << true));
 
 	if (count_number > 0) {
-		cout << "\t策略已经存在!!" << endl;
+		std::cout << "\t策略已经存在!!" << std::endl;
 		flag = 1;
 	}
 	else {
@@ -692,12 +693,13 @@ int DBManager::DeleteStrategy(Strategy *stg) {
 		BSON("strategy_id" << stg->getStgStrategyId().c_str() << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
 
 	if (count_number > 0) {
-		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str()) << "is_active" << true), BSON("$set" << BSON("is_active" << false)));
+		this->conn->remove(DB_STRATEGY_COLLECTION, MONGO_QUERY("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str()) << "is_active" << true));
 		USER_PRINT("DBManager::DeleteStrategy ok");
 		flag = 0;
 	}
 	else {
-		cout << "Strategy Not Exists!" << endl;
+		//cout << "Strategy Not Exists!" << endl;
+		Utils::printRedColor("策略不存在!");
 		flag = 1;
 	}
 	return flag;
@@ -1256,11 +1258,12 @@ int DBManager::DeleteStrategyYesterday(Strategy *stg) {
 		BSON("strategy_id" << stg->getStgStrategyId().c_str() << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
 
 	if (count_number > 0) {
-		this->conn->update(DB_STRATEGY_YESTERDAY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true), BSON("$set" << BSON("is_active" << false)));
+		this->conn->remove(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
 		USER_PRINT("DBManager::DeleteStrategy ok");
 	}
 	else {
-		cout << "Strategy ID Not Exists!" << endl;
+		//cout << "Strategy ID Not Exists!" << endl;
+		Utils::printRedColor("策略不存在!");
 		flag = 1;
 	}
 	return flag;
