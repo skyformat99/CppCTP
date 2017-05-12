@@ -2088,78 +2088,78 @@ void Strategy::printStrategyInfoPosition() {
 		<< "B合约总卖:" << this->stg_position_b_sell << std::endl;
 
 	//Utils::printGreenColorWithKV("Trade持仓明细大小", this->getStg_List_Position_Detail_From_Trade()->size());
-	Utils::printGreenColor("Trade持仓明细");
+	//Utils::printGreenColor("Trade持仓明细");
 
-	list<USER_CThostFtdcTradeField *>::iterator posd_itor_trade;
-	// 遍历strategy持仓明细(trade)并保存
-	for (posd_itor_trade = this->getStg_List_Position_Detail_From_Trade()->begin();
-		posd_itor_trade != this->getStg_List_Position_Detail_From_Trade()->end();
-		posd_itor_trade++) {
+	//list<USER_CThostFtdcTradeField *>::iterator posd_itor_trade;
+	//// 遍历strategy持仓明细(trade)并保存
+	//for (posd_itor_trade = this->getStg_List_Position_Detail_From_Trade()->begin();
+	//	posd_itor_trade != this->getStg_List_Position_Detail_From_Trade()->end();
+	//	posd_itor_trade++) {
 
-		//this->dbm->CreatePositionDetail((*posd_itor));
-		
-		std::cout << "\tinstrumentid = " << (*posd_itor_trade)->InstrumentID
-			<< ", orderref = " << (*posd_itor_trade)->OrderRef
-			<< ", userid = " << (*posd_itor_trade)->UserID;
+	//	//this->dbm->CreatePositionDetail((*posd_itor));
+	//	
+	//	std::cout << "\tinstrumentid = " << (*posd_itor_trade)->InstrumentID
+	//		<< ", orderref = " << (*posd_itor_trade)->OrderRef
+	//		<< ", userid = " << (*posd_itor_trade)->UserID;
 
-		if ((*posd_itor_trade)->Direction == '0')
-		{
-			std::cout << ", direction = \033[32m" << (*posd_itor_trade)->Direction << "\033[0m";
-			std::cout << ", volume = \033[32m" << (*posd_itor_trade)->Volume << "\033[0m";
-		}
-		else {
-			std::cout << ", direction = \033[31m" << (*posd_itor_trade)->Direction << "\033[0m";
-			std::cout << ", volume = \033[31m" << (*posd_itor_trade)->Volume << "\033[0m";
-		}
-			 
-			std::cout << ", offsetflag = " << (*posd_itor_trade)->OffsetFlag 
-			<< ", hedgeflag = " << (*posd_itor_trade)->HedgeFlag 
-			<< ", price = " << (*posd_itor_trade)->Price 
-			<< ", tradingday = " << (*posd_itor_trade)->TradingDay 
-			<< ", tradingdayrecord = " << (*posd_itor_trade)->TradingDayRecord 
-			<< ", tradingdate = " << (*posd_itor_trade)->TradeDate 
-			<< ", strategyid = " << (*posd_itor_trade)->StrategyID 
-			<< std::endl;
-	}
+	//	if ((*posd_itor_trade)->Direction == '0')
+	//	{
+	//		std::cout << ", direction = \033[32m" << (*posd_itor_trade)->Direction << "\033[0m";
+	//		std::cout << ", volume = \033[32m" << (*posd_itor_trade)->Volume << "\033[0m";
+	//	}
+	//	else {
+	//		std::cout << ", direction = \033[31m" << (*posd_itor_trade)->Direction << "\033[0m";
+	//		std::cout << ", volume = \033[31m" << (*posd_itor_trade)->Volume << "\033[0m";
+	//	}
+	//		 
+	//		std::cout << ", offsetflag = " << (*posd_itor_trade)->OffsetFlag
+	//		<< ", hedgeflag = " << (*posd_itor_trade)->HedgeFlag 
+	//		<< ", price = " << (*posd_itor_trade)->Price 
+	//		<< ", tradingday = " << (*posd_itor_trade)->TradingDay 
+	//		<< ", tradingdayrecord = " << (*posd_itor_trade)->TradingDayRecord
+	//		<< ", tradingdate = " << (*posd_itor_trade)->TradeDate 
+	//		<< ", strategyid = " << (*posd_itor_trade)->StrategyID 
+	//		<< std::endl;
+	//}
 
-	//Utils::printGreenColorWithKV("Order持仓明细大小", this->getStg_List_Position_Detail_From_Order()->size());
-	Utils::printGreenColor("Order持仓明细");
+	////Utils::printGreenColorWithKV("Order持仓明细大小", this->getStg_List_Position_Detail_From_Order()->size());
+	//Utils::printGreenColor("Order持仓明细");
 
-	list<USER_CThostFtdcOrderField *>::iterator posd_itor;
-	// 遍历strategy持仓明细(order)并保存
-	for (posd_itor = this->getStg_List_Position_Detail_From_Order()->begin();
-		posd_itor != this->getStg_List_Position_Detail_From_Order()->end();
-		posd_itor++) {
-		
-		std::cout << "\tinstrumentid = " << (*posd_itor)->InstrumentID
-			<< ", orderref = " << (*posd_itor)->OrderRef
-			<< ", userid = " << (*posd_itor)->UserID;
+	//list<USER_CThostFtdcOrderField *>::iterator posd_itor;
+	//// 遍历strategy持仓明细(order)并保存
+	//for (posd_itor = this->getStg_List_Position_Detail_From_Order()->begin();
+	//	posd_itor != this->getStg_List_Position_Detail_From_Order()->end();
+	//	posd_itor++) {
+	//	
+	//	std::cout << "\tinstrumentid = " << (*posd_itor)->InstrumentID
+	//		<< ", orderref = " << (*posd_itor)->OrderRef
+	//		<< ", userid = " << (*posd_itor)->UserID;
 
-		if ((*posd_itor)->Direction == '0')
-		{
-			std::cout << ", direction = \033[32m" << (*posd_itor)->Direction << "\033[0m";
-			std::cout << ", volumetradedbatch = \033[32m" << (*posd_itor)->VolumeTradedBatch << "\033[0m";
-		}
-		else {
-			std::cout << ", direction = \033[31m" << (*posd_itor)->Direction << "\033[0m";
-			std::cout << ", volumetradedbatch = \033[31m" << (*posd_itor)->VolumeTradedBatch << "\033[0m";
-		}
+	//	if ((*posd_itor)->Direction == '0')
+	//	{
+	//		std::cout << ", direction = \033[32m" << (*posd_itor)->Direction << "\033[0m";
+	//		std::cout << ", volumetradedbatch = \033[32m" << (*posd_itor)->VolumeTradedBatch << "\033[0m";
+	//	}
+	//	else {
+	//		std::cout << ", direction = \033[31m" << (*posd_itor)->Direction << "\033[0m";
+	//		std::cout << ", volumetradedbatch = \033[31m" << (*posd_itor)->VolumeTradedBatch << "\033[0m";
+	//	}
 
 
-		std::cout << ", comboffsetflag = " << (*posd_itor)->CombOffsetFlag[0]
-			<< ", combhedgeflag = " << (*posd_itor)->CombHedgeFlag[0]
-			<< ", limitprice = " << (*posd_itor)->LimitPrice 
-			<< ", volumetotaloriginal = " << (*posd_itor)->VolumeTotalOriginal 
-			<< ", tradingday = " << (*posd_itor)->TradingDay 
-			<< ", tradingdayrecord = " << (*posd_itor)->TradingDayRecord 
-			<< ", orderstatus = " << (*posd_itor)->OrderStatus 
-			<< ", volumetraded = " << (*posd_itor)->VolumeTraded 
-			<< ", volumetotal = " << (*posd_itor)->VolumeTotal 
-			<< ", insertdate = " << (*posd_itor)->InsertDate 
-			<< ", inserttime = " << (*posd_itor)->InsertTime 
-			<< ", strategyid = " << (*posd_itor)->StrategyID 
-			<< std::endl;
-	}
+	//	std::cout << ", comboffsetflag = " << (*posd_itor)->CombOffsetFlag[0]
+	//		<< ", combhedgeflag = " << (*posd_itor)->CombHedgeFlag[0]
+	//		<< ", limitprice = " << (*posd_itor)->LimitPrice 
+	//		<< ", volumetotaloriginal = " << (*posd_itor)->VolumeTotalOriginal 
+	//		<< ", tradingday = " << (*posd_itor)->TradingDay 
+	//		<< ", tradingdayrecord = " << (*posd_itor)->TradingDayRecord 
+	//		<< ", orderstatus = " << (*posd_itor)->OrderStatus 
+	//		<< ", volumetraded = " << (*posd_itor)->VolumeTraded 
+	//		<< ", volumetotal = " << (*posd_itor)->VolumeTotal 
+	//		<< ", insertdate = " << (*posd_itor)->InsertDate 
+	//		<< ", inserttime = " << (*posd_itor)->InsertTime 
+	//		<< ", strategyid = " << (*posd_itor)->StrategyID 
+	//		<< std::endl;
+	//}
 }
 
 void Strategy::setStgUpdatePositionDetailRecordTime(string stg_update_position_detail_record_time) {

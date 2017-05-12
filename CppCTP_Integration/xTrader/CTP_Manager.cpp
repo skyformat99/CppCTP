@@ -841,6 +841,12 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	list<User *>::iterator future_itor;
 	for (future_itor = ctp_m->getL_User()->begin(); future_itor != ctp_m->getL_User()->end(); future_itor++) {
 
+		// 如果userid和traderid不一致,那么就跳过
+		if ((*future_itor)->getTraderID() != s_TraderID)
+		{
+			continue;
+		}
+
 		rapidjson::Value info_object(rapidjson::kObjectType);
 		info_object.SetObject();
 		info_object.AddMember("brokerid", rapidjson::StringRef((*future_itor)->getBrokerID().c_str()), allocator1);
@@ -1722,6 +1728,12 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 				list<User *>::iterator future_itor;
 				for (future_itor = ctp_m->getL_User()->begin(); future_itor != ctp_m->getL_User()->end(); future_itor++) {
+
+					// 如果userid和traderid不一致,那么就跳过
+					if ((*future_itor)->getTraderID() != s_TraderID)
+					{
+						continue;
+					}
 
 					rapidjson::Value info_object(rapidjson::kObjectType);
 					info_object.SetObject();
@@ -3146,6 +3158,16 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									std::cout << "\tB买(" << (*stg_itor)->getStgPositionBBuy() << ", " << (*stg_itor)->getStgPositionBBuyYesterday() << ")" << std::endl;
 									std::cout << "\tA买(" << (*stg_itor)->getStgPositionABuy() << ", " << (*stg_itor)->getStgPositionABuyYesterday() << ")" << std::endl;
 									std::cout << "\tB卖(" << (*stg_itor)->getStgPositionBSell() << ", " << (*stg_itor)->getStgPositionBSellYesterday() << ")" << std::endl;
+
+									// 如果修改后的仓位均为0,那么直接清空持仓明细(order,trade)
+									if (((*stg_itor)->getStgPositionASell() == 0) &&
+										((*stg_itor)->getStgPositionBBuy() == 0) &&
+										((*stg_itor)->getStgPositionABuy() == 0) &&
+										((*stg_itor)->getStgPositionBSell() == 0)
+										)
+									{
+										(*stg_itor)->clearStgPositionDetail();
+									}
 
 									// 最新修改时间
 									(*stg_itor)->setStgUpdatePositionDetailRecordTime(Utils::getDate());

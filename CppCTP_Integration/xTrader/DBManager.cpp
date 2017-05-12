@@ -693,7 +693,7 @@ int DBManager::DeleteStrategy(Strategy *stg) {
 		BSON("strategy_id" << stg->getStgStrategyId().c_str() << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
 
 	if (count_number > 0) {
-		this->conn->remove(DB_STRATEGY_COLLECTION, MONGO_QUERY("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str()) << "is_active" << true));
+		this->conn->remove(DB_STRATEGY_COLLECTION, MONGO_QUERY("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str())));
 		USER_PRINT("DBManager::DeleteStrategy ok");
 		flag = 0;
 	}
@@ -1258,7 +1258,7 @@ int DBManager::DeleteStrategyYesterday(Strategy *stg) {
 		BSON("strategy_id" << stg->getStgStrategyId().c_str() << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
 
 	if (count_number > 0) {
-		this->conn->remove(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
+		this->conn->remove(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str()));
 		USER_PRINT("DBManager::DeleteStrategy ok");
 	}
 	else {
@@ -1929,6 +1929,7 @@ void DBManager::getAllMarketConfig(list<MarketConfig *> *l_marketconfig) {
 	if (l_marketconfig->size() > 0) {
 		list<MarketConfig *>::iterator market_itor;
 		for (market_itor = l_marketconfig->begin(); market_itor != l_marketconfig->end();) {
+			delete *market_itor;
 			market_itor = l_marketconfig->erase(market_itor);
 		}
 	}
@@ -2257,7 +2258,11 @@ void DBManager::DeletePositionDetail(USER_CThostFtdcOrderField *posd) {
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
-		this->conn->update(DB_POSITIONDETAIL_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
+		//this->conn->update(DB_POSITIONDETAIL_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
+		
+		this->conn->remove(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef));
+
+
 		USER_PRINT("DBManager::DeletePositionDetail ok");
 	}
 	else {
@@ -2443,7 +2448,11 @@ void DBManager::DeletePositionDetailChanged(USER_CThostFtdcOrderField *posd) {
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
-		this->conn->update(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
+		//this->conn->update(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
+
+		this->conn->remove(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, MONGO_QUERY("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef));
+
+
 		USER_PRINT("DBManager::DeletePositionDetailChanged ok");
 	}
 	else {
@@ -2650,7 +2659,10 @@ void DBManager::DeletePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
-		this->conn->update(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
+		//this->conn->update(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
+		
+		this->conn->remove(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, MONGO_QUERY("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef));
+
 		USER_PRINT("DBManager::DeletePositionDetail ok");
 	}
 	else {
@@ -2812,7 +2824,11 @@ void DBManager::DeletePositionDetailTrade(USER_CThostFtdcTradeField *posd) {
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
-		this->conn->update(DB_POSITIONDETAIL_TRADE_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
+		//this->conn->update(DB_POSITIONDETAIL_TRADE_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
+		
+		this->conn->remove(DB_POSITIONDETAIL_TRADE_COLLECTION, MONGO_QUERY("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef));
+
+		
 		USER_PRINT("DBManager::DeletePositionDetailTrade ok");
 	}
 	else {
@@ -2973,7 +2989,10 @@ void DBManager::DeletePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
-		this->conn->update(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
+		//this->conn->update(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
+		
+		this->conn->remove(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, MONGO_QUERY("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef));
+
 		USER_PRINT("DBManager::DeletePositionDetailTradeYesterday ok");
 	}
 	else {
@@ -3155,7 +3174,10 @@ void DBManager::DeletePositionDetailTradeYesterday(USER_CThostFtdcTradeField *po
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
-		this->conn->update(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
+		//this->conn->update(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
+		
+		this->conn->remove(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION, MONGO_QUERY("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef));
+
 		USER_PRINT("DBManager::DeletePositionDetailTradeYesterday ok");
 	}
 	else {
