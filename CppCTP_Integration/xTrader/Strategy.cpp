@@ -2073,19 +2073,38 @@ void Strategy::printStrategyInfo(string message) {
 
 void Strategy::printStrategyInfoPosition() {
 	std::cout << "Strategy::printStrategyInfoPosition()" << std::endl;
-	std::cout << "\tA合约今买:" << this->stg_position_a_buy_today << ", "
+	/*std::cout << "\tA合约今买:" << this->stg_position_a_buy_today << ", "
 		<< "A合约昨买:" << this->stg_position_a_buy_yesterday << ", "
 		<< "A合约总买:" << this->stg_position_a_buy << ", "
 		<< "A合约今卖:" << this->stg_position_a_sell_today << ", "
 		<< "A合约昨卖:" << this->stg_position_a_sell_yesterday << ", "
 		<< "A合约总卖:" << this->stg_position_a_sell << std::endl;
 
-	std::cout << "\tB合约今买:" << this->stg_position_b_buy_today << ", "
+		std::cout << "\tB合约今买:" << this->stg_position_b_buy_today << ", "
 		<< "B合约昨买:" << this->stg_position_b_buy_yesterday << ", "
 		<< "B合约总买:" << this->stg_position_b_buy << ", "
 		<< "B合约今卖:" << this->stg_position_b_sell_today << ", "
 		<< "B合约昨卖:" << this->stg_position_b_sell_yesterday << ", "
-		<< "B合约总卖:" << this->stg_position_b_sell << std::endl;
+		<< "B合约总卖:" << this->stg_position_b_sell << std::endl;*/
+
+	/*std::cout << "\tA合约今买:" << this->stg_position_a_buy_today << ", "
+		<< "A合约昨买:" << this->stg_position_a_buy_yesterday << ", "
+		<< "A合约总买:" << this->stg_position_a_buy << ", "
+		<< "A合约今卖:" << this->stg_position_a_sell_today << ", "
+		<< "A合约昨卖:" << this->stg_position_a_sell_yesterday << ", "
+		<< "A合约总卖:" << this->stg_position_a_sell << std::endl;
+
+		std::cout << "\tB合约今买:" << this->stg_position_b_buy_today << ", "
+		<< "B合约昨买:" << this->stg_position_b_buy_yesterday << ", "
+		<< "B合约总买:" << this->stg_position_b_buy << ", "
+		<< "B合约今卖:" << this->stg_position_b_sell_today << ", "
+		<< "B合约昨卖:" << this->stg_position_b_sell_yesterday << ", "
+		<< "B合约总卖:" << this->stg_position_b_sell << std::endl;*/
+
+	std::cout << "\tA总卖:" << this->stg_position_a_sell << ", A昨卖:" << this->stg_position_a_sell_yesterday << std::endl;
+	std::cout << "\tB总买:" << this->stg_position_b_buy << ", B昨买:" << this->stg_position_b_buy_yesterday << std::endl;
+	std::cout << "\tA总买:" << this->stg_position_a_buy << ", A昨买:" << this->stg_position_a_buy_yesterday << std::endl;
+	std::cout << "\tB总卖:" << this->stg_position_b_sell << ", B昨卖:" << this->stg_position_b_sell_yesterday << std::endl;
 
 	//Utils::printGreenColorWithKV("Trade持仓明细大小", this->getStg_List_Position_Detail_From_Trade()->size());
 	//Utils::printGreenColor("Trade持仓明细");
