@@ -271,23 +271,26 @@ void User::CopyPositionDetailData(CThostFtdcInvestorPositionDetailField *dst, CT
 void User::init_instrument_id_action_counter(string instrument_id) {
 	//初始化为0
 	//this->stg_map_instrument_action_counter->insert(map < string, int >::value_type(instrument_id, 0)); 第一种map插入方法
-	this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0)); //第二种map插入方法
+	this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 1)); //第二种map插入方法
 }
 
 /// 获得合约撤单次数,例如"cu1710":0
 int User::get_instrument_id_action_counter(string instrument_id) {
 	USER_PRINT("User::get_instrument_id_action_counter");
+	std::cout << "User::get_instrument_id_action_counter()" << std::endl;
 	//对某个合约进行加1操作
 	map<string, int>::iterator m_itor;
 	m_itor = this->stg_map_instrument_action_counter->find(instrument_id);
 	if (m_itor == (this->stg_map_instrument_action_counter->end())) {
-		//cout << "撤单列表里不存在该合约 = " << instrument_id << endl;
+		std::cout << "\t撤单列表里不存在该合约 = " << instrument_id << endl;
+		std::cout << "\t撤单次数累计 = " << 0 << std::endl;
 		// this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0));
 		// this->init_instrument_id_action_counter(string(pOrder->InstrumentID));
 		return 0;
 	}
 	else {
-		//cout << "撤单列表里找到该合约 = " << instrument_id << endl;
+		std::cout << "\t撤单合约 = " << instrument_id << std::endl;
+		std::cout << "\t撤单次数累计 = " << m_itor->second << std::endl;
 		return m_itor->second;
 	}
 }
@@ -296,9 +299,12 @@ int User::get_instrument_id_action_counter(string instrument_id) {
 void User::add_instrument_id_action_counter(CThostFtdcOrderField *pOrder) {
 	USER_PRINT("User::add_instrument_id_action_counter");
 
+	//std:cout << "User::add_instrument_id_action_counter()" << std::endl;
+
 	if (strlen(pOrder->OrderSysID) == 0) { //只统计针对交易所编码的order
 		return;
 	}
+
 	if (pOrder->OrderStatus != '5') { //撤单
 		return;
 	}
@@ -308,8 +314,8 @@ void User::add_instrument_id_action_counter(CThostFtdcOrderField *pOrder) {
 		map<string, int>::iterator m_itor;
 		m_itor = this->stg_map_instrument_action_counter->find(string(pOrder->InstrumentID));
 		if (m_itor == (this->stg_map_instrument_action_counter->end())) {
-			//cout << "撤单列表里不存在该合约 = " << pOrder->InstrumentID << endl;
-			//cout << "添加 " << pOrder->InstrumentID << " 合约到列表中..." << endl;
+			std::cout << "\t撤单列表里不存在该合约 = " << pOrder->InstrumentID << std::endl;
+			std::cout << "\t添加 " << pOrder->InstrumentID << " 合约到列表中..." << std::endl;
 			//this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0));
 			this->init_instrument_id_action_counter(string(pOrder->InstrumentID));
 		}
@@ -324,8 +330,10 @@ void User::add_instrument_id_action_counter(CThostFtdcOrderField *pOrder) {
 
 			USER_PRINT((*stg_itor)->getStgInstrumentIdA());
 			USER_PRINT((*stg_itor)->getStgInstrumentIdB());
+
 			USER_PRINT(pOrder->InstrumentID);
 
+			// 如果是A合约
 			if (!strcmp((*stg_itor)->getStgInstrumentIdA().c_str(), pOrder->InstrumentID)) {
 				(*stg_itor)->setStgAOrderActionCount(this->get_instrument_id_action_counter(string(pOrder->InstrumentID)));
 			}

@@ -15,6 +15,16 @@
 #include "Utils.h"
 #include "Debug.h"
 
+#define RED   "\x1B[31m"
+#define GRN   "\x1B[32m"
+#define YEL   "\x1B[33m"
+#define BLU   "\x1B[34m"
+#define MAG   "\x1B[35m"
+#define CYN   "\x1B[36m"
+#define WHT   "\x1B[37m"
+#define RESET "\x1B[0m"
+
+
 //check folder exist
 int Utils::IsFolderExist(const char* path) {
 	DIR *dp;
@@ -282,25 +292,31 @@ string Utils::getYMDYesterdayDate() {
 }
 
 void Utils::printGreenColor(string text) {
-	std::cout << "\t\033[32m" << text << "\033[0m" << std::endl;
+	//std::cout << "\t\033[32m" << text << "\033[0m" << std::endl;
+	printf("\t" GRN "%s" RESET "\n", text.c_str());
 }
 
 void Utils::printRedColor(string text) {
-	std::cout << "\t\033[31m" << text << "\033[0m" << std::endl;
+	//std::cout << "\t\033[31m" << text << "\033[0m" << std::endl;
+	printf("\t" RED "%s" RESET "\n", text.c_str());
 }
 
 void Utils::printGreenColorWithKV(string key, string value) {
-	std::cout << "\t\033[32m" << key << " = " << value << "\033[0m" << std::endl;
+	//std::cout << "\t\033[32m" << key << " = " << value << "\033[0m" << std::endl;
+	printf("\t" GRN "%s = %s" RESET "\n", key.c_str(), value.c_str());
 }
 
 void Utils::printRedColorWithKV(string key, string value) {
-	std::cout << "\t\033[31m" << key << " = " << value << "\033[0m" << std::endl;
+	//std::cout << "\t\033[31m" << key << " = " << value << "\033[0m" << std::endl;
+	printf("\t" RED "%s = %s" RESET "\n", key.c_str(), value.c_str());
 }
 
 void Utils::printGreenColorWithKV(string key, int value) {
-	std::cout << "\t\033[32m" << key << " = " << value << "\033[0m" << std::endl;
+	//std::cout << "\t\033[32m" << key << " = " << value << "\033[0m" << std::endl;
+	printf("\t" GRN "%s = %d" RESET "\n", key.c_str(), value);
 }
 
 void Utils::printRedColorWithKV(string key, int value) {
-	std::cout << "\t\033[31m" << key << " = " << value << "\033[0m" << std::endl;
+	//std::cout << "\t\033[31m" << key << " = " << value << "\033[0m" << std::endl;
+	printf("\t" RED "%s = %d" RESET "\n", key.c_str(), value);
 }

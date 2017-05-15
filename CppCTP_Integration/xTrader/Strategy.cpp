@@ -68,6 +68,8 @@ Strategy::Strategy(User *stg_user) {
 	this->stg_order_algorithm = "";
 	this->stg_a_order_action_tires_limit = 0;
 	this->stg_b_order_action_tires_limit = 0;
+	this->stg_a_order_action_count = 0;
+	this->stg_b_order_action_count = 0;
 	this->stg_trade_model = "";
 	this->stg_hold_profit = 0;				// 持仓盈亏
 	this->stg_close_profit = 0;				// 平仓盈亏
@@ -1689,7 +1691,6 @@ void Strategy::update_task_status() {
 	std::cout << "Strategy::update_task_status() A昨卖 = " << stg_position_a_sell_yesterday << std::endl;
 	std::cout << "Strategy::update_task_status() B昨买 = " << stg_position_b_buy_yesterday << std::endl;*/
 
-	std::cout << "Strategy::update_task_status():" << std::endl;
 	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
 	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
 	std::cout << "\t(this->stg_position_a_buy_today == this->stg_position_b_sell_today)(" << this->stg_position_a_buy_today << ", " << this->stg_position_b_sell_today << ")" << std::endl;
@@ -2068,7 +2069,8 @@ void Strategy::printStrategyInfo(string message) {
 	std::cout << "\t期货账户开关:" << this->stg_user->getOn_Off() << std::endl;
 	std::cout << "\t交易员开关:" << this->stg_user->GetTrader()->getOn_Off() << std::endl;
 	std::cout << "\t策略开关:" << this->getOn_Off() << std::endl;
-	//std::cout << "\t撤单次数:" << this->getStgUser()<< std::endl;
+	std::cout << "\tA合约撤单次数:" << this->getStgAOrderActionCount() << ", A合约撤单限制:" << this->getStgAOrderActionTiresLimit() << std::endl;
+	std::cout << "\tB合约撤单次数:" << this->getStgBOrderActionCount() << ", B合约撤单限制:" << this->getStgBOrderActionTiresLimit() << std::endl;
 }
 
 void Strategy::printStrategyInfoPosition() {
@@ -2422,12 +2424,26 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 	}
 	else { /// 如果没有交易任务，那么选择开始新的交易任务
 
+		// 如果休盘期间
 		if (this->stg_user->getCTP_Manager()->getIsMarketClose())
 		{
 			std::cout << "Strategy::OnRtnDepthMarketData()" << std::endl;
+			Utils::printRedColor("非盘中时间!");
 			Utils::printRedColor("已停止新的任务!");
 			return;
 		}
+
+		// 如果撤单次数用完
+		if ((this->getStgAOrderActionCount() >= this->getStgAOrderActionTiresLimit()) ||
+			(this->getStgBOrderActionCount() >= this->getStgBOrderActionTiresLimit())) {
+			std::cout << "Strategy::OnRtnDepthMarketData()" << std::endl;
+			Utils::printRedColor("撤单次数已超设置值!");
+			std::cout << "\tA合约撤单次数:" << this->getStgAOrderActionCount() << ", A合约撤单限制:" << this->getStgAOrderActionTiresLimit() << std::endl;
+			std::cout << "\tB合约撤单次数:" << this->getStgBOrderActionCount() << ", B合约撤单限制:" << this->getStgBOrderActionTiresLimit() << std::endl;
+			Utils::printRedColor("已停止新的任务!");
+			return;
+		}
+
 
 		if (!stg_select_order_algorithm_flag) {
 			//this->setStgSelectOrderAlgorithmFlag("Strategy::OnRtnDepthMarketData()", true); // 开启下单锁
@@ -2437,7 +2453,6 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		}
 		else
 		{
-			
 			std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
 			std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
 			std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
@@ -3385,9 +3400,9 @@ void Strategy::ExEc_OnRtnTrade(CThostFtdcTradeField *pTrade) {
 		return;
 	}
 
-	USER_CThostFtdcTradeField *new_trade = new USER_CThostFtdcTradeField();
-	this->CopyTradeDataToNew(new_trade, pTrade);
-	this->update_position_detail(new_trade);
+	USER_CThostFtdcTradeField new_trade;
+	this->CopyTradeDataToNew(&new_trade, pTrade);
+	this->update_position_detail(&new_trade);
 
 }
 
@@ -4831,8 +4846,8 @@ void Strategy::setStgTradeTasking(bool stgTradeTasking) {
 	
 	std::cout << "\t期货账号 = " << this->getStgUserId() << std::endl;
 	std::cout << "\t策略编号 = " << this->getStgStrategyId() << std::endl;
-	std::cout << "\tstg_select_order_algorithm_flag = " << this->stg_select_order_algorithm_flag << std::endl;
-	std::cout << "\tstg_trade_tasking = " << stgTradeTasking << std::endl;
+	std::cout << "\t选择下单算法锁 = " << this->stg_select_order_algorithm_flag << std::endl;
+	std::cout << "\t策略执行标志位 = " << this->stg_trade_tasking << std::endl;
 }
 
 void Strategy::setStgTradeTaskingRecovery() {
@@ -4905,8 +4920,8 @@ void Strategy::setStgSelectOrderAlgorithmFlag(string msg, bool stg_select_order_
 	std::cout << "\t时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
 	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
 	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
-	std::cout << "\tstg_select_order_algorithm_flag = " << this->stg_select_order_algorithm_flag << std::endl;
-	std::cout << "\tstg_trade_tasking = " << this->stg_trade_tasking << std::endl;
+	std::cout << "\t选择下单算法锁 = " << this->stg_select_order_algorithm_flag << std::endl;
+	std::cout << "\t策略执行标志位 = " << this->stg_trade_tasking << std::endl;
 }
 
 bool Strategy::getStgSelectOrderAlgorithmFlag() {
@@ -4918,8 +4933,8 @@ bool Strategy::getStgSelectOrderAlgorithmFlag() {
 	std::cout << "\t时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
 	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
 	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
-	std::cout << "\tstg_select_order_algorithm_flag = " << this->stg_select_order_algorithm_flag << std::endl;
-	std::cout << "\tstg_trade_tasking = " << this->stg_trade_tasking << std::endl;
+	std::cout << "\t选择下单算法锁 = " << this->stg_select_order_algorithm_flag << std::endl;
+	std::cout << "\t策略执行标志位 = " << this->stg_trade_tasking << std::endl;
 	return this->stg_select_order_algorithm_flag;
 }
 

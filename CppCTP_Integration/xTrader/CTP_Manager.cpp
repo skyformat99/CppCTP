@@ -1567,8 +1567,6 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 	std::cout << "CTP_Manager::HandleMessage" << std::endl;
 	std::cout << "\t服务端收到的数据 = " << msg_tmp << std::endl;
-	std::cout << "\tCTP管理类地址 = " << ctp_m << std::endl;
-	std::cout << "\t通信文件流标识 = " << fd << std::endl;
 	static_dbm->setIs_Online(ctp_m->getDBManager()->getIs_Online());
 
 	//const char *rsp_msg;
