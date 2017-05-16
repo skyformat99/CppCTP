@@ -28,14 +28,14 @@ std::mutex create_position_detail_mtx;
 
 Strategy::Strategy(User *stg_user) {
 
-	this->on_off = 0;						//开关					
+	this->on_off = 0;						//开关	
+	this->on_off_end_task = false;			//收盘任务默认允许执行
 	this->stg_only_close = 0;				//只能平仓
 	this->sell_open_on_off = 1;				//卖开-开关
 	this->buy_close_on_off = 1;				//买平-开关
 	this->buy_open_on_off = 1;				//买开-开关
 	this->sell_close_on_off = 1;			//卖平-开关
 	this->is_position_right = true;			//仓位是否正确,默认正确
-
 	this->stg_position_a_sell = 0;			//持仓A卖
 	this->stg_position_b_buy = 0;			//持仓B买
 	this->stg_position_a_buy = 0;			//持仓A买
@@ -2306,6 +2306,15 @@ string Strategy::getStgLastSavedTime() {
 	return this->stg_last_saved_time;
 }
 
+//是否允许收盘任务执行
+bool Strategy::getStgOnOffEndTask() {
+	return this->on_off_end_task;
+}
+
+void Strategy::setStgOnOffEndTask(bool on_off_end_task) {
+	this->on_off_end_task = on_off_end_task;
+}
+
 // 获取持仓明细
 list<USER_CThostFtdcOrderField *> *Strategy::getStg_List_Position_Detail_From_Order() {
 	return this->stg_list_position_detail_from_order;
@@ -2397,6 +2406,9 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		USER_PRINT(stg_instrument_B_tick->BidPrice1);
 	}
 	USER_PRINT(this->stg_trade_tasking);
+
+
+
 	/// 如果有交易任务,进入交易任务执行
 	if (this->stg_trade_tasking) {
 		//this->printStrategyInfo("Strategy::OnRtnDepthMarketData() 有交易任务,进入交易任务执行");
@@ -2415,12 +2427,6 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		// 有隐患，改为临时变量
 		//this->Exec_OnTickComing(pDepthMarketData);
 		this->Exec_OnTickComing(&pDepthMarketData_tmp);
-		
-		//收到最后5秒开始强制处理挂单列表命令
-		if (this->stg_user->getCTP_Manager()->getIsStartEndTask()) {
-			//this->finish_pending_order_list();
-		}
-
 	}
 	else { /// 如果没有交易任务，那么选择开始新的交易任务
 
@@ -2430,6 +2436,16 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 			std::cout << "Strategy::OnRtnDepthMarketData()" << std::endl;
 			Utils::printRedColor("非盘中时间!");
 			Utils::printRedColor("已停止新的任务!");
+
+			//收到最后5秒开始强制处理挂单列表命令
+			if (this->stg_user->getCTP_Manager()->getIsStartEndTask()) {
+				if (this->getStgOnOffEndTask())
+				{
+					this->setStgOnOffEndTask(false);
+					this->finish_pending_order_list();
+				}
+			}
+
 			return;
 		}
 

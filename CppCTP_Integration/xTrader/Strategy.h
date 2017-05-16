@@ -481,6 +481,10 @@ public:
 	void setStgLastSavedTime(string stg_last_saved_time);
 	string getStgLastSavedTime();
 
+	//是否允许收盘任务执行
+	bool getStgOnOffEndTask();
+	void setStgOnOffEndTask(bool on_off_end_task);
+
 private:
 	Trader *trader;
 	User *user;
@@ -568,6 +572,7 @@ private:
 	int stg_b_limit_price_shift; // B合约报单偏移
 
 	bool stg_trade_tasking;		// 交易任务进行中
+	bool on_off_end_task;		//是否允许收盘任务执行
 	CThostFtdcInputOrderField *stg_a_order_insert_args;		// a合约报单参数
 	CThostFtdcInputOrderField *stg_b_order_insert_args;		// b合约报单参数
 	list<CThostFtdcOrderField *> *stg_list_order_pending;	// 挂单列表，报单、成交、撤单回报

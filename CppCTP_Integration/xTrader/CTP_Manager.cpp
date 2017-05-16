@@ -4805,7 +4805,16 @@ bool CTP_Manager::getIsMarketClose() {
 
 //系统收盘最后5秒内要完成的收尾工作标志位
 void CTP_Manager::setIsStartEndTask(bool is_start_end_task) {
+	//打开结束任务标志位
 	this->is_start_end_task = is_start_end_task;
+}
+
+void CTP_Manager::StrategyIsStartEndTask() {
+	//打开所有策略的收盘结束任务标志位
+	list<Strategy *>::iterator stg_itor;
+	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
+		(*stg_itor)->setStgOnOffEndTask(true);
+	}
 }
 
 bool CTP_Manager::getIsStartEndTask() {
