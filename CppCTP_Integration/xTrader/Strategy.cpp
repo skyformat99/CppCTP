@@ -2434,16 +2434,18 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		}
 
 		// 如果撤单次数用完
-		if ((this->getStgAOrderActionCount() >= this->getStgAOrderActionTiresLimit()) ||
-			(this->getStgBOrderActionCount() >= this->getStgBOrderActionTiresLimit())) {
-			std::cout << "Strategy::OnRtnDepthMarketData()" << std::endl;
-			Utils::printRedColor("撤单次数已超设置值!");
-			std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
-			std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
-			std::cout << "\tA合约撤单次数:" << this->getStgAOrderActionCount() << ", A合约撤单限制:" << this->getStgAOrderActionTiresLimit() << std::endl;
-			std::cout << "\tB合约撤单次数:" << this->getStgBOrderActionCount() << ", B合约撤单限制:" << this->getStgBOrderActionTiresLimit() << std::endl;
-			Utils::printRedColor("已停止新的任务!");
-			return;
+		if (this->getOn_Off()) {
+			if ((this->getStgAOrderActionCount() > this->getStgAOrderActionTiresLimit()) ||
+				(this->getStgBOrderActionCount() > this->getStgBOrderActionTiresLimit())) {
+				std::cout << "Strategy::OnRtnDepthMarketData()" << std::endl;
+				Utils::printRedColor("撤单次数已超设置值!");
+				std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
+				std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
+				std::cout << "\tA合约撤单次数:" << this->getStgAOrderActionCount() << ", A合约撤单限制:" << this->getStgAOrderActionTiresLimit() << std::endl;
+				std::cout << "\tB合约撤单次数:" << this->getStgBOrderActionCount() << ", B合约撤单限制:" << this->getStgBOrderActionTiresLimit() << std::endl;
+				Utils::printRedColor("已停止新的任务!");
+				return;
+			}
 		}
 
 
