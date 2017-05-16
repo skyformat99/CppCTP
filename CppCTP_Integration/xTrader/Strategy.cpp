@@ -2473,50 +2473,52 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		}
 		else
 		{
-			std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
-			std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
-			std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
-			std::cout << "\ttick锁已上锁 stg_select_order_algorithm_flag = " << this->stg_select_order_algorithm_flag << ")" << std::endl;
-			std::cout << "\t上一个tick系统时间 = " << this->stg_tick_systime_record << std::endl;
-			std::cout << "\t新tick系统时间 = " << new_time << std::endl;
-			if (!CompareTickData(this->stg_instrument_Last_tick, pDepthMarketData)) {
-				std::cout << "\t上一个tick信息 = 交易日:" << stg_instrument_Last_tick->TradingDay
-					<< ", 合约代码:" << stg_instrument_Last_tick->InstrumentID
-					//<< ", 最新价:" << pDepthMarketData->LastPrice
-					//<< ", 持仓量:" << pDepthMarketData->OpenInterest
-					//<< ", 上次结算价:" << pDepthMarketData->PreSettlementPrice 
-					//<< ", 昨收盘:" << pDepthMarketData->PreClosePrice 
-					//<< ", 数量:" << pDepthMarketData->Volume
-					//<< ", 昨持仓量:" << pDepthMarketData->PreOpenInterest
-					<< ", 最后修改时间:" << stg_instrument_Last_tick->UpdateTime
-					<< ", 最后修改毫秒:" << stg_instrument_Last_tick->UpdateMillisec << std::endl;
-				//<< ", 申买价一：" << pDepthMarketData->BidPrice1
-				//<< ", 申买量一:" << pDepthMarketData->BidVolume1
-				//<< ", 申卖价一:" << pDepthMarketData->AskPrice1
-				//<< ", 申卖量一:" << pDepthMarketData->AskVolume1
-				//<< ", 今收盘价:" << pDepthMarketData->ClosePrice
-				//<< ", 当日均价:" << pDepthMarketData->AveragePrice
-				//<< ", 本次结算价格:" << pDepthMarketData->SettlementPrice
-				//<< ", 成交金额:" << pDepthMarketData->Turnover << std::endl;
-				
-				std::cout << "\t新tick信息 = 交易日:" << pDepthMarketData->TradingDay
-					<< ", 合约代码:" << pDepthMarketData->InstrumentID
-					//<< ", 最新价:" << pDepthMarketData->LastPrice
-					//<< ", 持仓量:" << pDepthMarketData->OpenInterest
-					//<< ", 上次结算价:" << pDepthMarketData->PreSettlementPrice 
-					//<< ", 昨收盘:" << pDepthMarketData->PreClosePrice 
-					//<< ", 数量:" << pDepthMarketData->Volume
-					//<< ", 昨持仓量:" << pDepthMarketData->PreOpenInterest
-					<< ", 最后修改时间:" << pDepthMarketData->UpdateTime
-					<< ", 最后修改毫秒:" << pDepthMarketData->UpdateMillisec << std::endl;
-				//<< ", 申买价一：" << pDepthMarketData->BidPrice1
-				//<< ", 申买量一:" << pDepthMarketData->BidVolume1
-				//<< ", 申卖价一:" << pDepthMarketData->AskPrice1
-				//<< ", 申卖量一:" << pDepthMarketData->AskVolume1
-				//<< ", 今收盘价:" << pDepthMarketData->ClosePrice
-				//<< ", 当日均价:" << pDepthMarketData->AveragePrice
-				//<< ", 本次结算价格:" << pDepthMarketData->SettlementPrice
-				//<< ", 成交金额:" << pDepthMarketData->Turnover << std::endl;
+			if (this->getOn_Off()) {
+				std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
+				std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
+				std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
+				std::cout << "\ttick锁已上锁 stg_select_order_algorithm_flag = " << this->stg_select_order_algorithm_flag << ")" << std::endl;
+				std::cout << "\t上一个tick系统时间 = " << this->stg_tick_systime_record << std::endl;
+				std::cout << "\t新tick系统时间 = " << new_time << std::endl;
+				if (!CompareTickData(this->stg_instrument_Last_tick, pDepthMarketData)) {
+					std::cout << "\t上一个tick信息 = 交易日:" << stg_instrument_Last_tick->TradingDay
+						<< ", 合约代码:" << stg_instrument_Last_tick->InstrumentID
+						//<< ", 最新价:" << pDepthMarketData->LastPrice
+						//<< ", 持仓量:" << pDepthMarketData->OpenInterest
+						//<< ", 上次结算价:" << pDepthMarketData->PreSettlementPrice 
+						//<< ", 昨收盘:" << pDepthMarketData->PreClosePrice 
+						//<< ", 数量:" << pDepthMarketData->Volume
+						//<< ", 昨持仓量:" << pDepthMarketData->PreOpenInterest
+						<< ", 最后修改时间:" << stg_instrument_Last_tick->UpdateTime
+						<< ", 最后修改毫秒:" << stg_instrument_Last_tick->UpdateMillisec << std::endl;
+					//<< ", 申买价一：" << pDepthMarketData->BidPrice1
+					//<< ", 申买量一:" << pDepthMarketData->BidVolume1
+					//<< ", 申卖价一:" << pDepthMarketData->AskPrice1
+					//<< ", 申卖量一:" << pDepthMarketData->AskVolume1
+					//<< ", 今收盘价:" << pDepthMarketData->ClosePrice
+					//<< ", 当日均价:" << pDepthMarketData->AveragePrice
+					//<< ", 本次结算价格:" << pDepthMarketData->SettlementPrice
+					//<< ", 成交金额:" << pDepthMarketData->Turnover << std::endl;
+
+					std::cout << "\t新tick信息 = 交易日:" << pDepthMarketData->TradingDay
+						<< ", 合约代码:" << pDepthMarketData->InstrumentID
+						//<< ", 最新价:" << pDepthMarketData->LastPrice
+						//<< ", 持仓量:" << pDepthMarketData->OpenInterest
+						//<< ", 上次结算价:" << pDepthMarketData->PreSettlementPrice 
+						//<< ", 昨收盘:" << pDepthMarketData->PreClosePrice 
+						//<< ", 数量:" << pDepthMarketData->Volume
+						//<< ", 昨持仓量:" << pDepthMarketData->PreOpenInterest
+						<< ", 最后修改时间:" << pDepthMarketData->UpdateTime
+						<< ", 最后修改毫秒:" << pDepthMarketData->UpdateMillisec << std::endl;
+					//<< ", 申买价一：" << pDepthMarketData->BidPrice1
+					//<< ", 申买量一:" << pDepthMarketData->BidVolume1
+					//<< ", 申卖价一:" << pDepthMarketData->AskPrice1
+					//<< ", 申卖量一:" << pDepthMarketData->AskVolume1
+					//<< ", 今收盘价:" << pDepthMarketData->ClosePrice
+					//<< ", 当日均价:" << pDepthMarketData->AveragePrice
+					//<< ", 本次结算价格:" << pDepthMarketData->SettlementPrice
+					//<< ", 成交金额:" << pDepthMarketData->Turnover << std::endl;
+				}
 			}
 		}
 
