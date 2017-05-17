@@ -3754,10 +3754,7 @@ void Strategy::update_position(USER_CThostFtdcOrderField *pOrder) {
 	USER_PRINT(pOrder->InstrumentID);
 	USER_PRINT(this->stg_instrument_id_A);
 	USER_PRINT(this->stg_instrument_id_B);
-
 	//this->printStrategyInfo("Strategy::update_position() 输出VolumeTradedBatch");
-	
-
 	// A成交
 	if (!strcmp(pOrder->InstrumentID, this->stg_instrument_id_A.c_str())) {
 		USER_PRINT(pOrder->CombOffsetFlag[0]);
@@ -4931,19 +4928,21 @@ void Strategy::setStgSelectOrderAlgorithmFlag(string msg, bool stg_select_order_
 		(this->stg_user->getCTP_Manager()->getOn_Off())))
 	{
 		this->stg_select_order_algorithm_flag = stg_select_order_algorithm_flag;
+
+		std::cout << "Strategy::setStgSelectOrderAlgorithmFlag():" << std::endl;
+		std::cout << "\t调用者 = " << msg << std::endl;
+		//std::cout << "====策略状态信息====" << std::endl;
+		std::cout << "\t时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
+		std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
+		std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
+		std::cout << "\t选择下单算法锁 = " << this->stg_select_order_algorithm_flag << std::endl;
+		std::cout << "\t策略执行标志位 = " << this->stg_trade_tasking << std::endl;
 	}
 	else {
 		std::cout << "\t请检查开关再进行stg_select_order_algorithm_flag设置!" << std::endl;
 	}
 
-	std::cout << "Strategy::setStgSelectOrderAlgorithmFlag():" << std::endl;
-	std::cout << "\t调用者 = " << msg << std::endl;
-	//std::cout << "====策略状态信息====" << std::endl;
-	std::cout << "\t时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
-	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
-	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
-	std::cout << "\t选择下单算法锁 = " << this->stg_select_order_algorithm_flag << std::endl;
-	std::cout << "\t策略执行标志位 = " << this->stg_trade_tasking << std::endl;
+	
 }
 
 bool Strategy::getStgSelectOrderAlgorithmFlag() {

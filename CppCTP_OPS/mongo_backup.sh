@@ -1,13 +1,13 @@
 #!/bin/bash
  
-MONGO_DATABASE="your_db_name"
-APP_NAME="your_app_name"
+MONGO_DATABASE="CTP"
+APP_NAME="xts"
 
 MONGO_HOST="127.0.0.1"
 MONGO_PORT="27017"
 TIMESTAMP=`date +%F-%H%M`
 MONGODUMP_PATH="/usr/bin/mongodump"
-BACKUPS_DIR="/home/username/backups/$APP_NAME"
+BACKUPS_DIR="/root/xts_backup/$APP_NAME"
 BACKUP_NAME="$APP_NAME-$TIMESTAMP"
  
 # mongo admin --eval "printjson(db.fsyncLock())"
