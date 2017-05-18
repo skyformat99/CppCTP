@@ -13,7 +13,7 @@
 #include "Session.h"
 
 //转码数组
-char codeDst[90] = { 0 };
+char codeDst[255];
 std::condition_variable cv;
 std::mutex mtx;
 std::mutex position_add_mtx;
@@ -2484,9 +2484,9 @@ bool TdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo) {
 	// 如果ErrorID != 0, 说明收到了错误的响应
 	bool bResult = ((pRspInfo) && (pRspInfo->ErrorID != 0));
 	if (bResult) {
-		codeDst[90] = { 0 };
-		Utils::Gb2312ToUtf8(codeDst, 90, pRspInfo->ErrorMsg, strlen(pRspInfo->ErrorMsg)); // Gb2312ToUtf8
-		cerr << "TdSpi::IsErrorRspInfo() ErrorID = " << pRspInfo->ErrorID << ", ErrorMsg=" << codeDst << endl;
+		codeDst[255] = { 0 };
+		Utils::Gb2312ToUtf8(codeDst, 255, pRspInfo->ErrorMsg, strlen(pRspInfo->ErrorMsg)); // Gb2312ToUtf8
+		cerr << "TdSpi::IsErrorRspInfo() ErrorID = " << pRspInfo->ErrorID << ", ErrorMsg = " << codeDst << endl;
 		/*Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() ErrorID", pRspInfo->ErrorID);
 		Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() ErrorMsg", codeDst);*/
 	}

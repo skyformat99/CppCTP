@@ -1727,8 +1727,8 @@ void Strategy::update_task_status() {
 		this->setStgTradeTasking(true);
 	}
 	//std::cout << "After update this.trade_tasking = " << this->stg_trade_tasking << endl;
-	std::cout << "\t挂单列表长度 = " << this->stg_list_order_pending->size() << std::endl;
-	std::cout << "\t任务执行状态 = " << this->stg_trade_tasking << std::endl;
+	//std::cout << "\t挂单列表长度 = " << this->stg_list_order_pending->size() << std::endl;
+	//std::cout << "\t任务执行状态 = " << this->stg_trade_tasking << std::endl;
 	//update_status_mtx.unlock();
 	USER_PRINT(this->stg_trade_tasking);
 
@@ -1748,7 +1748,7 @@ void Strategy::update_task_status() {
 void Strategy::update_tick_lock_status(USER_CThostFtdcOrderField *pOrder) {
 	std::cout << "Strategy::update_tick_lock_status():" << std::endl;
 	bool flag; // tick锁标志位
-	if (strlen(pOrder->OrderSysID) != 0) { //收到交易所回报
+	if (strlen(pOrder->OrderSysID) != 0) { // 收到交易所回报
 		
 
 		if (pOrder->OrderStatus == '0') { // 全部成交
@@ -2365,49 +2365,19 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 	memset(&pDepthMarketData_tmp, 0x00, sizeof(CThostFtdcDepthMarketDataField));
 	this->CopyTickData(&pDepthMarketData_tmp, pDepthMarketData);
 
-	time_t tt = system_clock::to_time_t(system_clock::now());
-	std::string nowt(std::ctime(&tt));
-	string new_time = Utils::getNowTimeMs();
+	//time_t tt = system_clock::to_time_t(system_clock::now());
+	//std::string nowt(std::ctime(&tt));
+	//string new_time = Utils::getNowTimeMs();
 
-	// Get Own Instrument
-	USER_PRINT(this);
-	USER_PRINT("Strategy::OnRtnDepthMarketData IN");
-	USER_PRINT(this->getStgInstrumentIdA());
-	USER_PRINT(this->getStgInstrumentIdB());
-	USER_PRINT(pDepthMarketData->InstrumentID);
-
-	if (!strcmp(pDepthMarketData->InstrumentID, this->getStgInstrumentIdA().c_str())) {
+	if (!strcmp(pDepthMarketData_tmp.InstrumentID, this->getStgInstrumentIdA().c_str())) {
 		USER_PRINT("stg_instrument_A_tick ask_volume bid_volume");
-		this->CopyTickData(stg_instrument_A_tick, pDepthMarketData);
-		/*std::cout << "stg_instrument_A_tick = " << stg_instrument_A_tick->InstrumentID << endl;
-		std::cout << "stg_instrument_A_tick->AskVolume1 = " << stg_instrument_A_tick->AskVolume1 << endl;
-		std::cout << "stg_instrument_A_tick->BidVolume1 = " << stg_instrument_A_tick->BidVolume1 << endl;
-		std::cout << "stg_instrument_A_tick->AskPrice1 = " << stg_instrument_A_tick->AskPrice1 << endl;
-		std::cout << "stg_instrument_A_tick->BidPrice1 = " << stg_instrument_A_tick->BidPrice1 << endl;*/
-		USER_PRINT(stg_instrument_A_tick->InstrumentID);
-		USER_PRINT(stg_instrument_A_tick->AskVolume1);
-		USER_PRINT(stg_instrument_A_tick->BidVolume1);
-		USER_PRINT(stg_instrument_A_tick->AskPrice1);
-		USER_PRINT(stg_instrument_A_tick->BidPrice1);
+		this->CopyTickData(stg_instrument_A_tick, &pDepthMarketData_tmp);
 	}
-	else if (!strcmp(pDepthMarketData->InstrumentID, this->getStgInstrumentIdB().c_str()))
+	else if (!strcmp(pDepthMarketData_tmp.InstrumentID, this->getStgInstrumentIdB().c_str()))
 	{
 		USER_PRINT("stg_instrument_B_tick ask_volume bid_volume");
-		this->CopyTickData(stg_instrument_B_tick, pDepthMarketData);
-		/*std::cout << "stg_instrument_B_tick = " << stg_instrument_B_tick->InstrumentID << endl;
-		std::cout << "stg_instrument_B_tick->AskVolume1 = " << stg_instrument_B_tick->AskVolume1 << endl;
-		std::cout << "stg_instrument_B_tick->BidVolume1 = " << stg_instrument_B_tick->BidVolume1 << endl;
-		std::cout << "stg_instrument_B_tick->AskPrice1 = " << stg_instrument_B_tick->AskPrice1 << endl;
-		std::cout << "stg_instrument_B_tick->BidPrice1 = " << stg_instrument_B_tick->BidPrice1 << endl;*/
-		USER_PRINT(stg_instrument_B_tick->InstrumentID);
-		USER_PRINT(stg_instrument_B_tick->AskVolume1);
-		USER_PRINT(stg_instrument_B_tick->BidVolume1);
-		USER_PRINT(stg_instrument_B_tick->AskPrice1);
-		USER_PRINT(stg_instrument_B_tick->BidPrice1);
+		this->CopyTickData(stg_instrument_B_tick, &pDepthMarketData_tmp);
 	}
-	USER_PRINT(this->stg_trade_tasking);
-
-
 
 	/// 如果有交易任务,进入交易任务执行
 	if (this->stg_trade_tasking) {
@@ -2427,15 +2397,14 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		// 有隐患，改为临时变量
 		//this->Exec_OnTickComing(pDepthMarketData);
 		this->Exec_OnTickComing(&pDepthMarketData_tmp);
-	}
-	else { /// 如果没有交易任务，那么选择开始新的交易任务
+	} else { /// 如果没有交易任务，那么选择开始新的交易任务
 
 		// 如果休盘期间
 		if (this->stg_user->getCTP_Manager()->getIsMarketClose())
 		{
-			std::cout << "Strategy::OnRtnDepthMarketData()" << std::endl;
+			/*std::cout << "Strategy::OnRtnDepthMarketData()" << std::endl;
 			Utils::printRedColor("非盘中时间!");
-			Utils::printRedColor("已停止新的任务!");
+			Utils::printRedColor("已停止新的任务!");*/
 
 			//收到最后5秒开始强制处理挂单列表命令
 			if (this->stg_user->getCTP_Manager()->getIsStartEndTask()) {
@@ -2445,7 +2414,6 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 					this->finish_pending_order_list();
 				}
 			}
-
 			return;
 		}
 
@@ -2464,61 +2432,20 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 			}
 		}
 
-
+		// 如果选择下单算法锁释放,那么开始新的下单
 		if (!stg_select_order_algorithm_flag) {
 			//this->setStgSelectOrderAlgorithmFlag("Strategy::OnRtnDepthMarketData()", true); // 开启下单锁
 			this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
 			/*std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
 			std::cout << "\t(开启tick锁 stg_select_order_algorithm_flag):(" << this->stg_select_order_algorithm_flag << ")" << std::endl;*/
-		}
-		else
-		{
+		} else {
 			if (this->getOn_Off()) {
 				std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
 				std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
 				std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
 				std::cout << "\ttick锁已上锁 stg_select_order_algorithm_flag = " << this->stg_select_order_algorithm_flag << ")" << std::endl;
-				std::cout << "\t上一个tick系统时间 = " << this->stg_tick_systime_record << std::endl;
-				std::cout << "\t新tick系统时间 = " << new_time << std::endl;
-				if (!CompareTickData(this->stg_instrument_Last_tick, pDepthMarketData)) {
-					std::cout << "\t上一个tick信息 = 交易日:" << stg_instrument_Last_tick->TradingDay
-						<< ", 合约代码:" << stg_instrument_Last_tick->InstrumentID
-						//<< ", 最新价:" << pDepthMarketData->LastPrice
-						//<< ", 持仓量:" << pDepthMarketData->OpenInterest
-						//<< ", 上次结算价:" << pDepthMarketData->PreSettlementPrice 
-						//<< ", 昨收盘:" << pDepthMarketData->PreClosePrice 
-						//<< ", 数量:" << pDepthMarketData->Volume
-						//<< ", 昨持仓量:" << pDepthMarketData->PreOpenInterest
-						<< ", 最后修改时间:" << stg_instrument_Last_tick->UpdateTime
-						<< ", 最后修改毫秒:" << stg_instrument_Last_tick->UpdateMillisec << std::endl;
-					//<< ", 申买价一：" << pDepthMarketData->BidPrice1
-					//<< ", 申买量一:" << pDepthMarketData->BidVolume1
-					//<< ", 申卖价一:" << pDepthMarketData->AskPrice1
-					//<< ", 申卖量一:" << pDepthMarketData->AskVolume1
-					//<< ", 今收盘价:" << pDepthMarketData->ClosePrice
-					//<< ", 当日均价:" << pDepthMarketData->AveragePrice
-					//<< ", 本次结算价格:" << pDepthMarketData->SettlementPrice
-					//<< ", 成交金额:" << pDepthMarketData->Turnover << std::endl;
-
-					std::cout << "\t新tick信息 = 交易日:" << pDepthMarketData->TradingDay
-						<< ", 合约代码:" << pDepthMarketData->InstrumentID
-						//<< ", 最新价:" << pDepthMarketData->LastPrice
-						//<< ", 持仓量:" << pDepthMarketData->OpenInterest
-						//<< ", 上次结算价:" << pDepthMarketData->PreSettlementPrice 
-						//<< ", 昨收盘:" << pDepthMarketData->PreClosePrice 
-						//<< ", 数量:" << pDepthMarketData->Volume
-						//<< ", 昨持仓量:" << pDepthMarketData->PreOpenInterest
-						<< ", 最后修改时间:" << pDepthMarketData->UpdateTime
-						<< ", 最后修改毫秒:" << pDepthMarketData->UpdateMillisec << std::endl;
-					//<< ", 申买价一：" << pDepthMarketData->BidPrice1
-					//<< ", 申买量一:" << pDepthMarketData->BidVolume1
-					//<< ", 申卖价一:" << pDepthMarketData->AskPrice1
-					//<< ", 申卖量一:" << pDepthMarketData->AskVolume1
-					//<< ", 今收盘价:" << pDepthMarketData->ClosePrice
-					//<< ", 当日均价:" << pDepthMarketData->AveragePrice
-					//<< ", 本次结算价格:" << pDepthMarketData->SettlementPrice
-					//<< ", 成交金额:" << pDepthMarketData->Turnover << std::endl;
-				}
+				//std::cout << "\t上一个tick系统时间 = " << this->stg_tick_systime_record << std::endl;
+				//std::cout << "\t新tick系统时间 = " << new_time << std::endl;
 			}
 		}
 
@@ -2526,8 +2453,8 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 		//this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
 	}
 
-	this->CopyTickData(this->stg_instrument_Last_tick, pDepthMarketData);
-	this->stg_tick_systime_record = new_time;
+	this->CopyTickData(this->stg_instrument_Last_tick, &pDepthMarketData_tmp);
+	//this->stg_tick_systime_record = new_time;
 
 	USER_PRINT("Strategy::OnRtnDepthMarketData OUT");
 	//tick_mtx.unlock();
@@ -2536,13 +2463,6 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 //选择下单算法
 void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 	USER_PRINT("Strategy::Select_Order_Algorithm");
-	USER_PRINT(this->stg_trade_tasking);
-	USER_PRINT(this->stg_list_order_pending);
-	USER_PRINT(this->stg_list_order_pending->size());
-	USER_PRINT(this->stg_position_a_sell);
-	USER_PRINT(this->stg_position_b_buy);
-	USER_PRINT(this->stg_position_a_buy);
-	USER_PRINT(this->stg_position_b_sell);
 
 	////如果正在交易,直接返回0
 	//if (this->stg_trade_tasking) {
@@ -2552,30 +2472,28 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 	//}
 	//如果有挂单,返回0
 	if (this->stg_list_order_pending->size() > 0) {
-		USER_PRINT("有挂单,返回");
 		USER_PRINT(this->stg_list_order_pending->size());
 		list<CThostFtdcOrderField *>::iterator itor;
 		for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end(); itor++) {
 			USER_PRINT((*itor)->InstrumentID);
 		}
 		//this->printStrategyInfo("有挂单,返回");
-		std::cout << "Strategy::Select_Order_Algorithm():" << std::endl;
-		std::cout << "\t(有挂单,返回)" << std::endl;
+		//std::cout << "Strategy::Select_Order_Algorithm():" << std::endl;
+		//std::cout << "\t(有挂单,返回)" << std::endl;
 		this->setStgSelectOrderAlgorithmFlag("Strategy::OnRtnDepthMarketData() 有挂单", false); // 关闭下单锁
 		return;
 	}
 
 	if (!((this->stg_position_a_sell == this->stg_position_b_buy) && 
 		(this->stg_position_a_buy == this->stg_position_b_sell))) {
-		USER_PRINT("有撇腿,返回");
 		//this->printStrategyInfo("有撇腿,返回");
 		// 有撇腿
-		std::cout << "Strategy::Select_Order_Algorithm():" << std::endl;
-		std::cout << "\t(有撇腿)" << std::endl;
-		std::cout << "\t当前持仓情况(A卖,B买)(A买,B卖) = (" << this->stg_position_a_sell << ", " <<
+		//std::cout << "Strategy::Select_Order_Algorithm():" << std::endl;
+		//std::cout << "\t(有撇腿)" << std::endl;
+		/*std::cout << "\t当前持仓情况(A卖,B买)(A买,B卖) = (" << this->stg_position_a_sell << ", " <<
 			this->stg_position_b_buy << ")(" <<
 			this->stg_position_a_buy << ", " <<
-			this->stg_position_b_sell << ")" << std::endl;
+			this->stg_position_b_sell << ")" << std::endl;*/
 		this->setStgSelectOrderAlgorithmFlag("Strategy::OnRtnDepthMarketData() 有撇腿", false); // 关闭下单锁
 		return;
 	}
@@ -2661,24 +2579,6 @@ void Strategy::Order_Algorithm_One() {
 		return;
 	}
 
-	/*std::cout << "测试是否是stg_user问题" << std::endl;
-	std::cout << "this->stg_user = " << this->stg_user << std::endl;
-	std::cout << "this->stg_user->getCTP_Manager() = " << this->stg_user->getCTP_Manager() << std::endl;
-	std::cout << "策略开关,期货账户开关,总开关" << std::endl;*/
-	/*if (this->stg_user) {
-		USER_PRINT(this->stg_user);
-		}
-		else {
-		USER_PRINT("CRASH!!!");
-		}*/
-	//USER_PRINT(this->stg_user->getCTP_Manager()->getOn_Off());
-	////为了测试需要打开开关
-	////this->stg_user->getCTP_Manager()->setOn_Off(1);
-	//USER_PRINT(this->getStgStrategyId())
-	//USER_PRINT(this->stg_user->GetTrader()->getOn_Off());
-	//USER_PRINT(this->stg_user->getOn_Off());
-	//USER_PRINT(this->getOn_Off());
-
 
 	/// 策略开关，期货账户开关，交易员开关，系统总开关
 	if (!((this->getOn_Off()) && 
@@ -2693,27 +2593,6 @@ void Strategy::Order_Algorithm_One() {
 		//this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One()_2", false);
 		return;
 	}
-
-	//std::cout << "策略开关,期货账户开关,总开关22222" << std::endl;
-	
-	/*this->printStrategyInfo("价差卖开参数");
-	std::cout << "this->stg_spread_long = " << this->stg_spread_long << std::endl;
-	std::cout << "this->stg_sell_open = " << this->stg_sell_open << std::endl;
-	std::cout << "this->stg_spread_shift = " << this->stg_spread_shift << std::endl;
-	std::cout << "this->stg_a_price_tick = " << this->stg_a_price_tick << std::endl;
-	std::cout << "(this->stg_spread_long >= (this->stg_sell_open + this->stg_spread_shift * this->stg_a_price_tick)) = " << (this->stg_spread_long >= (this->stg_sell_open + this->stg_spread_shift * this->stg_a_price_tick)) << std::endl;*/
-
-
-	/*this->printStrategyInfo("价差卖平参数");
-	std::cout << "this->sell_close_on_off = " << this->sell_close_on_off << std::endl;
-	std::cout << "this->stg_position_a_sell = " << this->stg_position_a_sell << std::endl;
-	std::cout << "this->stg_position_b_buy = " << this->stg_position_b_buy << std::endl;
-	std::cout << "this->stg_position_a_buy = " << this->stg_position_a_buy << std::endl;
-	std::cout << "this->stg_spread_long = " << this->stg_spread_long << std::endl;
-	std::cout << "this->stg_sell_close = " << this->stg_sell_close << std::endl;
-	std::cout << "this->stg_spread_shift = " << this->stg_spread_shift << std::endl;
-	std::cout << "this->stg_a_price_tick = " << this->stg_a_price_tick << std::endl;
-	std::cout << "(this->stg_spread_long >= (this->stg_sell_close + this->stg_spread_shift * this->stg_a_price_tick)) = " << (this->stg_spread_long >= (this->stg_sell_close + this->stg_spread_shift * this->stg_a_price_tick)) << std::endl;*/
 
 	/// 价差卖平(b)
 	if ((this->sell_close_on_off) &&
@@ -4852,17 +4731,18 @@ bool Strategy::isStgTradeTasking() {
 
 void Strategy::setStgTradeTasking(bool stgTradeTasking) {
 	std::cout << "Strategy::setStgTradeTasking()" << std::endl;
-	if (((this->getOn_Off()) &&
+	/*if (((this->getOn_Off()) &&
 		(this->stg_user->getOn_Off()) &&
 		(this->stg_user->GetTrader()->getOn_Off()) &&
 		(this->stg_user->getCTP_Manager()->getOn_Off())))
-	{
+		{
 		this->stg_trade_tasking = stgTradeTasking;
-	}
-	else {
+		}
+		else {
 		std::cout << "\t请检查开关再进行trade_tasking设置!" << std::endl;
-	}
-	
+		}*/
+
+	this->stg_trade_tasking = stgTradeTasking;
 	std::cout << "\t期货账号 = " << this->getStgUserId() << std::endl;
 	std::cout << "\t策略编号 = " << this->getStgStrategyId() << std::endl;
 	std::cout << "\t选择下单算法锁 = " << this->stg_select_order_algorithm_flag << std::endl;
@@ -4919,30 +4799,38 @@ string Strategy::getStgTradingDay() {
 }
 
 void Strategy::setStgSelectOrderAlgorithmFlag(string msg, bool stg_select_order_algorithm_flag) {
+	
 	time_t tt = system_clock::to_time_t(system_clock::now());
 	std::string nowt(std::ctime(&tt));
 
-	if (((this->getOn_Off()) &&
-		(this->stg_user->getOn_Off()) &&
-		(this->stg_user->GetTrader()->getOn_Off()) &&
-		(this->stg_user->getCTP_Manager()->getOn_Off())))
-	{
-		this->stg_select_order_algorithm_flag = stg_select_order_algorithm_flag;
+	//if (((this->getOn_Off()) &&
+	//	(this->stg_user->getOn_Off()) &&
+	//	(this->stg_user->GetTrader()->getOn_Off()) &&
+	//	(this->stg_user->getCTP_Manager()->getOn_Off())))
+	//{
+	//	this->stg_select_order_algorithm_flag = stg_select_order_algorithm_flag;
 
-		std::cout << "Strategy::setStgSelectOrderAlgorithmFlag():" << std::endl;
-		std::cout << "\t调用者 = " << msg << std::endl;
-		//std::cout << "====策略状态信息====" << std::endl;
-		std::cout << "\t时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
-		std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
-		std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
-		std::cout << "\t选择下单算法锁 = " << this->stg_select_order_algorithm_flag << std::endl;
-		std::cout << "\t策略执行标志位 = " << this->stg_trade_tasking << std::endl;
-	}
-	else {
-		std::cout << "\t请检查开关再进行stg_select_order_algorithm_flag设置!" << std::endl;
-	}
+	//	std::cout << "Strategy::setStgSelectOrderAlgorithmFlag():" << std::endl;
+	//	std::cout << "\t调用者 = " << msg << std::endl;
+	//	//std::cout << "====策略状态信息====" << std::endl;
+	//	std::cout << "\t时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
+	//	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
+	//	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
+	//	std::cout << "\t选择下单算法锁 = " << this->stg_select_order_algorithm_flag << std::endl;
+	//	std::cout << "\t策略执行标志位 = " << this->stg_trade_tasking << std::endl;
+	//}
+	//else {
+	//	//std::cout << "\t请检查开关再进行stg_select_order_algorithm_flag设置!" << std::endl;
+	//}
 
-	
+	this->stg_select_order_algorithm_flag = stg_select_order_algorithm_flag;
+	std::cout << "Strategy::setStgSelectOrderAlgorithmFlag():" << std::endl;
+	std::cout << "\t调用者 = " << msg << std::endl;
+	std::cout << "\t时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
+	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
+	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
+	std::cout << "\t选择下单算法锁 = " << this->stg_select_order_algorithm_flag << std::endl;
+	std::cout << "\t策略执行标志位 = " << this->stg_trade_tasking << std::endl;
 }
 
 bool Strategy::getStgSelectOrderAlgorithmFlag() {

@@ -18,8 +18,8 @@
 
 
 //转码数组
-char codeDst_2[90] = { 0 };
-char codeDst_3[150] = { 0 };
+char codeDst_2[255] = { 0 };
+char codeDst_3[255] = { 0 };
 
 User::User(string frontAddress, string BrokerID, string UserID, string Password, string nRequestID, int on_off, string TraderID, string stg_order_ref_base) {
 	this->on_off = on_off;
@@ -881,8 +881,8 @@ void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *
 	b.append("UserProductInfo", pOrder->UserProductInfo);
 	///状态信息
 	///状态信息
-	codeDst_2[90] = { 0 };
-	Utils::Gb2312ToUtf8(codeDst_2, 90, pOrder->StatusMsg, strlen(pOrder->StatusMsg)); // Gb2312ToUtf8
+	codeDst_2[255] = { 0 };
+	Utils::Gb2312ToUtf8(codeDst_2, 255, pOrder->StatusMsg, strlen(pOrder->StatusMsg)); // Gb2312ToUtf8
 	b.append("StatusMsg", codeDst_2);
 	///用户强评标志
 	b.append("UserForceClose", pOrder->UserForceClose);
@@ -1343,8 +1343,8 @@ void User::DB_OnErrRtnOrderAction(mongo::DBClientConnection *conn, CThostFtdcOrd
 	///用户代码
 	b.append("UserID", pOrderAction->UserID);
 	///状态信息
-	codeDst_3[150] = { 0 };
-	Utils::Gb2312ToUtf8(codeDst_3, 150, pOrderAction->StatusMsg, strlen(pOrderAction->StatusMsg)); // Gb2312ToUtf8
+	codeDst_3[255] = { 0 };
+	Utils::Gb2312ToUtf8(codeDst_3, 255, pOrderAction->StatusMsg, strlen(pOrderAction->StatusMsg)); // Gb2312ToUtf8
 	b.append("StatusMsg", codeDst_3);
 	/*///状态信息
 	b.append("StatusMsg", pOrderAction->StatusMsg);*/
