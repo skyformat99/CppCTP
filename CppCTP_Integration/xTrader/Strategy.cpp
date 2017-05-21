@@ -1677,7 +1677,7 @@ int Strategy::getStgSellCloseOnOff() {
 
 /// 更新交易状态
 void Strategy::update_task_status() {
-	std::cout << "Strategy::update_task_status()" << std::endl;
+	//std::cout << "Strategy::update_task_status()" << std::endl;
 	//update_status_mtx.lock();
 	USER_PRINT("Strategy::update_task_status");
 	USER_PRINT(this->stg_trade_tasking);
@@ -1691,13 +1691,15 @@ void Strategy::update_task_status() {
 	std::cout << "Strategy::update_task_status() A昨卖 = " << stg_position_a_sell_yesterday << std::endl;
 	std::cout << "Strategy::update_task_status() B昨买 = " << stg_position_b_buy_yesterday << std::endl;*/
 
-	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
-	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
-	std::cout << "\t(this->stg_position_a_buy_today == this->stg_position_b_sell_today)(" << this->stg_position_a_buy_today << ", " << this->stg_position_b_sell_today << ")" << std::endl;
+	/*std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
+	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;*/
+	//this->getStgUser()->getXtsLogger()->info("\t期货账户: {}", this->stg_user_id);
+	//this->getStgUser()->getXtsLogger()->info("\t策略编号: {}", this->stg_strategy_id);
+	/*std::cout << "\t(this->stg_position_a_buy_today == this->stg_position_b_sell_today)(" << this->stg_position_a_buy_today << ", " << this->stg_position_b_sell_today << ")" << std::endl;
 	std::cout << "\t(this->stg_position_a_buy_yesterday == this->stg_position_b_sell_yesterday)(" << this->stg_position_a_buy_yesterday << ", " << this->stg_position_b_sell_yesterday << ")" << std::endl;
 	std::cout << "\t(this->stg_position_a_sell_today == this->stg_position_b_buy_today)(" << this->stg_position_a_sell_today << ", " << this->stg_position_b_buy_today << ")" << std::endl;
 	std::cout << "\t(this->stg_position_a_sell_yesterday == this->stg_position_b_buy_yesterday)(" << this->stg_position_a_sell_yesterday << ", " << this->stg_position_b_buy_yesterday << ")" << std::endl;
-	std::cout << "\t(this->stg_list_order_pending->size() == 0)(" << this->stg_list_order_pending->size() << ", " << 0 << ")" << std::endl;
+	std::cout << "\t(this->stg_list_order_pending->size() == 0)(" << this->stg_list_order_pending->size() << ", " << 0 << ")" << std::endl;*/
 	
 	
 
@@ -1784,7 +1786,7 @@ void Strategy::update_tick_lock_status(USER_CThostFtdcOrderField *pOrder) {
 			flag = true;
 		}
 
-		std::cout << "\t tick flag = " << flag << std::endl;
+		//std::cout << "\t tick flag = " << flag << std::endl;
 		this->setStgSelectOrderAlgorithmFlag("Strategy::update_tick_lock_status()", flag); // tick锁
 	}
 	else {
@@ -2315,6 +2317,15 @@ void Strategy::setStgOnOffEndTask(bool on_off_end_task) {
 	this->on_off_end_task = on_off_end_task;
 }
 
+// 设置系统xts_logger
+void Strategy::setXtsLogger(std::shared_ptr<spdlog::logger> ptr) {
+	this->xts_logger = ptr;
+}
+
+std::shared_ptr<spdlog::logger> Strategy::getXtsLogger() {
+	return this->xts_logger;
+}
+
 // 获取持仓明细
 list<USER_CThostFtdcOrderField *> *Strategy::getStg_List_Position_Detail_From_Order() {
 	return this->stg_list_position_detail_from_order;
@@ -2440,10 +2451,15 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 			std::cout << "\t(开启tick锁 stg_select_order_algorithm_flag):(" << this->stg_select_order_algorithm_flag << ")" << std::endl;*/
 		} else {
 			if (this->getOn_Off()) {
-				std::cout << "Strategy::OnRtnDepthMarketData():" << std::endl;
-				std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
+				
+				/*std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
 				std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
-				std::cout << "\ttick锁已上锁 stg_select_order_algorithm_flag = " << this->stg_select_order_algorithm_flag << ")" << std::endl;
+				std::cout << "\ttick锁已上锁 stg_select_order_algorithm_flag = " << this->stg_select_order_algorithm_flag << ")" << std::endl;*/
+
+				this->getStgUser()->getXtsLogger()->info("Strategy::OnRtnDepthMarketData():");
+				this->getStgUser()->getXtsLogger()->info("\t期货账户:{}", this->stg_user_id);
+				this->getStgUser()->getXtsLogger()->info("\t策略编号:{}", this->stg_strategy_id);
+				this->getStgUser()->getXtsLogger()->info("\ttick锁已上锁:{}", this->stg_select_order_algorithm_flag);
 				//std::cout << "\t上一个tick系统时间 = " << this->stg_tick_systime_record << std::endl;
 				//std::cout << "\t新tick系统时间 = " << new_time << std::endl;
 			}
@@ -4730,7 +4746,8 @@ bool Strategy::isStgTradeTasking() {
 }
 
 void Strategy::setStgTradeTasking(bool stgTradeTasking) {
-	std::cout << "Strategy::setStgTradeTasking()" << std::endl;
+	//std::cout << "Strategy::setStgTradeTasking()" << std::endl;
+	this->getStgUser()->getXtsLogger()->info("Strategy::setStgTradeTasking()");
 	/*if (((this->getOn_Off()) &&
 		(this->stg_user->getOn_Off()) &&
 		(this->stg_user->GetTrader()->getOn_Off()) &&
@@ -4743,19 +4760,28 @@ void Strategy::setStgTradeTasking(bool stgTradeTasking) {
 		}*/
 
 	this->stg_trade_tasking = stgTradeTasking;
-	std::cout << "\t期货账号 = " << this->getStgUserId() << std::endl;
+	/*std::cout << "\t期货账号 = " << this->getStgUserId() << std::endl;
 	std::cout << "\t策略编号 = " << this->getStgStrategyId() << std::endl;
 	std::cout << "\t选择下单算法锁 = " << this->stg_select_order_algorithm_flag << std::endl;
-	std::cout << "\t策略执行标志位 = " << this->stg_trade_tasking << std::endl;
+	std::cout << "\t策略执行标志位 = " << this->stg_trade_tasking << std::endl;*/
+	this->getStgUser()->getXtsLogger()->info("\t期货账号 = {}", this->getStgUserId());
+	this->getStgUser()->getXtsLogger()->info("\t策略编号 = {}", this->getStgStrategyId());
+	this->getStgUser()->getXtsLogger()->info("\t选择下单算法锁 = {}", this->stg_select_order_algorithm_flag);
+	this->getStgUser()->getXtsLogger()->info("\t交易执行锁 = {}", this->stg_trade_tasking);
 }
 
 void Strategy::setStgTradeTaskingRecovery() {
-	std::cout << "Strategy::setStgTradeTaskingRecovery()" << std::endl;
+	//std::cout << "Strategy::setStgTradeTaskingRecovery()" << std::endl;
+	this->getStgUser()->getXtsLogger()->info("Strategy::setStgTradeTaskingRecovery()");
 	this->stg_trade_tasking = false;
-	std::cout << "\t期货账号 = " << this->getStgUserId() << std::endl;
+	/*std::cout << "\t期货账号 = " << this->getStgUserId() << std::endl;
 	std::cout << "\t策略编号 = " << this->getStgStrategyId() << std::endl;
 	std::cout << "\tstg_select_order_algorithm_flag = " << this->stg_select_order_algorithm_flag << std::endl;
-	std::cout << "\tstg_trade_tasking = " << this->stg_trade_tasking << std::endl;
+	std::cout << "\tstg_trade_tasking = " << this->stg_trade_tasking << std::endl;*/
+	this->getStgUser()->getXtsLogger()->info("\t期货账号 = {}", this->getStgUserId());
+	this->getStgUser()->getXtsLogger()->info("\t策略编号 = {}", this->getStgStrategyId());
+	this->getStgUser()->getXtsLogger()->info("\t选择下单算法锁 = {}", this->stg_select_order_algorithm_flag);
+	this->getStgUser()->getXtsLogger()->info("\t交易执行锁 = {}", this->stg_trade_tasking);
 }
 
 string Strategy::getStgTraderId() {
@@ -4800,8 +4826,8 @@ string Strategy::getStgTradingDay() {
 
 void Strategy::setStgSelectOrderAlgorithmFlag(string msg, bool stg_select_order_algorithm_flag) {
 	
-	time_t tt = system_clock::to_time_t(system_clock::now());
-	std::string nowt(std::ctime(&tt));
+	/*time_t tt = system_clock::to_time_t(system_clock::now());
+	std::string nowt(std::ctime(&tt));*/
 
 	//if (((this->getOn_Off()) &&
 	//	(this->stg_user->getOn_Off()) &&
@@ -4824,26 +4850,42 @@ void Strategy::setStgSelectOrderAlgorithmFlag(string msg, bool stg_select_order_
 	//}
 
 	this->stg_select_order_algorithm_flag = stg_select_order_algorithm_flag;
-	std::cout << "Strategy::setStgSelectOrderAlgorithmFlag():" << std::endl;
-	std::cout << "\t调用者 = " << msg << std::endl;
-	std::cout << "\t时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
-	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
+
+	/*std::cout << "Strategy::setStgSelectOrderAlgorithmFlag():" << std::endl;
+	std::cout << "\t调用者 = " << msg << std::endl;*/
+	//std::cout << "\t时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
+	/*std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
 	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
 	std::cout << "\t选择下单算法锁 = " << this->stg_select_order_algorithm_flag << std::endl;
-	std::cout << "\t策略执行标志位 = " << this->stg_trade_tasking << std::endl;
+	std::cout << "\t策略执行标志位 = " << this->stg_trade_tasking << std::endl;*/
+
+	this->getStgUser()->getXtsLogger()->info("Strategy::setStgSelectOrderAlgorithmFlag():");
+	this->getStgUser()->getXtsLogger()->info("\t期货账号 = {}", this->getStgUserId());
+	this->getStgUser()->getXtsLogger()->info("\t策略编号 = {}", this->getStgStrategyId());
+	this->getStgUser()->getXtsLogger()->info("\t调用者 = {}", msg);
+	this->getStgUser()->getXtsLogger()->info("\t选择下单算法锁 = {}", this->stg_select_order_algorithm_flag);
+	this->getStgUser()->getXtsLogger()->info("\t交易执行锁 = {}", this->stg_trade_tasking);
+
 }
 
 bool Strategy::getStgSelectOrderAlgorithmFlag() {
-	time_t tt = system_clock::to_time_t(system_clock::now());
-	std::string nowt(std::ctime(&tt));
-	this->stg_select_order_algorithm_flag = stg_select_order_algorithm_flag;
-	std::cout << "Strategy::getStgSelectOrderAlgorithmFlag():" << std::endl;
+	/*time_t tt = system_clock::to_time_t(system_clock::now());
+	std::string nowt(std::ctime(&tt));*/
+	//this->stg_select_order_algorithm_flag = stg_select_order_algorithm_flag;
+	//std::cout << "Strategy::getStgSelectOrderAlgorithmFlag():" << std::endl;
 	//std::cout << "====策略状态信息====" << std::endl;
-	std::cout << "\t时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
+	/*std::cout << "\t时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
 	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
 	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
 	std::cout << "\t选择下单算法锁 = " << this->stg_select_order_algorithm_flag << std::endl;
-	std::cout << "\t策略执行标志位 = " << this->stg_trade_tasking << std::endl;
+	std::cout << "\t策略执行标志位 = " << this->stg_trade_tasking << std::endl;*/
+
+	this->getStgUser()->getXtsLogger()->info("Strategy::getStgSelectOrderAlgorithmFlag():");
+	this->getStgUser()->getXtsLogger()->info("\t期货账号 = {}", this->getStgUserId());
+	this->getStgUser()->getXtsLogger()->info("\t策略编号 = {}", this->getStgStrategyId());
+	this->getStgUser()->getXtsLogger()->info("\t选择下单算法锁 = {}", this->stg_select_order_algorithm_flag);
+	this->getStgUser()->getXtsLogger()->info("\t交易执行锁 = {}", this->stg_trade_tasking);
+
 	return this->stg_select_order_algorithm_flag;
 }
 

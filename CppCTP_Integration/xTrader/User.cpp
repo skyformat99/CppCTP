@@ -1818,3 +1818,11 @@ bool User::ComparePositionTotal() {
 
 	return is_same_flag;
 }
+
+// 设置系统xts_logger
+void User::setXtsLogger(std::shared_ptr<spdlog::logger> ptr) {
+	this->xts_logger = ptr;
+}
+std::shared_ptr<spdlog::logger> User::getXtsLogger() {
+	return this->xts_logger;
+}

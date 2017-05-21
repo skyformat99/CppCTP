@@ -4830,6 +4830,15 @@ bool CTP_Manager::getIsMarketCloseDone() {
 	return this->is_market_close_done;
 }
 
+
+// 设置系统xts_logger
+void CTP_Manager::setXtsLogger(std::shared_ptr<spdlog::logger> ptr) {
+	this->xts_logger = ptr;
+}
+std::shared_ptr<spdlog::logger> CTP_Manager::getXtsLogger() {
+	return this->xts_logger;
+}
+
 ///// 初始化昨仓明细
 //bool CTP_Manager::initYesterdayPositionDetail() {
 //	bool flag = false;
@@ -4934,7 +4943,8 @@ bool CTP_Manager::init(bool is_online) {
 
 	bool init_flag = true;
 
-	std::cout << "Trade Server开始初始化..." << std::endl;
+	//std::cout << "Trade Server开始初始化..." << std::endl;
+	this->xts_logger->info("Trade Server开始初始化...");
 
 	/************************************************************************/
 	/* 初始化工作按顺序执行
@@ -4949,7 +4959,7 @@ bool CTP_Manager::init(bool is_online) {
 	//设置盘中还是盘后
 	this->dbm->setIs_Online(is_online);
 
-	std::cout << "\t初始化网络环境完成..." << std::endl;
+	this->xts_logger->info("\t初始化网络环境完成...");
 	if (!this->dbm->getDBConnection()) {
 		std::cout << "\tMongoDB数据库连接有问题..." << std::endl;
 		init_flag = false;
@@ -4959,11 +4969,13 @@ bool CTP_Manager::init(bool is_online) {
 	/// 数据库查询所有的Trader
 	this->dbm->getAllTrader(this->l_trader);
 	this->dbm->getAllObjTrader(this->l_obj_trader);
-	std::cout << "\t初始化交易员完成..." << std::endl;
+	//std::cout << "\t初始化交易员完成..." << std::endl;
+	this->xts_logger->info("\t初始化交易员完成...");
 
 	/// 查询所有的期货账户
 	this->dbm->getAllFutureAccount(this->l_user);
-	std::cout << "\t初始化期货账户完成..." << std::endl;
+	//std::cout << "\t初始化期货账户完成..." << std::endl;
+	this->xts_logger->info("\t初始化期货账户完成...");
 
 	if ((this->l_user->size() <= 0) || (this->l_obj_trader->size() <= 0)) {
 		USER_PRINT("期货账户或者交易员账户为空，未能初始化!");
@@ -4984,13 +4996,15 @@ bool CTP_Manager::init(bool is_online) {
 	//this->dbm->getAllStrategyYesterday(this->l_strategys_yesterday);
 	this->dbm->getAllStrategyYesterdayByActiveUser(this->l_strategys_yesterday, this->l_user);
 	
-	std::cout << "\t初始化策略完成..." << std::endl;
+	//std::cout << "\t初始化策略完成..." << std::endl;
+	this->xts_logger->info("\t初始化策略完成...");
 
 	/// 查询上次系统结束是否正常结束
 	//this->dbm->CheckSystemStartFlag();
 
 	this->system_init_flag = this->dbm->GetSystemRunningStatus();
-	std::cout << "\t系统初始化状态 = " << this->system_init_flag << std::endl;
+	//std::cout << "\t系统初始化状态 = " << this->system_init_flag << std::endl;
+	this->xts_logger->info("\t系统初始化状态 = {}", this->system_init_flag);
 
 	/// 查询昨仓持仓明细(order)
 	this->dbm->getAllPositionDetail(this->l_posdetail);
@@ -5024,6 +5038,7 @@ bool CTP_Manager::init(bool is_online) {
 		USER_PRINT((*user_itor)->getTraderID());
 		(*user_itor)->setCTP_Manager(this); //每个user对象设置CTP_Manager对象
 		(*user_itor)->setDBManager(this->dbm); //每个user对象设置DBManager对象
+		(*user_itor)->setXtsLogger(this->xts_logger);
 
 		for (trader_itor = this->l_obj_trader->begin(); trader_itor != this->l_obj_trader->end(); trader_itor++) {
 			USER_PRINT((*trader_itor)->getTraderID());
@@ -5032,7 +5047,8 @@ bool CTP_Manager::init(bool is_online) {
 			}
 		}
 	}
-	std::cout << "\t初始化交易员,期货账户绑定完成..." << std::endl;
+	//std::cout << "\t初始化交易员,期货账户绑定完成..." << std::endl;
+	this->xts_logger->info("\t初始化交易员,期货账户绑定完成...");
 
 	/// 绑定期货账户和策略
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
@@ -5049,7 +5065,8 @@ bool CTP_Manager::init(bool is_online) {
 			}
 		}
 	}
-	std::cout << "\t初始化期货账户,策略绑定完成..." << std::endl;
+	//std::cout << "\t初始化期货账户,策略绑定完成..." << std::endl;
+	this->xts_logger->info("\t初始化期货账户,策略绑定完成...");
 
 	/*/// 设置时间
 	this->setTradingDay(this->l_user->front()->getUserTradeSPI()->getTradingDay());*/
@@ -5064,7 +5081,8 @@ bool CTP_Manager::init(bool is_online) {
 		init_flag = false;
 		return init_flag;
 	}
-	std::cout << "\t初始化行情完成..." << std::endl;
+	//std::cout << "\t初始化行情完成..." << std::endl;
+	this->xts_logger->info("\t初始化行情完成...");
 
 	/// 如果是新的交易日，更新策略，今昨持仓量以及期货账户报单引用
 	if (!(this->initStrategyAndFutureAccount())) {
@@ -5075,7 +5093,8 @@ bool CTP_Manager::init(bool is_online) {
 	}
 	else {
 		USER_PRINT("策略，仓位完成...");
-		std::cout << "\t初始化策略,仓位完成..." << std::endl;
+		//std::cout << "\t初始化策略,仓位完成..." << std::endl;
+		this->xts_logger->info("\t初始化策略,仓位完成...");
 	}
 
 	
@@ -5102,8 +5121,9 @@ bool CTP_Manager::init(bool is_online) {
 		//sleep(3);
 	}
 
-	std::cout << "\t主线程ID = " << std::this_thread::get_id() << std::endl;
-	std::cout << "\t主线程设置子线程分离..." << std::endl;
+	/*std::cout << "\t主线程ID = " << std::this_thread::get_id() << std::endl;
+	std::cout << "\t主线程设置子线程分离..." << std::endl;*/
+
 	/// 设置线程分离
 	for (auto& t: this->user_threads)
 	{
@@ -5116,7 +5136,7 @@ bool CTP_Manager::init(bool is_online) {
 		/// 初始值为true,一旦有账户不满足初始化完成条件，置false操作
 		is_all_user_finished_init = true;
 		/// 检查USER初始化是否完成
-		std::cout << "\t主线程ID = " << std::this_thread::get_id() << std::endl;
+		//std::cout << "\t主线程ID = " << std::this_thread::get_id() << std::endl;
 		std::cout << "\t检查期货账户登录状态" << std::endl;
 
 		for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User

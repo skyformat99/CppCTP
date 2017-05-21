@@ -13,8 +13,13 @@
 #include "PositionDetail.h"
 #include "xTradeStruct.h"
 #include "Timer.h"
+#include <spdlog/spdlog.h>
+using namespace spdlog;
+using spdlog::logger;
 
 using std::map;
+
+
 class MdSpi;
 
 class CTP_Manager {
@@ -214,6 +219,11 @@ public:
 	void setIsMarketCloseDone(bool is_market_close_done);
 	bool getIsMarketCloseDone();
 
+	// …Ë÷√œµÕ≥xts_logger
+	void setXtsLogger(std::shared_ptr<spdlog::logger> ptr);
+	std::shared_ptr<spdlog::logger> getXtsLogger();
+
+
 private:
 	//Login *login;
 	list<string> *l_instrument;
@@ -251,5 +261,6 @@ private:
 	static bool one_min_flag;
 	static bool one_second_flag;
 	bool system_init_flag;
+	std::shared_ptr<spdlog::logger> xts_logger;
 };
 #endif

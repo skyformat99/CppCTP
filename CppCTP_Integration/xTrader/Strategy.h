@@ -6,6 +6,9 @@
 #include "Debug.h"
 #include "DBManager.h"
 #include "xTradeStruct.h"
+#include <spdlog/spdlog.h>
+using namespace spdlog;
+using spdlog::logger;
 
 using std::list;
 class DBManager;
@@ -485,6 +488,10 @@ public:
 	bool getStgOnOffEndTask();
 	void setStgOnOffEndTask(bool on_off_end_task);
 
+	// 设置系统xts_logger
+	void setXtsLogger(std::shared_ptr<spdlog::logger> ptr);
+	std::shared_ptr<spdlog::logger> getXtsLogger();
+
 private:
 	Trader *trader;
 	User *user;
@@ -594,6 +601,7 @@ private:
 	
 	bool init_finished;
 	bool is_position_right;				//仓位是否正确,是否需要调整仓位
+	std::shared_ptr<spdlog::logger> xts_logger;
 
 };
 

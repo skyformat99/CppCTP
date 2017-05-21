@@ -14,6 +14,9 @@
 #include "CTP_Manager.h"
 #include "Session.h"
 #include "xTradeStruct.h"
+#include <spdlog/spdlog.h>
+using namespace spdlog;
+using spdlog::logger;
 
 using namespace mongo;
 using namespace std;
@@ -167,7 +170,9 @@ public:
 	// 对比本地维护持仓结果与CTP API返回持仓对比结果
 	bool ComparePositionTotal();
 
-
+	// 设置系统xts_logger
+	void setXtsLogger(std::shared_ptr<spdlog::logger> ptr);
+	std::shared_ptr<spdlog::logger> getXtsLogger();
 
 private:
 	int on_off; //开关
@@ -205,6 +210,7 @@ private:
 	list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_local_order;
 	list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_local_trade;
 	bool thread_init_status;
+	std::shared_ptr<spdlog::logger> xts_logger;
 };
 
 #endif

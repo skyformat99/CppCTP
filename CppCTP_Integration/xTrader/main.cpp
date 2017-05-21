@@ -16,6 +16,7 @@
 #include <pthread.h>
 #include <errno.h>
 #include <arpa/inet.h>  // inet_ntoa
+#include <spdlog/spdlog.h>
 
 #include "ThostFtdcTraderApi.h"
 #include "TdSpi.h"
@@ -34,6 +35,7 @@
 using std::cout;
 using std::cin;
 using namespace rapidjson;
+using namespace spdlog;
 
 /*宏定义*/
 #define MAXCONNECTIONS 100
@@ -494,12 +496,33 @@ int main(int argc, char *argv[]) {
 
 	signal(SIGPIPE, SIG_IGN);
 
+	std::shared_ptr<spdlog::logger> xts_logger = NULL;
+
+	try
+	{
+		// 设置缓冲区大小
+		spdlog::set_async_mode(8);
+		// 创建日志文件
+		xts_logger = spdlog::daily_logger_st("async_file_logger", "logs/async_log.txt");
+
+		xts_logger->info("hello, world");
+		// Release and close all loggers
+		//spdlog::drop_all();
+
+	}
+	catch (const spdlog::spdlog_ex& ex)
+	{
+		std::cout << "Log初始化失败,错误:" << ex.what() << std::endl;
+		exit(1);
+	}
+
 	// 初始化mongoDB
 	mongo::client::initialize();
 
 	// 初始化CTP_Manager
 	ctp_m = new CTP_Manager();
 
+	ctp_m->setXtsLogger(xts_logger);
 	
 	bool init_flag = true;
 
