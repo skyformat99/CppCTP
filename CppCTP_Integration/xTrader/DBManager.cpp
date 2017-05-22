@@ -2551,7 +2551,7 @@ void DBManager::getAllPositionDetailChanged(list<USER_CThostFtdcOrderField *> *l
 		strcpy(new_pos->StrategyID, p.getStringField("strategyid"));
 		new_pos->VolumeTradedBatch = p.getIntField("volumetradedbatch");
 
-		cout << "\t*instrumentid = " << p.getStringField("instrumentid") << ", ";
+		/*cout << "\t*instrumentid = " << p.getStringField("instrumentid") << ", ";
 		cout << "orderref = " << p.getStringField("orderref") << ", ";
 		cout << "userid = " << p.getStringField("userid") << ", ";
 		cout << "direction = " << p.getIntField("direction") << ", ";
@@ -2567,7 +2567,7 @@ void DBManager::getAllPositionDetailChanged(list<USER_CThostFtdcOrderField *> *l
 		cout << "insertdate = " << p.getStringField("insertdate") << ", ";
 		cout << "inserttime = " << p.getStringField("inserttime") << ", ";
 		cout << "strategyid = " << p.getStringField("strategyid") << ", ";
-		cout << "volumetradedbatch = " << p.getIntField("volumetradedbatch") << std::endl;
+		cout << "volumetradedbatch = " << p.getIntField("volumetradedbatch") << std::endl;*/
 
 		l_posd->push_back(new_pos);
 	}
@@ -2584,24 +2584,24 @@ void DBManager::DropPositionDetailChanged() {
 //根据策略,删除策略对应的order,trade持仓明细
 bool DBManager::DeletePositionDetailChangedByStrategy(Strategy *stg) {
 	USER_PRINT("DBManager::DeletePositionDetailChangedByStrategy");
-	std::cout << "DBManager::DeletePositionDetailChangedByStrategy()" << std::endl;
+	//std::cout << "DBManager::DeletePositionDetailChangedByStrategy()" << std::endl;
 	bool flag = true;
 	int count_number = this->conn->count(DB_STRATEGY_COLLECTION,
 		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str()) << "trading_day" << (stg->getStgTradingDay().c_str()) << "is_active" << true));
 
 	if (count_number > 0) {
-		std::cout << "\t策略存在,开始删除对应策略持仓明细" << std::endl;
+		/*std::cout << "\t策略存在,开始删除对应策略持仓明细" << std::endl;
 		std::cout << "\t策略存在,开始删除持仓明细changed order" << std::endl;
 		std::cout << "\tstrategyid = " << stg->getStgStrategyId() << std::endl;
-		std::cout << "\tuserid = " << stg->getStgUserId() << std::endl;
+		std::cout << "\tuserid = " << stg->getStgUserId() << std::endl;*/
 
 		this->conn->remove(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, MONGO_QUERY("strategyid" << stg->getStgStrategyId().c_str() << "userid" << stg->getStgUserId().c_str() << "is_active" << ISACTIVE));
-		std::cout << "\t策略存在,开始删除持仓明细changed trade" << std::endl;
+		//std::cout << "\t策略存在,开始删除持仓明细changed trade" << std::endl;
 		this->conn->remove(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, MONGO_QUERY("strategyid" << stg->getStgStrategyId().c_str() << "userid" << stg->getStgUserId().c_str() << "is_active" << ISACTIVE));
 		flag = true;
 	}
 	else {
-		cout << "\t策略不存在!!" << endl;
+		//cout << "\t策略不存在!!" << endl;
 		flag = false;
 	}
 
@@ -2794,21 +2794,21 @@ void DBManager::DropPositionDetailYesterday() {
 //根据策略,删除策略对应的order,trade持仓明细
 bool DBManager::DeletePositionDetailByStrategy(Strategy *stg) {
 	USER_PRINT("DBManager::DeletePositionDetailByStrategy");
-	std::cout << "DBManager::DeletePositionDetailByStrategy()" << std::endl;
+	//std::cout << "DBManager::DeletePositionDetailByStrategy()" << std::endl;
 	bool flag = true;
 	int count_number = this->conn->count(DB_STRATEGY_COLLECTION,
 		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str()) << "trading_day" << (stg->getStgTradingDay().c_str()) << "is_active" << true));
 
 	if (count_number > 0) {
-		std::cout << "\t策略存在,开始删除对应策略持仓明细" << std::endl;
-		std::cout << "\t策略存在,开始删除持仓明细order" << std::endl;
+		/*std::cout << "\t策略存在,开始删除对应策略持仓明细" << std::endl;
+		std::cout << "\t策略存在,开始删除持仓明细order" << std::endl;*/
 		this->conn->remove(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("strategyid" << stg->getStgStrategyId().c_str() << "userid" << stg->getStgUserId().c_str() << "is_active" << ISACTIVE));
-		std::cout << "\t策略存在,开始删除持仓明细trade" << std::endl;
+		//std::cout << "\t策略存在,开始删除持仓明细trade" << std::endl;
 		this->conn->remove(DB_POSITIONDETAIL_TRADE_COLLECTION, MONGO_QUERY("strategyid" << stg->getStgStrategyId().c_str() << "userid" << stg->getStgUserId().c_str() << "is_active" << ISACTIVE));
 		flag = true;
 	}
 	else {
-		cout << "\t策略不存在!!" << endl;
+		//cout << "\t策略不存在!!" << endl;
 		flag = false;
 	}
 
@@ -3081,7 +3081,7 @@ void DBManager::getAllPositionDetailTradeChanged(list<USER_CThostFtdcTradeField 
 		strcpy(new_pos->StrategyID, p.getStringField("strategyid"));
 		new_pos->Volume = p.getIntField("volume");
 
-		cout << "\t*instrumentid = " << p.getStringField("instrumentid") << ", ";
+		/*cout << "\t*instrumentid = " << p.getStringField("instrumentid") << ", ";
 		cout << "orderref = " << p.getStringField("orderref") << ", ";
 		cout << "userid = " << p.getStringField("userid") << ", ";
 		cout << "direction = " << p.getIntField("direction") << ", ";
@@ -3092,7 +3092,7 @@ void DBManager::getAllPositionDetailTradeChanged(list<USER_CThostFtdcTradeField 
 		cout << "tradingdayrecord = " << p.getStringField("tradingdayrecord") << ", ";
 		cout << "tradedate = " << p.getIntField("tradedate") << ", ";
 		cout << "strategyid = " << p.getStringField("strategyid") << ", ";
-		cout << "volume = " << p.getIntField("volume") << std::endl;
+		cout << "volume = " << p.getIntField("volume") << std::endl;*/
 
 		l_posd->push_back(new_pos);
 	}

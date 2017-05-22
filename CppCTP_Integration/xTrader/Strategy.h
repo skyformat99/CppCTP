@@ -297,16 +297,16 @@ public:
 	void update_pending_order_list(CThostFtdcOrderField *pOrder);
 
 	/// 更新持仓量(Order)
-	void update_position(CThostFtdcOrderField *pOrder);
+	//void update_position(CThostFtdcOrderField *pOrder);
 
 	/// 更新持仓量(UserOrder)
 	void update_position(USER_CThostFtdcOrderField *pOrder);
 	
 	/// 更新持仓量(Trade)
-	void update_position(CThostFtdcTradeField *pTrade);
+	//void update_position(CThostFtdcTradeField *pTrade);
 
 	/// 更新持仓明细(Trade)
-	void update_position_detail(CThostFtdcTradeField *pTrade);
+	//void update_position_detail(CThostFtdcTradeField *pTrade);
 
 	/// 更新自定义持仓明细结构(Order)
 	void update_position_detail(USER_CThostFtdcOrderField *pOrder);

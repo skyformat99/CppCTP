@@ -1996,7 +1996,7 @@ void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcR
 	if ((this->IsErrorRspInfo(pRspInfo))) {
 		if (pInputOrder) {
 
-			std::cout << "TdSpi::OnRspOrderInsert()" << endl;
+			/*std::cout << "TdSpi::OnRspOrderInsert()" << endl;
 			std::cout << "=================================================================================" << endl;
 			///经纪公司代码
 			std::cout << "经纪公司代码:" << pInputOrder->BrokerID << ", ";
@@ -2044,8 +2044,9 @@ void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcR
 			std::cout << "用户强评标志:" << pInputOrder->UserForceClose << ", ";
 			///互换单标志
 			std::cout << "互换单标志:" << pInputOrder->IsSwapOrder << endl;
-			std::cout << "=================================================================================" << endl;
-			this->current_user->DB_OnRspOrderInsert(this->current_user->GetOrderConn(), pInputOrder);
+			std::cout << "=================================================================================" << endl;*/
+			
+			//this->current_user->DB_OnRspOrderInsert(this->current_user->GetOrderConn(), pInputOrder);
 
 			string temp(pInputOrder->OrderRef);
 			string result = temp.substr(0, 1);
@@ -2486,7 +2487,9 @@ bool TdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo) {
 	if (bResult) {
 		codeDst[255] = { 0 };
 		Utils::Gb2312ToUtf8(codeDst, 255, pRspInfo->ErrorMsg, strlen(pRspInfo->ErrorMsg)); // Gb2312ToUtf8
-		cerr << "TdSpi::IsErrorRspInfo() ErrorID = " << pRspInfo->ErrorID << ", ErrorMsg = " << codeDst << endl;
+		//cerr << "TdSpi::IsErrorRspInfo() ErrorID = " << pRspInfo->ErrorID << ", ErrorMsg = " << codeDst << endl;
+		Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() ErrorID = ", pRspInfo->ErrorID);
+		Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() ErrorMsg = ", codeDst);
 		/*Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() ErrorID", pRspInfo->ErrorID);
 		Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() ErrorMsg", codeDst);*/
 	}

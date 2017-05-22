@@ -92,9 +92,6 @@ public:
 	bool getOneSecondFlag();
 	void setOneSecondFlag(bool one_second_flag);
 
-
-
-
 	/// 得到l_trader
 	list<string> *getL_Trader();
 
@@ -219,10 +216,9 @@ public:
 	void setIsMarketCloseDone(bool is_market_close_done);
 	bool getIsMarketCloseDone();
 
-	// 设置系统xts_logger
-	void setXtsLogger(std::shared_ptr<spdlog::logger> ptr);
+	//// 设置系统xts_logger
+	//void setXtsLogger(std::shared_ptr<spdlog::logger> ptr);
 	std::shared_ptr<spdlog::logger> getXtsLogger();
-
 
 private:
 	//Login *login;

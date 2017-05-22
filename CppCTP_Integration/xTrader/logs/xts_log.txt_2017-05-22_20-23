@@ -1,0 +1,345 @@
+[2017-05-22 20:23:37.299] [xts_async_logger] [info] Trade Server开始初始化...
+[2017-05-22 20:23:37.299] [xts_async_logger] [info] 	初始化网络环境完成...
+[2017-05-22 20:23:37.302] [xts_async_logger] [info] 	初始化交易员完成...
+[2017-05-22 20:23:37.304] [xts_async_logger] [info] 	初始化期货账户完成...
+[2017-05-22 20:23:37.318] [xts_async_logger] [info] 	初始化策略完成...
+[2017-05-22 20:23:37.318] [xts_async_logger] [info] 	系统初始化状态 = true
+[2017-05-22 20:23:37.320] [xts_async_logger] [info] 	初始化交易员,期货账户绑定完成...
+[2017-05-22 20:23:37.320] [xts_async_logger] [info] 	初始化期货账户,策略绑定完成...
+[2017-05-22 20:23:39.373] [xts_async_logger] [info] 	初始化行情完成...
+[2017-05-22 20:23:39.375] [xts_async_logger] [info] 	初始化策略,仓位完成...
+[2017-05-22 20:23:39.376] [xts_async_logger] [info] 	检查期货账户登录状态...
+[2017-05-22 20:23:41.376] [xts_async_logger] [info] 	检查期货账户登录状态...
+[2017-05-22 20:23:43.377] [xts_async_logger] [info] 	检查期货账户登录状态...
+[2017-05-22 20:23:45.377] [xts_async_logger] [info] 	检查期货账户登录状态...
+[2017-05-22 20:23:45.377] [xts_async_logger] [info] 	账户初始化完成,进入登录检查...
+[2017-05-22 20:23:45.377] [xts_async_logger] [info] 	初始化期货账户和策略绑定完成...
+[2017-05-22 20:23:49.379] [xts_async_logger] [info] 	初始化合约最小跳价格完成...
+[2017-05-22 20:23:49.379] [xts_async_logger] [info] 	行情订阅已初始化!
+[2017-05-22 20:24:08.598] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:24:08.598] [xts_async_logger] [info] 	服务端收到的数据 = {"MsgSendFlag": 0, "MsgRef": 1, "MsgType": 1, "MsgSrc": 0, "TraderID": "1601", "Password": "123456"}
+[2017-05-22 20:24:38.459] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:24:38.459] [xts_async_logger] [info] 	服务端收到的数据 = {"MsgSendFlag": 0, "MsgRef": 2, "MsgType": 12, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "01", "Info": [{"position_b_buy_yesterday": 20, "position_b_buy": 20, "position_a_buy": 0, "position_b_buy_today": 0, "position_b_sell": 0, "position_a_sell_today": 0, "position_b_sell_yesterday": 0, "position_a_sell": 20, "position_b_sell_today": 0, "position_a_sell_yesterday": 20, "position_a_buy_yesterday": 0, "strategy_id": "01", "trader_id": "1601", "user_id": "091921", "position_a_buy_today": 0}]}
+[2017-05-22 20:24:38.459] [xts_async_logger] [info] 	请求策略持仓修改...
+[2017-05-22 20:24:38.459] [xts_async_logger] [info] 	收到交易员ID = 1601
+[2017-05-22 20:24:38.459] [xts_async_logger] [info] 	收到期货账户ID = 091921
+[2017-05-22 20:24:38.459] [xts_async_logger] [info] 	修改之前的仓位:
+[2017-05-22 20:24:38.459] [xts_async_logger] [info] 	A卖(20, 20)
+[2017-05-22 20:24:38.459] [xts_async_logger] [info] 	B买(20, 20)
+[2017-05-22 20:24:38.459] [xts_async_logger] [info] 	A买(0, 0)
+[2017-05-22 20:24:38.459] [xts_async_logger] [info] 	B卖(0, 0)
+[2017-05-22 20:24:38.459] [xts_async_logger] [info] 	修改之后的仓位:
+[2017-05-22 20:24:38.459] [xts_async_logger] [info] 	A卖(20, 20)
+[2017-05-22 20:24:38.459] [xts_async_logger] [info] 	B买(20, 20)
+[2017-05-22 20:24:38.459] [xts_async_logger] [info] 	A买(0, 0)
+[2017-05-22 20:24:38.459] [xts_async_logger] [info] 	B卖(0, 0)
+[2017-05-22 20:24:38.463] [xts_async_logger] [info] CTP_Manager::saveStrategyPositionDetail()
+[2017-05-22 20:24:38.464] [xts_async_logger] [info] 	保存期货账户 = 091921
+[2017-05-22 20:24:38.464] [xts_async_logger] [info] 	保存策略ID = 01
+[2017-05-22 20:24:38.464] [xts_async_logger] [info] 	保存策略order持仓明细长度 = 40
+[2017-05-22 20:24:38.464] [xts_async_logger] [info] 	保存策略trade持仓明细长度 = 40
+[2017-05-22 20:24:38.495] [xts_async_logger] [info] CTP_Manager::saveStrategyChangedPositionDetail()
+[2017-05-22 20:24:38.496] [xts_async_logger] [info] 	保存期货账户 = 091921
+[2017-05-22 20:24:38.496] [xts_async_logger] [info] 	保存策略ID = 01
+[2017-05-22 20:24:38.496] [xts_async_logger] [info] 	保存策略order持仓明细长度 = 40
+[2017-05-22 20:24:38.496] [xts_async_logger] [info] 	保存策略trade持仓明细长度 = 40
+[2017-05-22 20:24:38.510] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.510] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.510] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.510] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.510] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.510] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.510] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.510] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.511] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.511] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.511] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.511] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.511] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.511] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.511] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.511] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.511] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.511] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.511] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.511] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.511] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.511] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.511] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.511] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.512] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.512] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.512] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.512] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.512] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.512] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.512] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.512] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.512] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.512] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.512] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.512] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.512] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.512] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.512] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.512] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.512] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.513] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.513] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.513] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.513] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.513] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.513] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.513] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.513] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.513] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.513] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.513] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.513] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.513] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.513] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.513] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.513] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.514] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.514] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.514] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.514] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.514] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.514] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.514] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.514] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.515] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.515] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.515] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.515] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.516] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.516] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.516] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.516] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.516] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.516] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.516] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.517] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.517] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.517] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.517] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.517] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.517] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.517] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.517] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.518] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.518] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.518] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.518] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.518] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.518] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.518] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.518] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.518] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.518] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.518] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.518] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.518] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.519] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.519] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.519] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.519] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.519] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.519] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.519] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.519] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.519] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.519] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.519] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.519] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.519] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.519] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.519] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.519] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.519] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.519] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.519] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.520] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.520] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.520] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.520] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.520] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.520] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.520] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.520] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.520] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.520] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.520] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.520] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.520] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.520] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.520] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.520] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.521] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.521] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.521] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.521] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.521] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.521] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.521] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.521] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.521] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.521] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.521] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.521] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.521] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.521] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.521] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.521] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] Strategy::Update_Position_Trade_Changed_Detail_To_DB()
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] 	收盘保存持仓明细 未 找到(Trade)!
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] 	开始新建持仓明细(Trade)!
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] Strategy::setStgTradeTasking()
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] 	期货账号 = 091921
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] 	策略编号 = 01
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] 	选择下单算法锁 = false
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] 	交易执行锁 = false
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] Strategy::getStgSelectOrderAlgorithmFlag():
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] 	期货账号 = 091921
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] 	策略编号 = 01
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] 	选择下单算法锁 = false
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] 	交易执行锁 = false
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] Strategy::setStgSelectOrderAlgorithmFlag():
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] 	期货账号 = 091921
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] 	策略编号 = 01
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] 	调用者 = CTP_Manager::HandleMessage() msgtype == 12
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] 	选择下单算法锁 = false
+[2017-05-22 20:24:38.522] [xts_async_logger] [info] 	交易执行锁 = false
+[2017-05-22 20:24:50.135] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:24:50.135] [xts_async_logger] [info] 	服务端收到的数据 = {"OnOff": 1, "MsgSendFlag": 0, "MsgRef": 3, "MsgType": 13, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "01"}
+[2017-05-22 20:24:52.133] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:24:52.133] [xts_async_logger] [info] 	服务端收到的数据 = {"OnOff": 0, "MsgSendFlag": 0, "MsgRef": 4, "MsgType": 13, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "01"}
+[2017-05-22 20:24:58.550] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:24:58.550] [xts_async_logger] [info] 	服务端收到的数据 = {"OnOff": 1, "MsgSendFlag": 0, "MsgRef": 5, "MsgType": 13, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "01"}
+[2017-05-22 20:25:00.551] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:25:00.551] [xts_async_logger] [info] 	服务端收到的数据 = {"OnOff": 0, "MsgSendFlag": 0, "MsgRef": 6, "MsgType": 13, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "01"}
+[2017-05-22 20:25:02.551] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:25:02.551] [xts_async_logger] [info] 	服务端收到的数据 = {"OnOff": 1, "MsgSendFlag": 0, "MsgRef": 7, "MsgType": 13, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "02"}
+[2017-05-22 20:25:04.553] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:25:04.553] [xts_async_logger] [info] 	服务端收到的数据 = {"OnOff": 0, "MsgSendFlag": 0, "MsgRef": 8, "MsgType": 13, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "02"}
+[2017-05-22 20:25:07.137] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:25:07.137] [xts_async_logger] [info] 	服务端收到的数据 = {"MsgSendFlag": 0, "MsgRef": 9, "MsgType": 5, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "02", "Info": [{"buy_open": -40.0, "a_limit_price_shift": 0, "sell_close": -30.0, "lots_batch": 1, "a_order_action_limit": 400, "b_wait_price_tick": 0.0, "spread_shift": 0.0, "stop_loss": 0.0, "buy_close_on_off": 1, "order_algorithm": "01", "user_id": "091921", "strategy_id": "02", "lots": 10, "buy_open_on_off": 1, "trade_model": "", "sell_open": -30.0, "buy_close": -40.0, "sell_open_on_off": 1, "b_limit_price_shift": 0, "b_order_action_limit": 400, "sell_close_on_off": 1, "trader_id": "1601", "a_wait_price_tick": 0.0}]}
+[2017-05-22 20:25:14.462] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:25:14.462] [xts_async_logger] [info] 	服务端收到的数据 = {"MsgSendFlag": 0, "MsgRef": 10, "MsgType": 5, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "01", "Info": [{"buy_open": -150.0, "a_limit_price_shift": 0, "sell_close": -120.0, "lots_batch": 1, "a_order_action_limit": 200, "b_wait_price_tick": 0.0, "spread_shift": 0.0, "stop_loss": 0.0, "buy_close_on_off": 1, "order_algorithm": "01", "user_id": "091921", "strategy_id": "01", "lots": 30, "buy_open_on_off": 1, "trade_model": "", "sell_open": -60.0, "buy_close": -80.0, "sell_open_on_off": 1, "b_limit_price_shift": 0, "b_order_action_limit": 200, "sell_close_on_off": 1, "trader_id": "1601", "a_wait_price_tick": 0.0}]}
+[2017-05-22 20:25:16.678] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:25:16.678] [xts_async_logger] [info] 	服务端收到的数据 = {"MsgSendFlag": 0, "MsgRef": 11, "MsgType": 5, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "01", "Info": [{"buy_open": -130.0, "a_limit_price_shift": 0, "sell_close": -100.0, "lots_batch": 1, "a_order_action_limit": 200, "b_wait_price_tick": 0.0, "spread_shift": 0.0, "stop_loss": 0.0, "buy_close_on_off": 1, "order_algorithm": "01", "user_id": "091921", "strategy_id": "01", "lots": 30, "buy_open_on_off": 1, "trade_model": "", "sell_open": -40.0, "buy_close": -60.0, "sell_open_on_off": 1, "b_limit_price_shift": 0, "b_order_action_limit": 200, "sell_close_on_off": 1, "trader_id": "1601", "a_wait_price_tick": 0.0}]}
+[2017-05-22 20:25:18.679] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:25:18.679] [xts_async_logger] [info] 	服务端收到的数据 = {"MsgSendFlag": 0, "MsgRef": 12, "MsgType": 5, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "01", "Info": [{"buy_open": -130.0, "a_limit_price_shift": 0, "sell_close": -100.0, "lots_batch": 1, "a_order_action_limit": 200, "b_wait_price_tick": 0.0, "spread_shift": 0.0, "stop_loss": 0.0, "buy_close_on_off": 1, "order_algorithm": "01", "user_id": "091921", "strategy_id": "01", "lots": 30, "buy_open_on_off": 1, "trade_model": "", "sell_open": -40.0, "buy_close": -60.0, "sell_open_on_off": 1, "b_limit_price_shift": 0, "b_order_action_limit": 200, "sell_close_on_off": 1, "trader_id": "1601", "a_wait_price_tick": 0.0}]}
+[2017-05-22 20:25:20.680] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:25:20.680] [xts_async_logger] [info] 	服务端收到的数据 = {"MsgSendFlag": 0, "MsgRef": 13, "MsgType": 5, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "01", "Info": [{"buy_open": -130.0, "a_limit_price_shift": 0, "sell_close": -100.0, "lots_batch": 1, "a_order_action_limit": 200, "b_wait_price_tick": 0.0, "spread_shift": 0.0, "stop_loss": 0.0, "buy_close_on_off": 1, "order_algorithm": "01", "user_id": "091921", "strategy_id": "01", "lots": 30, "buy_open_on_off": 1, "trade_model": "", "sell_open": -40.0, "buy_close": -60.0, "sell_open_on_off": 1, "b_limit_price_shift": 0, "b_order_action_limit": 200, "sell_close_on_off": 1, "trader_id": "1601", "a_wait_price_tick": 0.0}]}
+[2017-05-22 20:25:22.680] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:25:22.680] [xts_async_logger] [info] 	服务端收到的数据 = {"MsgSendFlag": 0, "MsgRef": 14, "MsgType": 5, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "01", "Info": [{"buy_open": -130.0, "a_limit_price_shift": 0, "sell_close": -100.0, "lots_batch": 1, "a_order_action_limit": 200, "b_wait_price_tick": 0.0, "spread_shift": 0.0, "stop_loss": 0.0, "buy_close_on_off": 1, "order_algorithm": "01", "user_id": "091921", "strategy_id": "01", "lots": 30, "buy_open_on_off": 1, "trade_model": "", "sell_open": -40.0, "buy_close": -60.0, "sell_open_on_off": 1, "b_limit_price_shift": 0, "b_order_action_limit": 200, "sell_close_on_off": 1, "trader_id": "1601", "a_wait_price_tick": 0.0}]}
+[2017-05-22 20:25:24.680] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:25:24.680] [xts_async_logger] [info] 	服务端收到的数据 = {"MsgSendFlag": 0, "MsgRef": 15, "MsgType": 5, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "01", "Info": [{"buy_open": -130.0, "a_limit_price_shift": 0, "sell_close": -100.0, "lots_batch": 1, "a_order_action_limit": 200, "b_wait_price_tick": 0.0, "spread_shift": 0.0, "stop_loss": 0.0, "buy_close_on_off": 1, "order_algorithm": "01", "user_id": "091921", "strategy_id": "01", "lots": 30, "buy_open_on_off": 1, "trade_model": "", "sell_open": -40.0, "buy_close": -60.0, "sell_open_on_off": 1, "b_limit_price_shift": 0, "b_order_action_limit": 200, "sell_close_on_off": 1, "trader_id": "1601", "a_wait_price_tick": 0.0}]}
+[2017-05-22 20:25:26.680] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:25:26.680] [xts_async_logger] [info] 	服务端收到的数据 = {"MsgSendFlag": 0, "MsgRef": 16, "MsgType": 5, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "01", "Info": [{"buy_open": -130.0, "a_limit_price_shift": 0, "sell_close": -100.0, "lots_batch": 1, "a_order_action_limit": 200, "b_wait_price_tick": 0.0, "spread_shift": 0.0, "stop_loss": 0.0, "buy_close_on_off": 1, "order_algorithm": "01", "user_id": "091921", "strategy_id": "01", "lots": 30, "buy_open_on_off": 1, "trade_model": "", "sell_open": -40.0, "buy_close": -60.0, "sell_open_on_off": 1, "b_limit_price_shift": 0, "b_order_action_limit": 200, "sell_close_on_off": 1, "trader_id": "1601", "a_wait_price_tick": 0.0}]}
+[2017-05-22 20:25:28.681] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:25:28.681] [xts_async_logger] [info] 	服务端收到的数据 = {"MsgSendFlag": 0, "MsgRef": 17, "MsgType": 5, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "01", "Info": [{"buy_open": -130.0, "a_limit_price_shift": 0, "sell_close": -100.0, "lots_batch": 1, "a_order_action_limit": 200, "b_wait_price_tick": 0.0, "spread_shift": 0.0, "stop_loss": 0.0, "buy_close_on_off": 1, "order_algorithm": "01", "user_id": "091921", "strategy_id": "01", "lots": 30, "buy_open_on_off": 1, "trade_model": "", "sell_open": -40.0, "buy_close": -60.0, "sell_open_on_off": 1, "b_limit_price_shift": 0, "b_order_action_limit": 200, "sell_close_on_off": 1, "trader_id": "1601", "a_wait_price_tick": 0.0}]}
+[2017-05-22 20:25:30.682] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:25:30.682] [xts_async_logger] [info] 	服务端收到的数据 = {"MsgSendFlag": 0, "MsgRef": 18, "MsgType": 5, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "01", "Info": [{"buy_open": -130.0, "a_limit_price_shift": 0, "sell_close": -100.0, "lots_batch": 1, "a_order_action_limit": 200, "b_wait_price_tick": 0.0, "spread_shift": 0.0, "stop_loss": 0.0, "buy_close_on_off": 1, "order_algorithm": "01", "user_id": "091921", "strategy_id": "01", "lots": 30, "buy_open_on_off": 1, "trade_model": "", "sell_open": -40.0, "buy_close": -60.0, "sell_open_on_off": 1, "b_limit_price_shift": 0, "b_order_action_limit": 200, "sell_close_on_off": 1, "trader_id": "1601", "a_wait_price_tick": 0.0}]}
+[2017-05-22 20:25:32.682] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:25:32.682] [xts_async_logger] [info] 	服务端收到的数据 = {"MsgSendFlag": 0, "MsgRef": 19, "MsgType": 22, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "01"}
+[2017-05-22 20:25:32.682] [xts_async_logger] [info] 	请求查询策略信息...
+[2017-05-22 20:25:32.682] [xts_async_logger] [info] 	收到交易员ID = 1601
+[2017-05-22 20:25:32.682] [xts_async_logger] [info] 	收到期货账户ID = 091921
+[2017-05-22 20:25:32.682] [xts_async_logger] [info] Strategy::printStrategyInfo()
+[2017-05-22 20:25:32.682] [xts_async_logger] [info] 	期货账户:091921
+[2017-05-22 20:25:32.682] [xts_async_logger] [info] 	策略编号:01
+[2017-05-22 20:25:32.682] [xts_async_logger] [info] 	调试信息:msgtype == 22
+[2017-05-22 20:25:32.682] [xts_async_logger] [info] 	系统总开关:1
+[2017-05-22 20:25:32.682] [xts_async_logger] [info] 	期货账户开关:1
+[2017-05-22 20:25:32.682] [xts_async_logger] [info] 	交易员开关:1
+[2017-05-22 20:25:32.682] [xts_async_logger] [info] 	策略开关:0
+[2017-05-22 20:25:32.682] [xts_async_logger] [info] 	A合约撤单次数:0, A合约撤单限制:200
+[2017-05-22 20:25:32.682] [xts_async_logger] [info] 	B合约撤单次数:0, B合约撤单限制:200
+[2017-05-22 20:25:32.682] [xts_async_logger] [info] 	A总卖:20, A昨卖:20
+[2017-05-22 20:25:32.682] [xts_async_logger] [info] 	B总买:20, B昨买:20
+[2017-05-22 20:25:32.682] [xts_async_logger] [info] 	A总买:0, A昨买:0
+[2017-05-22 20:25:32.682] [xts_async_logger] [info] 	B总卖:0, B昨卖:0
+[2017-05-22 20:25:37.882] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:25:37.882] [xts_async_logger] [info] 	服务端收到的数据 = {"MsgSendFlag": 0, "MsgRef": 20, "MsgType": 22, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "02"}
+[2017-05-22 20:25:37.882] [xts_async_logger] [info] 	请求查询策略信息...
+[2017-05-22 20:25:37.882] [xts_async_logger] [info] 	收到交易员ID = 1601
+[2017-05-22 20:25:37.882] [xts_async_logger] [info] 	收到期货账户ID = 091921
+[2017-05-22 20:25:37.882] [xts_async_logger] [info] Strategy::printStrategyInfo()
+[2017-05-22 20:25:37.882] [xts_async_logger] [info] 	期货账户:091921
+[2017-05-22 20:25:37.882] [xts_async_logger] [info] 	策略编号:02
+[2017-05-22 20:25:37.882] [xts_async_logger] [info] 	调试信息:msgtype == 22
+[2017-05-22 20:25:37.882] [xts_async_logger] [info] 	系统总开关:1
+[2017-05-22 20:25:37.882] [xts_async_logger] [info] 	期货账户开关:1
+[2017-05-22 20:25:37.882] [xts_async_logger] [info] 	交易员开关:1
+[2017-05-22 20:25:37.882] [xts_async_logger] [info] 	策略开关:0
+[2017-05-22 20:25:37.882] [xts_async_logger] [info] 	A合约撤单次数:0, A合约撤单限制:400
+[2017-05-22 20:25:37.882] [xts_async_logger] [info] 	B合约撤单次数:0, B合约撤单限制:400
+[2017-05-22 20:25:37.882] [xts_async_logger] [info] 	A总卖:0, A昨卖:0
+[2017-05-22 20:25:37.882] [xts_async_logger] [info] 	B总买:0, B昨买:0
+[2017-05-22 20:25:37.882] [xts_async_logger] [info] 	A总买:0, A昨买:0
+[2017-05-22 20:25:37.882] [xts_async_logger] [info] 	B总卖:0, B昨卖:0
+[2017-05-22 20:25:55.219] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:25:55.219] [xts_async_logger] [info] 	服务端收到的数据 = {"OnOff": 1, "MsgSendFlag": 0, "MsgRef": 21, "MsgType": 13, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "01"}
+[2017-05-22 20:25:57.222] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:25:57.222] [xts_async_logger] [info] 	服务端收到的数据 = {"OnOff": 0, "MsgSendFlag": 0, "MsgRef": 22, "MsgType": 13, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "01"}
+[2017-05-22 20:25:59.222] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:25:59.222] [xts_async_logger] [info] 	服务端收到的数据 = {"OnOff": 1, "MsgSendFlag": 0, "MsgRef": 23, "MsgType": 13, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "01"}
+[2017-05-22 20:26:01.223] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:26:01.223] [xts_async_logger] [info] 	服务端收到的数据 = {"OnOff": 0, "MsgSendFlag": 0, "MsgRef": 24, "MsgType": 13, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "01"}
+[2017-05-22 20:26:03.224] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:26:03.224] [xts_async_logger] [info] 	服务端收到的数据 = {"OnOff": 1, "MsgSendFlag": 0, "MsgRef": 25, "MsgType": 13, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "01"}
+[2017-05-22 20:26:07.657] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:26:07.657] [xts_async_logger] [info] 	服务端收到的数据 = {"OnOff": 0, "MsgSendFlag": 0, "MsgRef": 26, "MsgType": 13, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "01"}
+[2017-05-22 20:26:11.770] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:26:11.770] [xts_async_logger] [info] 	服务端收到的数据 = {"OnOff": 0, "MsgSendFlag": 0, "MsgRef": 27, "MsgType": 9, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601"}
+[2017-05-22 20:26:13.771] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:26:13.771] [xts_async_logger] [info] 	服务端收到的数据 = {"OnOff": 1, "MsgSendFlag": 0, "MsgRef": 28, "MsgType": 9, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601"}
+[2017-05-22 20:26:16.210] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:26:16.210] [xts_async_logger] [info] 	服务端收到的数据 = {"MsgSendFlag": 0, "MsgRef": 29, "MsgType": 7, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "02"}
+[2017-05-22 20:26:16.210] [xts_async_logger] [info] 	删除策略...
+[2017-05-22 20:26:16.210] [xts_async_logger] [info] 	收到交易员ID = 1601
+[2017-05-22 20:26:16.210] [xts_async_logger] [info] 	收到期货账户ID = 091921
+[2017-05-22 20:26:16.210] [xts_async_logger] [info] 	收到要删除的策略ID = 02
+[2017-05-22 20:26:16.215] [xts_async_logger] [info] CTP_Manager::calInstrument()
+[2017-05-22 20:26:17.215] [xts_async_logger] [info] CTP_Manager::calInstrument()
+[2017-05-22 20:26:17.215] [xts_async_logger] [info] 	系统存在账户 = 091921
+[2017-05-22 20:26:17.215] [xts_async_logger] [info] 	欲删除策略账户id = 091921
+[2017-05-22 20:26:17.215] [xts_async_logger] [info] 	欲删除策略id = 02
+[2017-05-22 20:26:17.215] [xts_async_logger] [info] 	期货账户,交易员均相同,开始匹配策略id...
+[2017-05-22 20:26:17.215] [xts_async_logger] [info] 	策略id匹配成功...
+[2017-05-22 20:26:35.750] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:26:35.750] [xts_async_logger] [info] 	服务端收到的数据 = {"MsgSendFlag": 0, "MsgRef": 30, "MsgType": 6, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "Info": [{"a_instrument_id": "cu1802", "trader_id": "1601", "b_instrument_id": "cu1805", "user_id": "091921", "strategy_id": "02"}]}
+[2017-05-22 20:26:56.022] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:26:56.022] [xts_async_logger] [info] 	服务端收到的数据 = {"MsgSendFlag": 0, "MsgRef": 31, "MsgType": 5, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "02", "Info": [{"buy_open": 20.0, "a_limit_price_shift": 0, "sell_close": 30.0, "lots_batch": 1, "a_order_action_limit": 100, "b_wait_price_tick": 0.0, "spread_shift": 0.0, "stop_loss": 0.0, "buy_close_on_off": 1, "order_algorithm": "01", "user_id": "091921", "strategy_id": "02", "lots": 10, "buy_open_on_off": 1, "trade_model": "", "sell_open": 30.0, "buy_close": 20.0, "sell_open_on_off": 1, "b_limit_price_shift": 0, "b_order_action_limit": 100, "sell_close_on_off": 1, "trader_id": "1601", "a_wait_price_tick": 0.0}]}
+[2017-05-22 20:26:59.792] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:26:59.792] [xts_async_logger] [info] 	服务端收到的数据 = {"MsgSendFlag": 0, "MsgRef": 32, "MsgType": 22, "UserID": "091921", "MsgSrc": 0, "TraderID": "1601", "StrategyID": "02"}
+[2017-05-22 20:26:59.792] [xts_async_logger] [info] 	请求查询策略信息...
+[2017-05-22 20:26:59.792] [xts_async_logger] [info] 	收到交易员ID = 1601
+[2017-05-22 20:26:59.792] [xts_async_logger] [info] 	收到期货账户ID = 091921
+[2017-05-22 20:26:59.792] [xts_async_logger] [info] Strategy::printStrategyInfo()
+[2017-05-22 20:26:59.792] [xts_async_logger] [info] 	期货账户:091921
+[2017-05-22 20:26:59.792] [xts_async_logger] [info] 	策略编号:02
+[2017-05-22 20:26:59.792] [xts_async_logger] [info] 	调试信息:msgtype == 22
+[2017-05-22 20:26:59.792] [xts_async_logger] [info] 	系统总开关:1
+[2017-05-22 20:26:59.792] [xts_async_logger] [info] 	期货账户开关:1
+[2017-05-22 20:26:59.792] [xts_async_logger] [info] 	交易员开关:1
+[2017-05-22 20:26:59.792] [xts_async_logger] [info] 	策略开关:0
+[2017-05-22 20:26:59.792] [xts_async_logger] [info] 	A合约撤单次数:0, A合约撤单限制:100
+[2017-05-22 20:26:59.792] [xts_async_logger] [info] 	B合约撤单次数:0, B合约撤单限制:100
+[2017-05-22 20:26:59.792] [xts_async_logger] [info] 	A总卖:0, A昨卖:0
+[2017-05-22 20:26:59.792] [xts_async_logger] [info] 	B总买:0, B昨买:0
+[2017-05-22 20:26:59.792] [xts_async_logger] [info] 	A总买:0, A昨买:0
+[2017-05-22 20:26:59.792] [xts_async_logger] [info] 	B总卖:0, B昨卖:0
+[2017-05-22 20:27:10.736] [xts_async_logger] [info] CTP_Manager::HandleMessage
+[2017-05-22 20:27:10.736] [xts_async_logger] [info] 	服务端收到的数据 = 

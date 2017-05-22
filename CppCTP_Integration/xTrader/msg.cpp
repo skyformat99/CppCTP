@@ -32,9 +32,9 @@ static unsigned char msg_check(Msg *message) {
  * 发送的数据存放在buff中*/
 /************************************************************************/
 int write_msg(int sockfd, char *buff, size_t len) {
-	printf("msg.cpp write_msg()\n");
-	printf("\t开始发消息... \n");
-	Utils::printGreenColorWithKV("真实长度", len);
+	//printf("msg.cpp write_msg()\n");
+	//printf("\t开始发消息... \n");
+	//Utils::printGreenColorWithKV("真实长度", len);
 	Msg message;
 	memset(&message, 0, sizeof(message));
 	//strcpy(message.head, "gmqh_sh_2016");
@@ -44,11 +44,11 @@ int write_msg(int sockfd, char *buff, size_t len) {
 	//printf("write_msg2 \n");
 	//printf("write Message head %s\n", message.head);
 	//printf("write Message checknum %d\n", message.checknum);
-	Utils::printGreenColorWithKV("实际包长", sizeof(message));
+	//Utils::printGreenColorWithKV("实际包长", sizeof(message));
 	if (write(sockfd, &message, sizeof(message)) != sizeof(message)) {
 		return -1;
 	}
-	printf("\t消息发送完毕 \n");
+	//printf("\t消息发送完毕 \n");
 }
 
 /************************************************************************/
@@ -56,8 +56,8 @@ int write_msg(int sockfd, char *buff, size_t len) {
  * 读取的数据存放在buff中*/
 /************************************************************************/
 int read_msg(int sockfd, char *buff, size_t len) {
-	printf("msg.cpp read_msg()\n");
-	printf("\t开始接收消息... \n");
+	//printf("msg.cpp read_msg()\n");
+	//printf("\t开始接收消息... \n");
 	Msg message;
 	memset(&message, 0, sizeof(message));
 	size_t size;
@@ -79,7 +79,7 @@ int read_msg(int sockfd, char *buff, size_t len) {
 	if ((s == (unsigned char)message.checknum) && (!strcmp("gmqh_sh_2016", message.head))) {
 		
 		memcpy(buff, message.buff, len);
-		printf("\t消息接收完毕\n");
+		//printf("\t消息接收完毕\n");
 		return sizeof(message);
 	}
 	//printf("read_msg4 \n");

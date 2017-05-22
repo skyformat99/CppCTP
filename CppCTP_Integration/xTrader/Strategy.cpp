@@ -1575,15 +1575,16 @@ void Strategy::Update_Position_Trade_Detail_To_DB(USER_CThostFtdcTradeField *pos
 /// 数据库更新策略持仓明细(trade changed)
 void Strategy::Update_Position_Trade_Changed_Detail_To_DB(USER_CThostFtdcTradeField *posd) {
 	USER_PRINT("Strategy::Update_Position_Trade_Changed_Detail_To_DB");
-	std::cout << "Strategy::Update_Position_Trade_Changed_Detail_To_DB()" << std::endl;
+	//std::cout << "Strategy::Update_Position_Trade_Changed_Detail_To_DB()" << std::endl;
+	this->getStgUser()->getXtsLogger()->info("Strategy::Update_Position_Trade_Changed_Detail_To_DB()");
 	int count_number = 0;
 
 	count_number = this->stg_save_strategy_conn->count(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
-		std::cout << "Strategy::Update_Position_Trade_Changed_Detail_To_DB()" << std::endl;
-		std::cout << "\t收盘保存持仓明细 已 找到(Trade)!" << std::endl;
+		//std::cout << "\t收盘保存持仓明细 已 找到(Trade)!" << std::endl;
+		this->getStgUser()->getXtsLogger()->info("\t收盘保存持仓明细 已 找到(Trade)!");
 		this->stg_save_strategy_conn->update(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON(
 			"instrumentid" << posd->InstrumentID
 			<< "orderref" << posd->OrderRef
@@ -1604,9 +1605,12 @@ void Strategy::Update_Position_Trade_Changed_Detail_To_DB(USER_CThostFtdcTradeFi
 		USER_PRINT("Strategy::Update_Position_Trade_Changed_Detail_To_DB ok");
 	}
 	else {
-		std::cout << "Strategy::Update_Position_Trade_Changed_Detail_To_DB()" << std::endl;
+		/*std::cout << "Strategy::Update_Position_Trade_Changed_Detail_To_DB()" << std::endl;
 		std::cout << "\t收盘保存持仓明细 未 找到(Trade)!" << std::endl;
-		std::cout << "\t开始新建持仓明细(Trade)!" << std::endl;
+		std::cout << "\t开始新建持仓明细(Trade)!" << std::endl;*/
+		this->getStgUser()->getXtsLogger()->info("Strategy::Update_Position_Trade_Changed_Detail_To_DB()");
+		this->getStgUser()->getXtsLogger()->info("\t收盘保存持仓明细 未 找到(Trade)!");
+		this->getStgUser()->getXtsLogger()->info("\t开始新建持仓明细(Trade)!");
 
 		BSONObjBuilder b;
 
@@ -2060,10 +2064,8 @@ void Strategy::add_position_detail(USER_CThostFtdcOrderField *posd) {
 //}
 
 void Strategy::printStrategyInfo(string message) {
-	time_t tt = system_clock::to_time_t(system_clock::now()); 
-	std::string nowt(std::ctime(&tt)); 
-	std::cout << "Strategy::printStrategyInfo()" << std::endl;
-	std::cout << "\t时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
+	
+	/*std::cout << "Strategy::printStrategyInfo()" << std::endl;
 	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
 	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
 	std::cout << "\t调试信息:" << message << std::endl;
@@ -2073,42 +2075,63 @@ void Strategy::printStrategyInfo(string message) {
 	std::cout << "\t策略开关:" << this->getOn_Off() << std::endl;
 	std::cout << "\tA合约撤单次数:" << this->getStgAOrderActionCount() << ", A合约撤单限制:" << this->getStgAOrderActionTiresLimit() << std::endl;
 	std::cout << "\tB合约撤单次数:" << this->getStgBOrderActionCount() << ", B合约撤单限制:" << this->getStgBOrderActionTiresLimit() << std::endl;
-}
-
-void Strategy::printStrategyInfoPosition() {
-	std::cout << "Strategy::printStrategyInfoPosition()" << std::endl;
-	/*std::cout << "\tA合约今买:" << this->stg_position_a_buy_today << ", "
-		<< "A合约昨买:" << this->stg_position_a_buy_yesterday << ", "
-		<< "A合约总买:" << this->stg_position_a_buy << ", "
-		<< "A合约今卖:" << this->stg_position_a_sell_today << ", "
-		<< "A合约昨卖:" << this->stg_position_a_sell_yesterday << ", "
-		<< "A合约总卖:" << this->stg_position_a_sell << std::endl;
-
-		std::cout << "\tB合约今买:" << this->stg_position_b_buy_today << ", "
-		<< "B合约昨买:" << this->stg_position_b_buy_yesterday << ", "
-		<< "B合约总买:" << this->stg_position_b_buy << ", "
-		<< "B合约今卖:" << this->stg_position_b_sell_today << ", "
-		<< "B合约昨卖:" << this->stg_position_b_sell_yesterday << ", "
-		<< "B合约总卖:" << this->stg_position_b_sell << std::endl;*/
-
-	/*std::cout << "\tA合约今买:" << this->stg_position_a_buy_today << ", "
-		<< "A合约昨买:" << this->stg_position_a_buy_yesterday << ", "
-		<< "A合约总买:" << this->stg_position_a_buy << ", "
-		<< "A合约今卖:" << this->stg_position_a_sell_today << ", "
-		<< "A合约昨卖:" << this->stg_position_a_sell_yesterday << ", "
-		<< "A合约总卖:" << this->stg_position_a_sell << std::endl;
-
-		std::cout << "\tB合约今买:" << this->stg_position_b_buy_today << ", "
-		<< "B合约昨买:" << this->stg_position_b_buy_yesterday << ", "
-		<< "B合约总买:" << this->stg_position_b_buy << ", "
-		<< "B合约今卖:" << this->stg_position_b_sell_today << ", "
-		<< "B合约昨卖:" << this->stg_position_b_sell_yesterday << ", "
-		<< "B合约总卖:" << this->stg_position_b_sell << std::endl;*/
-
 	std::cout << "\tA总卖:" << this->stg_position_a_sell << ", A昨卖:" << this->stg_position_a_sell_yesterday << std::endl;
 	std::cout << "\tB总买:" << this->stg_position_b_buy << ", B昨买:" << this->stg_position_b_buy_yesterday << std::endl;
 	std::cout << "\tA总买:" << this->stg_position_a_buy << ", A昨买:" << this->stg_position_a_buy_yesterday << std::endl;
-	std::cout << "\tB总卖:" << this->stg_position_b_sell << ", B昨卖:" << this->stg_position_b_sell_yesterday << std::endl;
+	std::cout << "\tB总卖:" << this->stg_position_b_sell << ", B昨卖:" << this->stg_position_b_sell_yesterday << std::endl;*/
+
+	this->getStgUser()->getXtsLogger()->info("Strategy::printStrategyInfo()");
+	this->getStgUser()->getXtsLogger()->info("\t期货账户:{}", this->stg_user_id);
+	this->getStgUser()->getXtsLogger()->info("\t策略编号:{}", this->stg_strategy_id);
+	this->getStgUser()->getXtsLogger()->info("\t调试信息:{}", message);
+	this->getStgUser()->getXtsLogger()->info("\t系统总开关:{}", this->stg_user->getCTP_Manager()->getOn_Off());
+	this->getStgUser()->getXtsLogger()->info("\t期货账户开关:{}", this->stg_user->getOn_Off());
+	this->getStgUser()->getXtsLogger()->info("\t交易员开关:{}", this->stg_user->GetTrader()->getOn_Off());
+	this->getStgUser()->getXtsLogger()->info("\t策略开关:{}", this->getOn_Off());
+	this->getStgUser()->getXtsLogger()->info("\tA合约撤单次数:{}, A合约撤单限制:{}", this->getStgAOrderActionCount(), this->getStgAOrderActionTiresLimit());
+	this->getStgUser()->getXtsLogger()->info("\tB合约撤单次数:{}, B合约撤单限制:{}", this->getStgBOrderActionCount(), this->getStgBOrderActionTiresLimit());
+	this->getStgUser()->getXtsLogger()->info("\tA总卖:{}, A昨卖:{}", this->stg_position_a_sell, this->stg_position_a_sell_yesterday);
+	this->getStgUser()->getXtsLogger()->info("\tB总买:{}, B昨买:{}", this->stg_position_b_buy, this->stg_position_b_buy_yesterday);
+	this->getStgUser()->getXtsLogger()->info("\tA总买:{}, A昨买:{}", this->stg_position_a_buy, this->stg_position_a_buy_yesterday);
+	this->getStgUser()->getXtsLogger()->info("\tB总卖:{}, B昨卖:{}", this->stg_position_b_sell, this->stg_position_b_sell_yesterday);
+	this->getStgUser()->getXtsLogger()->flush();
+
+}
+
+void Strategy::printStrategyInfoPosition() {
+	//std::cout << "Strategy::printStrategyInfoPosition()" << std::endl;
+	/*std::cout << "\tA合约今买:" << this->stg_position_a_buy_today << ", "
+		<< "A合约昨买:" << this->stg_position_a_buy_yesterday << ", "
+		<< "A合约总买:" << this->stg_position_a_buy << ", "
+		<< "A合约今卖:" << this->stg_position_a_sell_today << ", "
+		<< "A合约昨卖:" << this->stg_position_a_sell_yesterday << ", "
+		<< "A合约总卖:" << this->stg_position_a_sell << std::endl;
+
+		std::cout << "\tB合约今买:" << this->stg_position_b_buy_today << ", "
+		<< "B合约昨买:" << this->stg_position_b_buy_yesterday << ", "
+		<< "B合约总买:" << this->stg_position_b_buy << ", "
+		<< "B合约今卖:" << this->stg_position_b_sell_today << ", "
+		<< "B合约昨卖:" << this->stg_position_b_sell_yesterday << ", "
+		<< "B合约总卖:" << this->stg_position_b_sell << std::endl;*/
+
+	/*std::cout << "\tA合约今买:" << this->stg_position_a_buy_today << ", "
+		<< "A合约昨买:" << this->stg_position_a_buy_yesterday << ", "
+		<< "A合约总买:" << this->stg_position_a_buy << ", "
+		<< "A合约今卖:" << this->stg_position_a_sell_today << ", "
+		<< "A合约昨卖:" << this->stg_position_a_sell_yesterday << ", "
+		<< "A合约总卖:" << this->stg_position_a_sell << std::endl;
+
+		std::cout << "\tB合约今买:" << this->stg_position_b_buy_today << ", "
+		<< "B合约昨买:" << this->stg_position_b_buy_yesterday << ", "
+		<< "B合约总买:" << this->stg_position_b_buy << ", "
+		<< "B合约今卖:" << this->stg_position_b_sell_today << ", "
+		<< "B合约昨卖:" << this->stg_position_b_sell_yesterday << ", "
+		<< "B合约总卖:" << this->stg_position_b_sell << std::endl;*/
+
+	/*std::cout << "\tA总卖:" << this->stg_position_a_sell << ", A昨卖:" << this->stg_position_a_sell_yesterday << std::endl;
+	std::cout << "\tB总买:" << this->stg_position_b_buy << ", B昨买:" << this->stg_position_b_buy_yesterday << std::endl;
+	std::cout << "\tA总买:" << this->stg_position_a_buy << ", A昨买:" << this->stg_position_a_buy_yesterday << std::endl;
+	std::cout << "\tB总卖:" << this->stg_position_b_sell << ", B昨卖:" << this->stg_position_b_sell_yesterday << std::endl;*/
 
 	//Utils::printGreenColorWithKV("Trade持仓明细大小", this->getStg_List_Position_Detail_From_Trade()->size());
 	//Utils::printGreenColor("Trade持仓明细");
@@ -2464,9 +2487,6 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 				//std::cout << "\t新tick系统时间 = " << new_time << std::endl;
 			}
 		}
-
-		//一把锁测试
-		//this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
 	}
 
 	this->CopyTickData(this->stg_instrument_Last_tick, &pDepthMarketData_tmp);
@@ -2488,7 +2508,6 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 	//}
 	//如果有挂单,返回0
 	if (this->stg_list_order_pending->size() > 0) {
-		USER_PRINT(this->stg_list_order_pending->size());
 		list<CThostFtdcOrderField *>::iterator itor;
 		for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end(); itor++) {
 			USER_PRINT((*itor)->InstrumentID);
@@ -3158,14 +3177,19 @@ string Strategy::Generate_Order_Ref() {
 
 // 报单
 void Strategy::Exec_OrderInsert(CThostFtdcInputOrderField *insert_order) {
-	std::cout << "Strategy::Exec_OrderInsert()" << std::endl;
+	/*std::cout << "Strategy::Exec_OrderInsert()" << std::endl;
 	std::cout << "\tOrderRef = " << insert_order->OrderRef <<
-		", InstrumentID = " << insert_order->InstrumentID <<
-		", LimitPrice = " << insert_order->LimitPrice <<
-		", VolumeTotalOriginal = " << insert_order->VolumeTotalOriginal <<
-		", Direction = " << insert_order->Direction <<
-		", CombOffsetFlag = " << insert_order->CombOffsetFlag[0] <<
-		", CombHedgeFlag = " << insert_order->CombHedgeFlag[0] << std::endl;
+	", InstrumentID = " << insert_order->InstrumentID <<
+	", LimitPrice = " << insert_order->LimitPrice <<
+	", VolumeTotalOriginal = " << insert_order->VolumeTotalOriginal <<
+	", Direction = " << insert_order->Direction <<
+	", CombOffsetFlag = " << insert_order->CombOffsetFlag[0] <<
+	", CombHedgeFlag = " << insert_order->CombHedgeFlag[0] << std::endl;*/
+
+	this->getStgUser()->getXtsLogger()->info("Strategy::Exec_OrderInsert()");
+	this->getStgUser()->getXtsLogger()->info("\tOrderRef = {}, InstrumentID = {}, LimitPrice = {}, VolumeTotalOriginal = {}, Direction = {}, CombOffsetFlag = {}, CombHedgeFlag = {}",
+		insert_order->OrderRef, insert_order->InstrumentID, insert_order->LimitPrice, insert_order->VolumeTotalOriginal, insert_order->Direction,
+		insert_order->CombOffsetFlag[0], insert_order->CombHedgeFlag[0]);
 
 	//下单操作
 	this->stg_user->getUserTradeSPI()->OrderInsert(this->stg_user, insert_order);
@@ -3174,7 +3198,8 @@ void Strategy::Exec_OrderInsert(CThostFtdcInputOrderField *insert_order) {
 // 报单录入请求
 void Strategy::Exec_OnRspOrderInsert() {
 	USER_PRINT("Exec_OnRspOrderInsert()");
-	std::cout << "Strategy::Exec_OnRspOrderInsert()" << std::endl;
+	//std::cout << "Strategy::Exec_OnRspOrderInsert()" << std::endl;
+	this->getStgUser()->getXtsLogger()->info("Strategy::Exec_OnRspOrderInsert()");
 	this->setStgSelectOrderAlgorithmFlag("Strategy::Exec_OnRspOrderInsert()", false);
 }
 
@@ -3201,17 +3226,17 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	// 添加字段,本次成交量
 	USER_CThostFtdcOrderField order_new_tmp;
 	memset(&order_new_tmp, 0x00, sizeof(USER_CThostFtdcOrderField));
+	CThostFtdcOrderField pOrder_tmp;
+	memset(&pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
 	
 
 	// 添加本次成交字段VolumeTradedBatch
 	this->add_VolumeTradedBatch(pOrder, &order_new);
-
 	this->CopyNewOrderData(&order_new_tmp, &order_new);
+	this->CopyOrderData(&pOrder_tmp, pOrder);
 	
 	// 更新挂单列表，持仓信息
-	this->update_pending_order_list(pOrder);
-
-	//std::auto_ptr<USER_CThostFtdcOrderField> order_new(new USER_CThostFtdcOrderField);
+	this->update_pending_order_list(&pOrder_tmp);
 
 	// 更新持仓明细列表
 	this->update_position_detail(&order_new_tmp);
@@ -3296,19 +3321,11 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 		//this->stg_user->getUserTradeSPI()->OrderInsert(this->stg_user, this->stg_b_order_insert_args);
 		this->Exec_OrderInsert(this->stg_b_order_insert_args);
 	}
-
 }
 
 // 成交回报
 void Strategy::ExEc_OnRtnTrade(CThostFtdcTradeField *pTrade) {
 	/*1:更新持仓明细*/
-	/************************************************************************/
-	/* 由于修改了持仓计算方式，故以下被注释                                                                     */
-	/************************************************************************/
-	//this->update_position_detail(pTrade); 
-	//this->update_position(pTrade);
-	//this->update_task_status();
-
 	string compare_date = pTrade->TradeDate; //报单日期
 	string compare_time = pTrade->TradeTime; //报单时间
 
@@ -3468,6 +3485,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 	if (strlen(pOrder->OrderSysID) != 0) { // 如果报单编号不为空，为交易所返回
 		if (pOrder->OrderStatus == '0') { // 全部成交
 			//std::cout << "更新挂单,全部成交" << std::endl;
+			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = 0 全部成交");
 			list<CThostFtdcOrderField *>::iterator itor;
 			for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
 				if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
@@ -3482,6 +3500,8 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 		}
 		else if (pOrder->OrderStatus == '1') { // 部分成交还在队列中
 			//std::cout << "更新挂单,部分成交还在队列中" << std::endl;
+			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = 1 部分成交还在队列中");
+
 			list<CThostFtdcOrderField *>::iterator itor;
 			for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
 				if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
@@ -3495,10 +3515,12 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 
 		}
 		else if (pOrder->OrderStatus == '2') { ///部分成交不在队列中
-			std::cout << "\tpOrder->OrderStatus = 2 部分成交不在队列中" << std::endl;
+			//std::cout << "\tpOrder->OrderStatus = 2 部分成交不在队列中" << std::endl;
+			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = 2 部分成交不在队列中");
 		}
 		else if (pOrder->OrderStatus == '3') { // 未成交还在队列中
 			//std::cout << "更新挂单,未成交还在队列中" << std::endl;
+			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = 3 未成交还在队列中");
 			bool isExists = false;
 			// 判断挂单列表是否存在
 			list<CThostFtdcOrderField *>::iterator itor;
@@ -3527,7 +3549,8 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 		}
 		else if (pOrder->OrderStatus == '4') //未成交不在队列中
 		{
-			std::cout << "\tpOrder->OrderStatus = 4 未成交不在队列中" << std::endl;
+			//std::cout << "\tpOrder->OrderStatus = 4 未成交不在队列中" << std::endl;
+			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = 4 未成交不在队列中");
 		}
 		else if (pOrder->OrderStatus == '5') { // 撤单
 			//std::cout << "更新挂单,撤单" << std::endl;
@@ -3544,13 +3567,16 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 			}
 		}
 		else if (pOrder->OrderStatus == 'a') { // 未知
-			std::cout << "\tpOrder->OrderStatus = a 未知" << std::endl;
+			//std::cout << "\tpOrder->OrderStatus = a 未知" << std::endl;
+			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = a 未知");
 		}
 		else if (pOrder->OrderStatus == 'b') { // 尚未触发
-			std::cout << "\tpOrder->OrderStatus = b 尚未触发" << std::endl;
+			//std::cout << "\tpOrder->OrderStatus = b 尚未触发" << std::endl;
+			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = b 尚未触发");
 		}
 		else if (pOrder->OrderStatus == 'c') { // 已触发
-			std::cout << "\tpOrder->OrderStatus = c 已触发" << std::endl;
+			//std::cout << "\tpOrder->OrderStatus = c 已触发" << std::endl;
+			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = c 已触发");
 		}
 
 		// 遍历挂单列表，找出A合约开仓未成交的量
@@ -3578,6 +3604,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 	}
 }
 
+#if 0
 /// 更新持仓量
 void Strategy::update_position(CThostFtdcOrderField *pOrder) {
 	USER_PRINT("update_position");
@@ -3642,6 +3669,7 @@ void Strategy::update_position(CThostFtdcOrderField *pOrder) {
 		this->stg_position_b_sell = this->stg_position_b_sell_today + this->stg_position_b_sell_yesterday;
 	}
 }
+#endif
 
 /// 更新持仓量(UserOrder)
 void Strategy::update_position(USER_CThostFtdcOrderField *pOrder) {
@@ -3755,6 +3783,7 @@ void Strategy::update_position(USER_CThostFtdcOrderField *pOrder) {
 
 }
 
+#if 0
 /// 更新持仓量
 void Strategy::update_position(CThostFtdcTradeField *pTrade) {
 	//std::cout << "update_position(CThostFtdcTradeField *pTrade)" << std::endl;
@@ -3860,6 +3889,7 @@ void Strategy::update_position(CThostFtdcTradeField *pTrade) {
 
 }
 
+
 /// 更新持仓明细
 void Strategy::update_position_detail(CThostFtdcTradeField *pTrade_cal) {
 	CThostFtdcTradeField *pTrade = new CThostFtdcTradeField();
@@ -3918,6 +3948,7 @@ void Strategy::update_position_detail(CThostFtdcTradeField *pTrade_cal) {
 		}
 	}
 }
+#endif
 
 /// 更新持仓明细
 void Strategy::update_position_detail(USER_CThostFtdcTradeField *pTrade) {
@@ -4205,42 +4236,50 @@ void Strategy::add_VolumeTradedBatch(CThostFtdcOrderField *pOrder, USER_CThostFt
 	}
 	else if (new_Order->OrderStatus == '2') ///部分成交不在队列中
 	{
-		std::cout << "\tnew_Order->OrderStatus == '2' 部分成交不在队列中" << std::endl;
+		//std::cout << "\tnew_Order->OrderStatus == '2' 部分成交不在队列中" << std::endl;
+		this->getStgUser()->getXtsLogger()->info("\tnew_Order->OrderStatus == '2' 部分成交不在队列中");
 		new_Order->VolumeTradedBatch = 0;
 	}
 	else if (new_Order->OrderStatus == '3') ///未成交还在队列中
 	{
-		std::cout << "\tnew_Order->OrderStatus == '3' 未成交还在队列中" << std::endl;
+		//std::cout << "\tnew_Order->OrderStatus == '3' 未成交还在队列中" << std::endl;
+		this->getStgUser()->getXtsLogger()->info("\tnew_Order->OrderStatus == '3' 未成交还在队列中");
 		new_Order->VolumeTradedBatch = 0;
 	}
 	else if (new_Order->OrderStatus == '4') ///未成交不在队列中
 	{
-		std::cout << "\tnew_Order->OrderStatus == '4' 未成交不在队列中" << std::endl;
+		//std::cout << "\tnew_Order->OrderStatus == '4' 未成交不在队列中" << std::endl;
+		this->getStgUser()->getXtsLogger()->info("\tnew_Order->OrderStatus == '4' 未成交不在队列中");
 		new_Order->VolumeTradedBatch = 0;
 	}
 	else if (new_Order->OrderStatus == '5') ///撤单
 	{
-		std::cout << "\tnew_Order->OrderStatus == '5' 撤单" << std::endl;
+		//std::cout << "\tnew_Order->OrderStatus == '5' 撤单" << std::endl;
+		this->getStgUser()->getXtsLogger()->info("\tnew_Order->OrderStatus == '5' 撤单");
 		new_Order->VolumeTradedBatch = 0;
 	}
 	else if (new_Order->OrderStatus == 'a') ///未知
 	{
-		std::cout << "\tnew_Order->OrderStatus == 'a' 未知" << std::endl;
+		//std::cout << "\tnew_Order->OrderStatus == 'a' 未知" << std::endl;
+		this->getStgUser()->getXtsLogger()->info("\tnew_Order->OrderStatus == 'a' 未知");
 		new_Order->VolumeTradedBatch = 0;
 	}
 	else if (new_Order->OrderStatus == 'b') ///尚未触发
 	{
-		std::cout << "\tnew_Order->OrderStatus == 'b' 尚未触发" << std::endl;
+		//std::cout << "\tnew_Order->OrderStatus == 'b' 尚未触发" << std::endl;
+		this->getStgUser()->getXtsLogger()->info("\tnew_Order->OrderStatus == 'b' 尚未触发");
 		new_Order->VolumeTradedBatch = 0;
 	}
 	else if (new_Order->OrderStatus == 'c') ///已触发
 	{
-		std::cout << "\tnew_Order->OrderStatus == 'c' 已触发" << std::endl;
+		//std::cout << "\tnew_Order->OrderStatus == 'c' 已触发" << std::endl;
+		this->getStgUser()->getXtsLogger()->info("\tnew_Order->OrderStatus == 'c' 已触发");
 		new_Order->VolumeTradedBatch = 0;
 	}
 	else
 	{
-		std::cout << "\tnew_Order->OrderStatus不在系统范围内!" << std::endl;
+		//std::cout << "\tnew_Order->OrderStatus不在系统范围内!" << std::endl;
+		this->getStgUser()->getXtsLogger()->info("\tnew_Order->OrderStatus不在系统范围内!");
 		new_Order->VolumeTradedBatch = 0;
 	}
 	/*std::cout << "Strategy::add_VolumeTradedBatch()" << std::endl;
@@ -4825,40 +4864,7 @@ string Strategy::getStgTradingDay() {
 }
 
 void Strategy::setStgSelectOrderAlgorithmFlag(string msg, bool stg_select_order_algorithm_flag) {
-	
-	/*time_t tt = system_clock::to_time_t(system_clock::now());
-	std::string nowt(std::ctime(&tt));*/
-
-	//if (((this->getOn_Off()) &&
-	//	(this->stg_user->getOn_Off()) &&
-	//	(this->stg_user->GetTrader()->getOn_Off()) &&
-	//	(this->stg_user->getCTP_Manager()->getOn_Off())))
-	//{
-	//	this->stg_select_order_algorithm_flag = stg_select_order_algorithm_flag;
-
-	//	std::cout << "Strategy::setStgSelectOrderAlgorithmFlag():" << std::endl;
-	//	std::cout << "\t调用者 = " << msg << std::endl;
-	//	//std::cout << "====策略状态信息====" << std::endl;
-	//	std::cout << "\t时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
-	//	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
-	//	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
-	//	std::cout << "\t选择下单算法锁 = " << this->stg_select_order_algorithm_flag << std::endl;
-	//	std::cout << "\t策略执行标志位 = " << this->stg_trade_tasking << std::endl;
-	//}
-	//else {
-	//	//std::cout << "\t请检查开关再进行stg_select_order_algorithm_flag设置!" << std::endl;
-	//}
-
 	this->stg_select_order_algorithm_flag = stg_select_order_algorithm_flag;
-
-	/*std::cout << "Strategy::setStgSelectOrderAlgorithmFlag():" << std::endl;
-	std::cout << "\t调用者 = " << msg << std::endl;*/
-	//std::cout << "\t时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
-	/*std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
-	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
-	std::cout << "\t选择下单算法锁 = " << this->stg_select_order_algorithm_flag << std::endl;
-	std::cout << "\t策略执行标志位 = " << this->stg_trade_tasking << std::endl;*/
-
 	this->getStgUser()->getXtsLogger()->info("Strategy::setStgSelectOrderAlgorithmFlag():");
 	this->getStgUser()->getXtsLogger()->info("\t期货账号 = {}", this->getStgUserId());
 	this->getStgUser()->getXtsLogger()->info("\t策略编号 = {}", this->getStgStrategyId());
@@ -4869,17 +4875,6 @@ void Strategy::setStgSelectOrderAlgorithmFlag(string msg, bool stg_select_order_
 }
 
 bool Strategy::getStgSelectOrderAlgorithmFlag() {
-	/*time_t tt = system_clock::to_time_t(system_clock::now());
-	std::string nowt(std::ctime(&tt));*/
-	//this->stg_select_order_algorithm_flag = stg_select_order_algorithm_flag;
-	//std::cout << "Strategy::getStgSelectOrderAlgorithmFlag():" << std::endl;
-	//std::cout << "====策略状态信息====" << std::endl;
-	/*std::cout << "\t时间:" << nowt.substr(0, nowt.length() - 1) << std::endl;
-	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
-	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
-	std::cout << "\t选择下单算法锁 = " << this->stg_select_order_algorithm_flag << std::endl;
-	std::cout << "\t策略执行标志位 = " << this->stg_trade_tasking << std::endl;*/
-
 	this->getStgUser()->getXtsLogger()->info("Strategy::getStgSelectOrderAlgorithmFlag():");
 	this->getStgUser()->getXtsLogger()->info("\t期货账号 = {}", this->getStgUserId());
 	this->getStgUser()->getXtsLogger()->info("\t策略编号 = {}", this->getStgStrategyId());
@@ -4950,7 +4945,8 @@ void Strategy::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder) {
 	//if (this->getStgUser()->getCTP_Manager()->getIsMarketCloseDone()) {
 	//	return;
 	//}
-	std::cout << "Strategy::OnRspOrderInsert()" << std::endl;
+	//std::cout << "Strategy::OnRspOrderInsert()" << std::endl;
+	this->getStgUser()->getXtsLogger()->info("Strategy::OnRspOrderInsert()");
 	this->Exec_OnRspOrderInsert();
 }
 
@@ -4967,5 +4963,7 @@ void Strategy::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderActi
 //撤单错误
 void Strategy::OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction) {
 	USER_PRINT("Strategy::OnErrRtnOrderAction");
+	this->getStgUser()->getXtsLogger()->info("Strategy::OnErrRtnOrderAction()");
+	this->Exec_OnErrRtnOrderAction();
 }
 
