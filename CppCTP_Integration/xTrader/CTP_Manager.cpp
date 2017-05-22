@@ -4961,7 +4961,8 @@ bool CTP_Manager::init(bool is_online) {
 
 	this->xts_logger->info("\t初始化网络环境完成...");
 	if (!this->dbm->getDBConnection()) {
-		std::cout << "\tMongoDB数据库连接有问题..." << std::endl;
+		//std::cout << "\tMongoDB数据库连接有问题..." << std::endl;
+		Utils::printRedColor("\tMongoDB数据库连接有问题...");
 		init_flag = false;
 		return init_flag;
 	}
@@ -4979,7 +4980,8 @@ bool CTP_Manager::init(bool is_online) {
 
 	if ((this->l_user->size() <= 0) || (this->l_obj_trader->size() <= 0)) {
 		USER_PRINT("期货账户或者交易员账户为空，未能初始化!");
-		std::cout << "\t期货账户或者交易员账户为空，未能初始化!请检查数据库!" << std::endl;
+		//std::cout << "\t期货账户或者交易员账户为空，未能初始化!请检查数据库!" << std::endl;
+		Utils::printRedColor("\t期货账户或者交易员账户为空，未能初始化!请检查数据库!");
 		init_flag = false;
 		return init_flag;
 	}
@@ -5077,7 +5079,8 @@ bool CTP_Manager::init(bool is_online) {
 		this->mdspi = this->CreateMd(mc->getMarketFrontAddr(), mc->getBrokerID(), mc->getUserID(), mc->getPassword(), this->l_strategys);
 	}
 	else {
-		std::cout << "\t行情初始化失败!" << std::endl;
+		//std::cout << "\t行情初始化失败!" << std::endl;
+		Utils::printRedColor("\t行情初始化失败!");
 		init_flag = false;
 		return init_flag;
 	}
@@ -5087,7 +5090,8 @@ bool CTP_Manager::init(bool is_online) {
 	/// 如果是新的交易日，更新策略，今昨持仓量以及期货账户报单引用
 	if (!(this->initStrategyAndFutureAccount())) {
 		USER_PRINT("初始化策略，仓位失败...");
-		std::cout << "\t初始化策略，仓位失败..." << std::endl;
+		//std::cout << "\t初始化策略，仓位失败..." << std::endl;
+		Utils::printRedColor("\t初始化策略，仓位失败...");
 		init_flag = false;
 		return init_flag;
 	}
@@ -5137,7 +5141,8 @@ bool CTP_Manager::init(bool is_online) {
 		is_all_user_finished_init = true;
 		/// 检查USER初始化是否完成
 		//std::cout << "\t主线程ID = " << std::this_thread::get_id() << std::endl;
-		std::cout << "\t检查期货账户登录状态" << std::endl;
+		//std::cout << "\t检查期货账户登录状态" << std::endl;
+		this->xts_logger->info("\t检查期货账户登录状态...");
 
 		for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
 
@@ -5149,7 +5154,8 @@ bool CTP_Manager::init(bool is_online) {
 		}
 
 		if (is_all_user_finished_init) {
-			std::cout << "\t账户初始化完成,进入登录检查..." << std::endl;
+			//std::cout << "\t账户初始化完成,进入登录检查..." << std::endl;
+			this->xts_logger->info("\t账户初始化完成,进入登录检查...");
 			break;
 		}
 
@@ -5174,12 +5180,14 @@ bool CTP_Manager::init(bool is_online) {
 
 	if ((this->l_user->size() <= 0)) {
 		USER_PRINT("可用期货账户为空!");
-		std::cout << "\t期货账户登录均失败,请检查id与密码" << std::endl;
+		//std::cout << "\t期货账户登录均失败,请检查id与密码" << std::endl;
+		Utils::printRedColor("\t期货账户登录均失败,请检查id与密码");
 		init_flag = false;
 		return init_flag;
 	}
 	else {
-		std::cout << "\t初始化期货账户和策略绑定完成..." << std::endl;
+		//std::cout << "\t初始化期货账户和策略绑定完成..." << std::endl;
+		this->xts_logger->info("\t初始化期货账户和策略绑定完成...");
 	}
 
 
@@ -5248,7 +5256,8 @@ bool CTP_Manager::init(bool is_online) {
 
 	if ((this->l_user->size() <= 0)) {
 		USER_PRINT("可用期货账户为空!");
-		std::cout << "\t期货账户仓位全部不一致!全部均初始化失败!" << std::endl;
+		//std::cout << "\t期货账户仓位全部不一致!全部均初始化失败!" << std::endl;
+		Utils::printRedColor("期货账户仓位全部不一致!全部均初始化失败!");
 		init_flag = false;
 		return init_flag;
 	}
@@ -5266,11 +5275,13 @@ bool CTP_Manager::init(bool is_online) {
 		}
 	}
 	else {
-		std::cout << "\t策略最小跳价格获取失败!!!" << std::endl;
+		//std::cout << "\t策略最小跳价格获取失败!!!" << std::endl;
+		Utils::printRedColor("策略最小跳价格获取失败!!!");
 		init_flag = false;
 		return init_flag;
 	}
-	std::cout << "\t初始化合约最小跳价格完成..." << std::endl;
+	//std::cout << "\t初始化合约最小跳价格完成..." << std::endl;
+	this->xts_logger->info("\t初始化合约最小跳价格完成...");
 
 	
 
@@ -5359,12 +5370,17 @@ bool CTP_Manager::init(bool is_online) {
 		}
 		/// 订阅合约
 		this->SubmarketData(this->mdspi, this->l_instrument);
-		std::cout << "\t行情订阅已初始化!" << std::endl;
+		//std::cout << "\t行情订阅已初始化!" << std::endl;
+		this->xts_logger->info("\t行情订阅已初始化!");
 	}
 
-	std::cout << "\033[32m===========恭喜============\033[0m" << std::endl;
+	/*std::cout << "\033[32m===========恭喜============\033[0m" << std::endl;
 	std::cout << "\033[32m|=!xTrader系统初始化完成!=|\033[0m" << std::endl;
-	std::cout << "\033[32m===========================\033[0m" << std::endl;
+	std::cout << "\033[32m===========================\033[0m" << std::endl;*/
+
+	Utils::printGreenColor("===========恭喜============");
+	Utils::printGreenColor("|=!xTrader系统初始化完成!=|");
+	Utils::printGreenColor("===========================");
 
 	//初始化完毕,开启系统全局开关
 	this->setOn_Off(1);

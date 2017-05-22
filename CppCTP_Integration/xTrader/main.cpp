@@ -501,11 +501,11 @@ int main(int argc, char *argv[]) {
 	try
 	{
 		// 设置缓冲区大小
-		spdlog::set_async_mode(8);
+		spdlog::set_async_mode(4096);
 		// 创建日志文件
 		xts_logger = spdlog::daily_logger_st("async_file_logger", "logs/async_log.txt");
 
-		xts_logger->info("hello, world");
+		//xts_logger->info("hello, world");
 		// Release and close all loggers
 		//spdlog::drop_all();
 
