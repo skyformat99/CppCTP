@@ -101,10 +101,12 @@ void sig_handler(int signo) {
 					ctp_m->saveAllStrategyPositionDetail();
 
 				}
-				/// 刷新log
-				ctp_m->getXtsLogger()->flush();
+				///// 刷新log
+				//ctp_m->getXtsLogger()->flush();
 				/// 正常关闭,更新标志位
 				ctp_m->updateSystemFlag();
+				/// 关闭所有的log
+				spdlog::drop_all();
 				close(sockfd);
 				exit(1);
 			}

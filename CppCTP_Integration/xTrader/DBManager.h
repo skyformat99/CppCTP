@@ -6,7 +6,7 @@
 #include <list>
 #include <vector>
 #include <mongo/client/dbclient.h>
-
+#include <spdlog/spdlog.h>
 #include "Trader.h"
 #include "FutureAccount.h"
 #include "Strategy.h"
@@ -25,6 +25,7 @@ using namespace mongo;
 using namespace std;
 using std::string;
 using mongo::DBClientConnection;
+using namespace spdlog;
 
 class DBManager {
 
@@ -231,10 +232,13 @@ public:
 	void setDB_Connect_Status(bool db_connect_status);
 	bool getDB_Connect_Status();
 
+	std::shared_ptr<spdlog::logger> getXtsDBLogger();
+
 private:
 	mongo::DBClientConnection *conn;
 	bool is_online;
 	bool db_connect_status;
+	std::shared_ptr<spdlog::logger> xts_db_logger;
 };
 
 #endif

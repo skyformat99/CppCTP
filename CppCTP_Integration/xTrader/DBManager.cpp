@@ -74,6 +74,23 @@ DBManager::DBManager() {
 		std::cout << "MongoDB无法访问! 问题:" << e.what() << std::endl;
 		this->db_connect_status = false;
 	}
+
+	try {
+		this->xts_db_logger = spdlog::get("xts_async_db_logger");
+		if (!this->xts_db_logger)
+		{
+			// 设置缓冲区大小
+			spdlog::set_async_mode(4096);
+			// 创建日志文件
+			this->xts_db_logger = spdlog::daily_logger_mt("xts_async_db_logger", "logs/xts_db_log.txt");
+		}
+		
+	}
+	catch (const spdlog::spdlog_ex& ex) {
+		Utils::printRedColor("DB Log初始化失败,错误!");
+		Utils::printRedColor(ex.what());
+		exit(1);
+	}
 }
 
 DBManager::~DBManager() {
@@ -282,7 +299,8 @@ bool DBManager::FindTraderByTraderIdAndPassword(string traderid, string password
 }
 
 void DBManager::getAllTrader(list<string> *l_trader) {
-	std::cout << "DBManager::getAllTrader()" << std::endl;
+	//std::cout << "DBManager::getAllTrader()" << std::endl;
+	this->getXtsDBLogger()->info("DBManager::getAllTrader()");
 	/// 初始化的时候，必须保证list为空
 	if (l_trader->size() > 0) {
 		list<string>::iterator Itor;
@@ -302,11 +320,13 @@ void DBManager::getAllTrader(list<string> *l_trader) {
 		while (cursor->more()) {
 
 			BSONObj p = cursor->next();
-			cout << "\t*" << "traderid:" << p.getStringField("traderid") << "  "
+			/*cout << "\t*" << "traderid:" << p.getStringField("traderid") << "  "
 				<< "tradername:" << p.getStringField("tradername") << "  "
 				<< "password:" << p.getStringField("password") << "  "
 				<< "isactive:" << p.getStringField("isactive") << " "
-				<< "on_off" << p.getIntField("on_off") << "*" << endl;
+				<< "on_off" << p.getIntField("on_off") << "*" << endl;*/
+			this->getXtsDBLogger()->info("\t*traderid:{} tradername:{} password:{} isactive:{} on_off:{}",
+				p.getStringField("traderid"), p.getStringField("tradername"), p.getStringField("password"), p.getStringField("isactive"), p.getIntField("on_off"));
 
 			l_trader->push_back(p.getStringField("traderid"));
 		}
@@ -315,7 +335,8 @@ void DBManager::getAllTrader(list<string> *l_trader) {
 }
 
 void DBManager::getAllObjTrader(list<Trader *> *l_trader) {
-	std::cout << "DBManager::getAllObjTrader()" << std::endl;
+	//std::cout << "DBManager::getAllObjTrader()" << std::endl;
+	this->getXtsDBLogger()->info("DBManager::getAllObjTrader()");
 	/// 初始化的时候，必须保证list为空
 	if (l_trader->size() > 0) {
 		list<Trader *>::iterator Itor;
@@ -336,11 +357,14 @@ void DBManager::getAllObjTrader(list<Trader *> *l_trader) {
 		while (cursor->more()) {
 			Trader *op = new Trader();
 			BSONObj p = cursor->next();
-			cout << "\t*" << "traderid:" << p.getStringField("traderid") << "  "
+			/*cout << "\t*" << "traderid:" << p.getStringField("traderid") << "  "
 				<< "tradername:" << p.getStringField("tradername") << "  "
 				<< "password:" << p.getStringField("password") << "  "
 				<< "isactive:" << p.getStringField("isactive") << " "
-				<< "on_off" << p.getIntField("on_off") << "*" << endl;
+				<< "on_off" << p.getIntField("on_off") << "*" << endl;*/
+
+			this->getXtsDBLogger()->info("\t*traderid:{} tradername:{} password:{} isactive:{} on_off:{}", p.getStringField("traderid"), p.getStringField("tradername"), p.getStringField("password"),
+				p.getStringField("isactive"), p.getIntField("on_off"));
 
 			op->setTraderID(p.getStringField("traderid"));
 			op->setTraderName(p.getStringField("tradername"));
@@ -556,7 +580,8 @@ void DBManager::SearchFutrueListByTraderID(string traderid, list<FutureAccount *
 
 void DBManager::getAllFutureAccount(list<User *> *l_user) {
 	USER_PRINT(this->is_online);
-	std::cout << "DBManager::getAllFutureAccount()" << std::endl;
+	//std::cout << "DBManager::getAllFutureAccount()" << std::endl;
+	this->getXtsDBLogger()->info("DBManager::getAllFutureAccount()");
 	string DB_FUTUREACCOUNT_COLLECTION;
 	if (this->is_online) {
 		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount";
@@ -576,21 +601,25 @@ void DBManager::getAllFutureAccount(list<User *> *l_user) {
 
 	int countnum = this->conn->count(DB_FUTUREACCOUNT_COLLECTION, BSON("isactive" << ISACTIVE));
 	if (countnum == 0) {
-		cout << "DBManager::getAllFutureAccount None!" << endl;
+		//cout << "DBManager::getAllFutureAccount None!" << endl;
+		this->getXtsDBLogger()->info("DBManager::getAllFutureAccount None!");
 	}
 	else {
 		unique_ptr<DBClientCursor> cursor =
 			this->conn->query(DB_FUTUREACCOUNT_COLLECTION, MONGO_QUERY("isactive" << ISACTIVE));
 		while (cursor->more()) {
 			BSONObj p = cursor->next();
-			cout << "\t*" << "brokerid:" << p.getStringField("brokerid") << "  "
+			/*cout << "\t*" << "brokerid:" << p.getStringField("brokerid") << "  "
 				<< "traderid:" << p.getStringField("traderid") << "  "
 				<< "password:" << p.getStringField("password") << "  "
 				<< "userid:" << p.getStringField("userid") << "  "
 				<< "frontAddress:" << p.getStringField("frontaddress") << "  "
 				<< "on_off:" << p.getIntField("on_off") << "  "
 				<< "sessionid:" << p.getIntField("sessionid") << "  "
-				<< "isactive:" << p.getStringField("isactive") << "*" << endl;
+				<< "isactive:" << p.getStringField("isactive") << "*" << endl;*/
+			this->getXtsDBLogger()->info("\t*brokerid:{} traderid:{} password:{} userid:{} frontAdress:{} on_off:{}", 
+				p.getStringField("brokerid"), p.getStringField("traderid"), p.getStringField("password"), p.getStringField("userid"),
+				p.getStringField("frontaddress"), p.getIntField("on_off"));
 			User *user = new User(p.getStringField("frontaddress"), p.getStringField("brokerid"), p.getStringField("userid"), p.getStringField("password"), p.getStringField("userid"), p.getIntField("on_off"), p.getStringField("traderid"), p.getStringField("order_ref_base"));
 			l_user->push_back(user);
 		}
@@ -3340,4 +3369,8 @@ void DBManager::setDB_Connect_Status(bool db_connect_status) {
 
 bool DBManager::getDB_Connect_Status() {
 	return this->db_connect_status;
+}
+
+std::shared_ptr<spdlog::logger> DBManager::getXtsDBLogger() {
+	return this->xts_db_logger;
 }

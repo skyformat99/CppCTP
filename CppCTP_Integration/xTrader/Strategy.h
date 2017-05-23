@@ -6,10 +6,11 @@
 #include "Debug.h"
 #include "DBManager.h"
 #include "xTradeStruct.h"
+#include "concurrentqueue/blockingconcurrentqueue.h"
 #include <spdlog/spdlog.h>
 using namespace spdlog;
 using spdlog::logger;
-
+using namespace moodycamel;
 using std::list;
 class DBManager;
 
@@ -358,8 +359,6 @@ public:
 	/// 更新策略
 	void UpdateStrategy(Strategy *stg);
 
-	
-
 	/// 创建持仓明细
 	void CreatePositionDetail(USER_CThostFtdcOrderField *posd);
 	
@@ -603,6 +602,10 @@ private:
 	bool is_position_right;				//仓位是否正确,是否需要调整仓位
 	std::shared_ptr<spdlog::logger> xts_logger;
 
+	// 阻塞队列
+	moodycamel::BlockingConcurrentQueue<CThostFtdcDepthMarketDataField *> queue_OnRtnDepthMarketData;	// 行情队列
+	moodycamel::BlockingConcurrentQueue<CThostFtdcOrderField *> queue_OnRtnOrder;						// order回调队列
+	moodycamel::BlockingConcurrentQueue<CThostFtdcTradeField *> queue_OnRtnTrade;						// trade回调队列
 };
 
 #endif
