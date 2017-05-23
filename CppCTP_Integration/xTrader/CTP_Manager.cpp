@@ -504,8 +504,7 @@ void CTP_Manager::saveAllStrategyPositionDetail() {
 	list<Strategy *>::iterator stg_itor;
 	list<USER_CThostFtdcOrderField *>::iterator posd_itor;
 	list<USER_CThostFtdcTradeField *>::iterator posd_itor_trade;
-	USER_PRINT("CTP_Manager::saveAllStrategyPositionDetail()");
-	std::cout << "CTP_Manager::saveAllStrategyPositionDetail()" << std::endl;
+	this->getXtsLogger()->info("CTP_Manager::saveAllStrategyPositionDetail()");
 	for (stg_itor = this->l_strategys->begin();
 		stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
 
@@ -518,10 +517,10 @@ void CTP_Manager::saveAllStrategyPositionDetail() {
 		// 删除之前集合里的trade,order
 		this->getDBManager()->DeletePositionDetailByStrategy((*stg_itor));
 
-		std::cout << "\t关闭服务端,保存期货账户 = " << (*stg_itor)->getStgUserId() << std::endl;
-		std::cout << "\t关闭服务端,保存策略ID = " << (*stg_itor)->getStgStrategyId() << std::endl;
-		std::cout << "\t关闭服务端,Order明细长度 = " << (*stg_itor)->getStg_List_Position_Detail_From_Order()->size() << std::endl;
-		std::cout << "\t关闭服务端,Trade明细长度 = " << (*stg_itor)->getStg_List_Position_Detail_From_Trade()->size() << std::endl;
+		this->getXtsLogger()->info("\t关闭服务端,保存期货账户 = {}", (*stg_itor)->getStgUserId());
+		this->getXtsLogger()->info("\t关闭服务端,保存策略ID = {}", (*stg_itor)->getStgStrategyId());
+		this->getXtsLogger()->info("\t关闭服务端,Order明细长度 = {}", (*stg_itor)->getStg_List_Position_Detail_From_Order()->size());
+		this->getXtsLogger()->info("\t关闭服务端,Trade明细长度 = {}", (*stg_itor)->getStg_List_Position_Detail_From_Trade()->size());
 
 		// 遍历strategy持仓明细并保存
 		for (posd_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
@@ -2079,7 +2078,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 							}
 							else {
-								std::cout << "\t未能找到修改的Strategy" << std::endl;
+								ctp_m->getXtsLogger()->debug("\t未能找到修改的Strategy");
 							}
 						}
 					}
@@ -3181,8 +3180,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					}
 				}
 				else {
-					USER_PRINT("infoArray.Is Not Array()");
-					std::cout << "\t未收到修改策略信息" << std::endl;
+					ctp_m->getXtsLogger()->debug("\tinfoArray.Is Not Array()");
+					ctp_m->getXtsLogger()->debug("\t未收到修改策略信息");
 				}
 				
 				/// 如果找到修改的策略
@@ -3354,7 +3353,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						break;
 					}
 					else {
-						std::cout << "\t未能找到修改的Strategy" << std::endl;
+						ctp_m->getXtsLogger()->debug("\t未能找到修改的Strategy");
 						stg_itor++;
 					}
 				}

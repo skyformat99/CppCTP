@@ -2463,6 +2463,7 @@ void DBManager::CreatePositionDetailChanged(USER_CThostFtdcOrderField *posd) {
 	USER_PRINT("DBManager::CreatePositionDetailYesterday OK");
 }
 void DBManager::DeletePositionDetailChanged(USER_CThostFtdcOrderField *posd) {
+	this->getXtsDBLogger()->info("DBManager::DeletePositionDetailChanged()");
 	USER_PRINT("DBManager::DeletePositionDetailChanged");
 	int count_number = 0;
 
@@ -2478,7 +2479,7 @@ void DBManager::DeletePositionDetailChanged(USER_CThostFtdcOrderField *posd) {
 		USER_PRINT("DBManager::DeletePositionDetailChanged ok");
 	}
 	else {
-		cout << "删除昨持仓明细,持仓明细不存在!" << endl;
+		this->getXtsDBLogger()->debug("\t删除昨持仓明细,持仓明细不存在!");
 	}
 	USER_PRINT("DBManager::DeletePositionDetailChanged OK");
 }
@@ -2674,7 +2675,7 @@ void DBManager::CreatePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
 	USER_PRINT("DBManager::CreatePositionDetailYesterday OK");
 }
 void DBManager::DeletePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
-	USER_PRINT("DBManager::DeletePositionDetailYesterday");
+	this->getXtsDBLogger()->info("DBManager::DeletePositionDetailYesterday()");
 	int count_number = 0;
 
 	count_number = this->conn->count(DB_POSITIONDETAIL_YESTERDAY_COLLECTION,
@@ -2688,7 +2689,7 @@ void DBManager::DeletePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
 		USER_PRINT("DBManager::DeletePositionDetail ok");
 	}
 	else {
-		cout << "删除昨持仓明细,持仓明细不存在!" << endl;
+		this->getXtsDBLogger()->debug("\t删除昨持仓明细,持仓明细不存在!");
 	}
 	USER_PRINT("DBManager::DeletePositionDetailYesterday OK");
 }
@@ -3002,7 +3003,7 @@ void DBManager::CreatePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd
 }
 
 void DBManager::DeletePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd) {
-	USER_PRINT("DBManager::DeletePositionDetailTradeChanged");
+	this->getXtsDBLogger()->info("DBManager::DeletePositionDetailTradeChanged");
 	int count_number = 0;
 
 	count_number = this->conn->count(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION,
@@ -3016,7 +3017,7 @@ void DBManager::DeletePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd
 		USER_PRINT("DBManager::DeletePositionDetailTradeYesterday ok");
 	}
 	else {
-		cout << "删除昨持仓明细,持仓明细不存在!" << endl;
+		this->getXtsDBLogger()->debug("\t删除昨持仓明细,持仓明细不存在!");
 	}
 	USER_PRINT("DBManager::DeletePositionDetailTradeChanged OK");
 }
@@ -3187,7 +3188,7 @@ void DBManager::CreatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *po
 }
 
 void DBManager::DeletePositionDetailTradeYesterday(USER_CThostFtdcTradeField *posd) {
-	USER_PRINT("DBManager::DeletePositionDetailTradeYesterday");
+	this->getXtsDBLogger()->info("DBManager::DeletePositionDetailTradeYesterday()");
 	int count_number = 0;
 
 	count_number = this->conn->count(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION,
@@ -3201,7 +3202,7 @@ void DBManager::DeletePositionDetailTradeYesterday(USER_CThostFtdcTradeField *po
 		USER_PRINT("DBManager::DeletePositionDetailTradeYesterday ok");
 	}
 	else {
-		cout << "删除昨持仓明细,持仓明细不存在!" << endl;
+		this->getXtsDBLogger()->debug("\t删除昨持仓明细,持仓明细不存在!");
 	}
 	USER_PRINT("DBManager::DeletePositionDetailTradeYesterday OK");
 }

@@ -2524,56 +2524,30 @@ void Strategy::Order_Algorithm_One() {
 		(this->stg_instrument_B_tick->AskVolume1 != 0) &&
 		(this->stg_instrument_B_tick->BidVolume1 != 0))
 	{
-		//std::cout << "计算多头" << endl;
-		//std::cout << "A_tick->BidPrice1 = " << this->stg_instrument_A_tick->BidPrice1 << endl;
-		//std::cout << "B_tick->AskPrice1 = " << this->stg_instrument_B_tick->AskPrice1 << endl;
-		USER_PRINT("计算多头");
-		USER_PRINT(this->stg_instrument_A_tick->BidPrice1);
-		USER_PRINT(this->stg_instrument_B_tick->AskPrice1);
 		//市场多头价差
 		this->stg_spread_long = this->stg_instrument_A_tick->BidPrice1 - 
 								this->stg_instrument_B_tick->AskPrice1;
 
-		//std::cout << "A_tick->BidVolume1 = " << this->stg_instrument_A_tick->BidVolume1 << endl;
-		//std::cout << "B_tick->AskVolume1 = " << this->stg_instrument_B_tick->AskVolume1 << endl;
-		USER_PRINT(this->stg_instrument_A_tick->BidVolume1);
-		USER_PRINT(this->stg_instrument_B_tick->AskVolume1);
 
 		//市场多头价差挂单量
 		this->stg_spread_long_volume = std::min(this->stg_instrument_A_tick->BidVolume1,
 			this->stg_instrument_B_tick->AskVolume1);
 
-		//std::cout << "stg_spread_long_volume = " << this->stg_spread_long_volume << endl;
-		USER_PRINT(this->stg_spread_long_volume);
 
-		//std::cout << "计算空头" << endl;
-		//std::cout << "A_tick->AskPrice1 = " << this->stg_instrument_A_tick->AskPrice1 << endl;
-		//std::cout << "B_tick->BidPrice1 = " << this->stg_instrument_B_tick->BidPrice1 << endl;
-		USER_PRINT("计算空头");
-		USER_PRINT(this->stg_instrument_A_tick->AskPrice1);
-		USER_PRINT(this->stg_instrument_B_tick->BidPrice1);
 		// 市场空头价差
 		this->stg_spread_short = this->stg_instrument_A_tick->AskPrice1 -
 			this->stg_instrument_B_tick->BidPrice1;
 
-
-		//std::cout << "A_tick->AskVolume1 = " << this->stg_instrument_A_tick->AskVolume1 << endl;
-		//std::cout << "B_tick->BidVolume1 = " << this->stg_instrument_B_tick->BidVolume1 << endl;
-
-		USER_PRINT(this->stg_instrument_A_tick->AskVolume1);
-		USER_PRINT(this->stg_instrument_B_tick->BidVolume1);
-
 		// 市场空头价差挂单量
 		this->stg_spread_short_volume = std::min(this->stg_instrument_A_tick->AskVolume1,
 			this->stg_instrument_B_tick->BidVolume1);
-
-		//std::cout << "stg_spread_short_volume = " << this->stg_spread_short_volume << endl;
-		USER_PRINT(this->stg_spread_short_volume);
 	} 
 	else
 	{
 		//this->printStrategyInfo("策略跳过异常行情");
 		//this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One()_1", false);
+		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One()");
+		this->getStgUser()->getXtsLogger()->info("\t策略跳过异常行情");
 		return;
 	}
 
@@ -2583,12 +2557,6 @@ void Strategy::Order_Algorithm_One() {
 		(this->stg_user->getOn_Off()) && 
 		(this->stg_user->GetTrader()->getOn_Off()) && 
 		(this->stg_user->getCTP_Manager()->getOn_Off()))) {
-		USER_PRINT("请检查开关状态!");
-		/*this->printStrategyInfo("请检查开关状态!");
-		std::cout << "策略开关 = " << this->getOn_Off() << std::endl;
-		std::cout << "期货账户开关 = " << this->stg_user->getOn_Off() << std::endl;
-		std::cout << "总开关 = " << this->stg_user->GetTrader()->getOn_Off() << std::endl;*/
-		//this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One()_2", false);
 		return;
 	}
 
@@ -2606,8 +2574,8 @@ void Strategy::Order_Algorithm_One() {
 		//this->update_task_status();
 
 		/// 市场多头价差大于触发参数， AB持仓量相等且大于0
-		std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
-		std::cout << "\t策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差卖平" << endl;
+		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One()");
+		this->getStgUser()->getXtsLogger()->info("\t策略编号:{}, 交易信号触发，价差卖平", this->stg_strategy_id);
 		
 
 		/*std::cout << "user_id = " << this->stg_user_id << ", "
@@ -2730,9 +2698,8 @@ void Strategy::Order_Algorithm_One() {
 		//this->update_task_status();
 
 		/// 市场空头价差小于等于触发参数， AB持仓量相等且大于0
-		//std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买平" << endl;
-		std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
-		std::cout << "\t策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买平" << endl;
+		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One()");
+		this->getStgUser()->getXtsLogger()->info("\t策略编号:{}, 交易信号触发，价差买平", this->stg_strategy_id);
 
 		/*std::cout << "user_id = " << this->stg_user_id << ", "
 			<< "strategy_id = " << this->stg_strategy_id << ", "
@@ -2849,53 +2816,8 @@ void Strategy::Order_Algorithm_One() {
 		((this->stg_position_a_buy + this->stg_position_a_sell + this->stg_pending_a_open) < this->stg_lots) &&
 		(this->stg_spread_long >= (this->stg_sell_open + this->stg_spread_shift * this->stg_a_price_tick)) &&
 		(!this->stg_select_order_algorithm_flag)) {
-		std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
-		std::cout << "\tthis->stg_select_order_algorithm_flag before set = " << this->stg_select_order_algorithm_flag << std::endl;
 
 		this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One() 价差卖开", true); // 开启下单锁
-		
-		//this->setStgTradeTasking(true);
-		//this->printStrategyInfo("价差卖开");
-		//this->update_task_status();
-
-		/** 市场多头价差大于触发参数
-		A合约买持仓加B合约买小于总仓位**/
-
-		//std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差卖开" << endl;
-		
-		//std::cout << "\t策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差卖开" << endl;
-		
-		std::cout << "user_id = " << this->stg_user_id << ", "
-			<< "strategy_id = " << this->stg_strategy_id << ", "
-			<< "instrument_A = " << this->stg_instrument_id_A << ", "
-			<< "instrument_B = " << this->stg_instrument_id_B << ", "
-			<< "spread long = " << this->stg_spread_long << ", "
-			<< "spread long volume = " << this->stg_spread_long_volume << ", "
-			<< "spread short = " << this->stg_spread_short << ", "
-			<< "spread short volume = " << this->stg_spread_short_volume << ", "
-			<< "stg_lots_batch = " << this->stg_lots_batch << ", "
-			<< "stg_position_a_buy = " << this->stg_position_a_buy << ", "
-			<< "stg_position_a_sell = " << this->stg_position_a_sell << ", "
-			<< "stg_lots = " << this->stg_lots << endl;
-
-		//cout << "\t交易日:" << stg_instrument_A_tick->TradingDay 
-		//	<< ", 合约代码:" << stg_instrument_A_tick->InstrumentID 
-		//	<< ", 最新价:" << stg_instrument_A_tick->LastPrice 
-		//	<< ", 持仓量:" << stg_instrument_A_tick->OpenInterest 
-		//	//<< ", 上次结算价:" << stg_instrument_A_tick->PreSettlementPrice 
-		//	//<< ", 昨收盘:" << stg_instrument_A_tick->PreClosePrice 
-		//	<< ", 数量:" << stg_instrument_A_tick->Volume 
-		//	//<< ", 昨持仓量:" << stg_instrument_A_tick->PreOpenInterest
-		//	<< ", 最后修改时间:" << stg_instrument_A_tick->UpdateTime
-		//	<< ", 最后修改毫秒:" << stg_instrument_A_tick->UpdateMillisec
-		//	<< ", 申买价一：" << stg_instrument_A_tick->BidPrice1 
-		//	<< ", 申买量一:" << stg_instrument_A_tick->BidVolume1 
-		//	<< ", 申卖价一:" << stg_instrument_A_tick->AskPrice1 
-		//	<< ", 申卖量一:" << stg_instrument_A_tick->AskVolume1 
-		//	//<< ", 今收盘价:" << stg_instrument_A_tick->ClosePrice
-		//	//<< ", 当日均价:" << stg_instrument_A_tick->AveragePrice
-		//	//<< ", 本次结算价格:" << stg_instrument_A_tick->SettlementPrice
-		//	<< ", 成交金额:" << stg_instrument_A_tick->Turnover << endl;
 
 		/*if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) || this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick)) {
 			std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
@@ -2904,6 +2826,9 @@ void Strategy::Order_Algorithm_One() {
 			std::cout << "\tthis->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick) = " << this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick) << std::endl;
 			return;
 			}*/
+
+		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One()");
+		this->getStgUser()->getXtsLogger()->info("\t策略编号:{}, 交易信号触发，价差卖开", this->stg_strategy_id);
 
 		/// 满足交易任务之前的tick
 		this->CopyTickData(stg_instrument_A_tick_last, stg_instrument_A_tick);
@@ -2999,27 +2924,8 @@ void Strategy::Order_Algorithm_One() {
 		//this->stg_trade_tasking = true;
 		//this->printStrategyInfo("价差买开");
 		//this->update_task_status();
-
-		//std::cout << "策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买开" << endl;
-		std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
-		std::cout << "\t策略编号：" << this->stg_strategy_id << ", 交易信号触发，价差买开" << endl;
-
-		/*std::cout << "user_id = " << this->stg_user_id << ", "
-			<< "strategy_id = " << this->stg_strategy_id << ", "
-			<< "instrument_A = " << this->stg_instrument_id_A << ", "
-			<< "instrument_B = " << this->stg_instrument_id_B << ", "
-			<< "spread long = " << this->stg_spread_long << ", "
-			<< "spread long volume = " << this->stg_spread_long_volume << ", "
-			<< "spread short = " << this->stg_spread_short << ", "
-			<< "spread short volume = " << this->stg_spread_short_volume << endl;*/
-
-		/*if (this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) || this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick)) {
-			std::cout << "Strategy::Order_Algorithm_One()" << std::endl;
-			std::cout << "\t CompareTickData相同!" << std::endl;
-			std::cout << "\tthis->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) = " << this->CompareTickData(stg_instrument_A_tick_last, stg_instrument_A_tick) << std::endl;
-			std::cout << "\tthis->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick) = " << this->CompareTickData(stg_instrument_B_tick_last, stg_instrument_B_tick) << std::endl;
-			return;
-		}*/
+		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One()");
+		this->getStgUser()->getXtsLogger()->info("\t策略编号:{}, 交易信号触发，价差买开", this->stg_strategy_id);
 
 		/// 满足交易任务之前的tick
 		this->CopyTickData(stg_instrument_A_tick_last, stg_instrument_A_tick);

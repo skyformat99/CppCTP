@@ -5,5 +5,8 @@ FutureTools/Pycharm/Gather/.idea/*
 FutureTools/Pycharm/Gather/gui/.idea/*
 CppCTP_Integration/xTrader/conn/md/*
 CppCTP_Integration/xTrader/conn/td/*
+CppCTP_Integration/xTrader/bin/conn/md/*
+CppCTP_Integration/xTrader/bin/conn/td/*
+CppCTP_Integration/xTrader/bin/logs/*
 CppCTP_Integration/xTrader/CMakeFiles/*
 CppCTP_LTS/Cython_CppCTP_LTS/.idea/*

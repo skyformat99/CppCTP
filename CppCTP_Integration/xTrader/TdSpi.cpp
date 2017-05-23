@@ -75,10 +75,6 @@ TdSpi::TdSpi() {
 
 //增加api
 void TdSpi::addApi(User *user, string flowpath) {
-	USER_PRINT("TdSpi::addApi");
-	USER_PRINT(flowpath);
-	
-
 	int flag = Utils::CreateFolder(flowpath.c_str());
 	if (flag != 0) {
 		USER_PRINT("Can not create folder");
