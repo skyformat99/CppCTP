@@ -47,6 +47,25 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 	this->l_position_detail_from_local_order = new list<USER_INSTRUMENT_POSITION *>();
 	this->l_position_detail_from_local_trade = new list<USER_INSTRUMENT_POSITION *>();
 	this->thread_init_status = false;
+
+	try {
+		this->xts_user_logger = spdlog::get("xts_async_" + UserID + "_logger");
+		if (!this->xts_user_logger)
+		{
+			// 设置缓冲区大小
+			spdlog::set_async_mode(4096);
+			// 创建日志文件
+			this->xts_user_logger = spdlog::daily_logger_mt("xts_async_" + UserID + "_logger", "logs/xts_log_user_" +  UserID + ".txt");
+			this->xts_user_logger->flush_on(spdlog::level::debug);
+		}
+
+	}
+	catch (const spdlog::spdlog_ex& ex) {
+		Utils::printRedColor("Log初始化失败,错误!");
+		Utils::printRedColor(ex.what());
+		exit(1);
+	}
+
 	USER_PRINT(this->stg_order_ref_base);
 }
 
@@ -73,6 +92,24 @@ User::User(string BrokerID, string UserID, int nRequestID, string stg_order_ref_
 	this->l_position_detail_from_ctp = new list<USER_INSTRUMENT_POSITION *>();
 	this->l_position_detail_from_local_order = new list<USER_INSTRUMENT_POSITION *>();
 	this->l_position_detail_from_local_trade = new list<USER_INSTRUMENT_POSITION *>();
+
+	try {
+		this->xts_user_logger = spdlog::get("xts_async_" + UserID + "_logger");
+		if (!this->xts_user_logger)
+		{
+			// 设置缓冲区大小
+			spdlog::set_async_mode(4096);
+			// 创建日志文件
+			this->xts_user_logger = spdlog::daily_logger_mt("xts_async_" + UserID + "_logger", "logs/xts_log_user_" + UserID + ".txt");
+			this->xts_user_logger->flush_on(spdlog::level::debug);
+		}
+		
+	}
+	catch (const spdlog::spdlog_ex& ex) {
+		Utils::printRedColor("Log初始化失败,错误!");
+		Utils::printRedColor(ex.what());
+		exit(1);
+	}
 }
 
 User::~User() {
@@ -1831,8 +1868,8 @@ bool User::ComparePositionTotal() {
 
 // 设置系统xts_logger
 void User::setXtsLogger(std::shared_ptr<spdlog::logger> ptr) {
-	this->xts_logger = ptr;
+	this->xts_user_logger = ptr;
 }
 std::shared_ptr<spdlog::logger> User::getXtsLogger() {
-	return this->xts_logger;
+	return this->xts_user_logger;
 }

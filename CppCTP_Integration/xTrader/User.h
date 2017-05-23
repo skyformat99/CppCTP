@@ -210,7 +210,7 @@ private:
 	list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_local_order;
 	list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_local_trade;
 	bool thread_init_status;
-	std::shared_ptr<spdlog::logger> xts_logger;
+	std::shared_ptr<spdlog::logger> xts_user_logger;
 };
 
 #endif

@@ -1,0 +1,36 @@
+[2017-05-23 13:37:34.828] [xts_async_db_logger] [info] DBManager::getAllTrader()
+[2017-05-23 13:37:34.828] [xts_async_db_logger] [info] 	*traderid:1601 tradername:yuanpengfei password:123456 isactive:1 on_off:1
+[2017-05-23 13:37:34.828] [xts_async_db_logger] [info] 	*traderid:1602 tradername:yinjiaxing password:123456 isactive:1 on_off:1
+[2017-05-23 13:37:34.828] [xts_async_db_logger] [info] 	*traderid:1603 tradername:yeting password:123456 isactive:1 on_off:1
+[2017-05-23 13:37:34.828] [xts_async_db_logger] [info] 	*traderid:1606 tradername:yuwangying password:123456 isactive:1 on_off:1
+[2017-05-23 13:37:34.828] [xts_async_db_logger] [info] DBManager::getAllObjTrader()
+[2017-05-23 13:37:34.829] [xts_async_db_logger] [info] 	*traderid:1601 tradername:yuanpengfei password:123456 isactive:1 on_off:1
+[2017-05-23 13:37:34.829] [xts_async_db_logger] [info] 	*traderid:1602 tradername:yinjiaxing password:123456 isactive:1 on_off:1
+[2017-05-23 13:37:34.829] [xts_async_db_logger] [info] 	*traderid:1603 tradername:yeting password:123456 isactive:1 on_off:1
+[2017-05-23 13:37:34.829] [xts_async_db_logger] [info] 	*traderid:1606 tradername:yuwangying password:123456 isactive:1 on_off:1
+[2017-05-23 13:37:34.829] [xts_async_db_logger] [info] DBManager::getAllFutureAccount()
+[2017-05-23 13:37:34.829] [xts_async_db_logger] [info] 	*brokerid:9999 traderid:1601 password:123456 userid:091921 frontAdress:tcp://180.168.146.187:10000 on_off:1
+[2017-05-23 13:37:34.832] [xts_async_db_logger] [info] DBManager::getAllStrategyByActiveUser()
+[2017-05-23 13:37:34.833] [xts_async_db_logger] [info] DBManager::getAllStrategyYesterdayByActiveUser()
+[2017-05-23 13:37:34.836] [xts_async_db_logger] [info] DBManager::getAllPositionDetail()
+[2017-05-23 13:37:34.837] [xts_async_db_logger] [info] DBManager::getAllPositionDetailTrade()
+[2017-05-23 13:37:34.838] [xts_async_db_logger] [info] DBManager::getOneMarketConfig()
+[2017-05-23 13:37:36.861] [xts_async_db_logger] [info] DBManager::getAllPositionDetailYesterday()
+[2017-05-23 13:37:36.862] [xts_async_db_logger] [info] DBManager::getAllPositionDetailTradeYesterday()
+[2017-05-23 13:37:46.867] [xts_async_db_logger] [info] DBManager::UpdateSystemRunningStatus value = on
+[2017-05-23 13:37:46.867] [xts_async_db_logger] [info] DBManager::UpdateSystemRunningStatus key = BEES_HOME
+[2017-05-23 13:37:55.728] [xts_async_db_logger] [info] DBManager::FindTraderByTraderIdAndPassword()
+[2017-05-23 13:37:55.729] [xts_async_db_logger] [info] 	traderid = 1601
+[2017-05-23 13:37:55.729] [xts_async_db_logger] [info] 	tradername = yuanpengfei
+[2017-05-23 13:37:55.729] [xts_async_db_logger] [info] 	password = 123456
+[2017-05-23 13:37:55.729] [xts_async_db_logger] [info] 	isactive = 1
+[2017-05-23 13:37:55.729] [xts_async_db_logger] [info] 	on_off = 1
+[2017-05-23 13:37:55.729] [xts_async_db_logger] [info] DBManager::getAllMarketConfig()
+[2017-05-23 13:37:55.730] [xts_async_db_logger] [info] 	*market_id:1 market_frontAddr:tcp://180.168.146.187:10011 broker_id:9999 password:123456
+[2017-05-23 13:37:55.733] [xts_async_db_logger] [info] DBManager::getAllAlgorithm()
+[2017-05-23 13:37:55.733] [xts_async_db_logger] [info] 	*name:01
+[2017-05-23 13:37:55.733] [xts_async_db_logger] [info] DBManager::getAllStrategyByActiveUser()
+[2017-05-23 13:37:55.737] [xts_async_db_logger] [info] DBManager::getAllPositionDetailYesterday()
+[2017-05-23 13:37:55.739] [xts_async_db_logger] [info] DBManager::getAllPositionDetailTradeYesterday()
+[2017-05-23 13:37:55.741] [xts_async_db_logger] [info] DBManager::getAllPositionDetailChanged()
+[2017-05-23 13:37:55.758] [xts_async_db_logger] [info] DBManager::getAllPositionDetailTradeChanged()

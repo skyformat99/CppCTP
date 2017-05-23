@@ -82,7 +82,7 @@ DBManager::DBManager() {
 			// 设置缓冲区大小
 			spdlog::set_async_mode(4096);
 			// 创建日志文件
-			this->xts_db_logger = spdlog::daily_logger_mt("xts_async_db_logger", "logs/xts_db_log.txt");
+			this->xts_db_logger = spdlog::daily_logger_mt("xts_async_db_logger", "logs/xts_log_db.txt");
 		}
 		
 	}
@@ -267,6 +267,7 @@ void DBManager::SearchTraderByTraderIdAndPassword(string traderid, string passwo
 }
 
 bool DBManager::FindTraderByTraderIdAndPassword(string traderid, string password, Trader *op) {
+	this->getXtsDBLogger()->info("DBManager::FindTraderByTraderIdAndPassword()");
 	int count_number = 0;
 	bool flag = false;
 
@@ -281,11 +282,11 @@ bool DBManager::FindTraderByTraderIdAndPassword(string traderid, string password
 			this->conn->query(DB_OPERATOR_COLLECTION, MONGO_QUERY("traderid" << traderid << "password" << password << "isactive" << ISACTIVE));
 		while (cursor->more()) {
 			BSONObj p = cursor->next();
-			cout << "traderid = " << p.getStringField("traderid") << endl;
-			cout << "tradername = " << p.getStringField("tradername") << endl;
-			cout << "password = " << p.getStringField("password") << endl;
-			cout << "isactive = " << p.getStringField("isactive") << endl;
-			cout << "on_off = " << p.getIntField("on_off") << endl;
+			this->getXtsDBLogger()->info("\ttraderid = {}", p.getStringField("traderid"));
+			this->getXtsDBLogger()->info("\ttradername = {}", p.getStringField("tradername"));
+			this->getXtsDBLogger()->info("\tpassword = {}", p.getStringField("password"));
+			this->getXtsDBLogger()->info("\tisactive = {}", p.getStringField("isactive"));
+			this->getXtsDBLogger()->info("\ton_off = {}", p.getIntField("on_off"));
 			op->setTraderID(p.getStringField("traderid"));
 			op->setTraderName(p.getStringField("tradername"));
 			op->setPassword(p.getStringField("password"));
@@ -735,6 +736,7 @@ int DBManager::DeleteStrategy(Strategy *stg) {
 }
 
 int DBManager::UpdateStrategyOnOff(Strategy *stg) {
+	this->getXtsDBLogger()->info("DBManager::UpdateStrategyOnOff()");
 	int count_number = 0;
 	int flag = 0;
 	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
@@ -742,9 +744,9 @@ int DBManager::UpdateStrategyOnOff(Strategy *stg) {
 
 	if (count_number > 0) {
 
-		std::cout << "UpdateStrategyOnOff strategy_id = " << stg->getStgStrategyId() << std::endl;
-		std::cout << "UpdateStrategyOnOff user_id = " << stg->getStgUserId() << std::endl;
-		std::cout << "UpdateStrategyOnOff strategy_on_off = " << stg->getOn_Off() << std::endl;
+		this->getXtsDBLogger()->info("UpdateStrategyOnOff strategy_id = {}", stg->getStgStrategyId());
+		this->getXtsDBLogger()->info("UpdateStrategyOnOff user_id = {}", stg->getStgUserId());
+		this->getXtsDBLogger()->info("UpdateStrategyOnOff strategy_on_off = {}", stg->getOn_Off());
 
 		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId()) << "is_active" << true), BSON("$set" << BSON("strategy_on_off" << stg->getOn_Off())));
 		USER_PRINT("DBManager::UpdateStrategyOnOff ok");
@@ -784,13 +786,13 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 	USER_PRINT("DBManager::UpdateStrategy()");
 	int count_number = 0;
 
-	std::cout << "DBManager::UpdateStrategy()" << std::endl;
+	this->getXtsDBLogger()->info("DBManager::UpdateStrategy()");
 
 
 	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
 		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
 
-	std::cout << "\tcount_number = " << count_number << std::endl;
+	this->getXtsDBLogger()->info("\tcount_number = {}", count_number);
 
 	if (count_number > 0) {
 		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true), BSON("$set" << BSON("position_a_sell_today" << stg->getStgPositionASellToday()
@@ -1016,7 +1018,7 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 }
 
 void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<User *> *l_users, string traderid) {
-	std::cout << "DBManager::getAllStrategyByActiveUser()" << std::endl;
+	this->getXtsDBLogger()->info("DBManager::getAllStrategyByActiveUser()");
 	USER_PRINT("getAllStrategyByActiveUser");
 	list<User *>::iterator user_itor;
 	/// 初始化的时候，必须保证list为空
@@ -1687,7 +1689,7 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 }
 
 void DBManager::getAllStrategyYesterdayByActiveUser(list<Strategy *> *l_strategys, list<User *> *l_users, string traderid) {
-	std::cout << "DBManager::getAllStrategyYesterdayByActiveUser()" << std::endl;
+	this->getXtsDBLogger()->info("DBManager::getAllStrategyYesterdayByActiveUser()");
 	USER_PRINT("getAllStrategyYesterdayByActiveUser");
 	list<User *>::iterator user_itor;
 	/// 初始化的时候，必须保证list为空
@@ -1945,7 +1947,7 @@ void DBManager::UpdateMarketConfig(MarketConfig *mc) {
 }
 
 void DBManager::getAllMarketConfig(list<MarketConfig *> *l_marketconfig) {
-	std::cout << "DBManager::getAllMarketConfig()" << std::endl;
+	this->getXtsDBLogger()->info("DBManager::getAllMarketConfig()");
 	string DB_MARKETCONFIG_COLLECTION;
 	if (this->is_online) {
 		DB_MARKETCONFIG_COLLECTION = "CTP.marketconfig";
@@ -1965,19 +1967,15 @@ void DBManager::getAllMarketConfig(list<MarketConfig *> *l_marketconfig) {
 
 	int countnum = this->conn->count(DB_MARKETCONFIG_COLLECTION);
 	if (countnum == 0) {
-		cout << "DBManager::getAllMarketConfig None!" << endl;
+		this->getXtsDBLogger()->info("\tDBManager::getAllMarketConfig None!");
 	}
 	else {
 		unique_ptr<DBClientCursor> cursor =
 			this->conn->query(DB_MARKETCONFIG_COLLECTION, MONGO_QUERY("isactive" << ISACTIVE));
 		while (cursor->more()) {
 			BSONObj p = cursor->next();
-			cout << "\t*" << "market_id:" << p.getStringField("market_id") << "  "
-				<< "market_frontAddr:" << p.getStringField("market_frontAddr") << "  "
-				<< "broker_id:" << p.getStringField("broker_id") << "  "
-				<< "userid:" << p.getStringField("user_id") << "  "
-				<< "password:" << p.getStringField("password") << "  "
-				<< "isactive:" << p.getStringField("isactive") << "*" << endl;
+			this->getXtsDBLogger()->info("\t*market_id:{} market_frontAddr:{} broker_id:{} password:{}",
+				p.getStringField("market_id"), p.getStringField("market_frontAddr"), p.getStringField("broker_id"), p.getStringField("password"));
 			MarketConfig *mc = new MarketConfig();
 			mc->setMarketID(p.getStringField("market_id"));
 			mc->setMarketFrontAddr(p.getStringField("market_frontAddr"));
@@ -1993,7 +1991,7 @@ void DBManager::getAllMarketConfig(list<MarketConfig *> *l_marketconfig) {
 }
 
 MarketConfig * DBManager::getOneMarketConfig() {
-	std::cout << "DBManager::getOneMarketConfig()" << std::endl;
+	this->getXtsDBLogger()->info("DBManager::getOneMarketConfig()");
 	USER_PRINT(this->is_online);
 	string DB_MARKETCONFIG_COLLECTION;
 	if (this->is_online) {
@@ -2008,17 +2006,13 @@ MarketConfig * DBManager::getOneMarketConfig() {
 		cout << "\tDBManager::getOneMarketConfig None!" << endl;
 	}
 	else {
-		cout << "\tMarketConfig * DBManager::getOneMarketConfig() isactive" << ISACTIVE << endl;
 		BSONObj p = this->conn->findOne(DB_MARKETCONFIG_COLLECTION, BSON("isactive" << ISACTIVE));
-		cout << "\tmarket_id = " << p.getStringField("market_id") << endl;
 		if ((strcmp(p.getStringField("market_id"), ""))) {
-			cout << "\t*" << "market_id:" << p.getStringField("market_id") << "  "
-				<< "market_frontAddr:" << p.getStringField("market_frontAddr") << "  "
-				<< "broker_id:" << p.getStringField("broker_id") << "  "
-				<< "userid:" << p.getStringField("user_id") << "  "
-				<< "password:" << p.getStringField("password") << "  "
-				<< "isactive:" << p.getStringField("isactive") << "*" << endl;
-			USER_PRINT("DBManager::getOneMarketConfig ok");
+
+			this->getXtsDBLogger()->debug("\t*market_id:{} market_frontAddr:{} broker_id:{} userid:{} password:{}",
+				p.getStringField("market_id"), p.getStringField("market_frontAddr"), p.getStringField("broker_id"), 
+				p.getStringField("password"));
+			
 			return new MarketConfig(p.getStringField("market_id"), p.getStringField("market_frontAddr"), p.getStringField("broker_id"),
 				p.getStringField("user_id"), p.getStringField("password"), p.getStringField("isactive"));
 		}
@@ -2086,7 +2080,7 @@ void DBManager::UpdateAlgorithm(Algorithm *alg) {
 
 }
 void DBManager::getAllAlgorithm(list<Algorithm *> *l_alg) {
-	std::cout << "DBManager::getAllAlgorithm()" << std::endl;
+	this->getXtsDBLogger()->info("DBManager::getAllAlgorithm()");
 	/// 初始化的时候，必须保证list为空
 	if (l_alg->size() > 0) {
 		list<Algorithm *>::iterator alg_itor;
@@ -2097,15 +2091,14 @@ void DBManager::getAllAlgorithm(list<Algorithm *> *l_alg) {
 
 	int countnum = this->conn->count(DB_ALGORITHM_COLLECTION);
 	if (countnum == 0) {
-		cout << "DBManager::getAllAlgorithm None!" << endl;
+		this->getXtsDBLogger()->info("\tDBManager::getAllAlgorithm None!");
 	}
 	else {
 		unique_ptr<DBClientCursor> cursor =
 			this->conn->query(DB_ALGORITHM_COLLECTION, MONGO_QUERY("isactive" << ISACTIVE));
 		while (cursor->more()) {
 			BSONObj p = cursor->next();
-			cout << "\t*" << "name:" << p.getStringField("name") << "  "
-				<< "isactive:" << p.getStringField("isactive") << "*" << endl;
+			this->getXtsDBLogger()->info("\t*name:{}", p.getStringField("name"));
 			Algorithm *alg = new Algorithm();
 			alg->setAlgName(p.getStringField("name"));
 			alg->setIsActive(p.getStringField("isactive"));
@@ -2344,7 +2337,7 @@ void DBManager::UpdatePositionDetail(USER_CThostFtdcOrderField *posd) {
 
 void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, string traderid, string userid) {
 	USER_PRINT("DBManager::getAllPositionDetail");
-	std::cout << "DBManager::getAllPositionDetail()" << std::endl;
+	this->getXtsDBLogger()->info("DBManager::getAllPositionDetail()");
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
 		list<USER_CThostFtdcOrderField *>::iterator itor;
@@ -2527,7 +2520,7 @@ void DBManager::UpdatePositionDetailChanged(USER_CThostFtdcOrderField *posd) {
 void DBManager::getAllPositionDetailChanged(list<USER_CThostFtdcOrderField *> *l_posd,
 	string traderid, string userid) {
 	USER_PRINT("DBManager::getAllPositionDetailChanged");
-	std::cout << "DBManager::getAllPositionDetailChanged()" << std::endl;
+	this->getXtsDBLogger()->info("DBManager::getAllPositionDetailChanged()");
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
 		list<USER_CThostFtdcOrderField *>::iterator itor;
@@ -2736,8 +2729,7 @@ void DBManager::UpdatePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
 
 void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> *l_posd,
 	string traderid, string userid) {
-	USER_PRINT("DBManager::getAllPositionDetailYesterday");
-	std::cout << "DBManager::getAllPositionDetailYesterday()" << std::endl;
+	this->getXtsDBLogger()->info("DBManager::getAllPositionDetailYesterday()");
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
 		list<USER_CThostFtdcOrderField *>::iterator itor;
@@ -2898,8 +2890,7 @@ void DBManager::UpdatePositionDetailTrade(USER_CThostFtdcTradeField *posd) {
 }
 
 void DBManager::getAllPositionDetailTrade(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id, string userid) {
-	USER_PRINT("DBManager::getAllPositionDetailTrade");
-	std::cout << "DBManager::getAllPositionDetailTrade()" << std::endl;
+	this->getXtsDBLogger()->info("DBManager::getAllPositionDetailTrade()");
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
 		list<USER_CThostFtdcTradeField *>::iterator itor;
@@ -3061,7 +3052,7 @@ void DBManager::UpdatePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd
 
 void DBManager::getAllPositionDetailTradeChanged(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id, string userid) {
 	USER_PRINT("DBManager::getAllPositionDetailTradeChanged");
-	std::cout << "DBManager::getAllPositionDetailTradeChanged()" << std::endl;
+	this->getXtsDBLogger()->info("DBManager::getAllPositionDetailTradeChanged()");
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
 		list<USER_CThostFtdcTradeField *>::iterator itor;
@@ -3245,8 +3236,7 @@ void DBManager::UpdatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *po
 }
 
 void DBManager::getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id, string userid) {
-	USER_PRINT("DBManager::getAllPositionDetailYesterday");
-	std::cout << "DBManager::getAllPositionDetailTradeYesterday()" << std::endl;
+	this->getXtsDBLogger()->info("DBManager::getAllPositionDetailTradeYesterday()");
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
 		list<USER_CThostFtdcTradeField *>::iterator itor;
@@ -3321,10 +3311,10 @@ void DBManager::DropPositionDetailTradeYesterday() {
 }
 
 void DBManager::UpdateSystemRunningStatus(string value) {
-	USER_PRINT("DBManager::UpdateSystemRunningStatus");
 
-	std::cout << "DBManager::UpdateSystemRunningStatus value = " << value << std::endl;
-	std::cout << "DBManager::UpdateSystemRunningStatus key = " << DB_RUNNING_KEY << std::endl;
+	this->getXtsDBLogger()->info("DBManager::UpdateSystemRunningStatus value = {}", value);
+	this->getXtsDBLogger()->info("DBManager::UpdateSystemRunningStatus key = {}", DB_RUNNING_KEY);
+
 	int count_number = this->conn->count(DB_SYSTEM_RUNNING_STATUS_COLLECTION,
 		BSON("key" << DB_RUNNING_KEY));
 

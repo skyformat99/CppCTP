@@ -92,11 +92,8 @@ void TdSpi::addApi(User *user, string flowpath) {
 
 //建立连接
 void TdSpi::Connect(User *user, bool init_flag) {
-	USER_PRINT("TdSpi::Connect");
 	USER_PRINT(const_cast<char *>(user->getFrontAddress().c_str()));
 	this->tdapi = user->getUserTradeAPI();
-	cout << "TdSpi::Connect()" << std::endl;
-	cout << "\t已创建连接对象 = " << this->tdapi << std::endl;
 	this->tdapi->RegisterFront(const_cast<char *>(user->getFrontAddress().c_str()));
 	//注册事件处理对象
 	this->tdapi->RegisterSpi(user->getUserTradeSPI());
@@ -1961,7 +1958,7 @@ void TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
 	//TThostFtdcMacAddressType	MacAddress;
 	//sleep(1);
 
-	std::cout << "TdSpi::OrderInsert() 报单参数:" <<
+	/*std::cout << "TdSpi::OrderInsert() 报单参数:" <<
 		"BrokerID:" << pInputOrder->BrokerID <<
 		", InvestorID:" << pInputOrder->InvestorID <<
 		", OrderRef:" << pInputOrder->OrderRef <<
@@ -1971,7 +1968,7 @@ void TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
 		", Direction:" << pInputOrder->Direction <<
 		", CombOffsetFlag:" << pInputOrder->CombOffsetFlag[0] <<
 		", CombHedgeFlag:" << pInputOrder->CombHedgeFlag[0] <<
-		std::endl;
+		std::endl;*/
 
 	this->tdapi->ReqOrderInsert(pInputOrder, 1);
 

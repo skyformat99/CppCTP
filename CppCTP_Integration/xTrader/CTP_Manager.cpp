@@ -50,7 +50,8 @@ CTP_Manager::CTP_Manager() {
 		// 设置缓冲区大小
 		spdlog::set_async_mode(4096);
 		// 创建日志文件
-		this->xts_logger = spdlog::daily_logger_mt("xts_async_logger", "logs/xts_log.txt");
+		this->xts_logger = spdlog::daily_logger_mt("xts_async_logger", "logs/xts_log_ctpmanager.txt");
+		this->xts_logger->flush_on(spdlog::level::debug);
 	} catch (const spdlog::spdlog_ex& ex) {
 		Utils::printRedColor("Log初始化失败,错误!");
 		Utils::printRedColor(ex.what());
@@ -114,10 +115,16 @@ User * CTP_Manager::CreateAccount(User *user, list<Strategy *> *l_strategys) {
 		}
 
 		sleep(1);
-		std::cout << "CTP_Manager::CreateAccount()" << std::endl;
+		/*std::cout << "CTP_Manager::CreateAccount()" << std::endl;
 		std::cout << "\t期货账户 = " << user->getUserID() << endl;
 		std::cout << "\tBrokerID = " << user->getBrokerID() << endl;
-		std::cout << "\t期货密码 = " << user->getPassword() << endl;
+		std::cout << "\t期货密码 = " << user->getPassword() << endl;*/
+
+		this->getXtsLogger()->info("CTP_Manager::CreateAccount()");
+		this->getXtsLogger()->info("\t期货账户 = {}", user->getUserID());
+		this->getXtsLogger()->info("\tBrokerID = {}", user->getBrokerID());
+		this->getXtsLogger()->info("\t期货密码 = {}", user->getPassword());
+
 		user->getUserTradeSPI()->Connect(user, this->system_init_flag); // 连接
 		sleep(1);
 		user->getUserTradeSPI()->Login(user); // 登陆
@@ -125,8 +132,6 @@ User * CTP_Manager::CreateAccount(User *user, list<Strategy *> *l_strategys) {
 		user->getUserTradeSPI()->QrySettlementInfoConfirm(user); // 确认交易结算
 		/// 设置初始化状态完成
 		user->setThread_Init_Status(true);
-
-		std::cout << "\t子线程ID = " << std::this_thread::get_id() << ", UserID = " << user->getUserID() << std::endl;
 
 		/// 等待结束
 		user->getUserTradeAPI()->Join();
@@ -658,8 +663,6 @@ void CTP_Manager::saveStrategyPositionDetail(Strategy *stg) {
 void CTP_Manager::saveStrategyChangedPositionDetail(Strategy *stg) {
 	list<USER_CThostFtdcOrderField *>::iterator posd_itor;
 	list<USER_CThostFtdcTradeField *>::iterator posd_itor_trade;
-	USER_PRINT("CTP_Manager::saveStrategyChangedPositionDetail()");
-	std::cout << "CTP_Manager::saveStrategyChangedPositionDetail()" << std::endl;
 	this->getXtsLogger()->info("CTP_Manager::saveStrategyChangedPositionDetail()");
 	//this->dbm->UpdateStrategy((*stg_itor));
 	stg->setStgUpdatePositionDetailRecordTime(Utils::getDate());
@@ -778,17 +781,17 @@ string CTP_Manager::getTradingDay() {
 
 /// 初始化数据发送
 void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, int i_MsgRef, int i_MsgSrc, string s_UserID, string s_StrategyID) {
-	std::cout << "CTP_Manager::InitClientData()" << std::endl;
+	ctp_m->getXtsLogger()->info("CTP_Manager::InitClientData()");
 	rapidjson::Document build_doc;
 	rapidjson::StringBuffer buffer;
 	rapidjson::Writer<StringBuffer> writer(buffer);
 
-	std::cout << "\t服务端发送客户端初始化数据" << std::endl;
+	ctp_m->getXtsLogger()->info("\t服务端发送客户端初始化数据");
 
 	/************************************************************************/
 	/*请求行情接口配置信息     msgtype == 4                                                       */
 	/************************************************************************/
-	std::cout << "\t请求行情接口配置信息..." << std::endl;
+	ctp_m->getXtsLogger()->info("\t请求行情接口配置信息...");
 
 	list<MarketConfig *> l_marketconfig;
 	static_dbm->getAllMarketConfig(&l_marketconfig);
@@ -839,7 +842,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	/************************************************************************/
 	/*请求账户信息        msgtype == 2                                                    */
 	/************************************************************************/
-	std::cout << "\t请求账户信息..." << std::endl;
+	ctp_m->getXtsLogger()->info("\t请求账户信息...");
 	//list<FutureAccount *> l_futureaccount;
 	//static_dbm->SearchFutrueListByTraderID(s_TraderID, &l_futureaccount);
 
@@ -911,8 +914,8 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	/************************************************************************/
 	/*请求查询算法             msgtype == 11                                            */
 	/************************************************************************/
-	std::cout << "\t请求查询算法..." << std::endl;
-
+	//std::cout << "\t请求查询算法..." << std::endl;
+	ctp_m->getXtsLogger()->info("\t请求查询算法...");
 
 	rapidjson::Document build_doc3;
 	rapidjson::StringBuffer buffer3;
@@ -965,8 +968,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	/************************************************************************/
 	/*请求查询策略信息      msgtype == 3                                                   */
 	/************************************************************************/
-	std::cout << "\t请求查询策略信息..." << std::endl;
-
+	ctp_m->getXtsLogger()->info("\t请求查询策略信息...");
 
 	rapidjson::Document build_doc4;
 	rapidjson::StringBuffer buffer4;
@@ -1101,8 +1103,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	/* 查询期货账户昨日持仓明细(order)    msgtype == 15                                                                 */
 	/************************************************************************/
 	// 查询期货账户昨日持仓明细
-	std::cout << "\t查询期货账户昨日持仓明细..." << std::endl;
-
+	ctp_m->getXtsLogger()->info("\t查询期货账户昨日持仓明细...");
 
 	rapidjson::Document build_doc5;
 	rapidjson::StringBuffer buffer5;
@@ -1205,7 +1206,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	/*查询期货账户昨日持仓明细(trade) msgtype == 17                                                                      */
 	/************************************************************************/
 	// 查询期货账户昨日持仓明细(trade)
-	std::cout << "\t查询期货账户昨日持仓明细..." << std::endl;
+	ctp_m->getXtsLogger()->info("\t查询期货账户昨日持仓明细...");
 
 	bFind = false;
 
@@ -1346,8 +1347,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	/* 查询期货账户今日持仓明细(order)已修改过的    msgtype == 20                                                                 */
 	/************************************************************************/
 	// 查询期货账户今日持仓明细
-	std::cout << "\t查询期货账户今日持仓明细order(已修改过的)..." << std::endl;
-	
+	ctp_m->getXtsLogger()->info("\t查询期货账户今日持仓明细order(已修改过的)...");
 
 	rapidjson::Document build_doc20;
 	rapidjson::StringBuffer buffer20;
@@ -1355,8 +1355,6 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 
 	bFind = false;
 	static_dbm->getAllPositionDetailChanged(&l_posd, s_TraderID, s_UserID);
-
-	std::cout << "\torder size = " << l_posd.size() << std::endl;
 
 	/*构建策略昨仓Json*/
 	build_doc20.SetObject();
@@ -1448,8 +1446,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	/*查询期货账户昨日持仓明细(trade) msgtype == 21                                                                      */
 	/************************************************************************/
 	// 查询期货账户昨日持仓明细(trade)
-	std::cout << "\t查询期货账户今日持仓明细trade(已修改过的)..." << std::endl;
-
+	ctp_m->getXtsLogger()->info("\t查询期货账户今日持仓明细trade(已修改过的)...");
 	bFind = false;
 
 	rapidjson::Document build_doc21;
@@ -1457,8 +1454,6 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	rapidjson::Writer<StringBuffer> writer21(buffer21);
 
 	static_dbm->getAllPositionDetailTradeChanged(&l_posd_trade, s_TraderID, s_UserID);
-
-	std::cout << "\ttrade size = " << l_posd_trade.size() << std::endl;
 
 	/*构建策略昨仓Json*/
 	build_doc21.SetObject();
@@ -1638,7 +1633,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 			//ctp_m->getXtsLogger()->info("\tmsgtype = {}", msgtype);
 
 			if (msgtype == 1) { // TraderInfo
-				std::cout << "\t请求交易登录..." << std::endl;
+				ctp_m->getXtsLogger()->info("\t请求交易登录...");
 				rapidjson::Value &TraderID = doc["TraderID"];
 				rapidjson::Value &Password = doc["Password"];
 				rapidjson::Value &MsgRef = doc["MsgRef"];
@@ -1650,12 +1645,12 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				int i_MsgSendFlag = MsgSendFlag.GetInt();
 				int i_MsgSrc = MsgSrc.GetInt();
 
-				std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
-				std::cout << "\t收到交易员密码 = " << s_Password << std::endl;
+				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
+				ctp_m->getXtsLogger()->info("\t收到交易员密码 = {}", s_Password);
 
 				bool isTraderExists = static_dbm->FindTraderByTraderIdAndPassword(s_TraderID, s_Password, op);
 				if (isTraderExists) { // 用户存在
-					std::cout << "\t交易员存在..." << std::endl;
+					ctp_m->getXtsLogger()->info("\t交易员存在");
 					build_doc.SetObject();
 					rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
 					build_doc.AddMember("MsgRef", server_msg_ref++, allocator);
@@ -1735,7 +1730,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				int i_MsgSendFlag = MsgSendFlag.GetInt();
 				int i_MsgSrc = MsgSrc.GetInt();
 
-				std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
+				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
 				//list<FutureAccount *> l_futureaccount;
 				//static_dbm->SearchFutrueListByTraderID(s_TraderID, &l_futureaccount);
 
@@ -1803,8 +1798,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				string s_UserID = UserID.GetString();
 				string s_StrategyID = StrategyID.GetString();
 
-				std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
-				std::cout << "\t收到期货账户ID = " << s_UserID << std::endl;
+				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
+				ctp_m->getXtsLogger()->info("\t收到期货账户ID = {}", s_UserID);
 
 				//list<Strategy *> l_strategys;
 				//static_dbm->getAllStrategy(&l_strategys, s_TraderID, s_UserID);
@@ -1931,7 +1926,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				int i_MsgSendFlag = MsgSendFlag.GetInt();
 				int i_MsgSrc = MsgSrc.GetInt();
 
-				std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
+				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
 
 				list<MarketConfig *> l_marketconfig;
 				static_dbm->getAllMarketConfig(&l_marketconfig);
@@ -1967,7 +1962,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 			}
 			else if (msgtype == 5) { // 修改Strategy（修改Strategy参数,不带修改持仓信息）
-				std::cout << "\t请求策略修改..." << std::endl;
+				ctp_m->getXtsLogger()->info("\t请求策略修改...");
 
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
@@ -1984,8 +1979,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				string s_UserID = UserID.GetString();
 				string s_StrategyID = StrategyID.GetString();
 
-				std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
-				std::cout << "\t收到期货账户ID = " << s_UserID << std::endl;
+				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
+				ctp_m->getXtsLogger()->info("\t收到期货账户ID = {}", s_UserID);
 
 				/*构建StrategyInfo的Json*/
 				build_doc.SetObject();
@@ -2008,12 +2003,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						const Value& object = infoArray[i];
 						std::string q_user_id = object["user_id"].GetString();
 						std::string q_strategy_id = object["strategy_id"].GetString();
-						std::cout << "q_user_id = " << q_user_id << std::endl;
-						std::cout << "q_strategy_id = " << q_strategy_id << std::endl;
 						list<Strategy *>::iterator stg_itor;
 						for (stg_itor = ctp_m->getListStrategy()->begin(); stg_itor != ctp_m->getListStrategy()->end(); stg_itor++) {
-							std::cout << "\t存在UserID = " << (*stg_itor)->getStgUserId() << std::endl;
-							std::cout << "\t存在StrategyID = " << (*stg_itor)->getStgStrategyId() << std::endl;
+							
 							if (((*stg_itor)->getStgUserId() == q_user_id) && ((*stg_itor)->getStgStrategyId() == q_strategy_id)) {
 								Utils::printGreenColor("找到即将修改的Strategy");
 								/* PyQt更新参数如下 */
@@ -2116,8 +2108,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				int i_MsgSrc = MsgSrc.GetInt();
 				string s_UserID = UserID.GetString();
 
-				std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
-				std::cout << "\t收到期货账户ID = " << s_UserID << std::endl;
+				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
+				ctp_m->getXtsLogger()->info("\t收到期货账户ID = {}", s_UserID);
 
 				/*构建StrategyInfo的Json*/
 				build_doc.SetObject();
@@ -2554,8 +2546,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 				bool bFind = false;
 
-				std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
-				std::cout << "\t收到交易员账户开关 = " << i_OnOff << std::endl;
+				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
 
 				/*构建交易员开关的Json*/
 				build_doc.SetObject();
@@ -2608,9 +2599,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 				bool bFind = false;
 
-				std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
-				std::cout << "\t收到期货账户ID = " << s_UserID << std::endl;
-				std::cout << "\t收到期货账户开关 = " << i_OnOff << std::endl;
+				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
+				ctp_m->getXtsLogger()->info("\t收到期货账户ID = {}", s_UserID);
+				ctp_m->getXtsLogger()->info("\t收到期货账户开关 = {}", i_OnOff);
 
 				/*构建期货账户开关的Json*/
 				build_doc.SetObject();
@@ -2662,8 +2653,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 				bool bFind = false;
 
-				std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
-				std::cout << "\t收到期货账户ID = " << s_UserID << std::endl;
+				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
+				ctp_m->getXtsLogger()->info("\t收到期货账户ID = {}", s_UserID);
 
 				list<Strategy *> l_strategys;
 				//static_dbm->getAllStrategyYesterday(&l_strategys, s_TraderID, s_UserID);
@@ -2795,7 +2786,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				int i_MsgSendFlag = MsgSendFlag.GetInt();
 				int i_MsgSrc = MsgSrc.GetInt();
 
-				std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
+				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
 
 				list<Algorithm *> l_alg;
 				static_dbm->getAllAlgorithm(&l_alg);
@@ -2843,8 +2834,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				string s_UserID = UserID.GetString();
 				string s_StrategyID = StrategyID.GetString();
 
-				/*std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
-				std::cout << "\t收到期货账户ID = " << s_UserID << std::endl;*/
+				
 				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
 				ctp_m->getXtsLogger()->info("\t收到期货账户ID = {}", s_UserID);
 
@@ -3137,7 +3127,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									//(*stg_itor)->setStgTradeTaskingRecovery();
 									// tick锁归位
 									(*stg_itor)->setStgSelectOrderAlgorithmFlag("CTP_Manager::HandleMessage() msgtype == 12", false);
-									std::cout << "\tStrategy修改持仓完成!" << std::endl;
+									ctp_m->getXtsLogger()->debug("\tStrategy修改持仓完成!");
 
 									/*构造内容json*/
 									rapidjson::Value create_info_object(rapidjson::kObjectType);
@@ -3184,7 +3174,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 								}
 								else {
-									std::cout << "\t未能找到修改的Strategy" << std::endl;
+									ctp_m->getXtsLogger()->debug("\t未能找到修改的Strategy");
 								}
 							}
 						}
@@ -3225,7 +3215,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 			}
 			else if (msgtype == 13) { // 策略开关
-				std::cout << "\t策略开关..." << std::endl;
+				ctp_m->getXtsLogger()->info("\t策略开关...");
 
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
@@ -3243,8 +3233,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				string s_StrategyID = StrategyID.GetString();
 				int i_OnOff = OnOff.GetInt();
 
-				std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
-				std::cout << "\t收到期货账户ID = " << s_UserID << std::endl;
+				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
+				ctp_m->getXtsLogger()->info("\t收到期货账户ID = {}", s_UserID);
 
 				/*构建StrategyInfo的Json*/
 				build_doc.SetObject();
@@ -3319,8 +3309,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				string s_StrategyID = StrategyID.GetString();
 				int i_OnOff = OnOff.GetInt();
 
-				std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
-				std::cout << "\t收到期货账户ID = " << s_UserID << std::endl;
+				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
+				ctp_m->getXtsLogger()->info("\t收到期货账户ID = {}", s_UserID);
 
 				/*构建StrategyInfo的Json*/
 				build_doc.SetObject();
@@ -3388,8 +3378,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 				bool bFind = false;
 
-				std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
-				std::cout << "\t收到期货账户ID = " << s_UserID << std::endl;
+				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
+				ctp_m->getXtsLogger()->info("\t收到期货账户ID = {}", s_UserID);
 
 				list<USER_CThostFtdcOrderField *> l_posd;
 				static_dbm->getAllPositionDetailYesterday(&l_posd, s_TraderID, s_UserID);
@@ -3478,8 +3468,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				int i_MsgSendFlag = MsgSendFlag.GetInt();
 				int i_MsgSrc = MsgSrc.GetInt();
 
-				std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
-				std::cout << "\t收到UserID = " << s_UserID << std::endl;
+				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
+				ctp_m->getXtsLogger()->info("\t收到期货账户ID = {}", s_UserID);
 				
 				list<Session *>::iterator sid_itor;
 				list<User *>::iterator user_itor;
@@ -3553,8 +3543,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 				bool bFind = false;
 
-				std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
-				std::cout << "\t收到期货账户ID = " << s_UserID << std::endl;
+				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
+				ctp_m->getXtsLogger()->info("\t收到期货账户ID = {}", s_UserID);
 
 				list<USER_CThostFtdcTradeField *> l_posd;
 				static_dbm->getAllPositionDetailTradeYesterday(&l_posd, s_TraderID, s_UserID);
@@ -3687,8 +3677,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 				bool bFind = false;
 
-				std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
-				std::cout << "\t收到期货账户ID = " << s_UserID << std::endl;
+				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
+				ctp_m->getXtsLogger()->info("\t收到期货账户ID = {}", s_UserID);
 
 				list<USER_CThostFtdcOrderField *> l_posd;
 				static_dbm->getAllPositionDetailChanged(&l_posd, s_TraderID, s_UserID);
@@ -3778,8 +3768,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 				bool bFind = false;
 
-				std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
-				std::cout << "\t收到期货账户ID = " << s_UserID << std::endl;
+				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
+				ctp_m->getXtsLogger()->info("\t收到期货账户ID = {}", s_UserID);
 
 				list<USER_CThostFtdcTradeField *> l_posd;
 				static_dbm->getAllPositionDetailTradeChanged(&l_posd, s_TraderID, s_UserID);
@@ -4219,26 +4209,26 @@ bool CTP_Manager::initYesterdayPosition() {
 
 /// 初始化策略(策略更新trading_day, 期货账户更新order_ref)
 bool CTP_Manager::initStrategyAndFutureAccount() {
-	USER_PRINT("CTP_Manager::initStrategyAndFutureAccount()");
-	std::cout << "CTP_Manager::initStrategyAndFutureAccount()" << std::endl;
+	this->getXtsLogger()->info("CTP_Manager::initStrategyAndFutureAccount()");
 	/// 如果ctp_manager交易日为空,说明未初始化完成
 	if (this->trading_day == "")
 	{
-		std::cout << "\tctp_manager交易日为空,初始化失败!" << std::endl;
+		this->getXtsLogger()->error("\tctp_manager交易日为空,初始化失败!");
 		this->setCTPFinishedPositionInit(false);
 		return false;
 	}
 	else {
-		std::cout << "\tctp_manager交易日 不 为空" << std::endl;
+		this->getXtsLogger()->info("\tctp_manager交易日 不 为空");
 		if (this->getMdLogin()) {
-			std::cout << "\t行情 已 登陆成功,初始化成功" << std::endl;
+			this->getXtsLogger()->info("\t行情 已 登陆成功,初始化成功");
 			this->setCTPFinishedPositionInit(true);
 		}
 		else {
-			std::cout << "\t行情 未 登陆成功,初始化失败!" << std::endl;
+			this->getXtsLogger()->info("\t行情 未 登陆成功,初始化失败!");
 			this->setCTPFinishedPositionInit(false);
 		}
 	}
+
 	bool flag = true;
 	bool is_position_right = true; //策略是否有过修改持仓,默认无,仓位都是正确的
 
@@ -4653,7 +4643,7 @@ void CTP_Manager::sendTradeOffLineMessage(string user_id) {
 /// 策略增加后同步到Users
 bool CTP_Manager::syncStrategyAddToUsers(Strategy *stg) {
 	USER_PRINT("CTP_Manager::syncStrategyAddToUsers");
-	std::cout << "CTP_Manager::syncStrategyAddToUsers()" << std::endl;
+	this->getXtsLogger()->debug("CTP_Manager::syncStrategyAddToUsers()");
 	bool isAddSuccess = false;
 	bool isFindUser = false;
 
@@ -4661,11 +4651,13 @@ bool CTP_Manager::syncStrategyAddToUsers(Strategy *stg) {
 
 	/// 添加策略到user列表里
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
-		std::cout << "\t系统存在账户 = " << (*user_itor)->getUserID() << std::endl;
-		std::cout << "\t增加策略账户 = " << stg->getStgUserId() << std::endl;
+
+		this->getXtsLogger()->info("\t系统存在账户 = {}", (*user_itor)->getUserID());
+		this->getXtsLogger()->info("\t增加策略账户 = {}", stg->getStgUserId());
+
 		if ((stg->getStgUserId() == (*user_itor)->getUserID())
 			&& (stg->getStgTraderId() == (*user_itor)->getTraderID())) {
-			std::cout << "\t期货账户,交易员均相同,开始同步..." << std::endl;
+			this->getXtsLogger()->debug("\t期货账户,交易员均相同,开始同步...");
 			isFindUser = true;
 			(*user_itor)->addStrategyToList(stg);
 			isAddSuccess = true;
@@ -4673,11 +4665,11 @@ bool CTP_Manager::syncStrategyAddToUsers(Strategy *stg) {
 	}
 
 	if (isFindUser && isAddSuccess) {
-		std::cout << "\t新增策略已同步到期货账户!" << std::endl;
+		this->getXtsLogger()->debug("\t新增策略已同步到期货账户!");
 		return true;
 	}
 	else {
-		std::cout << "\t新增策略 未 同步到期货账户!" << std::endl;
+		this->getXtsLogger()->debug("\t新增策略 未 同步到期货账户!");
 		return false;
 	}
 
@@ -4686,7 +4678,7 @@ bool CTP_Manager::syncStrategyAddToUsers(Strategy *stg) {
 /// 策略删除后同步到Users
 bool CTP_Manager::syncStrategyDeleteToUsers(string d_traderid, string d_userid, string d_strategyid) {
 	USER_PRINT("CTP_Manager::syncStrategyAddToUsers");
-	std::cout << "CTP_Manager::syncStrategyAddToUsers()" << std::endl;
+	this->getXtsLogger()->debug("CTP_Manager::syncStrategyDeleteToUsers()");
 	bool isDeleteSuccess = false;
 	bool isFindUser = false;
 
@@ -4695,9 +4687,6 @@ bool CTP_Manager::syncStrategyDeleteToUsers(string d_traderid, string d_userid, 
 
 	/// 添加策略到user列表里
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
-		/*std::cout << "\t系统存在账户 = " << (*user_itor)->getUserID() << std::endl;
-		std::cout << "\t欲删除策略账户id = " << d_userid << std::endl;
-		std::cout << "\t欲删除策略id = " << d_strategyid << std::endl;*/
 
 		this->getXtsLogger()->info("\t系统存在账户 = {}", (*user_itor)->getUserID());
 		this->getXtsLogger()->info("\t欲删除策略账户id = {}", d_userid);
@@ -4705,13 +4694,11 @@ bool CTP_Manager::syncStrategyDeleteToUsers(string d_traderid, string d_userid, 
 
 		if ((d_userid == (*user_itor)->getUserID())
 			&& (d_traderid == (*user_itor)->getTraderID())) {
-			//std::cout << "\t期货账户,交易员均相同,开始匹配策略id..." << std::endl;
 			this->getXtsLogger()->info("\t期货账户,交易员均相同,开始匹配策略id...");
 			isFindUser = true;
 			for (stg_itor = (*user_itor)->getListStrategy()->begin(); stg_itor != (*user_itor)->getListStrategy()->end(); ) {
 				if ((*stg_itor)->getStgStrategyId() == d_strategyid)
 				{
-					//std::cout << "\t策略id匹配成功..." << std::endl;
 					this->getXtsLogger()->info("\t策略id匹配成功...");
 					delete (*stg_itor);
 					stg_itor = (*user_itor)->getListStrategy()->erase(stg_itor);
@@ -4726,11 +4713,11 @@ bool CTP_Manager::syncStrategyDeleteToUsers(string d_traderid, string d_userid, 
 	}
 
 	if (isFindUser && isDeleteSuccess) {
-		std::cout << "\t删除策略已同步到期货账户!" << std::endl;
+		this->getXtsLogger()->debug("\t删除策略已同步到期货账户!");
 		return true;
 	}
 	else {
-		std::cout << "\t删除策略 未 同步到期货账户!" << std::endl;
+		this->getXtsLogger()->debug("\t删除策略 未 同步到期货账户!");
 		return false;
 	}
 }
@@ -4992,7 +4979,6 @@ bool CTP_Manager::init(bool is_online) {
 		USER_PRINT((*user_itor)->getTraderID());
 		(*user_itor)->setCTP_Manager(this); //每个user对象设置CTP_Manager对象
 		(*user_itor)->setDBManager(this->dbm); //每个user对象设置DBManager对象
-		(*user_itor)->setXtsLogger(this->getXtsLogger());
 
 		for (trader_itor = this->l_obj_trader->begin(); trader_itor != this->l_obj_trader->end(); trader_itor++) {
 			USER_PRINT((*trader_itor)->getTraderID());

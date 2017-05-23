@@ -379,7 +379,7 @@ void timer_handler() {
 
 	if (ctp_m->getIsMarketClose() != market_close_flag)
 	{
-		Utils::printGreenColorWithKV("现在时间:", nowtime);
+		Utils::printGreenColorWithKV("timer_handler() 现在时间:", nowtime);
 		ctp_m->setIsMarketClose(market_close_flag);
 	}
 
@@ -512,16 +512,17 @@ int main(int argc, char *argv[]) {
 
 	if (!strcmp("1", argv[2])) {
 		init_flag = true;
-		printf("盘中模式... \n");
+		//printf("盘中模式... \n");
 	}
 	else if (!strcmp("0", argv[2])) {
 		init_flag = false;
-		printf("离线模式... \n");
+		//printf("离线模式... \n");
 	}
 	else {
 		printf("usage: %s #port #mode\n", argv[0]);
 		printf("port: 0~65536\n");
 		printf("mode: 1:online 0:offline\n");
+		spdlog::drop_all();
 		exit(1);
 	}
 
@@ -546,7 +547,8 @@ int main(int argc, char *argv[]) {
 
 	// 程序入口，初始化资源
 	if (!ctp_m->init(init_flag)) {
-		std::cout << "系统初始化失败!" << std::endl;
+		std::cout << "系统初始化失败!请检查日志!" << std::endl;
+		spdlog::drop_all();
 		exit(1);
 	}
 
@@ -580,6 +582,7 @@ int main(int argc, char *argv[]) {
 	err = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &sock_reuse, sizeof(sock_reuse));
 	if (err != 0) {
 		printf("SO_REUSEADDR Setting Failed!\n");
+		spdlog::drop_all();
 		exit(1);
 	}
 	// b：设置接收缓冲区大小
@@ -587,6 +590,7 @@ int main(int argc, char *argv[]) {
 	err = setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, (const char*)&nRecvBuf, sizeof(int));
 	if (err != 0) {
 		printf("SO_RCVBUF Setting Failed!\n");
+		spdlog::drop_all();
 		exit(1);
 	}
 	// c：设置发送缓冲区大小
@@ -594,6 +598,7 @@ int main(int argc, char *argv[]) {
 	err = setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, (const char*)&nSendBuf, sizeof(int));
 	if (err != 0) {
 		printf("SO_SNDBUF Setting Failed!\n");
+		spdlog::drop_all();
 		exit(1);
 	}
 
@@ -606,6 +611,7 @@ int main(int argc, char *argv[]) {
 	serveraddr.sin_addr.s_addr = INADDR_ANY; //接收所有网卡地址
 	if (bind(sockfd, (struct sockaddr *)&serveraddr, sizeof(serveraddr)) < 0) {
 		perror("bind error");
+		spdlog::drop_all();
 		exit(1);
 	}
 
@@ -614,6 +620,7 @@ int main(int argc, char *argv[]) {
 	第二个参数:指定队列的长度*/
 	if (listen(sockfd, MAXCONNECTIONS) < 0) {
 		perror("listen error");
+		spdlog::drop_all();
 		exit(1);
 	}
 
