@@ -2078,7 +2078,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 							}
 							else {
-								ctp_m->getXtsLogger()->debug("\t未能找到修改的Strategy");
+								ctp_m->getXtsLogger()->info("\t未能找到修改的Strategy");
 							}
 						}
 					}
@@ -3126,7 +3126,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									//(*stg_itor)->setStgTradeTaskingRecovery();
 									// tick锁归位
 									(*stg_itor)->setStgSelectOrderAlgorithmFlag("CTP_Manager::HandleMessage() msgtype == 12", false);
-									ctp_m->getXtsLogger()->debug("\tStrategy修改持仓完成!");
+									ctp_m->getXtsLogger()->info("\tStrategy修改持仓完成!");
 
 									/*构造内容json*/
 									rapidjson::Value create_info_object(rapidjson::kObjectType);
@@ -3173,15 +3173,15 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 								}
 								else {
-									ctp_m->getXtsLogger()->debug("\t未能找到修改的Strategy");
+									ctp_m->getXtsLogger()->info("\t未能找到修改的Strategy");
 								}
 							}
 						}
 					}
 				}
 				else {
-					ctp_m->getXtsLogger()->debug("\tinfoArray.Is Not Array()");
-					ctp_m->getXtsLogger()->debug("\t未收到修改策略信息");
+					ctp_m->getXtsLogger()->info("\tinfoArray.Is Not Array()");
+					ctp_m->getXtsLogger()->info("\t未收到修改策略信息");
 				}
 				
 				/// 如果找到修改的策略
@@ -3353,7 +3353,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						break;
 					}
 					else {
-						ctp_m->getXtsLogger()->debug("\t未能找到修改的Strategy");
+						ctp_m->getXtsLogger()->info("\t未能找到修改的Strategy");
 						stg_itor++;
 					}
 				}
@@ -4236,18 +4236,19 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 	list<USER_CThostFtdcOrderField *>::iterator position_itor;
 	list<USER_CThostFtdcTradeField *>::iterator position_trade_itor;
 
-	std::cout << "\tCTP_Manager 系统交易日 = " << this->getTradingDay() << std::endl;
+	this->getXtsLogger()->info("\tCTP_Manager 系统交易日 = {}", this->getTradingDay());
 	// 判断策略
 	bool is_equal = false;
 	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
+		
 		// 遍历Strategy
-		std::cout << "\t策略最后更新时间 = " << (*stg_itor)->getStgTradingDay() << std::endl;
+		this->getXtsLogger()->info("\t策略最后更新时间 = {}", (*stg_itor)->getStgTradingDay());
 		
 		is_equal = Utils::compareTradingDay((*stg_itor)->getStgTradingDay().c_str(), this->getTradingDay().c_str());
 
-		std::cout << "\t对比结果 = " << is_equal << std::endl;
-		std::cout << "\t今仓 userid = " << (*stg_itor)->getStgUserId() << std::endl;
-		std::cout << "\t今仓 strategy_id = " << (*stg_itor)->getStgStrategyId() << std::endl;
+		this->getXtsLogger()->info("\t对比结果 = {}", is_equal);
+		this->getXtsLogger()->info("\t今仓 userid = {}", (*stg_itor)->getStgUserId());
+		this->getXtsLogger()->info("\t今仓 strategy_id = {}", (*stg_itor)->getStgStrategyId());
 
 		/************************************************************************/
 		/* 判断持仓明细的trading_day
@@ -4257,7 +4258,8 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 
 		if (is_equal == false) { // 如果时间晚于最新交易日，那么将策略新建到昨仓，并且更新仓位
 
-			std::cout << "\t时间晚于最新交易日，更新策略持仓变量,昨仓变量初始化" << std::endl;
+			this->getXtsLogger()->info("\t时间晚于最新交易日，更新策略持仓变量,昨仓变量初始化");
+
 			// 上个交易日的今仓作为当天交易日的昨仓,当天交易日的今仓全部初始化为0
 			(*stg_itor)->setStgPositionABuy((*stg_itor)->getStgPositionABuy());
 			(*stg_itor)->setStgPositionABuyToday(0);
@@ -4288,7 +4290,7 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 			this->dbm->UpdateFutureAccountOrderRef(this->dbm->getConn(), (*stg_itor)->getStgUser(), "1000000001");
 
 		} else { // 如果时间等于最新交易日,说明今天已经更新过策略
-			std::cout << "\t策略时间等于最新交易日,无需初始化" << std::endl;
+			this->getXtsLogger()->info("\t策略时间等于最新交易日,无需初始化");
 		}
 	}
 
@@ -4342,8 +4344,6 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 		{
 			for (position_itor = this->l_posdetail->begin(); position_itor != this->l_posdetail->end(); position_itor++) {
 
-				USER_PRINT("将今持仓明细添加到策略的持仓明细里(order)");
-
 				if ((!strcmp((*stg_itor)->getStgStrategyId().c_str(), (*position_itor)->StrategyID)) &&
 					(!strcmp((*stg_itor)->getStgUserId().c_str(), (*position_itor)->UserID))) { //策略id相同 && 用户ID相同
 					strcpy((*position_itor)->TradingDayRecord, this->getTradingDay().c_str());
@@ -4355,19 +4355,15 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 		else { // 策略未修改过持仓变量，从昨持仓明细初始化
 			for (position_itor = this->l_posdetail_yesterday->begin(); position_itor != this->l_posdetail_yesterday->end(); position_itor++) {
 
-				USER_PRINT("将昨持仓明细添加到策略的持仓明细里(order)_1");
-
 				if ((!strcmp((*stg_itor)->getStgStrategyId().c_str(), (*position_itor)->StrategyID)) &&
 					(!strcmp((*stg_itor)->getStgUserId().c_str(), (*position_itor)->UserID))) { //策略id相同 && 用户ID相同
 					strcpy((*position_itor)->TradingDayRecord, this->getTradingDay().c_str());
-					USER_PRINT("将昨持仓明细添加到策略的持仓明细里(order)_2");
 					//添加到对应策略的持仓明细列表里
 					(*stg_itor)->getStg_List_Position_Detail_From_Order()->push_back((*position_itor));
 				}
 			}
 		}
 	}
-	USER_PRINT("order持仓明细添加完成");
 
 	/*******************************Trade******************************/
 	/* 遍历今仓列表(trade),对比TradingDayRecord,
@@ -4405,7 +4401,6 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 			}
 		}
 	}
-	USER_PRINT("初始化持仓明细(trade)");
 
 	// 获取昨持仓明细
 	this->dbm->getAllPositionDetailTradeYesterday(this->l_posdetail_trade_yesterday);
@@ -4417,8 +4412,6 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 			for (position_trade_itor = this->l_posdetail_trade->begin();
 				position_trade_itor != this->l_posdetail_trade->end();
 				position_trade_itor++) {
-
-				USER_PRINT("将今持仓明细添加到策略的持仓明细里(trade)");
 
 				if ((!strcmp((*stg_itor)->getStgStrategyId().c_str(), (*position_trade_itor)->StrategyID)) &&
 					(!strcmp((*stg_itor)->getStgUserId().c_str(), (*position_trade_itor)->UserID))) { //策略id相同 && 用户ID相同
@@ -4434,8 +4427,6 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 			for (position_trade_itor = this->l_posdetail_trade_yesterday->begin();
 				position_trade_itor != this->l_posdetail_trade_yesterday->end();
 				position_trade_itor++) {
-
-				USER_PRINT("将昨持仓明细添加到策略的持仓明细里(trade)");
 
 				if ((!strcmp((*stg_itor)->getStgStrategyId().c_str(), (*position_trade_itor)->StrategyID)) &&
 					(!strcmp((*stg_itor)->getStgUserId().c_str(), (*position_trade_itor)->UserID))) { //策略id相同 && 用户ID相同
@@ -4642,7 +4633,7 @@ void CTP_Manager::sendTradeOffLineMessage(string user_id) {
 /// 策略增加后同步到Users
 bool CTP_Manager::syncStrategyAddToUsers(Strategy *stg) {
 	USER_PRINT("CTP_Manager::syncStrategyAddToUsers");
-	this->getXtsLogger()->debug("CTP_Manager::syncStrategyAddToUsers()");
+	this->getXtsLogger()->info("CTP_Manager::syncStrategyAddToUsers()");
 	bool isAddSuccess = false;
 	bool isFindUser = false;
 
@@ -4656,7 +4647,7 @@ bool CTP_Manager::syncStrategyAddToUsers(Strategy *stg) {
 
 		if ((stg->getStgUserId() == (*user_itor)->getUserID())
 			&& (stg->getStgTraderId() == (*user_itor)->getTraderID())) {
-			this->getXtsLogger()->debug("\t期货账户,交易员均相同,开始同步...");
+			this->getXtsLogger()->info("\t期货账户,交易员均相同,开始同步...");
 			isFindUser = true;
 			(*user_itor)->addStrategyToList(stg);
 			isAddSuccess = true;
@@ -4664,11 +4655,11 @@ bool CTP_Manager::syncStrategyAddToUsers(Strategy *stg) {
 	}
 
 	if (isFindUser && isAddSuccess) {
-		this->getXtsLogger()->debug("\t新增策略已同步到期货账户!");
+		this->getXtsLogger()->info("\t新增策略已同步到期货账户!");
 		return true;
 	}
 	else {
-		this->getXtsLogger()->debug("\t新增策略 未 同步到期货账户!");
+		this->getXtsLogger()->info("\t新增策略 未 同步到期货账户!");
 		return false;
 	}
 
@@ -4677,7 +4668,7 @@ bool CTP_Manager::syncStrategyAddToUsers(Strategy *stg) {
 /// 策略删除后同步到Users
 bool CTP_Manager::syncStrategyDeleteToUsers(string d_traderid, string d_userid, string d_strategyid) {
 	USER_PRINT("CTP_Manager::syncStrategyAddToUsers");
-	this->getXtsLogger()->debug("CTP_Manager::syncStrategyDeleteToUsers()");
+	this->getXtsLogger()->info("CTP_Manager::syncStrategyDeleteToUsers()");
 	bool isDeleteSuccess = false;
 	bool isFindUser = false;
 
@@ -4712,11 +4703,11 @@ bool CTP_Manager::syncStrategyDeleteToUsers(string d_traderid, string d_userid, 
 	}
 
 	if (isFindUser && isDeleteSuccess) {
-		this->getXtsLogger()->debug("\t删除策略已同步到期货账户!");
+		this->getXtsLogger()->info("\t删除策略已同步到期货账户!");
 		return true;
 	}
 	else {
-		this->getXtsLogger()->debug("\t删除策略 未 同步到期货账户!");
+		this->getXtsLogger()->info("\t删除策略 未 同步到期货账户!");
 		return false;
 	}
 }

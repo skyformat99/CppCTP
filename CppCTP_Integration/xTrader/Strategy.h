@@ -491,6 +491,13 @@ public:
 	void setXtsLogger(std::shared_ptr<spdlog::logger> ptr);
 	std::shared_ptr<spdlog::logger> getXtsLogger();
 
+	// 行情队列
+	void thread_queue_OnRtnDepthMarketData();
+	// order回调队列
+	void thread_queue_OnRtnOrder();
+	// trade回调队列
+	void thread_queue_OnRtnTrade();
+
 private:
 	Trader *trader;
 	User *user;

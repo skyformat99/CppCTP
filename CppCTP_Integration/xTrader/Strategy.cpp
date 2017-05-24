@@ -112,6 +112,15 @@ Strategy::Strategy(User *stg_user) {
 
 	this->l_query_order = new list<USER_CThostFtdcOrderField *>();
 	this->l_position_detail_from_ctp = new list<CThostFtdcInvestorPositionDetailField *>();
+	
+	// 创建三个线程,分别处理tick, OnRtnOrder, OnRtnTrade
+	std::thread thread_tick(&Strategy::thread_queue_OnRtnDepthMarketData, this);
+	std::thread thread_order(&Strategy::thread_queue_OnRtnOrder, this);
+	std::thread thread_trade(&Strategy::thread_queue_OnRtnTrade, this);
+	// 线程分离
+	thread_tick.detach();
+	thread_order.detach();
+	thread_trade.detach();
 }
 
 
@@ -2349,6 +2358,7 @@ std::shared_ptr<spdlog::logger> Strategy::getXtsLogger() {
 	return this->xts_logger;
 }
 
+
 // 获取持仓明细
 list<USER_CThostFtdcOrderField *> *Strategy::getStg_List_Position_Detail_From_Order() {
 	return this->stg_list_position_detail_from_order;
@@ -2393,73 +2403,94 @@ bool Strategy::CompareTickData(CThostFtdcDepthMarketDataField *last_tick_data, C
 
 void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 
-	CThostFtdcDepthMarketDataField pDepthMarketData_tmp;
-	memset(&pDepthMarketData_tmp, 0x00, sizeof(CThostFtdcDepthMarketDataField));
-	this->CopyTickData(&pDepthMarketData_tmp, pDepthMarketData);
+	CThostFtdcDepthMarketDataField *pDepthMarketData_tmp = new CThostFtdcDepthMarketDataField();
+	this->CopyTickData(pDepthMarketData_tmp, pDepthMarketData);
 
-	if (!strcmp(pDepthMarketData_tmp.InstrumentID, this->getStgInstrumentIdA().c_str())) {
-		USER_PRINT("stg_instrument_A_tick ask_volume bid_volume");
-		this->CopyTickData(stg_instrument_A_tick, &pDepthMarketData_tmp);
-	}
-	else if (!strcmp(pDepthMarketData_tmp.InstrumentID, this->getStgInstrumentIdB().c_str()))
+	this->queue_OnRtnDepthMarketData.enqueue(pDepthMarketData_tmp);
+}
+
+// 行情队列处理
+void Strategy::thread_queue_OnRtnDepthMarketData() {
+	while (1)
 	{
-		USER_PRINT("stg_instrument_B_tick ask_volume bid_volume");
-		this->CopyTickData(stg_instrument_B_tick, &pDepthMarketData_tmp);
-	}
+		CThostFtdcDepthMarketDataField *pDepthMarketData_tmp = NULL;
 
-	/// 如果有交易任务,进入交易任务执行
-	if (this->stg_trade_tasking) {
-		this->Exec_OnTickComing(&pDepthMarketData_tmp);
-	} else { /// 如果没有交易任务，那么选择开始新的交易任务
+		this->queue_OnRtnDepthMarketData.wait_dequeue(pDepthMarketData_tmp);
 
-		// 如果休盘期间
-		if (this->stg_user->getCTP_Manager()->getIsMarketClose())
+		//this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnDepthMarketData()");
+		//this->getStgUser()->getXtsLogger()->info("\t期货账号 = {}, 策略id = {}, 合约id = {}, 接收tick时间 = {}", this->getStgUserId(), this->getStgStrategyId(), pDepthMarketData_tmp->InstrumentID, pDepthMarketData_tmp->UpdateTime);
+
+		//执行tick处理
+		if (!strcmp(pDepthMarketData_tmp->InstrumentID, this->getStgInstrumentIdA().c_str())) {
+			this->CopyTickData(stg_instrument_A_tick, pDepthMarketData_tmp);
+		}
+		else if (!strcmp(pDepthMarketData_tmp->InstrumentID, this->getStgInstrumentIdB().c_str()))
 		{
-			//收到最后5秒开始强制处理挂单列表命令
-			if (this->stg_user->getCTP_Manager()->getIsStartEndTask()) {
-				if (this->getStgOnOffEndTask())
-				{
-					this->setStgOnOffEndTask(false);
-					this->finish_pending_order_list();
+			this->CopyTickData(stg_instrument_B_tick, pDepthMarketData_tmp);
+		}
+
+		/// 如果有交易任务,进入交易任务执行
+		if (this->stg_trade_tasking) {
+			this->Exec_OnTickComing(pDepthMarketData_tmp);
+		}
+		else { /// 如果没有交易任务，那么选择开始新的交易任务
+
+			// 如果休盘期间
+			if (this->stg_user->getCTP_Manager()->getIsMarketClose())
+			{
+				//收到最后5秒开始强制处理挂单列表命令
+				if (this->stg_user->getCTP_Manager()->getIsStartEndTask()) {
+					if (this->getStgOnOffEndTask())
+					{
+						this->setStgOnOffEndTask(false);
+						this->finish_pending_order_list();
+					}
+				}
+				// 析构
+				delete pDepthMarketData_tmp;
+				pDepthMarketData_tmp = NULL;
+				continue;
+			}
+
+			// 如果撤单次数用完
+			if (this->getOn_Off()) {
+				if ((this->getStgAOrderActionCount() > this->getStgAOrderActionTiresLimit()) ||
+					(this->getStgBOrderActionCount() > this->getStgBOrderActionTiresLimit())) {
+					std::cout << "Strategy::OnRtnDepthMarketData()" << std::endl;
+					Utils::printRedColor("撤单次数已超设置值!");
+					std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
+					std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
+					std::cout << "\tA合约撤单次数:" << this->getStgAOrderActionCount() << ", A合约撤单限制:" << this->getStgAOrderActionTiresLimit() << std::endl;
+					std::cout << "\tB合约撤单次数:" << this->getStgBOrderActionCount() << ", B合约撤单限制:" << this->getStgBOrderActionTiresLimit() << std::endl;
+					Utils::printRedColor("已停止新的任务!");
+					// 析构
+					delete pDepthMarketData_tmp;
+					pDepthMarketData_tmp = NULL;
+					continue;
 				}
 			}
-			return;
-		}
 
-		// 如果撤单次数用完
-		if (this->getOn_Off()) {
-			if ((this->getStgAOrderActionCount() > this->getStgAOrderActionTiresLimit()) ||
-				(this->getStgBOrderActionCount() > this->getStgBOrderActionTiresLimit())) {
-				std::cout << "Strategy::OnRtnDepthMarketData()" << std::endl;
-				Utils::printRedColor("撤单次数已超设置值!");
-				std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
-				std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
-				std::cout << "\tA合约撤单次数:" << this->getStgAOrderActionCount() << ", A合约撤单限制:" << this->getStgAOrderActionTiresLimit() << std::endl;
-				std::cout << "\tB合约撤单次数:" << this->getStgBOrderActionCount() << ", B合约撤单限制:" << this->getStgBOrderActionTiresLimit() << std::endl;
-				Utils::printRedColor("已停止新的任务!");
-				return;
+			// 如果选择下单算法锁释放,那么开始新的下单
+			if (!stg_select_order_algorithm_flag) {
+				// 选择下单算法锁
+				this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
+			}
+			else {
+				if (this->getOn_Off()) {
+					this->getStgUser()->getXtsLogger()->info("Strategy::OnRtnDepthMarketData():");
+					this->getStgUser()->getXtsLogger()->info("\t期货账户:{}", this->stg_user_id);
+					this->getStgUser()->getXtsLogger()->info("\t策略编号:{}", this->stg_strategy_id);
+					this->getStgUser()->getXtsLogger()->info("\ttick锁已上锁:{}", this->stg_select_order_algorithm_flag);
+				}
 			}
 		}
 
-		// 如果选择下单算法锁释放,那么开始新的下单
-		if (!stg_select_order_algorithm_flag) {
-			// 选择下单算法锁
-			this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
-		} else {
-			if (this->getOn_Off()) {
-				this->getStgUser()->getXtsLogger()->info("Strategy::OnRtnDepthMarketData():");
-				this->getStgUser()->getXtsLogger()->info("\t期货账户:{}", this->stg_user_id);
-				this->getStgUser()->getXtsLogger()->info("\t策略编号:{}", this->stg_strategy_id);
-				this->getStgUser()->getXtsLogger()->info("\ttick锁已上锁:{}", this->stg_select_order_algorithm_flag);
-			}
-		}
+		this->CopyTickData(this->stg_instrument_Last_tick, pDepthMarketData_tmp);
+
+		// 析构
+		delete pDepthMarketData_tmp;
+		pDepthMarketData_tmp = NULL;
 	}
-
-	this->CopyTickData(this->stg_instrument_Last_tick, &pDepthMarketData_tmp);
-	//this->stg_tick_systime_record = new_time;
-
-	USER_PRINT("Strategy::OnRtnDepthMarketData OUT");
-	//tick_mtx.unlock();
 }
 
 //选择下单算法
@@ -2482,7 +2513,7 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 		
 		this->getStgUser()->getXtsLogger()->info("\t期货账户:{}", this->stg_user_id);
 		this->getStgUser()->getXtsLogger()->info("\t策略编号:{}", this->stg_strategy_id);
-		this->getStgUser()->getXtsLogger()->debug("\t有挂单,返回");
+		this->getStgUser()->getXtsLogger()->info("\t有挂单,返回");
 		this->setStgSelectOrderAlgorithmFlag("Strategy::Select_Order_Algorithm() 有挂单", false); // 关闭下单锁
 		return;
 	}
@@ -2491,7 +2522,7 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 	if (!((this->stg_position_a_sell == this->stg_position_b_buy) && 
 		(this->stg_position_a_buy == this->stg_position_b_sell))) {
 		this->getStgUser()->getXtsLogger()->info("Strategy::Select_Order_Algorithm()");
-		this->getStgUser()->getXtsLogger()->debug("\t有撇腿,返回");
+		this->getStgUser()->getXtsLogger()->info("\t有撇腿,返回");
 		this->setStgSelectOrderAlgorithmFlag("Strategy::Select_Order_Algorithm() 有撇腿", false); // 关闭下单锁
 		return;
 	}
@@ -3056,7 +3087,7 @@ void Strategy::Exec_OrderInsert(CThostFtdcInputOrderField *insert_order) {
 	", CombHedgeFlag = " << insert_order->CombHedgeFlag[0] << std::endl;*/
 
 	this->getStgUser()->getXtsLogger()->info("Strategy::Exec_OrderInsert()");
-	this->getStgUser()->getXtsLogger()->debug("\tOrderRef = {}, InstrumentID = {}, LimitPrice = {}, VolumeTotalOriginal = {}, Direction = {}, CombOffsetFlag = {}, CombHedgeFlag = {}",
+	this->getStgUser()->getXtsLogger()->info("\tOrderRef = {}, InstrumentID = {}, LimitPrice = {}, VolumeTotalOriginal = {}, Direction = {}, CombOffsetFlag = {}, CombHedgeFlag = {}",
 		insert_order->OrderRef, insert_order->InstrumentID, insert_order->LimitPrice, insert_order->VolumeTotalOriginal, insert_order->Direction,
 		insert_order->CombOffsetFlag[0], insert_order->CombHedgeFlag[0]);
 
@@ -3077,134 +3108,169 @@ void Strategy::Exec_OnRspOrderAction() {
 
 // 报单回报
 void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
-	//std::cout << "Strategy::Exec_OnRtnOrder()" << std::endl;
-	USER_PRINT("Exec_OnRtnOrder");
 
-	string compare_date = pOrder->InsertDate; //报单日期
-	string compare_time = pOrder->InsertTime; //报单时间
-	// 如果pOrder的时间在修改持仓之前 return
-	if (!Utils::compareTradingDaySeconds((compare_date + compare_time).c_str(), this->getStgLastSavedTime().c_str())) {
-		return;
-	}
+	CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
+	this->CopyOrderData(pOrder_tmp, pOrder);
 
-	// 添加字段,本次成交量
-	USER_CThostFtdcOrderField order_new;
-	memset(&order_new, 0x00, sizeof(USER_CThostFtdcOrderField));
-	// 添加字段,本次成交量
-	USER_CThostFtdcOrderField order_new_tmp;
-	memset(&order_new_tmp, 0x00, sizeof(USER_CThostFtdcOrderField));
-	CThostFtdcOrderField pOrder_tmp;
-	memset(&pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
-	
+	this->queue_OnRtnOrder.enqueue(pOrder_tmp);
+}
 
-	// 添加本次成交字段VolumeTradedBatch
-	this->add_VolumeTradedBatch(pOrder, &order_new);
-	this->CopyNewOrderData(&order_new_tmp, &order_new);
-	this->CopyOrderData(&pOrder_tmp, pOrder);
-	
-	// 更新挂单列表，持仓信息
-	this->update_pending_order_list(&pOrder_tmp);
+// order回调队列处理
+void Strategy::thread_queue_OnRtnOrder() {
+	while (1)
+	{
+		CThostFtdcOrderField *pOrder = NULL;
+		//执行order处理
+		this->queue_OnRtnOrder.wait_dequeue(pOrder);
 
-	// 更新持仓明细列表
-	this->update_position_detail(&order_new_tmp);
-
-	// 更新持仓变量
-	this->update_position(&order_new);
-
-	// 更新标志位
-	this->update_task_status();
-
-	// 更新tick锁
-	//this->update_tick_lock_status(order_new);
-
-	//delete order_new;
-	//delete order_new_tmp;
-
-	/// A成交回报,B发送等量的报单
-	if ((!strcmp(pOrder->InstrumentID, this->stg_instrument_id_A.c_str())) && ((pOrder->OrderStatus == '0') || (pOrder->OrderStatus == '1')) && (strlen(pOrder->OrderSysID) != 0)) { //只有全部成交或者部分成交还在队列中
-
-		if (this->stg_list_order_pending->size() == 0) { // 无挂单
-			//std::cout << "A无挂单" << std::endl;
-			this->stg_b_order_insert_args->VolumeTotalOriginal = pOrder->VolumeTraded;
+		string compare_date = pOrder->InsertDate; //报单日期
+		string compare_time = pOrder->InsertTime; //报单时间
+		// 如果pOrder的时间在修改持仓之前 return
+		if (!Utils::compareTradingDaySeconds((compare_date + compare_time).c_str(), this->getStgLastSavedTime().c_str())) {
+			delete pOrder;
+			pOrder = NULL;
+			continue;
 		}
-		else { // 有挂单
-			//std::cout << "A有挂单" << std::endl;
-			bool b_fined = false;
-			list<CThostFtdcOrderField *>::iterator Itor;
-			for (Itor = this->stg_list_order_pending->begin(); Itor != this->stg_list_order_pending->end(); Itor++) {
-				if (!strcmp((*Itor)->OrderRef, pOrder->OrderRef)) { //报单引用相等
-					/*std::cout << "挂单列表找到A合约" << std::endl;
-					std::cout << "pOrder->VolumeTraded = " << pOrder->VolumeTraded << endl;
-					std::cout << "(*Itor)->VolumeTraded = " << (*Itor)->VolumeTraded << endl;*/
 
-					this->stg_b_order_insert_args->VolumeTotalOriginal = pOrder->VolumeTraded - (*Itor)->VolumeTraded; // B发单量等于本次回报A的成交量
-					b_fined = true;
-					break;
-				}
-			}
-			if (!b_fined) { // 无挂单，但是属于分批成交, 第一批
-				//std::cout << "无挂单，但是属于分批成交, 第一批" << std::endl;
-				//std::cout << "pOrder->VolumeTraded = " << pOrder->VolumeTraded << endl;
+		// 添加字段,本次成交量
+		USER_CThostFtdcOrderField order_new;
+		memset(&order_new, 0x00, sizeof(USER_CThostFtdcOrderField));
+		// 添加字段,本次成交量
+		USER_CThostFtdcOrderField order_new_tmp;
+		memset(&order_new_tmp, 0x00, sizeof(USER_CThostFtdcOrderField));
+		CThostFtdcOrderField pOrder_tmp;
+		memset(&pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
+
+
+		// 添加本次成交字段VolumeTradedBatch
+		this->add_VolumeTradedBatch(pOrder, &order_new);
+		this->CopyNewOrderData(&order_new_tmp, &order_new);
+		this->CopyOrderData(&pOrder_tmp, pOrder);
+
+		// 更新挂单列表，持仓信息
+		this->update_pending_order_list(&pOrder_tmp);
+
+		// 更新持仓明细列表
+		this->update_position_detail(&order_new_tmp);
+
+		// 更新持仓变量
+		this->update_position(&order_new);
+
+		// 更新标志位
+		this->update_task_status();
+
+		// 更新tick锁
+		//this->update_tick_lock_status(order_new);
+
+		//delete order_new;
+		//delete order_new_tmp;
+
+		/// A成交回报,B发送等量的报单
+		if ((!strcmp(pOrder->InstrumentID, this->stg_instrument_id_A.c_str())) && ((pOrder->OrderStatus == '0') || (pOrder->OrderStatus == '1')) && (strlen(pOrder->OrderSysID) != 0)) { //只有全部成交或者部分成交还在队列中
+
+			if (this->stg_list_order_pending->size() == 0) { // 无挂单
+				//std::cout << "A无挂单" << std::endl;
 				this->stg_b_order_insert_args->VolumeTotalOriginal = pOrder->VolumeTraded;
 			}
+			else { // 有挂单
+				//std::cout << "A有挂单" << std::endl;
+				bool b_fined = false;
+				list<CThostFtdcOrderField *>::iterator Itor;
+				for (Itor = this->stg_list_order_pending->begin(); Itor != this->stg_list_order_pending->end(); Itor++) {
+					if (!strcmp((*Itor)->OrderRef, pOrder->OrderRef)) { //报单引用相等
+						/*std::cout << "挂单列表找到A合约" << std::endl;
+						std::cout << "pOrder->VolumeTraded = " << pOrder->VolumeTraded << endl;
+						std::cout << "(*Itor)->VolumeTraded = " << (*Itor)->VolumeTraded << endl;*/
+
+						this->stg_b_order_insert_args->VolumeTotalOriginal = pOrder->VolumeTraded - (*Itor)->VolumeTraded; // B发单量等于本次回报A的成交量
+						b_fined = true;
+						break;
+					}
+				}
+				if (!b_fined) { // 无挂单，但是属于分批成交, 第一批
+					//std::cout << "无挂单，但是属于分批成交, 第一批" << std::endl;
+					//std::cout << "pOrder->VolumeTraded = " << pOrder->VolumeTraded << endl;
+					this->stg_b_order_insert_args->VolumeTotalOriginal = pOrder->VolumeTraded;
+				}
+			}
+
+			this->stg_order_ref_b = this->Generate_Order_Ref();
+			this->stg_order_ref_last = this->stg_order_ref_b;
+
+			strcpy(this->stg_b_order_insert_args->OrderRef, this->stg_order_ref_b.c_str());
+
+			//this->stg_user->getUserTradeSPI()->OrderInsert(this->stg_user, this->stg_b_order_insert_args);
+			this->Exec_OrderInsert(this->stg_b_order_insert_args);
+		}
+		/// B成交回报
+		else if ((!strcmp(pOrder->InstrumentID, this->stg_instrument_id_B.c_str())) && (pOrder->OrderStatus == '0' || pOrder->OrderStatus == '1') && (strlen(pOrder->OrderSysID) != 0)) { // 全部成交或者部分成交
+
+		}
+		/// B撤单回报，启动B重新发单一定成交策略
+		else if ((!strcmp(pOrder->InstrumentID, this->stg_instrument_id_B.c_str())) && (pOrder->OrderStatus == '5') && (strlen(pOrder->OrderSysID) != 0)) {
+			this->stg_order_ref_b = this->Generate_Order_Ref();
+			this->stg_order_ref_last = this->stg_order_ref_b;
+
+			USER_PRINT("OrderRef");
+			USER_PRINT(this->stg_order_ref_b);
+
+			if (pOrder->Direction == '0') {
+				this->stg_b_order_insert_args->LimitPrice = this->stg_instrument_B_tick->AskPrice1;
+			}
+			else if (pOrder->Direction == '1') {
+				this->stg_b_order_insert_args->LimitPrice = this->stg_instrument_B_tick->BidPrice1;
+			}
+
+			strcpy(this->stg_b_order_insert_args->OrderRef, this->stg_order_ref_b.c_str());
+			this->stg_b_order_insert_args->VolumeTotalOriginal = pOrder->VolumeTotal;
+			this->stg_b_order_insert_args->Direction = pOrder->Direction;
+			this->stg_b_order_insert_args->CombOffsetFlag[0] = pOrder->CombOffsetFlag[0];
+			this->stg_b_order_insert_args->CombHedgeFlag[0] = pOrder->CombHedgeFlag[0];
+
+			//this->stg_user->getUserTradeSPI()->OrderInsert(this->stg_user, this->stg_b_order_insert_args);
+			this->Exec_OrderInsert(this->stg_b_order_insert_args);
 		}
 
-		this->stg_order_ref_b = this->Generate_Order_Ref();
-		this->stg_order_ref_last = this->stg_order_ref_b;
-
-		USER_PRINT("OrderRef");
-		USER_PRINT(this->stg_order_ref_b);
-		
-		strcpy(this->stg_b_order_insert_args->OrderRef, this->stg_order_ref_b.c_str());
-
-		//this->stg_user->getUserTradeSPI()->OrderInsert(this->stg_user, this->stg_b_order_insert_args);
-		this->Exec_OrderInsert(this->stg_b_order_insert_args);
-	}
-	/// B成交回报
-	else if ((!strcmp(pOrder->InstrumentID, this->stg_instrument_id_B.c_str())) && (pOrder->OrderStatus == '0' || pOrder->OrderStatus == '1') && (strlen(pOrder->OrderSysID) != 0)) { // 全部成交或者部分成交
-
-	}
-	/// B撤单回报，启动B重新发单一定成交策略
-	else if ((!strcmp(pOrder->InstrumentID, this->stg_instrument_id_B.c_str())) && (pOrder->OrderStatus == '5') && (strlen(pOrder->OrderSysID) != 0)) {
-		this->stg_order_ref_b = this->Generate_Order_Ref();
-		this->stg_order_ref_last = this->stg_order_ref_b;
-
-		USER_PRINT("OrderRef");
-		USER_PRINT(this->stg_order_ref_b);
-
-		if (pOrder->Direction == '0') {
-			this->stg_b_order_insert_args->LimitPrice = this->stg_instrument_B_tick->AskPrice1;
-		}
-		else if (pOrder->Direction == '1') {
-			this->stg_b_order_insert_args->LimitPrice = this->stg_instrument_B_tick->BidPrice1;
-		}
-
-		strcpy(this->stg_b_order_insert_args->OrderRef, this->stg_order_ref_b.c_str());
-		this->stg_b_order_insert_args->VolumeTotalOriginal = pOrder->VolumeTotal;
-		this->stg_b_order_insert_args->Direction = pOrder->Direction;
-		this->stg_b_order_insert_args->CombOffsetFlag[0] = pOrder->CombOffsetFlag[0];
-		this->stg_b_order_insert_args->CombHedgeFlag[0] = pOrder->CombHedgeFlag[0];
-
-		//this->stg_user->getUserTradeSPI()->OrderInsert(this->stg_user, this->stg_b_order_insert_args);
-		this->Exec_OrderInsert(this->stg_b_order_insert_args);
+		// 析构
+		delete pOrder;
+		pOrder = NULL;
 	}
 }
 
 // 成交回报
 void Strategy::ExEc_OnRtnTrade(CThostFtdcTradeField *pTrade) {
-	/*1:更新持仓明细*/
-	string compare_date = pTrade->TradeDate; //报单日期
-	string compare_time = pTrade->TradeTime; //报单时间
+	CThostFtdcTradeField *pTrade_tmp = new CThostFtdcTradeField();
+	this->CopyTradeData(pTrade_tmp, pTrade);
+	this->queue_OnRtnTrade.enqueue(pTrade_tmp);
+}
 
-	// 如果pTrade的时间在修改持仓之前 return
-	if (!Utils::compareTradingDaySeconds((compare_date + compare_time).c_str(), this->getStgLastSavedTime().c_str())) {
-		return;
+// trade回调队列处理
+void Strategy::thread_queue_OnRtnTrade() {
+	while (1)
+	{
+		//执行trade处理
+		CThostFtdcTradeField *pTrade = NULL;
+
+		this->queue_OnRtnTrade.wait_dequeue(pTrade);
+
+		/*1:更新持仓明细*/
+		string compare_date = pTrade->TradeDate; //报单日期
+		string compare_time = pTrade->TradeTime; //报单时间
+
+		// 如果pTrade的时间在修改持仓之前 return
+		if (!Utils::compareTradingDaySeconds((compare_date + compare_time).c_str(), this->getStgLastSavedTime().c_str())) {
+			delete pTrade;
+			pTrade = NULL;
+			continue;
+		}
+
+		USER_CThostFtdcTradeField new_trade;
+		this->CopyTradeDataToNew(&new_trade, pTrade);
+		this->update_position_detail(&new_trade);
+
+		delete pTrade;
+		pTrade = NULL;
 	}
-
-	USER_CThostFtdcTradeField new_trade;
-	this->CopyTradeDataToNew(&new_trade, pTrade);
-	this->update_position_detail(&new_trade);
-
 }
 
 // 报单录入错误回报
@@ -3334,19 +3400,19 @@ void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketDat
 /// 更新挂单list
 void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 
-	this->getStgUser()->getXtsLogger()->debug("Strategy::update_pending_order_list()");
-	this->getStgUser()->getXtsLogger()->debug("\t期货账户:{}", this->stg_user_id);
-	this->getStgUser()->getXtsLogger()->debug("\t策略编号:{}", this->stg_strategy_id);
+	this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list()");
+	this->getStgUser()->getXtsLogger()->info("\t期货账户:{}", this->stg_user_id);
+	this->getStgUser()->getXtsLogger()->info("\t策略编号:{}", this->stg_strategy_id);
 
 	if (strlen(pOrder->OrderSysID) != 0) { // 如果报单编号不为空，为交易所返回
 		if (pOrder->OrderStatus == '0') { // 全部成交
-			this->getStgUser()->getXtsLogger()->debug("\tpOrder->OrderStatus = 0 全部成交");
+			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = 0 全部成交");
 			list<CThostFtdcOrderField *>::iterator itor;
 			for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
-				this->getStgUser()->getXtsLogger()->debug("\tpOrder->OrderRef = {}", pOrder->OrderRef);
-				this->getStgUser()->getXtsLogger()->debug("\t(*itor)->OrderRef = {}", (*itor)->OrderRef);
+				this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderRef = {}", pOrder->OrderRef);
+				this->getStgUser()->getXtsLogger()->info("\t(*itor)->OrderRef = {}", (*itor)->OrderRef);
 				if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
-					this->getStgUser()->getXtsLogger()->debug("更新挂单,有挂单");
+					this->getStgUser()->getXtsLogger()->info("更新挂单,有挂单");
 					delete (*itor);
 					itor = this->stg_list_order_pending->erase(itor); //移除
 					//break;
@@ -3357,40 +3423,40 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 			}
 		}
 		else if (pOrder->OrderStatus == '1') { // 部分成交还在队列中
-			this->getStgUser()->getXtsLogger()->debug("\tpOrder->OrderStatus = 1 部分成交还在队列中");
+			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = 1 部分成交还在队列中");
 			list<CThostFtdcOrderField *>::iterator itor;
 			for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end(); itor++) {
-				this->getStgUser()->getXtsLogger()->debug("\tpOrder->OrderRef = {}", pOrder->OrderRef);
-				this->getStgUser()->getXtsLogger()->debug("\t(*itor)->OrderRef = {}", (*itor)->OrderRef);
+				this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderRef = {}", pOrder->OrderRef);
+				this->getStgUser()->getXtsLogger()->info("\t(*itor)->OrderRef = {}", (*itor)->OrderRef);
 				if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
-					this->getStgUser()->getXtsLogger()->debug("更新挂单,有挂单");
+					this->getStgUser()->getXtsLogger()->info("更新挂单,有挂单");
 					this->CopyOrderData(*itor, pOrder);
 					//break;
 				}
 			}
 		}
 		else if (pOrder->OrderStatus == '2') { ///部分成交不在队列中
-			this->getStgUser()->getXtsLogger()->debug("\tpOrder->OrderStatus = 2 部分成交不在队列中");
+			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = 2 部分成交不在队列中");
 		}
 		else if (pOrder->OrderStatus == '3') { // 未成交还在队列中
-			this->getStgUser()->getXtsLogger()->debug("\tpOrder->OrderStatus = 3 未成交还在队列中");
+			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = 3 未成交还在队列中");
 			bool isExists = false;
 			// 判断挂单列表是否存在
 			list<CThostFtdcOrderField *>::iterator itor;
 			for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end(); itor++) {
-				this->getStgUser()->getXtsLogger()->debug("\tpOrder->OrderRef = {}", pOrder->OrderRef);
-				this->getStgUser()->getXtsLogger()->debug("\t(*itor)->OrderRef = {}", (*itor)->OrderRef);
+				this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderRef = {}", pOrder->OrderRef);
+				this->getStgUser()->getXtsLogger()->info("\t(*itor)->OrderRef = {}", (*itor)->OrderRef);
 				if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
 					// 存在置flag标志位
 					isExists = true;
-					this->getStgUser()->getXtsLogger()->debug("更新挂单,有挂单");
+					this->getStgUser()->getXtsLogger()->info("更新挂单,有挂单");
 					this->CopyOrderData(*itor, pOrder);
 					//break;
 				}
 			}
 			// 如果不存在直接加入
 			if (!isExists) {
-				this->getStgUser()->getXtsLogger()->debug("更新挂单,无挂单");
+				this->getStgUser()->getXtsLogger()->info("更新挂单,无挂单");
 				// 深复制对象
 				CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
 				memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
@@ -3401,16 +3467,16 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 		}
 		else if (pOrder->OrderStatus == '4') //未成交不在队列中
 		{
-			this->getStgUser()->getXtsLogger()->debug("\tpOrder->OrderStatus = 4 未成交不在队列中");
+			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = 4 未成交不在队列中");
 		}
 		else if (pOrder->OrderStatus == '5') { // 撤单
-			this->getStgUser()->getXtsLogger()->debug("\tpOrder->OrderStatus = 5 撤单");
+			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = 5 撤单");
 			list<CThostFtdcOrderField *>::iterator itor;
 			for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
-				this->getStgUser()->getXtsLogger()->debug("\tpOrder->OrderRef = {}", pOrder->OrderRef);
-				this->getStgUser()->getXtsLogger()->debug("\t(*itor)->OrderRef = {}", (*itor)->OrderRef);
+				this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderRef = {}", pOrder->OrderRef);
+				this->getStgUser()->getXtsLogger()->info("\t(*itor)->OrderRef = {}", (*itor)->OrderRef);
 				if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
-					this->getStgUser()->getXtsLogger()->debug("更新挂单,有挂单");
+					this->getStgUser()->getXtsLogger()->info("更新挂单,有挂单");
 					delete (*itor);
 					itor = this->stg_list_order_pending->erase(itor); //移除
 					//break;
@@ -3421,13 +3487,13 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 			}
 		}
 		else if (pOrder->OrderStatus == 'a') { // 未知
-			this->getStgUser()->getXtsLogger()->debug("\tpOrder->OrderStatus = a 未知");
+			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = a 未知");
 		}
 		else if (pOrder->OrderStatus == 'b') { // 尚未触发
-			this->getStgUser()->getXtsLogger()->debug("\tpOrder->OrderStatus = b 尚未触发");
+			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = b 尚未触发");
 		}
 		else if (pOrder->OrderStatus == 'c') { // 已触发
-			this->getStgUser()->getXtsLogger()->debug("\tpOrder->OrderStatus = c 已触发");
+			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = c 已触发");
 		}
 
 		// 遍历挂单列表，找出A合约开仓未成交的量
@@ -3449,7 +3515,7 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 		/************************************************************************/
 		/* 2：报单发往交易所未收到回报                                                                     */
 		/************************************************************************/
-		this->getStgUser()->getXtsLogger()->debug("\t报单编号长度为0,CTP直接返回的错误或者还未发到交易所");
+		this->getStgUser()->getXtsLogger()->info("\t报单编号长度为0,CTP直接返回的错误或者还未发到交易所");
 	}
 }
 
@@ -4769,11 +4835,7 @@ void Strategy::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 
 //成交通知
 void Strategy::OnRtnTrade(CThostFtdcTradeField *pTrade) {
-	USER_PRINT("Strategy::OnRtnTrade");
-	////如果已经收盘,不再接收
-	//if (this->getStgUser()->getCTP_Manager()->getIsMarketCloseDone()) {
-	//	return;
-	//}
+	
 	this->ExEc_OnRtnTrade(pTrade);
 }
 

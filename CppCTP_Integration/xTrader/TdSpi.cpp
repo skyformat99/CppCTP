@@ -357,7 +357,7 @@ void TdSpi::OnRspQrySettlementInfo(CThostFtdcSettlementInfoField *pSettlementInf
 		if (this->current_user->getRequestID() == nRequestID) {
 			//sem_post(&sem_ReqQrySettlementInfo);
 			if (pSettlementInfo) {
-				///交易日
+				/*///交易日
 				std::cout << "交易日:" << pSettlementInfo->TradingDay << endl;
 				///结算编号
 				std::cout << "结算编号:" << pSettlementInfo->SettlementID << endl;
@@ -368,7 +368,7 @@ void TdSpi::OnRspQrySettlementInfo(CThostFtdcSettlementInfoField *pSettlementInf
 				///序号
 				std::cout << "序号:" << pSettlementInfo->SequenceNo << endl;
 				///消息正文
-				std::cout << "消息正文:" << pSettlementInfo->Content << endl;
+				std::cout << "消息正文:" << pSettlementInfo->Content << endl;*/
 			}
 
 			if (bIsLast) {
@@ -378,7 +378,6 @@ void TdSpi::OnRspQrySettlementInfo(CThostFtdcSettlementInfoField *pSettlementInf
 		}
 		
 	}
-	
 }
 
 //确认结算结果
@@ -409,14 +408,16 @@ void TdSpi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSe
 		//sem_post(&sem_ReqSettlementInfoConfirm);
 		if (this->current_user->getRequestID() == nRequestID) {
 			if (pSettlementInfoConfirm) {
-				///经纪公司代码
+
+				/*///经纪公司代码
 				std::cout << "经纪公司代码" << pSettlementInfoConfirm->BrokerID << endl;
 				///投资者代码
 				std::cout << "投资者代码" << pSettlementInfoConfirm->InvestorID << endl;
 				///确认日期
 				std::cout << "确认日期" << pSettlementInfoConfirm->ConfirmDate << endl;
 				///确认时间
-				std::cout << "确认时间" << pSettlementInfoConfirm->ConfirmTime << endl;
+				std::cout << "确认时间" << pSettlementInfoConfirm->ConfirmTime << endl;*/
+
 				string today = this->tdapi->GetTradingDay();
 				string confirm_date = pSettlementInfoConfirm->ConfirmDate;
 				if (today == confirm_date) {
@@ -784,7 +785,7 @@ void TdSpi::CopyInstrumentInfo(CThostFtdcInstrumentField *dst, CThostFtdcInstrum
 void TdSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus) {
 	//USER_PRINT("TdSpi::OnRtnInstrumentStatus");
 	if (pInstrumentStatus) {
-		///交易所代码
+		/*///交易所代码
 		std::cout << "|交易所代码 = " << pInstrumentStatus->ExchangeID << ", ";
 		///合约在交易所的代码
 		std::cout << "合约在交易所的代码 = " << pInstrumentStatus->ExchangeInstID << ", ";
@@ -799,7 +800,11 @@ void TdSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentSt
 		///进入本状态时间
 		std::cout << "进入本状态时间 = " << pInstrumentStatus->EnterTime << ", ";
 		///进入本状态原因
-		std::cout << "进入本状态原因 = " << pInstrumentStatus->EnterReason << endl;
+		std::cout << "进入本状态原因 = " << pInstrumentStatus->EnterReason << endl;*/
+
+		this->current_user->getXtsLogger()->info("|交易所代码 = {} 合约在交易所的代码 = {} 结算组代码 = {} 合约代码 = {} 合约交易状态 = {} 交易阶段编号 = {} 进入本状态时间 = {} 进入本状态原因 = {}", 
+			pInstrumentStatus->ExchangeID, pInstrumentStatus->ExchangeInstID, pInstrumentStatus->SettlementGroupID, pInstrumentStatus->InstrumentID, 
+			pInstrumentStatus->InstrumentStatus, pInstrumentStatus->TradingSegmentSN, pInstrumentStatus->EnterTime, pInstrumentStatus->EnterReason);
 
 		//string status_time(pInstrumentStatus->EnterTime);
 		//string real_status_time = this->getTradingDay() + status_time;
@@ -1980,7 +1985,6 @@ void TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
 	USER_PRINT(orderref);
 	// 更新报单引用基准
 	user->DB_UpdateOrderRef(orderref.substr(0, 10));
-	//delete pInputOrder;
 }
 
 ///报单录入请求响应

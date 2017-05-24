@@ -75,6 +75,14 @@ DBManager::DBManager() {
 		this->db_connect_status = false;
 	}
 
+
+	string logpath = "logs/";
+	int flag = Utils::CreateFolder(logpath.c_str());
+	if (flag != 0) {
+		Utils::printRedColor("无法创建日志文件夹!");
+		exit(1);
+	}
+
 	try {
 		this->xts_db_logger = spdlog::get("xts_async_db_logger");
 		if (!this->xts_db_logger)
