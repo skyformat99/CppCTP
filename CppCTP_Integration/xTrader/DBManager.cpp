@@ -41,40 +41,42 @@ using std::unique_ptr;
 
 std::mutex update_futureaccount_mtx; // locks access to counter
 
-DBManager::DBManager() {
-	this->db_connect_status = true;
-	this->conn = NULL;
-	try {
-		this->conn = new mongo::DBClientConnection(false, 0, 5);
-	}
-	catch (const mongo::ConnectException &e) {
-		std::cout << "MongoDB无法访问!" << std::endl;
-		this->db_connect_status = false;
-	}
-	catch (const mongo::SocketException &e) {
-		std::cout << "MongoDB无法访问!" << std::endl;
-		this->db_connect_status = false;
-	}
-	catch (const mongo::DBException &e) {
-		std::cout << "MongoDB无法访问! 问题:" << e.what() << std::endl;
-		this->db_connect_status = false;
-	}
-	try {
-		this->conn->connect("localhost");
-	}
-	catch (const mongo::ConnectException &e) {
-		std::cout << "MongoDB无法访问!" << std::endl;
-		this->db_connect_status = false;
-	}
-	catch (const mongo::SocketException &e) {
-		std::cout << "MongoDB无法访问!" << std::endl;
-		this->db_connect_status = false;
-	}
-	catch (const mongo::DBException &e) {
-		std::cout << "MongoDB无法访问! 问题:" << e.what() << std::endl;
-		this->db_connect_status = false;
-	}
+DBManager::DBManager(int max_size) {
 
+	bool auto_conn = true;
+	double time_out = 3;
+	// 默认连接状态为true
+	this->db_connect_status = true;
+
+	//建立连接队列
+	for (int i = 0; i < max_size; i++) {
+		if (!this->db_connect_status) {
+			break;
+		}
+		try {
+			mongo::DBClientConnection *conn = new mongo::DBClientConnection(auto_conn, 0, time_out);
+			if (conn != NULL)
+			{
+				conn->connect("localhost");
+				this->queue_DBClient.enqueue(conn);
+			}
+			else {
+				this->db_connect_status = false;
+			}
+		}
+		catch (const mongo::ConnectException &e) {
+			std::cout << "MongoDB无法访问!" << std::endl;
+			this->db_connect_status = false;
+		}
+		catch (const mongo::SocketException &e) {
+			std::cout << "MongoDB无法访问!" << std::endl;
+			this->db_connect_status = false;
+		}
+		catch (const mongo::DBException &e) {
+			std::cout << "MongoDB无法访问! 问题:" << e.what() << std::endl;
+			this->db_connect_status = false;
+		}
+	}
 
 	string logpath = "logs/";
 	int flag = Utils::CreateFolder(logpath.c_str());
@@ -82,7 +84,6 @@ DBManager::DBManager() {
 		Utils::printRedColor("无法创建日志文件夹!");
 		exit(1);
 	}
-
 	try {
 		this->xts_db_logger = spdlog::get("xts_async_db_logger");
 		if (!this->xts_db_logger)
@@ -105,30 +106,6 @@ DBManager::~DBManager() {
 	delete this;
 }
 
-
-/************************************************************************/
-/* static method return mongo connection                                */
-/************************************************************************/
-mongo::DBClientConnection * DBManager::getDBConnection() {
-	try
-	{
-		mongo::DBClientConnection *conn = new mongo::DBClientConnection(false, 0, 5);
-		conn->connect("localhost");
-		USER_PRINT("Original DB Connection[DBManager::getDBConnection()]!");
-		USER_PRINT(conn);
-		return conn;
-	}
-	catch (const mongo::SocketException& e)
-	{
-		std::cout << "MongoDB无法访问!" << std::endl;
-		return NULL;
-	}
-	catch (const mongo::ConnectException& e) {
-		std::cout << "MongoDB无法访问!" << std::endl;
-		return NULL;
-	}
-}
-
 /************************************************************************/
 /* 设置交易模式(simnow 盘中/离线                                           */
 /************************************************************************/
@@ -146,11 +123,14 @@ bool DBManager::getIs_Online() {
 如果不存在说明程序关闭有误*/
 /************************************************************************/
 bool DBManager::CheckSystemStartFlag() {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	std::cout << "DBManager::CheckSystemStartFlag()" << std::endl;
 	list<string> collection_names;
 	bool flag_one = false;
 	bool flag_two = false;
-	collection_names = this->conn->getCollectionNames(DB_NAME);
+	bool flag = false;
+	collection_names = client->getCollectionNames(DB_NAME);
 	list<string>::iterator str_itor;
 	for (str_itor = collection_names.begin(); str_itor != collection_names.end(); str_itor++) {
 		std::cout << "\tcollection_name = " << (*str_itor) << std::endl;
@@ -163,23 +143,39 @@ bool DBManager::CheckSystemStartFlag() {
 	}
 	
 	if (flag_one && flag_two) {
+		flag = true;
 	}
 	else {
-		if (flag_one) { std::cout << "\tpositiondetail_yesterday exists." << std::endl; }
-		else { std::cout << "\tpositiondetail_yesterday NOT exists." << std::endl; }
-		if (flag_two) { std::cout << "\tpositiondetail_trade_yesterday exists." << std::endl; }
-		else { std::cout << "\tpositiondetail_trade_yesterday NOT exists." << std::endl; }
-		return false;
+		if (flag_one) {
+			std::cout << "\tpositiondetail_yesterday exists." << std::endl; 
+		}
+		else {
+			std::cout << "\tpositiondetail_yesterday NOT exists." << std::endl; 
+		}
+		if (flag_two) {
+			std::cout << "\tpositiondetail_trade_yesterday exists." << std::endl; 
+		}
+		else {
+			std::cout << "\tpositiondetail_trade_yesterday NOT exists." << std::endl; 
+		}
+		flag = false;
 	}
+
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
+	return flag;
 }
 
 
 // 创建Trader
 void DBManager::CreateTrader(Trader *op) {
 	
+	// 从队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
+
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_OPERATOR_COLLECTION,
+	count_number = client->count(DB_OPERATOR_COLLECTION,
 		BSON("traderid" << op->getTraderID()));
 
 	if (count_number > 0) {
@@ -193,49 +189,65 @@ void DBManager::CreateTrader(Trader *op) {
 		b.append("on_off", op->getOn_Off());
 		BSONObj p = b.obj();
 
-		conn->insert(DB_OPERATOR_COLLECTION, p);
+		client->insert(DB_OPERATOR_COLLECTION, p);
 		
 		USER_PRINT("DBManager::CreateOperator ok");
 	}
+
+	// 重新加到连接队列
+	this->recycleConn(client);
 }
 
 void DBManager::DeleteTrader(Trader *op) {
 
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
+
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_OPERATOR_COLLECTION,
+	count_number = client->count(DB_OPERATOR_COLLECTION,
 		BSON("traderid" << op->getTraderID()));
 
 	if (count_number > 0) {
-		this->conn->update(DB_OPERATOR_COLLECTION, BSON("traderid" << (op->getTraderID().c_str())), BSON("$set" << BSON("isactive" << ISNOTACTIVE)));
+		client->update(DB_OPERATOR_COLLECTION, BSON("traderid" << (op->getTraderID().c_str())), BSON("$set" << BSON("isactive" << ISNOTACTIVE)));
 		USER_PRINT("DBManager::DeleteOperator ok");
 	}
 	else {
 		cout << "Trader ID Not Exists!" << endl;
 	}
 	
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 
 void DBManager::UpdateTrader(string traderid, Trader *op) {
 
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
+
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_OPERATOR_COLLECTION,
+	count_number = client->count(DB_OPERATOR_COLLECTION,
 		BSON("traderid" << traderid));
 
 	if (count_number > 0) {
-		this->conn->update(DB_OPERATOR_COLLECTION, BSON("traderid" << (traderid.c_str())), BSON("$set" << BSON("tradername" << op->getTraderName() << "traderid" << op->getTraderID() << "password" << op->getPassword() << "on_off" << op->getOn_Off() << "isactive" << op->getIsActive())));
+		client->update(DB_OPERATOR_COLLECTION, BSON("traderid" << (traderid.c_str())), BSON("$set" << BSON("tradername" << op->getTraderName() << "traderid" << op->getTraderID() << "password" << op->getPassword() << "on_off" << op->getOn_Off() << "isactive" << op->getIsActive())));
 		USER_PRINT("DBManager::UpdateOperator ok");
 	}
 	else
 	{
 		cout << "Trader ID Not Exists!" << endl;
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 
 void DBManager::SearchTraderByTraderID(string traderid) {
-	unique_ptr<DBClientCursor> cursor =
-		this->conn->query(DB_OPERATOR_COLLECTION, MONGO_QUERY("traderid" << traderid));
+
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
+
+	unique_ptr<DBClientCursor> cursor = client->query(DB_OPERATOR_COLLECTION, MONGO_QUERY("traderid" << traderid));
 	while (cursor->more()) {
 		BSONObj p = cursor->next();
 		cout << "userid = " << p.getStringField("traderid") << endl;
@@ -244,11 +256,16 @@ void DBManager::SearchTraderByTraderID(string traderid) {
 		cout << "isactive = " << p.getStringField("isactive") << endl;
 		cout << "on_off = " << p.getIntField("on_off") << endl;
 	}
+
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::SearchTraderByTraderID ok");
 }
+
 void DBManager::SearchTraderByTraderName(string tradername) {
-	unique_ptr<DBClientCursor> cursor =
-		this->conn->query(DB_OPERATOR_COLLECTION, MONGO_QUERY("tradername" << tradername));
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
+	unique_ptr<DBClientCursor> cursor = client->query(DB_OPERATOR_COLLECTION, MONGO_QUERY("tradername" << tradername));
 	while (cursor->more()) {
 		BSONObj p = cursor->next();
 		cout << "traderid = " << p.getStringField("traderid") << endl;
@@ -257,12 +274,16 @@ void DBManager::SearchTraderByTraderName(string tradername) {
 		cout << "isactive = " << p.getStringField("isactive") << endl;
 		cout << "on_off = " << p.getIntField("on_off") << endl;
 	}
+
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::SearchTraderByTraderName ok");
 }
 
 void DBManager::SearchTraderByTraderIdAndPassword(string traderid, string password) {
-	unique_ptr<DBClientCursor> cursor =
-		this->conn->query(DB_OPERATOR_COLLECTION, MONGO_QUERY("traderid" << traderid << "password" << password));
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
+	unique_ptr<DBClientCursor> cursor = client->query(DB_OPERATOR_COLLECTION, MONGO_QUERY("traderid" << traderid << "password" << password));
 	while (cursor->more()) {
 		BSONObj p = cursor->next();
 		cout << "traderid = " << p.getStringField("traderid") << endl;
@@ -271,23 +292,26 @@ void DBManager::SearchTraderByTraderIdAndPassword(string traderid, string passwo
 		cout << "isactive = " << p.getStringField("isactive") << endl;
 		cout << "on_off = " << p.getIntField("on_off") << endl;
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::SearchTraderByTraderIdAndPassword ok");
 }
 
 bool DBManager::FindTraderByTraderIdAndPassword(string traderid, string password, Trader *op) {
 	this->getXtsDBLogger()->info("DBManager::FindTraderByTraderIdAndPassword()");
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	int count_number = 0;
 	bool flag = false;
 
-	count_number = this->conn->count(DB_OPERATOR_COLLECTION,
+	count_number = client->count(DB_OPERATOR_COLLECTION,
 		BSON("traderid" << traderid.c_str() << "password" << password.c_str() << "isactive" << ISACTIVE));
 
 	if (count_number == 0) {
 		flag = false;
 	} else {
 		flag = true;
-		unique_ptr<DBClientCursor> cursor =
-			this->conn->query(DB_OPERATOR_COLLECTION, MONGO_QUERY("traderid" << traderid << "password" << password << "isactive" << ISACTIVE));
+		unique_ptr<DBClientCursor> cursor = client->query(DB_OPERATOR_COLLECTION, MONGO_QUERY("traderid" << traderid << "password" << password << "isactive" << ISACTIVE));
 		while (cursor->more()) {
 			BSONObj p = cursor->next();
 			this->getXtsDBLogger()->info("\ttraderid = {}", p.getStringField("traderid"));
@@ -300,9 +324,10 @@ bool DBManager::FindTraderByTraderIdAndPassword(string traderid, string password
 			op->setPassword(p.getStringField("password"));
 			op->setOn_Off(p.getIntField("on_off"));
 		}
-
-
 	}
+
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 
 	return flag;
 }
@@ -318,14 +343,17 @@ void DBManager::getAllTrader(list<string> *l_trader) {
 		}
 	}
 
-	int countnum = this->conn->count(DB_OPERATOR_COLLECTION);
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
+
+	int countnum = client->count(DB_OPERATOR_COLLECTION);
 	USER_PRINT(countnum);
 	if (countnum == 0) {
 		cout << "DBManager::getAllTrader is NONE!" << endl;
 	}
 	else {
 		unique_ptr<DBClientCursor> cursor =
-			this->conn->query(DB_OPERATOR_COLLECTION);
+			client->query(DB_OPERATOR_COLLECTION);
 		while (cursor->more()) {
 
 			BSONObj p = cursor->next();
@@ -341,6 +369,8 @@ void DBManager::getAllTrader(list<string> *l_trader) {
 		}
 		USER_PRINT("DBManager::getAllTrader1 ok");
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 
 void DBManager::getAllObjTrader(list<Trader *> *l_trader) {
@@ -355,14 +385,17 @@ void DBManager::getAllObjTrader(list<Trader *> *l_trader) {
 		}
 	}
 
-	int countnum = this->conn->count(DB_OPERATOR_COLLECTION);
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
+
+	int countnum = client->count(DB_OPERATOR_COLLECTION);
 	USER_PRINT(countnum);
 	if (countnum == 0) {
 		cout << "\tDBManager::getAllTrader is NONE!" << endl;
 	}
 	else {
 		unique_ptr<DBClientCursor> cursor =
-			this->conn->query(DB_OPERATOR_COLLECTION);
+			client->query(DB_OPERATOR_COLLECTION);
 		while (cursor->more()) {
 			Trader *op = new Trader();
 			BSONObj p = cursor->next();
@@ -385,13 +418,17 @@ void DBManager::getAllObjTrader(list<Trader *> *l_trader) {
 		}
 		USER_PRINT("DBManager::getAllTrader1 ok");
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 
 bool DBManager::FindAdminByAdminIdAndPassword(string adminid, string password) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	int count_number = 0;
 	bool flag = false;
 
-	count_number = this->conn->count(DB_ADMIN_COLLECTION,
+	count_number = client->count(DB_ADMIN_COLLECTION,
 		BSON("adminid" << adminid << "password" << password));
 
 	if (count_number == 0) {
@@ -400,6 +437,9 @@ bool DBManager::FindAdminByAdminIdAndPassword(string adminid, string password) {
 	else {
 		flag = true;
 	}
+
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 
 	return flag;
 }
@@ -415,17 +455,20 @@ void DBManager::CreateFutureAccount(Trader *op, FutureAccount *fa) {
 		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount_panhou";
 	}
 
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
+
 	int count_number = 0;
 	int trader_count_number = 0;
 
 	if (op != NULL) {
-		trader_count_number = this->conn->count(DB_OPERATOR_COLLECTION,
+		trader_count_number = client->count(DB_OPERATOR_COLLECTION,
 			BSON("traderid" << op->getTraderID()));
 		if (trader_count_number == 0) { //交易员id不存在
 			cout << "Trader ID Not Exists!" << endl;
 		}
 		else { //交易员存在
-			count_number = this->conn->count(DB_FUTUREACCOUNT_COLLECTION,
+			count_number = client->count(DB_FUTUREACCOUNT_COLLECTION,
 				BSON("userid" << fa->getUserID()));
 
 			if (count_number > 0) { //期货账户已经存在
@@ -443,13 +486,17 @@ void DBManager::CreateFutureAccount(Trader *op, FutureAccount *fa) {
 				b.append("on_off", op->getOn_Off());
 
 				BSONObj p = b.obj();
-				conn->insert(DB_FUTUREACCOUNT_COLLECTION, p);
+				client->insert(DB_FUTUREACCOUNT_COLLECTION, p);
 				USER_PRINT("DBManager::CreateFutureAccount ok");
 			}
 		}
-	}	
+	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 void DBManager::DeleteFutureAccount(FutureAccount *fa) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	string DB_FUTUREACCOUNT_COLLECTION;
 	if (this->is_online) {
 		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount";
@@ -458,10 +505,14 @@ void DBManager::DeleteFutureAccount(FutureAccount *fa) {
 	{
 		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount_panhou";
 	}
-	this->conn->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (fa->getUserID().c_str())), BSON("$set" << BSON("isactive" << ISNOTACTIVE)));
+	client->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (fa->getUserID().c_str())), BSON("$set" << BSON("isactive" << ISNOTACTIVE)));
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::DeleteFutureAccount ok");
 }
 void DBManager::UpdateFutureAccount(User *u) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	string DB_FUTUREACCOUNT_COLLECTION;
 	if (this->is_online) {
 		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount";
@@ -470,13 +521,14 @@ void DBManager::UpdateFutureAccount(User *u) {
 	{
 		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount_panhou";
 	}
-	this->conn->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (u->getUserID().c_str())), BSON("$set" << BSON("userid" << u->getUserID() << "brokerid" << u->getBrokerID() << "traderid" << u->getTraderID() << "password" << u->getPassword() << "frontaddress" << u->getFrontAddress() << "on_off" << u->getOn_Off())));
-	USER_PRINT("DBManager::UpdateOperator ok");
+	client->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (u->getUserID().c_str())), BSON("$set" << BSON("userid" << u->getUserID() << "brokerid" << u->getBrokerID() << "traderid" << u->getTraderID() << "password" << u->getPassword() << "frontaddress" << u->getFrontAddress() << "on_off" << u->getOn_Off())));
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 
-void DBManager::UpdateFutureAccountOrderRef(mongo::DBClientConnection * conn_tmp, User *u, string order_ref_base) {
-	USER_PRINT("order_ref_base");
-	USER_PRINT(order_ref_base);
+void DBManager::UpdateFutureAccountOrderRef(User *u, string order_ref_base) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	string DB_FUTUREACCOUNT_COLLECTION;
 	if (this->is_online) {
 		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount";
@@ -485,18 +537,16 @@ void DBManager::UpdateFutureAccountOrderRef(mongo::DBClientConnection * conn_tmp
 	{
 		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount_panhou";
 	}
-	
-	USER_PRINT(DB_FUTUREACCOUNT_COLLECTION);
-	
-	update_futureaccount_mtx.lock();
-	
-	conn_tmp->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (u->getUserID().c_str())), BSON("$set" << BSON("order_ref_base" << order_ref_base)));
 
-	update_futureaccount_mtx.unlock();
-	USER_PRINT("DBManager::UpdateFutureAccountOrderRef ok");
+	client->update(DB_FUTUREACCOUNT_COLLECTION, BSON("userid" << (u->getUserID().c_str())), BSON("$set" << BSON("order_ref_base" << order_ref_base)));
+
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 
 void DBManager::SearchFutrueByUserID(string userid) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	string DB_FUTUREACCOUNT_COLLECTION;
 	if (this->is_online) {
 		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount";
@@ -505,8 +555,7 @@ void DBManager::SearchFutrueByUserID(string userid) {
 	{
 		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount_panhou";
 	}
-	unique_ptr<DBClientCursor> cursor =
-		this->conn->query(DB_FUTUREACCOUNT_COLLECTION, MONGO_QUERY("userid" << userid));
+	unique_ptr<DBClientCursor> cursor = client->query(DB_FUTUREACCOUNT_COLLECTION, MONGO_QUERY("userid" << userid));
 	while (cursor->more()) {
 		BSONObj p = cursor->next();
 		cout << "brokerid = " << p.getStringField("brokerid") << endl;
@@ -516,10 +565,14 @@ void DBManager::SearchFutrueByUserID(string userid) {
 		cout << "isactive = " << p.getStringField("isactive") << endl;
 		cout << "on_off = " << p.getIntField("on_off") << endl;
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::SearchFutrueByUserID ok");
 }
 
 void DBManager::SearchFutrueByTraderID(string traderid) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	string DB_FUTUREACCOUNT_COLLECTION;
 	if (this->is_online) {
 		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount";
@@ -528,8 +581,7 @@ void DBManager::SearchFutrueByTraderID(string traderid) {
 	{
 		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount_panhou";
 	}
-	unique_ptr<DBClientCursor> cursor =
-		this->conn->query(DB_FUTUREACCOUNT_COLLECTION, MONGO_QUERY("traderid" << traderid));
+	unique_ptr<DBClientCursor> cursor = client->query(DB_FUTUREACCOUNT_COLLECTION, MONGO_QUERY("traderid" << traderid));
 	while (cursor->more()) {
 		BSONObj p = cursor->next();
 		cout << "brokerid = " << p.getStringField("brokerid") << endl;
@@ -540,10 +592,14 @@ void DBManager::SearchFutrueByTraderID(string traderid) {
 		cout << "isactive = " << p.getStringField("isactive") << endl;
 		cout << "on_off = " << p.getIntField("on_off") << endl;
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::SearchFutrueByTraderName ok");
 }
 
 void DBManager::SearchFutrueListByTraderID(string traderid, list<FutureAccount *> *l_futureaccount) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	string DB_FUTUREACCOUNT_COLLECTION;
 	if (this->is_online) {
 		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount";
@@ -564,8 +620,7 @@ void DBManager::SearchFutrueListByTraderID(string traderid, list<FutureAccount *
 		}
 	}
 
-	unique_ptr<DBClientCursor> cursor =
-		this->conn->query(DB_FUTUREACCOUNT_COLLECTION, MONGO_QUERY("traderid" << traderid << "isactive" << ISACTIVE));
+	unique_ptr<DBClientCursor> cursor = client->query(DB_FUTUREACCOUNT_COLLECTION, MONGO_QUERY("traderid" << traderid << "isactive" << ISACTIVE));
 	while (cursor->more()) {
 		BSONObj p = cursor->next();
 		FutureAccount *fa = new FutureAccount();
@@ -584,10 +639,14 @@ void DBManager::SearchFutrueListByTraderID(string traderid, list<FutureAccount *
 		fa->setOn_Off(p.getIntField("on_off"));
 		l_futureaccount->push_back(fa);
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::SearchFutrueByTraderName ok");
 }
 
 void DBManager::getAllFutureAccount(list<User *> *l_user) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT(this->is_online);
 	//std::cout << "DBManager::getAllFutureAccount()" << std::endl;
 	this->getXtsDBLogger()->info("DBManager::getAllFutureAccount()");
@@ -608,14 +667,13 @@ void DBManager::getAllFutureAccount(list<User *> *l_user) {
 		}
 	}
 
-	int countnum = this->conn->count(DB_FUTUREACCOUNT_COLLECTION, BSON("isactive" << ISACTIVE));
+	int countnum = client->count(DB_FUTUREACCOUNT_COLLECTION, BSON("isactive" << ISACTIVE));
 	if (countnum == 0) {
 		//cout << "DBManager::getAllFutureAccount None!" << endl;
 		this->getXtsDBLogger()->info("DBManager::getAllFutureAccount None!");
 	}
 	else {
-		unique_ptr<DBClientCursor> cursor =
-			this->conn->query(DB_FUTUREACCOUNT_COLLECTION, MONGO_QUERY("isactive" << ISACTIVE));
+		unique_ptr<DBClientCursor> cursor = client->query(DB_FUTUREACCOUNT_COLLECTION, MONGO_QUERY("isactive" << ISACTIVE));
 		while (cursor->more()) {
 			BSONObj p = cursor->next();
 			/*cout << "\t*" << "brokerid:" << p.getStringField("brokerid") << "  "
@@ -635,14 +693,18 @@ void DBManager::getAllFutureAccount(list<User *> *l_user) {
 		
 		USER_PRINT("DBManager::getAllFutureAccount ok");
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 
 int DBManager::CreateStrategy(Strategy *stg) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	std::cout << "DBManager::CreateStrategy()" << std::endl;
 	int count_number = 0;
 	int flag = 0;
 
-	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
+	count_number = client->count(DB_STRATEGY_COLLECTION,
 		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str()) << "trading_day" << (stg->getStgTradingDay().c_str()) << "is_active" << true));
 
 	if (count_number > 0) {
@@ -717,21 +779,25 @@ int DBManager::CreateStrategy(Strategy *stg) {
 
 		BSONObj p = b.obj();
 
-		conn->insert(DB_STRATEGY_COLLECTION, p);
+		client->insert(DB_STRATEGY_COLLECTION, p);
 		USER_PRINT("DBManager::CreateStrategy ok");
 		flag = 0;
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	return flag;
 }
 
 int DBManager::DeleteStrategy(Strategy *stg) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	int count_number = 0;
 	int flag = 0;
-	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
+	count_number = client->count(DB_STRATEGY_COLLECTION,
 		BSON("strategy_id" << stg->getStgStrategyId().c_str() << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
 
 	if (count_number > 0) {
-		this->conn->remove(DB_STRATEGY_COLLECTION, MONGO_QUERY("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str())));
+		client->remove(DB_STRATEGY_COLLECTION, MONGO_QUERY("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str())));
 		USER_PRINT("DBManager::DeleteStrategy ok");
 		flag = 0;
 	}
@@ -740,14 +806,18 @@ int DBManager::DeleteStrategy(Strategy *stg) {
 		Utils::printRedColor("策略不存在!");
 		flag = 1;
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	return flag;
 }
 
 int DBManager::UpdateStrategyOnOff(Strategy *stg) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::UpdateStrategyOnOff()");
 	int count_number = 0;
 	int flag = 0;
-	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
+	count_number = client->count(DB_STRATEGY_COLLECTION,
 		BSON("strategy_id" << stg->getStgStrategyId().c_str() << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
 
 	if (count_number > 0) {
@@ -756,7 +826,7 @@ int DBManager::UpdateStrategyOnOff(Strategy *stg) {
 		this->getXtsDBLogger()->info("UpdateStrategyOnOff user_id = {}", stg->getStgUserId());
 		this->getXtsDBLogger()->info("UpdateStrategyOnOff strategy_on_off = {}", stg->getOn_Off());
 
-		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId()) << "is_active" << true), BSON("$set" << BSON("strategy_on_off" << stg->getOn_Off())));
+		client->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId()) << "is_active" << true), BSON("$set" << BSON("strategy_on_off" << stg->getOn_Off())));
 		USER_PRINT("DBManager::UpdateStrategyOnOff ok");
 		flag = 0;
 	}
@@ -764,13 +834,17 @@ int DBManager::UpdateStrategyOnOff(Strategy *stg) {
 		cout << "Strategy ID Not Exists!" << endl;
 		flag = 1;
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	return flag;
 }
 
 int DBManager::UpdateStrategyOnlyCloseOnOff(Strategy *stg) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	int count_number = 0;
 	int flag = 0;
-	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
+	count_number = client->count(DB_STRATEGY_COLLECTION,
 		BSON("strategy_id" << stg->getStgStrategyId().c_str() << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
 
 	if (count_number > 0) {
@@ -779,7 +853,7 @@ int DBManager::UpdateStrategyOnlyCloseOnOff(Strategy *stg) {
 		std::cout << "UpdateStrategyOnlyCloseOnOff user_id = " << stg->getStgUserId() << std::endl;
 		std::cout << "UpdateStrategyOnlyCloseOnOff only_close = " << stg->isStgOnlyClose() << std::endl;
 
-		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId()) << "is_active" << true), BSON("$set" << BSON("only_close" << stg->isStgOnlyClose())));
+		client->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId()) << "is_active" << true), BSON("$set" << BSON("only_close" << stg->isStgOnlyClose())));
 		USER_PRINT("DBManager::UpdateStrategyOnlyCloseOnOff ok");
 		flag = 0;
 	}
@@ -787,23 +861,27 @@ int DBManager::UpdateStrategyOnlyCloseOnOff(Strategy *stg) {
 		cout << "Strategy ID Not Exists!" << endl;
 		flag = 1;
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	return flag;
 }
 
 void DBManager::UpdateStrategy(Strategy *stg) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::UpdateStrategy()");
 	int count_number = 0;
 
 	this->getXtsDBLogger()->info("DBManager::UpdateStrategy()");
 
 
-	count_number = this->conn->count(DB_STRATEGY_COLLECTION,
+	count_number = client->count(DB_STRATEGY_COLLECTION,
 		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
 
 	this->getXtsDBLogger()->info("\tcount_number = {}", count_number);
 
 	if (count_number > 0) {
-		this->conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true), BSON("$set" << BSON("position_a_sell_today" << stg->getStgPositionASellToday()
+		client->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true), BSON("$set" << BSON("position_a_sell_today" << stg->getStgPositionASellToday()
 			<< "position_b_sell" << stg->getStgPositionBSell()
 			<< "spread_shift" << stg->getStgSpreadShift()
 			<< "position_b_sell_today" << stg->getStgPositionBSellToday()
@@ -865,8 +943,12 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 	{
 		USER_PRINT("Strategy ID Not Exists!");
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, string userid) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	std::cout << "DBManager::getAllStrategy()" << std::endl;
 	/// 初始化的时候，必须保证list为空
 	if (l_strategys->size() > 0) {
@@ -882,14 +964,14 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 	if (traderid.compare("")) { //如果traderid不为空
 		
 		if (userid.compare("")) { //如果userid不为空
-			cursor = this->conn->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid << "is_active" << true));
+			cursor = client->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid << "is_active" << true));
 		}
 		else {
-			cursor = this->conn->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "is_active" << true));
+			cursor = client->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "is_active" << true));
 		}
 	}
 	else {
-		cursor = this->conn->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("is_active" << true));
+		cursor = client->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("is_active" << true));
 	}
 		
 	while (cursor->more()) {
@@ -1021,11 +1103,14 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 		
 		l_strategys->push_back(stg);
 	}
-
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::getAllStragegy ok");
 }
 
 void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<User *> *l_users, string traderid) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::getAllStrategyByActiveUser()");
 	USER_PRINT("getAllStrategyByActiveUser");
 	list<User *>::iterator user_itor;
@@ -1043,10 +1128,10 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 	for (user_itor = l_users->begin(); user_itor != l_users->end(); user_itor++) {
 		if (traderid.compare("")) { //如果traderid不为空
 
-			cursor = this->conn->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << (*user_itor)->getUserID() << "is_active" << true));
+			cursor = client->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << (*user_itor)->getUserID() << "is_active" << true));
 		}
 		else {
-			cursor = this->conn->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("user_id" << (*user_itor)->getUserID() << "is_active" << true));
+			cursor = client->query(DB_STRATEGY_COLLECTION, MONGO_QUERY("user_id" << (*user_itor)->getUserID() << "is_active" << true));
 		}
 
 		while (cursor->more()) {
@@ -1197,7 +1282,8 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 			l_strategys->push_back(stg);
 		}
 	}
-
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::getAllStrategyByActiveUser ok");
 }
 
@@ -1209,10 +1295,12 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 查找策略(昨仓)			                                                */
 /************************************************************************/
 int DBManager::CreateStrategyYesterday(Strategy *stg) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	int count_number = 0;
 	int flag = 0;
 
-	count_number = this->conn->count(DB_STRATEGY_YESTERDAY_COLLECTION,
+	count_number = client->count(DB_STRATEGY_YESTERDAY_COLLECTION,
 		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str()) << "trading_day" << (stg->getStgTradingDay().c_str())));
 
 	if (count_number > 0) {
@@ -1282,22 +1370,26 @@ int DBManager::CreateStrategyYesterday(Strategy *stg) {
 
 		BSONObj p = b.obj();
 
-		conn->insert(DB_STRATEGY_YESTERDAY_COLLECTION, p);
+		client->insert(DB_STRATEGY_YESTERDAY_COLLECTION, p);
 		flag = 0;
 		USER_PRINT("DBManager::CreateStrategyYesterday ok");
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	return flag;
 }
 
 int DBManager::DeleteStrategyYesterday(Strategy *stg) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	int count_number = 0;
 	int flag = 0;
 
-	count_number = this->conn->count(DB_STRATEGY_YESTERDAY_COLLECTION,
+	count_number = client->count(DB_STRATEGY_YESTERDAY_COLLECTION,
 		BSON("strategy_id" << stg->getStgStrategyId().c_str() << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
 
 	if (count_number > 0) {
-		this->conn->remove(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str()));
+		client->remove(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str()));
 		USER_PRINT("DBManager::DeleteStrategy ok");
 	}
 	else {
@@ -1305,22 +1397,26 @@ int DBManager::DeleteStrategyYesterday(Strategy *stg) {
 		Utils::printRedColor("策略不存在!");
 		flag = 1;
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	return flag;
 }
 
 void DBManager::UpdateStrategyYesterday(Strategy *stg) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	int count_number = 0;
 
 	std::cout << "DBManager::UpdateStrategy" << std::endl;
 
 
-	count_number = this->conn->count(DB_STRATEGY_YESTERDAY_COLLECTION,
+	count_number = client->count(DB_STRATEGY_YESTERDAY_COLLECTION,
 		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
 	std::cout << "DBManager::UpdateStrategyYesterday()" << std::endl;
 	std::cout << "\tcount_number = " << count_number << std::endl;
 
 	if (count_number > 0) {
-		this->conn->update(DB_STRATEGY_YESTERDAY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str())), BSON("$set" << BSON("position_a_sell_today" << stg->getStgPositionASellToday()
+		client->update(DB_STRATEGY_YESTERDAY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str())), BSON("$set" << BSON("position_a_sell_today" << stg->getStgPositionASellToday()
 			<< "position_b_sell" << stg->getStgPositionBSell()
 			<< "spread_shift" << stg->getStgSpreadShift()
 			<< "position_b_sell_today" << stg->getStgPositionBSellToday()
@@ -1376,9 +1472,14 @@ void DBManager::UpdateStrategyYesterday(Strategy *stg) {
 	{
 		cout << "Strategy ID Not Exists!" << endl;
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 
 void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string traderid, string userid) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
+
 	/// 初始化的时候，必须保证list为空
 	if (l_strategys->size() > 0) {
 		list<Strategy *>::iterator Itor;
@@ -1393,14 +1494,14 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 	if (traderid.compare("")) { //如果traderid不为空
 
 		if (userid.compare("")) { //如果userid不为空
-			cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid << "is_active" << true));
+			cursor = client->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid << "is_active" << true));
 		}
 		else {
-			cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "is_active" << true));
+			cursor = client->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "is_active" << true));
 		}
 	}
 	else {
-		cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("is_active" << true));
+		cursor = client->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("is_active" << true));
 	}
 
 	while (cursor->more()) {
@@ -1532,10 +1633,15 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 		l_strategys->push_back(stg);
 	}
 
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
+
 	USER_PRINT("DBManager::getAllYesterdayStragegy ok");
 }
 
 void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Strategy *> *l_strategys, string traderid, string userid, string strategyid) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	/// 初始化的时候，必须保证list为空
 	if (l_strategys->size() > 0) {
 		list<Strategy *>::iterator Itor;
@@ -1552,19 +1658,19 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 		if (userid.compare("")) { //如果userid不为空
 
 			if (strategyid.compare("")) { //如果strategyid不为空
-				cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid << "strategy_id" << strategyid << "is_active" << true));
+				cursor = client->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid << "strategy_id" << strategyid << "is_active" << true));
 			}
 			else {
-				cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid << "is_active" << true));
+				cursor = client->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << userid << "is_active" << true));
 			}
 			
 		}
 		else {
-			cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "is_active" << true));
+			cursor = client->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "is_active" << true));
 		}
 	}
 	else {
-		cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("is_active" << true));
+		cursor = client->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("is_active" << true));
 	}
 
 	while (cursor->more()) {
@@ -1693,10 +1799,15 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 		l_strategys->push_back(stg);
 	}
 
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
+
 	USER_PRINT("DBManager::getAllStragegy ok");
 }
 
 void DBManager::getAllStrategyYesterdayByActiveUser(list<Strategy *> *l_strategys, list<User *> *l_users, string traderid) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::getAllStrategyYesterdayByActiveUser()");
 	USER_PRINT("getAllStrategyYesterdayByActiveUser");
 	list<User *>::iterator user_itor;
@@ -1714,10 +1825,10 @@ void DBManager::getAllStrategyYesterdayByActiveUser(list<Strategy *> *l_strategy
 	for (user_itor = l_users->begin(); user_itor != l_users->end(); user_itor++) {
 		if (traderid.compare("")) { //如果traderid不为空
 
-			cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << (*user_itor)->getUserID() << "is_active" << true));
+			cursor = client->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("trader_id" << traderid << "user_id" << (*user_itor)->getUserID() << "is_active" << true));
 		}
 		else {
-			cursor = this->conn->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("user_id" << (*user_itor)->getUserID() << "is_active" << true));
+			cursor = client->query(DB_STRATEGY_YESTERDAY_COLLECTION, MONGO_QUERY("user_id" << (*user_itor)->getUserID() << "is_active" << true));
 		}
 
 		while (cursor->more()) {
@@ -1857,6 +1968,8 @@ void DBManager::getAllStrategyYesterdayByActiveUser(list<Strategy *> *l_strategy
 			l_strategys->push_back(stg);
 		}
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 
 	USER_PRINT("DBManager::getAllStrategyYesterdayByActiveUser ok");
 }
@@ -1869,6 +1982,8 @@ void DBManager::getAllStrategyYesterdayByActiveUser(list<Strategy *> *l_strategy
 获取一条MD记录															*/
 /************************************************************************/
 void DBManager::CreateMarketConfig(MarketConfig *mc) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	string DB_MARKETCONFIG_COLLECTION;
 	if (this->is_online) {
 
@@ -1881,7 +1996,7 @@ void DBManager::CreateMarketConfig(MarketConfig *mc) {
 	}
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_MARKETCONFIG_COLLECTION,
+	count_number = client->count(DB_MARKETCONFIG_COLLECTION,
 		BSON("market_id" << mc->getMarketID()));
 
 	if (count_number > 0) {
@@ -1897,12 +2012,16 @@ void DBManager::CreateMarketConfig(MarketConfig *mc) {
 		b.append("isactive", ISACTIVE);
 		BSONObj p = b.obj();
 
-		conn->insert(DB_MARKETCONFIG_COLLECTION, p);
+		client->insert(DB_MARKETCONFIG_COLLECTION, p);
 		USER_PRINT("DBManager::CreateMarketConfig ok");
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 
 void DBManager::DeleteMarketConfig(MarketConfig *mc) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	string DB_MARKETCONFIG_COLLECTION;
 	if (this->is_online) {
 		DB_MARKETCONFIG_COLLECTION = "CTP.marketconfig";
@@ -1913,19 +2032,23 @@ void DBManager::DeleteMarketConfig(MarketConfig *mc) {
 	}
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_MARKETCONFIG_COLLECTION,
+	count_number = client->count(DB_MARKETCONFIG_COLLECTION,
 		BSON("market_id" << mc->getMarketID()));
 
 	if (count_number > 0) {
-		this->conn->update(DB_MARKETCONFIG_COLLECTION, BSON("market_id" << (mc->getMarketID().c_str())), BSON("$set" << BSON("isactive" << ISNOTACTIVE)));
+		client->update(DB_MARKETCONFIG_COLLECTION, BSON("market_id" << (mc->getMarketID().c_str())), BSON("$set" << BSON("isactive" << ISNOTACTIVE)));
 		USER_PRINT("DBManager::DeleteMarketConfig ok");
 	}
 	else {
 		cout << "MarketConfig ID Not Exists!" << endl;
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 
 void DBManager::UpdateMarketConfig(MarketConfig *mc) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	string DB_MARKETCONFIG_COLLECTION;
 	if (this->is_online) {
 		DB_MARKETCONFIG_COLLECTION = "CTP.marketconfig";
@@ -1936,11 +2059,11 @@ void DBManager::UpdateMarketConfig(MarketConfig *mc) {
 	}
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_MARKETCONFIG_COLLECTION,
+	count_number = client->count(DB_MARKETCONFIG_COLLECTION,
 		BSON("market_id" << mc->getMarketID()));
 
 	if (count_number > 0) {
-		this->conn->update(DB_MARKETCONFIG_COLLECTION, BSON("market_id" << (mc->getMarketID().c_str())), BSON("$set" << BSON("market_id" << mc->getMarketID() 
+		client->update(DB_MARKETCONFIG_COLLECTION, BSON("market_id" << (mc->getMarketID().c_str())), BSON("$set" << BSON("market_id" << mc->getMarketID()
 			<< "market_frontAddr" << mc->getMarketFrontAddr() 
 			<< "broker_id" << mc->getBrokerID() 
 			<< "user_id" << mc->getUserID() 
@@ -1952,9 +2075,13 @@ void DBManager::UpdateMarketConfig(MarketConfig *mc) {
 	{
 		cout << "MarketConfig ID Not Exists!" << endl;
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 
 void DBManager::getAllMarketConfig(list<MarketConfig *> *l_marketconfig) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::getAllMarketConfig()");
 	string DB_MARKETCONFIG_COLLECTION;
 	if (this->is_online) {
@@ -1973,13 +2100,13 @@ void DBManager::getAllMarketConfig(list<MarketConfig *> *l_marketconfig) {
 		}
 	}
 
-	int countnum = this->conn->count(DB_MARKETCONFIG_COLLECTION);
+	int countnum = client->count(DB_MARKETCONFIG_COLLECTION);
 	if (countnum == 0) {
 		this->getXtsDBLogger()->info("\tDBManager::getAllMarketConfig None!");
 	}
 	else {
 		unique_ptr<DBClientCursor> cursor =
-			this->conn->query(DB_MARKETCONFIG_COLLECTION, MONGO_QUERY("isactive" << ISACTIVE));
+			client->query(DB_MARKETCONFIG_COLLECTION, MONGO_QUERY("isactive" << ISACTIVE));
 		while (cursor->more()) {
 			BSONObj p = cursor->next();
 			this->getXtsDBLogger()->info("\t*market_id:{} market_frontAddr:{} broker_id:{} password:{}",
@@ -1996,9 +2123,13 @@ void DBManager::getAllMarketConfig(list<MarketConfig *> *l_marketconfig) {
 		}
 		USER_PRINT("DBManager::getAllMarketConfig ok");
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 
 MarketConfig * DBManager::getOneMarketConfig() {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::getOneMarketConfig()");
 	USER_PRINT(this->is_online);
 	string DB_MARKETCONFIG_COLLECTION;
@@ -2009,12 +2140,12 @@ MarketConfig * DBManager::getOneMarketConfig() {
 	{
 		DB_MARKETCONFIG_COLLECTION = "CTP.marketconfig_panhou";
 	}
-	int countnum = this->conn->count(DB_MARKETCONFIG_COLLECTION);
+	int countnum = client->count(DB_MARKETCONFIG_COLLECTION);
 	if (countnum == 0) {
 		cout << "\tDBManager::getOneMarketConfig None!" << endl;
 	}
 	else {
-		BSONObj p = this->conn->findOne(DB_MARKETCONFIG_COLLECTION, BSON("isactive" << ISACTIVE));
+		BSONObj p = client->findOne(DB_MARKETCONFIG_COLLECTION, BSON("isactive" << ISACTIVE));
 		if ((strcmp(p.getStringField("market_id"), ""))) {
 
 			this->getXtsDBLogger()->debug("\t*market_id:{} market_frontAddr:{} broker_id:{} userid:{} password:{}",
@@ -2028,6 +2159,8 @@ MarketConfig * DBManager::getOneMarketConfig() {
 			USER_PRINT("DBManager::getOneMarketConfig None");
 		}
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	return NULL;
 }
 
@@ -2038,9 +2171,11 @@ MarketConfig * DBManager::getOneMarketConfig() {
 获取算法															*/
 /************************************************************************/
 void DBManager::CreateAlgorithm(Algorithm *alg) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_ALGORITHM_COLLECTION,
+	count_number = client->count(DB_ALGORITHM_COLLECTION,
 		BSON("name" << alg->getAlgName()));
 
 	if (count_number > 0) {
@@ -2052,33 +2187,40 @@ void DBManager::CreateAlgorithm(Algorithm *alg) {
 		b.append("isactive", alg->getIsActive());
 		BSONObj p = b.obj();
 
-		conn->insert(DB_ALGORITHM_COLLECTION, p);
+		client->insert(DB_ALGORITHM_COLLECTION, p);
 		USER_PRINT("DBManager::CreateAlgorithm ok");
 	}
-
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 void DBManager::DeleteAlgorithm(Algorithm *alg) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_ALGORITHM_COLLECTION,
+	count_number = client->count(DB_ALGORITHM_COLLECTION,
 		BSON("name" << alg->getAlgName()));
 
 	if (count_number > 0) {
-		this->conn->update(DB_ALGORITHM_COLLECTION, BSON("name" << (alg->getAlgName().c_str())), BSON("$set" << BSON("isactive" << ISNOTACTIVE)));
+		client->update(DB_ALGORITHM_COLLECTION, BSON("name" << (alg->getAlgName().c_str())), BSON("$set" << BSON("isactive" << ISNOTACTIVE)));
 		USER_PRINT("DBManager::DeleteAlgorithm ok");
 	}
 	else {
 		cout << "MarketConfig ID Not Exists!" << endl;
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 void DBManager::UpdateAlgorithm(Algorithm *alg) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_ALGORITHM_COLLECTION,
+	count_number = client->count(DB_ALGORITHM_COLLECTION,
 		BSON("name" << alg->getAlgName()));
 
 	if (count_number > 0) {
-		this->conn->update(DB_ALGORITHM_COLLECTION, BSON("name" << (alg->getAlgName().c_str())), BSON("$set" << BSON("name" << alg->getAlgName() << "isactive" << alg->getIsActive())));
+		client->update(DB_ALGORITHM_COLLECTION, BSON("name" << (alg->getAlgName().c_str())), BSON("$set" << BSON("name" << alg->getAlgName() << "isactive" << alg->getIsActive())));
 		USER_PRINT("DBManager::UpdateAlgorithm ok");
 	}
 	else
@@ -2086,8 +2228,12 @@ void DBManager::UpdateAlgorithm(Algorithm *alg) {
 		cout << "Algorithm name Not Exists!" << endl;
 	}
 
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 void DBManager::getAllAlgorithm(list<Algorithm *> *l_alg) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::getAllAlgorithm()");
 	/// 初始化的时候，必须保证list为空
 	if (l_alg->size() > 0) {
@@ -2097,13 +2243,13 @@ void DBManager::getAllAlgorithm(list<Algorithm *> *l_alg) {
 		}
 	}
 
-	int countnum = this->conn->count(DB_ALGORITHM_COLLECTION);
+	int countnum = client->count(DB_ALGORITHM_COLLECTION);
 	if (countnum == 0) {
 		this->getXtsDBLogger()->info("\tDBManager::getAllAlgorithm None!");
 	}
 	else {
 		unique_ptr<DBClientCursor> cursor =
-			this->conn->query(DB_ALGORITHM_COLLECTION, MONGO_QUERY("isactive" << ISACTIVE));
+			client->query(DB_ALGORITHM_COLLECTION, MONGO_QUERY("isactive" << ISACTIVE));
 		while (cursor->more()) {
 			BSONObj p = cursor->next();
 			this->getXtsDBLogger()->info("\t*name:{}", p.getStringField("name"));
@@ -2115,6 +2261,8 @@ void DBManager::getAllAlgorithm(list<Algorithm *> *l_alg) {
 		}
 		USER_PRINT("DBManager::getAllAlgorithm ok");
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 
 #if 0
@@ -2281,16 +2429,18 @@ void DBManager::CreatePositionDetail(USER_CThostFtdcOrderField *posd) {
 #endif
 
 void DBManager::DeletePositionDetail(USER_CThostFtdcOrderField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::DeletePositionDetail");
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_POSITIONDETAIL_COLLECTION,
+	count_number = client->count(DB_POSITIONDETAIL_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
 		//this->conn->update(DB_POSITIONDETAIL_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
 		
-		this->conn->remove(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef));
+		client->remove(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef));
 
 
 		USER_PRINT("DBManager::DeletePositionDetail ok");
@@ -2298,23 +2448,27 @@ void DBManager::DeletePositionDetail(USER_CThostFtdcOrderField *posd) {
 	else {
 		cout << "删除order持仓明细,持仓明细不存在!" << endl;
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::DeletePositionDetail OK");
 }
 
 
 void DBManager::UpdatePositionDetail(USER_CThostFtdcOrderField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::UpdatePositionDetail");
 	std::cout << "DBManager::UpdatePositionDetail()" << std::endl;
 	
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_POSITIONDETAIL_COLLECTION,
+	count_number = client->count(DB_POSITIONDETAIL_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
 		
 		std::cout << "\tposd->TradingDayRecord = " << posd->TradingDayRecord << std::endl;
-		this->conn->update(DB_POSITIONDETAIL_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("instrumentid" << posd->InstrumentID
+		client->update(DB_POSITIONDETAIL_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("instrumentid" << posd->InstrumentID
 			<< "orderref" << posd->OrderRef
 			<< "userid" << posd->UserID
 			<< "direction" << posd->Direction
@@ -2338,12 +2492,16 @@ void DBManager::UpdatePositionDetail(USER_CThostFtdcOrderField *posd) {
 		std::cout << "更新今持仓明细,不存在!" << std::endl;
 	}
 
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::UpdatePositionDetail OK");
 }
 
 
 
 void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, string traderid, string userid) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::getAllPositionDetail");
 	this->getXtsDBLogger()->info("DBManager::getAllPositionDetail()");
 	/// 初始化的时候，必须保证list为空
@@ -2360,14 +2518,14 @@ void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, 
 	if (traderid.compare("")) { //如果traderid不为空
 
 		if (userid.compare("")) { //如果userid不为空
-			cursor = this->conn->query(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("userid" << userid << "is_active" << ISACTIVE));
+			cursor = client->query(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("userid" << userid << "is_active" << ISACTIVE));
 		}
 		else {
-			cursor = this->conn->query(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
+			cursor = client->query(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 		}
 	}
 	else {
-		cursor = this->conn->query(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
+		cursor = client->query(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 	}
 
 	while (cursor->more()) {
@@ -2416,13 +2574,19 @@ void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, 
 		l_posd->push_back(new_pos);
 	}
 
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::getAllPositionDetail OK");
 }
 
 void DBManager::DropPositionDetail() {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::DropPositionDetail");
-	this->conn->dropCollection(DB_POSITIONDETAIL_COLLECTION);
+	client->dropCollection(DB_POSITIONDETAIL_COLLECTION);
 	USER_PRINT("DBManager::DropPositionDetail ok");
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 
 
@@ -2430,12 +2594,14 @@ void DBManager::DropPositionDetail() {
 /* 修改过仓位的策略的持仓明细(order) CRUD                                   */
 /************************************************************************/
 void DBManager::CreatePositionDetailChanged(USER_CThostFtdcOrderField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::CreatePositionDetailChanged");
 
 	int posd_count_num = 0;
 
 	if (posd != NULL) {
-		posd_count_num = this->conn->count(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION,
+		posd_count_num = client->count(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION,
 			BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 		if (posd_count_num != 0) { //session_id存在
 			std::cout << "持仓明细已经存在了!" << std::endl;
@@ -2464,24 +2630,28 @@ void DBManager::CreatePositionDetailChanged(USER_CThostFtdcOrderField *posd) {
 			b.append("is_active", ISACTIVE);
 
 			BSONObj p = b.obj();
-			conn->insert(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, p);
+			client->insert(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, p);
 			USER_PRINT("DBManager::CreatePositionDetailChanged ok");
 		}
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::CreatePositionDetailYesterday OK");
 }
 void DBManager::DeletePositionDetailChanged(USER_CThostFtdcOrderField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::DeletePositionDetailChanged()");
 	USER_PRINT("DBManager::DeletePositionDetailChanged");
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION,
+	count_number = client->count(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
 		//this->conn->update(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
 
-		this->conn->remove(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, MONGO_QUERY("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef));
+		client->remove(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, MONGO_QUERY("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef));
 
 
 		USER_PRINT("DBManager::DeletePositionDetailChanged ok");
@@ -2489,18 +2659,22 @@ void DBManager::DeletePositionDetailChanged(USER_CThostFtdcOrderField *posd) {
 	else {
 		this->getXtsDBLogger()->debug("\t删除昨持仓明细,持仓明细不存在!");
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::DeletePositionDetailChanged OK");
 }
 
 void DBManager::UpdatePositionDetailChanged(USER_CThostFtdcOrderField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::UpdatePositionDetailChanged");
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION,
+	count_number = client->count(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
-		this->conn->update(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("instrumentid" << posd->InstrumentID
+		client->update(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("instrumentid" << posd->InstrumentID
 			<< "orderref" << posd->OrderRef
 			<< "userid" << posd->UserID
 			<< "direction" << posd->Direction
@@ -2523,11 +2697,15 @@ void DBManager::UpdatePositionDetailChanged(USER_CThostFtdcOrderField *posd) {
 	else {
 		cout << "更新昨持仓明细,持仓明细未找到!" << endl;
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::UpdatePositionDetailChanged OK");
 }
 
 void DBManager::getAllPositionDetailChanged(list<USER_CThostFtdcOrderField *> *l_posd,
 	string traderid, string userid) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::getAllPositionDetailChanged");
 	this->getXtsDBLogger()->info("DBManager::getAllPositionDetailChanged()");
 	/// 初始化的时候，必须保证list为空
@@ -2547,16 +2725,16 @@ void DBManager::getAllPositionDetailChanged(list<USER_CThostFtdcOrderField *> *l
 
 		if (userid.compare("")) { //如果userid不为空
 			USER_PRINT("如果userid不为空");
-			cursor = this->conn->query(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, MONGO_QUERY("userid" << userid << "is_active" << ISACTIVE));
+			cursor = client->query(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, MONGO_QUERY("userid" << userid << "is_active" << ISACTIVE));
 		}
 		else {
 			USER_PRINT("如果userid为空");
-			cursor = this->conn->query(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
+			cursor = client->query(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 		}
 	}
 	else {
 		USER_PRINT("如果traderid为空");
-		cursor = this->conn->query(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
+		cursor = client->query(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 	}
 
 	while (cursor->more()) {
@@ -2603,21 +2781,29 @@ void DBManager::getAllPositionDetailChanged(list<USER_CThostFtdcOrderField *> *l
 		l_posd->push_back(new_pos);
 	}
 
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::getAllPositionDetailChanged OK");
 }
 
 void DBManager::DropPositionDetailChanged() {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::DropPositionDetailChanged");
-	this->conn->dropCollection(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION);
+	client->dropCollection(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION);
 	USER_PRINT("DBManager::DropPositionDetailChanged ok");
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 
 //根据策略,删除策略对应的order,trade持仓明细
 bool DBManager::DeletePositionDetailChangedByStrategy(Strategy *stg) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::DeletePositionDetailChangedByStrategy");
 	//std::cout << "DBManager::DeletePositionDetailChangedByStrategy()" << std::endl;
 	bool flag = true;
-	int count_number = this->conn->count(DB_STRATEGY_COLLECTION,
+	int count_number = client->count(DB_STRATEGY_COLLECTION,
 		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str()) << "trading_day" << (stg->getStgTradingDay().c_str()) << "is_active" << true));
 
 	if (count_number > 0) {
@@ -2626,9 +2812,9 @@ bool DBManager::DeletePositionDetailChangedByStrategy(Strategy *stg) {
 		std::cout << "\tstrategyid = " << stg->getStgStrategyId() << std::endl;
 		std::cout << "\tuserid = " << stg->getStgUserId() << std::endl;*/
 
-		this->conn->remove(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, MONGO_QUERY("strategyid" << stg->getStgStrategyId().c_str() << "userid" << stg->getStgUserId().c_str() << "is_active" << ISACTIVE));
+		client->remove(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, MONGO_QUERY("strategyid" << stg->getStgStrategyId().c_str() << "userid" << stg->getStgUserId().c_str() << "is_active" << ISACTIVE));
 		//std::cout << "\t策略存在,开始删除持仓明细changed trade" << std::endl;
-		this->conn->remove(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, MONGO_QUERY("strategyid" << stg->getStgStrategyId().c_str() << "userid" << stg->getStgUserId().c_str() << "is_active" << ISACTIVE));
+		client->remove(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, MONGO_QUERY("strategyid" << stg->getStgStrategyId().c_str() << "userid" << stg->getStgUserId().c_str() << "is_active" << ISACTIVE));
 		flag = true;
 	}
 	else {
@@ -2636,18 +2822,22 @@ bool DBManager::DeletePositionDetailChangedByStrategy(Strategy *stg) {
 		flag = false;
 	}
 
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::DeletePositionDetailChangedByStrategy ok");
 	return flag;
 }
 
 
 void DBManager::CreatePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::CreatePositionDetailYesterday");
 
 	int posd_count_num = 0;
 
 	if (posd != NULL) {
-		posd_count_num = this->conn->count(DB_POSITIONDETAIL_YESTERDAY_COLLECTION,
+		posd_count_num = client->count(DB_POSITIONDETAIL_YESTERDAY_COLLECTION,
 			BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 		if (posd_count_num != 0) { //session_id存在
 			std::cout << "持仓明细已经存在了!" << std::endl;
@@ -2676,41 +2866,49 @@ void DBManager::CreatePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
 			b.append("is_active", ISACTIVE);
 
 			BSONObj p = b.obj();
-			conn->insert(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, p);
+			client->insert(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, p);
 			USER_PRINT("DBManager::CreatePositionDetailYesterday ok");
 		}
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::CreatePositionDetailYesterday OK");
 }
 void DBManager::DeletePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::DeletePositionDetailYesterday()");
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_POSITIONDETAIL_YESTERDAY_COLLECTION,
+	count_number = client->count(DB_POSITIONDETAIL_YESTERDAY_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
 		//this->conn->update(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
 		
-		this->conn->remove(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, MONGO_QUERY("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef));
+		client->remove(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, MONGO_QUERY("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef));
 
 		USER_PRINT("DBManager::DeletePositionDetail ok");
 	}
 	else {
 		this->getXtsDBLogger()->debug("\t删除昨持仓明细,持仓明细不存在!");
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::DeletePositionDetailYesterday OK");
 }
 
 void DBManager::UpdatePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::UpdatePositionDetailYesterday");
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_POSITIONDETAIL_YESTERDAY_COLLECTION,
+	count_number = client->count(DB_POSITIONDETAIL_YESTERDAY_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
-		this->conn->update(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("instrumentid" << posd->InstrumentID
+		client->update(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("instrumentid" << posd->InstrumentID
 			<< "orderref" << posd->OrderRef
 			<< "userid" << posd->UserID
 			<< "direction" << posd->Direction
@@ -2733,11 +2931,15 @@ void DBManager::UpdatePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
 	else {
 		cout << "更新昨持仓明细,持仓明细未找到!" << endl;
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::UpdatePositionDetailYesterday OK");
 }
 
 void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> *l_posd,
 	string traderid, string userid) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::getAllPositionDetailYesterday()");
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
@@ -2756,16 +2958,16 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 
 		if (userid.compare("")) { //如果userid不为空
 			USER_PRINT("如果userid不为空");
-			cursor = this->conn->query(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, MONGO_QUERY("userid" << userid << "is_active" << ISACTIVE));
+			cursor = client->query(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, MONGO_QUERY("userid" << userid << "is_active" << ISACTIVE));
 		}
 		else {
 			USER_PRINT("如果userid为空");
-			cursor = this->conn->query(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
+			cursor = client->query(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 		}
 	}
 	else {
 		USER_PRINT("如果traderid为空");
-		cursor = this->conn->query(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
+		cursor = client->query(DB_POSITIONDETAIL_YESTERDAY_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 	}
 
 	while (cursor->more()) {
@@ -2812,29 +3014,37 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 		l_posd->push_back(new_pos);
 	}
 
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::getAllPositionDetailYesterday OK");
 }
 
 void DBManager::DropPositionDetailYesterday() {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::DropPositionDetailYesterday");
-	this->conn->dropCollection(DB_POSITIONDETAIL_YESTERDAY_COLLECTION);
+	client->dropCollection(DB_POSITIONDETAIL_YESTERDAY_COLLECTION);
 	USER_PRINT("DBManager::DropPositionDetailYesterday ok");
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 
 //根据策略,删除策略对应的order,trade持仓明细
 bool DBManager::DeletePositionDetailByStrategy(Strategy *stg) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::DeletePositionDetailByStrategy");
 	//std::cout << "DBManager::DeletePositionDetailByStrategy()" << std::endl;
 	bool flag = true;
-	int count_number = this->conn->count(DB_STRATEGY_COLLECTION,
+	int count_number = client->count(DB_STRATEGY_COLLECTION,
 		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << (stg->getStgUserId().c_str()) << "trading_day" << (stg->getStgTradingDay().c_str()) << "is_active" << true));
 
 	if (count_number > 0) {
 		/*std::cout << "\t策略存在,开始删除对应策略持仓明细" << std::endl;
 		std::cout << "\t策略存在,开始删除持仓明细order" << std::endl;*/
-		this->conn->remove(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("strategyid" << stg->getStgStrategyId().c_str() << "userid" << stg->getStgUserId().c_str() << "is_active" << ISACTIVE));
+		client->remove(DB_POSITIONDETAIL_COLLECTION, MONGO_QUERY("strategyid" << stg->getStgStrategyId().c_str() << "userid" << stg->getStgUserId().c_str() << "is_active" << ISACTIVE));
 		//std::cout << "\t策略存在,开始删除持仓明细trade" << std::endl;
-		this->conn->remove(DB_POSITIONDETAIL_TRADE_COLLECTION, MONGO_QUERY("strategyid" << stg->getStgStrategyId().c_str() << "userid" << stg->getStgUserId().c_str() << "is_active" << ISACTIVE));
+		client->remove(DB_POSITIONDETAIL_TRADE_COLLECTION, MONGO_QUERY("strategyid" << stg->getStgStrategyId().c_str() << "userid" << stg->getStgUserId().c_str() << "is_active" << ISACTIVE));
 		flag = true;
 	}
 	else {
@@ -2842,21 +3052,25 @@ bool DBManager::DeletePositionDetailByStrategy(Strategy *stg) {
 		flag = false;
 	}
 
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::DeletePositionDetailByStrategy ok");
 	return flag;
 }
 
 void DBManager::DeletePositionDetailTrade(USER_CThostFtdcTradeField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::DeletePositionDetailTrade");
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_POSITIONDETAIL_TRADE_COLLECTION,
+	count_number = client->count(DB_POSITIONDETAIL_TRADE_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
 		//this->conn->update(DB_POSITIONDETAIL_TRADE_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
 		
-		this->conn->remove(DB_POSITIONDETAIL_TRADE_COLLECTION, MONGO_QUERY("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef));
+		client->remove(DB_POSITIONDETAIL_TRADE_COLLECTION, MONGO_QUERY("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDayRecord << "orderref" << posd->OrderRef));
 
 		
 		USER_PRINT("DBManager::DeletePositionDetailTrade ok");
@@ -2864,19 +3078,23 @@ void DBManager::DeletePositionDetailTrade(USER_CThostFtdcTradeField *posd) {
 	else {
 		cout << "删除trade持仓明细,持仓明细不存在!" << endl;
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::DeletePositionDetailTrade OK");
 }
 
 void DBManager::UpdatePositionDetailTrade(USER_CThostFtdcTradeField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::UpdatePositionDetailTrade");
 
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_POSITIONDETAIL_TRADE_COLLECTION,
+	count_number = client->count(DB_POSITIONDETAIL_TRADE_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
-		this->conn->update(DB_POSITIONDETAIL_TRADE_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("instrumentid" << posd->InstrumentID
+		client->update(DB_POSITIONDETAIL_TRADE_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("instrumentid" << posd->InstrumentID
 			<< "orderref" << posd->OrderRef
 			<< "userid" << posd->UserID
 			<< "direction" << posd->Direction
@@ -2895,10 +3113,14 @@ void DBManager::UpdatePositionDetailTrade(USER_CThostFtdcTradeField *posd) {
 		cout << "更新今持仓明细trade,不存在!" << endl;
 	}
 
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::UpdatePositionDetailTrade OK");
 }
 
 void DBManager::getAllPositionDetailTrade(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id, string userid) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::getAllPositionDetailTrade()");
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
@@ -2914,14 +3136,14 @@ void DBManager::getAllPositionDetailTrade(list<USER_CThostFtdcTradeField *> *l_p
 	if (trader_id.compare("")) { //如果traderid不为空
 
 		if (userid.compare("")) { //如果userid不为空
-			cursor = this->conn->query(DB_POSITIONDETAIL_TRADE_COLLECTION, MONGO_QUERY("userid" << userid << "is_active" << ISACTIVE));
+			cursor = client->query(DB_POSITIONDETAIL_TRADE_COLLECTION, MONGO_QUERY("userid" << userid << "is_active" << ISACTIVE));
 		}
 		else {
-			cursor = this->conn->query(DB_POSITIONDETAIL_TRADE_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
+			cursor = client->query(DB_POSITIONDETAIL_TRADE_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 		}
 	}
 	else {
-		cursor = this->conn->query(DB_POSITIONDETAIL_TRADE_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
+		cursor = client->query(DB_POSITIONDETAIL_TRADE_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 	}
 
 	while (cursor->more()) {
@@ -2962,23 +3184,31 @@ void DBManager::getAllPositionDetailTrade(list<USER_CThostFtdcTradeField *> *l_p
 		l_posd->push_back(new_pos);
 	}
 
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::getAllPositionDetailTrade OK");
 }
 
 void DBManager::DropPositionDetailTrade() {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::DropPositionDetailTrade");
-	this->conn->dropCollection(DB_POSITIONDETAIL_TRADE_COLLECTION);
+	client->dropCollection(DB_POSITIONDETAIL_TRADE_COLLECTION);
 	USER_PRINT("DBManager::DropPositionDetailTrade ok");
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 
 void DBManager::CreatePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::CreatePositionDetailTradeChanged");
 
 	int posd_count_num = 0;
 
 	if (posd != NULL) {
 
-		posd_count_num = this->conn->count(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION,
+		posd_count_num = client->count(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION,
 			BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 		if (posd_count_num != 0) { //session_id存在
 			std::cout << "持仓明细trade已经存在了!" << std::endl;
@@ -3003,42 +3233,50 @@ void DBManager::CreatePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd
 			b.append("exchangeid", posd->ExchangeID);
 
 			BSONObj p = b.obj();
-			conn->insert(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, p);
+			client->insert(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, p);
 			USER_PRINT("DBManager::CreatePositionDetailTradeChanged ok");
 		}
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::CreatePositionDetailTradeChanged OK");
 }
 
 void DBManager::DeletePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::DeletePositionDetailTradeChanged");
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION,
+	count_number = client->count(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
 		//this->conn->update(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
 		
-		this->conn->remove(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, MONGO_QUERY("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef));
+		client->remove(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, MONGO_QUERY("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef));
 
 		USER_PRINT("DBManager::DeletePositionDetailTradeYesterday ok");
 	}
 	else {
 		this->getXtsDBLogger()->debug("\t删除昨持仓明细,持仓明细不存在!");
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::DeletePositionDetailTradeChanged OK");
 }
 
 void DBManager::UpdatePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::UpdatePositionDetailTradeChanged");
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION,
+	count_number = client->count(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
-		this->conn->update(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("instrumentid" << posd->InstrumentID
+		client->update(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("instrumentid" << posd->InstrumentID
 			<< "orderref" << posd->OrderRef
 			<< "userid" << posd->UserID
 			<< "direction" << posd->Direction
@@ -3056,10 +3294,14 @@ void DBManager::UpdatePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd
 	else {
 		cout << "更新昨持仓明细,持仓明细未找到!" << endl;
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::UpdatePositionDetailTradeChanged OK");
 }
 
 void DBManager::getAllPositionDetailTradeChanged(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id, string userid) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::getAllPositionDetailTradeChanged");
 	this->getXtsDBLogger()->info("DBManager::getAllPositionDetailTradeChanged()");
 	/// 初始化的时候，必须保证list为空
@@ -3079,16 +3321,16 @@ void DBManager::getAllPositionDetailTradeChanged(list<USER_CThostFtdcTradeField 
 
 		if (userid.compare("")) { //如果userid不为空
 			USER_PRINT("如果userid不为空");
-			cursor = this->conn->query(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, MONGO_QUERY("userid" << userid << "is_active" << ISACTIVE));
+			cursor = client->query(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, MONGO_QUERY("userid" << userid << "is_active" << ISACTIVE));
 		}
 		else {
 			USER_PRINT("如果userid为空");
-			cursor = this->conn->query(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
+			cursor = client->query(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 		}
 	}
 	else {
 		USER_PRINT("如果traderid为空");
-		cursor = this->conn->query(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
+		cursor = client->query(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 	}
 
 	while (cursor->more()) {
@@ -3126,13 +3368,19 @@ void DBManager::getAllPositionDetailTradeChanged(list<USER_CThostFtdcTradeField 
 		l_posd->push_back(new_pos);
 	}
 
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::getAllPositionDetailTradeChanged OK");
 }
 
 void DBManager::DropPositionDetailTradeChanged() {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::DropPositionDetailTradeChanged");
-	this->conn->dropCollection(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION);
+	client->dropCollection(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION);
 	USER_PRINT("DBManager::DropPositionDetailTradeChanged ok");
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 
 ///************************************************************************/
@@ -3157,13 +3405,15 @@ void DBManager::DropPositionDetailTradeChanged() {
 //}
 
 void DBManager::CreatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::CreatePositionDetailTradeYesterday");
 
 	int posd_count_num = 0;
 
 	if (posd != NULL) {
 		
-		posd_count_num = this->conn->count(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION,
+		posd_count_num = client->count(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION,
 			BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 		if (posd_count_num != 0) { //session_id存在
 			std::cout << "持仓明细trade已经存在了!" << std::endl;
@@ -3188,42 +3438,50 @@ void DBManager::CreatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *po
 			b.append("exchangeid", posd->ExchangeID);
 
 			BSONObj p = b.obj();
-			conn->insert(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION, p);
+			client->insert(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION, p);
 			USER_PRINT("DBManager::CreatePositionDetailTradeYesterday ok");
 		}
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::CreatePositionDetailYesterday OK");
 }
 
 void DBManager::DeletePositionDetailTradeYesterday(USER_CThostFtdcTradeField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::DeletePositionDetailTradeYesterday()");
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION,
+	count_number = client->count(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
 		//this->conn->update(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("is_active" << ISNOTACTIVE)));
 		
-		this->conn->remove(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION, MONGO_QUERY("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef));
+		client->remove(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION, MONGO_QUERY("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef));
 
 		USER_PRINT("DBManager::DeletePositionDetailTradeYesterday ok");
 	}
 	else {
 		this->getXtsDBLogger()->debug("\t删除昨持仓明细,持仓明细不存在!");
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::DeletePositionDetailTradeYesterday OK");
 }
 
 void DBManager::UpdatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::UpdatePositionDetailTradeYesterday");
 	int count_number = 0;
 
-	count_number = this->conn->count(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION,
+	count_number = client->count(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
-		this->conn->update(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("instrumentid" << posd->InstrumentID
+		client->update(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON("instrumentid" << posd->InstrumentID
 			<< "orderref" << posd->OrderRef
 			<< "userid" << posd->UserID
 			<< "direction" << posd->Direction
@@ -3241,10 +3499,14 @@ void DBManager::UpdatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *po
 	else {
 		cout << "更新昨持仓明细,持仓明细未找到!" << endl;
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::UpdatePositionDetailTradeYesterday OK");
 }
 
 void DBManager::getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id, string userid) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::getAllPositionDetailTradeYesterday()");
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
@@ -3263,16 +3525,16 @@ void DBManager::getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeFiel
 
 		if (userid.compare("")) { //如果userid不为空
 			USER_PRINT("如果userid不为空");
-			cursor = this->conn->query(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION, MONGO_QUERY("userid" << userid << "is_active" << ISACTIVE));
+			cursor = client->query(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION, MONGO_QUERY("userid" << userid << "is_active" << ISACTIVE));
 		}
 		else {
 			USER_PRINT("如果userid为空");
-			cursor = this->conn->query(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
+			cursor = client->query(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 		}
 	}
 	else {
 		USER_PRINT("如果traderid为空");
-		cursor = this->conn->query(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
+		cursor = client->query(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION, MONGO_QUERY("is_active" << ISACTIVE));
 	}
 
 	while (cursor->more()) {
@@ -3310,37 +3572,49 @@ void DBManager::getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeFiel
 		l_posd->push_back(new_pos);
 	}
 
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::getAllPositionDetailYesterday OK");
 }
 
 void DBManager::DropPositionDetailTradeYesterday() {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::DropPositionDetailTradeYesterday");
-	this->conn->dropCollection(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION);
+	client->dropCollection(DB_POSITIONDETAIL_TRADE_YESTERDAY_COLLECTION);
 	USER_PRINT("DBManager::DropPositionDetailTradeYesterday ok");
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 }
 
 void DBManager::UpdateSystemRunningStatus(string value) {
 
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::UpdateSystemRunningStatus value = {}", value);
 	this->getXtsDBLogger()->info("DBManager::UpdateSystemRunningStatus key = {}", DB_RUNNING_KEY);
 
-	int count_number = this->conn->count(DB_SYSTEM_RUNNING_STATUS_COLLECTION,
+	int count_number = client->count(DB_SYSTEM_RUNNING_STATUS_COLLECTION,
 		BSON("key" << DB_RUNNING_KEY));
 
 	if (count_number > 0) {
-		this->conn->update(DB_SYSTEM_RUNNING_STATUS_COLLECTION, MONGO_QUERY("key" << DB_RUNNING_KEY), BSON("$set" << BSON("status" << value)));
+		client->update(DB_SYSTEM_RUNNING_STATUS_COLLECTION, MONGO_QUERY("key" << DB_RUNNING_KEY), BSON("$set" << BSON("status" << value)));
 	}
 	else {
 		std::cout << "\t查找数量为0！" << std::endl;
 	}
-	
+
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	USER_PRINT("DBManager::UpdateSystemRunningStatus ok");
 }
 
 bool DBManager::GetSystemRunningStatus() {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::GetSystemRunningStatus");
 	bool flag = false;;
-	BSONObj obj = this->conn->findOne(DB_SYSTEM_RUNNING_STATUS_COLLECTION, MONGO_QUERY("key" << DB_RUNNING_KEY));
+	BSONObj obj = client->findOne(DB_SYSTEM_RUNNING_STATUS_COLLECTION, MONGO_QUERY("key" << DB_RUNNING_KEY));
 	if (!obj.isEmpty()) {
 		if (!strcmp("off", obj.getStringField("status"))) {
 			flag = true;
@@ -3349,17 +3623,19 @@ bool DBManager::GetSystemRunningStatus() {
 			flag = false;
 		}
 	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
 	return flag;
-	USER_PRINT("DBManager::GetSystemRunningStatus ok");
-}
-
-
-void DBManager::setConn(mongo::DBClientConnection *conn) {
-	this->conn = conn;
 }
 
 mongo::DBClientConnection * DBManager::getConn() {
-	return this->conn;
+	mongo::DBClientConnection *client = NULL;
+	this->queue_DBClient.wait_dequeue(client);
+	return client;
+}
+
+void DBManager::recycleConn(mongo::DBClientConnection *conn) {
+	this->queue_DBClient.enqueue(conn);
 }
 
 void DBManager::setDB_Connect_Status(bool db_connect_status) {

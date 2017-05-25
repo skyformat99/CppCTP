@@ -29,11 +29,6 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 	this->frontAddress = frontAddress;
 	this->nRequestID = atoi(UserID.c_str());
 	this->isConfirmSettlement = false;
-	this->TradeConn = DBManager::getDBConnection();
-	this->PositionConn = DBManager::getDBConnection();
-	this->OrderConn = DBManager::getDBConnection();
-	this->OrderRefConn = DBManager::getDBConnection();
-	this->OrderActionConn = DBManager::getDBConnection();
 	this->TraderID = TraderID;
 	this->l_strategys = new list<Strategy *>();
 	this->l_sessions = new list<Session *>();
@@ -75,11 +70,6 @@ User::User(string BrokerID, string UserID, int nRequestID, string stg_order_ref_
 	this->UserID = UserID;
 	this->nRequestID = atoi(UserID.c_str());
 	this->isConfirmSettlement = false;
-	this->TradeConn = DBManager::getDBConnection();
-	this->PositionConn = DBManager::getDBConnection();
-	this->OrderConn = DBManager::getDBConnection();
-	this->OrderRefConn = DBManager::getDBConnection();
-	this->OrderActionConn = DBManager::getDBConnection();
 	this->l_strategys = new list<Strategy *>();
 	this->l_sessions = new list<Session *>();
 	this->stg_map_instrument_action_counter = new map<string, int>();
@@ -684,22 +674,6 @@ void User::getL_Position_Detail_Data(list<USER_INSTRUMENT_POSITION *> *l_positio
 }
 
 /************************************************************************/
-/* 获取数据库连接                                                         */
-/************************************************************************/
-mongo::DBClientConnection * User::GetPositionConn() {
-	return this->PositionConn;
-}
-mongo::DBClientConnection * User::GetTradeConn() {
-	return this->TradeConn;
-}
-mongo::DBClientConnection * User::GetOrderConn() {
-	return this->OrderConn;
-}
-mongo::DBClientConnection * User::GetOrderActionConn() {
-	return this->OrderActionConn;
-}
-
-/************************************************************************/
 /* 完成Order的MongoDB操作                                                 */
 /************************************************************************/
 void User::DB_OrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderField *pInputOrder) {
@@ -800,11 +774,12 @@ void User::DB_OrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderF
 	//conn->insert(DB_ORDERINSERT_COLLECTION, p);
 	USER_PRINT("Begin Insert!");
 
-	this->dbm->getConn()->insert(DB_ORDERINSERT_COLLECTION, p);
+	conn->insert(DB_ORDERINSERT_COLLECTION, p);
 
 	/*string temp_order_ref_base = temp.substr(0, 10);
 	USER_PRINT(temp_order_ref_base);
 	this->DB_UpdateOrderRef(temp_order_ref_base);*/
+	this->getDBManager()->recycleConn(conn);
 
 	USER_PRINT("DBManager::DB_OrderInsert ok");
 }
@@ -815,7 +790,7 @@ void User::DB_UpdateOrderRef(string order_ref_base) {
 	int len_order_ref_base = order_ref_base.length();
 	USER_PRINT(order_ref_base);
 	USER_PRINT(len_order_ref_base);
-	this->dbm->UpdateFutureAccountOrderRef(this->OrderRefConn, this, order_ref_base);
+	this->getCTP_Manager()->getDBManager()->UpdateFutureAccountOrderRef(this, order_ref_base);
 }
 
 void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *pOrder){
@@ -988,11 +963,14 @@ void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *
 	USER_PRINT("Begin Insert!");
 
 	//this->dbm->getConn()->insert(DB_ONRTNORDER_COLLECTION, p);
-	this->OrderConn->insert(DB_ONRTNORDER_COLLECTION, p);
+	conn->insert(DB_ONRTNORDER_COLLECTION, p);
 
 	/*string temp_order_ref_base = temp.substr(0, 10);
 	USER_PRINT(temp_order_ref_base);
 	this->DB_UpdateOrderRef(temp_order_ref_base);*/
+
+	this->getDBManager()->recycleConn(conn);
+
 	USER_PRINT("DBManager::DB_OnRtnOrder ok");
 	
 }
@@ -1100,7 +1078,9 @@ void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *
 	//conn->insert(DB_ONRTNTRADE_COLLECTION, p);
 
 	//this->dbm->getConn()->insert(DB_ONRTNTRADE_COLLECTION, p);
-	this->TradeConn->insert(DB_ONRTNTRADE_COLLECTION, p);
+	conn->insert(DB_ONRTNTRADE_COLLECTION, p);
+
+	this->getDBManager()->recycleConn(conn);
 	
 	USER_PRINT("DBManager::DB_OnRtnTrade ok");
 }
@@ -1146,7 +1126,9 @@ void User::DB_OrderAction(mongo::DBClientConnection *conn, CThostFtdcInputOrderA
 	///Mac地址
 	b.append("MacAddress", pOrderAction->MacAddress);
 	BSONObj p = b.obj();
-	this->OrderActionConn->insert(DB_ORDERACTION_COLLECTION, p);
+	conn->insert(DB_ORDERACTION_COLLECTION, p);
+
+	this->getDBManager()->recycleConn(conn);
 
 	USER_PRINT("DBManager::DB_OrderAction ok");
 }
@@ -1289,6 +1271,9 @@ void User::DB_OrderCombine(mongo::DBClientConnection *conn, CThostFtdcOrderField
 	b.append("MacAddress", pOrder->MacAddress);
 	BSONObj p = b.obj();
 	conn->insert(DB_ORDERCOMBINE_COLLECTION, p);
+
+	this->getDBManager()->recycleConn(conn);
+
 	USER_PRINT("DBManager::DB_OrderCombine ok");
 }
 
@@ -1334,6 +1319,9 @@ void User::DB_OnRspOrderAction(mongo::DBClientConnection *conn, CThostFtdcInputO
 	b.append("MacAddress", pInputOrderAction->MacAddress);
 	BSONObj p = b.obj();
 	conn->insert(DB_ONRSPORDERACTION_COLLECTION, p);
+
+	this->getDBManager()->recycleConn(conn);
+
 	USER_PRINT("DBManager::DB_OnRspOrderAction ok");
 } // CTP认为撤单参数错误
 
@@ -1406,7 +1394,11 @@ void User::DB_OnErrRtnOrderAction(mongo::DBClientConnection *conn, CThostFtdcOrd
 	///Mac地址
 	b.append("MacAddress", pOrderAction->MacAddress);
 	BSONObj p = b.obj();
+
 	conn->insert(DB_ONERRRTNORDERACTION_COLLECTION, p);
+
+	this->getDBManager()->recycleConn(conn);
+
 	USER_PRINT("DBManager::DB_OnErrRtnOrderAction ok");
 } // 交易所认为撤单错误
 
@@ -1479,6 +1471,8 @@ void User::DB_OnRspOrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputO
 	
 	BSONObj p = b.obj();
 	conn->insert(DB_ONRSPORDERINSERT_COLLECTION, p);
+
+	this->getDBManager()->recycleConn(conn);
 	USER_PRINT("DBManager::DB_OnRspOrderInsert ok");
 } // CTP认为报单参数错误
 
@@ -1552,6 +1546,9 @@ void User::DB_OnErrRtnOrderInsert(mongo::DBClientConnection *conn, CThostFtdcInp
 	BSONObj p = b.obj();
 	conn->insert(DB_ONERRRTNORDERINSERT_COLLECTION, p);
 	USER_PRINT("DBManager::DB_OnErrRtnOrderInsert ok");
+
+	this->getDBManager()->recycleConn(conn);
+
 } // 交易所认为报单错误
 
 void User::DB_OnRspQryInvestorPosition(mongo::DBClientConnection *conn, CThostFtdcInvestorPositionField *pInvestorPosition){
@@ -1648,6 +1645,9 @@ void User::DB_OnRspQryInvestorPosition(mongo::DBClientConnection *conn, CThostFt
 	b.append("AbandonFrozen", pInvestorPosition->AbandonFrozen);
 	BSONObj p = b.obj();
 	conn->insert(DB_ONRSPQRYINVESTORPOSITION, p);
+
+	this->getDBManager()->recycleConn(conn);
+
 	USER_PRINT("DBManager::DB_OnRspQryInvestorPosition ok");
 } // 持仓信息
 

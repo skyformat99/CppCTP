@@ -326,8 +326,6 @@ void TdSpi::OnRspQrySettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *
 //查询结算信息
 void TdSpi::QrySettlementInfo(User *user) {
 	USER_PRINT("TdSpi::QrySettlementInfo")
-	std::cout << "broker ID = " << user->getBrokerID() << endl;
-	std::cout << "InvestorID = " << user->getUserID() << endl;
 
 	CThostFtdcQrySettlementInfoField *pQrySettlementInfo = new CThostFtdcQrySettlementInfoField();
 	strcpy(pQrySettlementInfo->BrokerID, user->getBrokerID().c_str());
@@ -352,7 +350,6 @@ void TdSpi::QrySettlementInfo(User *user) {
 void TdSpi::OnRspQrySettlementInfo(CThostFtdcSettlementInfoField *pSettlementInfo,
                                    CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspQrySettlementInfo");
-	std::cout << "bIsLast = " << bIsLast;
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (this->current_user->getRequestID() == nRequestID) {
 			//sem_post(&sem_ReqQrySettlementInfo);
@@ -1376,7 +1373,8 @@ void TdSpi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorP
 			///放弃执行冻结
 			std::cout << "放弃执行冻结:" << pInvestorPosition->AbandonFrozen << endl;*/
 			//std::cout << "=================================================================================" << endl;
-			this->current_user->DB_OnRspQryInvestorPosition(this->current_user->GetPositionConn(), pInvestorPosition);
+			
+			//this->current_user->DB_OnRspQryInvestorPosition(this->current_user->getCTP_Manager()->getDBManager()->getConn(), pInvestorPosition);
 		}
 	}
 }
@@ -2218,7 +2216,8 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 		
 		if (len_order_ref == 12 && result == "1") { // 通过本交易系统发出去的order长度12,首位字符为1
 
-			this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pOrder);
+			//this->current_user->DB_OnRtnOrder(this->current_user->getCTP_Manager()->getDBManager()->getConn(), pOrder);
+
 			//delete[] codeDst;
 			strategyid = temp.substr(len_order_ref - 2, 2);
 			//std::cout << "\t回报策略编号 = " << strategyid << std::endl;
@@ -2341,7 +2340,9 @@ void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFt
 	if ((this->IsErrorRspInfo(pRspInfo))) {
 		if (pInputOrder) {
 			std::cout << "TdSpi::OnErrRtnOrderInsert()" << endl;
-			this->current_user->DB_OnErrRtnOrderInsert(this->current_user->GetOrderConn(), pInputOrder);
+			
+			//this->current_user->DB_OnErrRtnOrderInsert(this->current_user->getCTP_Manager()->getDBManager()->getConn(), pInputOrder);
+
 			string temp(pInputOrder->OrderRef);
 			string result = temp.substr(0, 1);
 			int len_order_ref = temp.length();
@@ -2363,17 +2364,19 @@ void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFt
 
 //撤单
 void TdSpi::OrderAction(char *ExchangeID, char *OrderRef, char *OrderSysID) {
-	CThostFtdcInputOrderActionField *pOrderAction = new CThostFtdcInputOrderActionField();
-	strcpy(pOrderAction->BrokerID, this->getBrokerID().c_str());
-	strcpy(pOrderAction->InvestorID, this->getUserID().c_str());
+	CThostFtdcInputOrderActionField pOrderAction;
+	memset(&pOrderAction, 0x00, sizeof(CThostFtdcInputOrderActionField));
+
+	strcpy(pOrderAction.BrokerID, this->getBrokerID().c_str());
+	strcpy(pOrderAction.InvestorID, this->getUserID().c_str());
 	//strcpy(f->InstrumentID, "a1501");
-	strcpy(pOrderAction->ExchangeID, ExchangeID);
-	strcpy(pOrderAction->OrderRef, OrderRef);		//设置报单引用
-	strcpy(pOrderAction->OrderSysID, OrderSysID);
-	pOrderAction->ActionFlag = THOST_FTDC_AF_Delete; //删除
-	this->tdapi->ReqOrderAction(pOrderAction, this->getRequestID());
-	this->current_user->DB_OrderAction(this->current_user->GetOrderConn(), pOrderAction);
-	delete pOrderAction;
+	strcpy(pOrderAction.ExchangeID, ExchangeID);
+	strcpy(pOrderAction.OrderRef, OrderRef);		//设置报单引用
+	strcpy(pOrderAction.OrderSysID, OrderSysID);
+	pOrderAction.ActionFlag = THOST_FTDC_AF_Delete; //删除
+	this->tdapi->ReqOrderAction(&pOrderAction, this->getRequestID());
+
+	//this->current_user->DB_OrderAction(this->current_user->getCTP_Manager()->getDBManager()->getConn(), &pOrderAction);
 }
 
 //撤单错误响应
@@ -2381,7 +2384,8 @@ void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction,
 	USER_PRINT("TdSpi::OnRspOrderAction");
 	if ((this->IsErrorRspInfo(pRspInfo))) {
 		if (pInputOrderAction) {
-			this->current_user->DB_OnRspOrderAction(this->current_user->GetOrderConn(), pInputOrderAction);
+
+			//this->current_user->DB_OnRspOrderAction(this->current_user->getCTP_Manager()->getDBManager()->getConn(), pInputOrderAction);
 
 			string temp(pInputOrderAction->OrderRef);
 			string result = temp.substr(0, 1);
@@ -2409,8 +2413,8 @@ void TdSpi::OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction, CThost
 	USER_PRINT("TdSpi::OnErrRtnOrderAction");
 	if ((this->IsErrorRspInfo(pRspInfo))) {
 		if (pOrderAction) {
-			this->current_user->DB_OnErrRtnOrderAction(this->current_user->GetOrderConn(), pOrderAction);
 
+			//this->current_user->DB_OnErrRtnOrderAction(this->current_user->getCTP_Manager()->getDBManager()->getConn(), pOrderAction);
 
 			string temp(pOrderAction->OrderRef);
 			string result = temp.substr(0, 1);

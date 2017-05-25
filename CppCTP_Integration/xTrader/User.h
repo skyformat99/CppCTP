@@ -113,10 +113,6 @@ public:
 	/************************************************************************/
 	/* 获取数据库连接                                                         */
 	/************************************************************************/
-	mongo::DBClientConnection * GetPositionConn();
-	mongo::DBClientConnection * GetTradeConn();
-	mongo::DBClientConnection * GetOrderConn();
-	mongo::DBClientConnection * GetOrderActionConn();
 
 
 	/************************************************************************/
@@ -194,11 +190,6 @@ private:
 	Trader *trader;
 	list<Strategy *> *l_strategys;
 	map<string, int> *stg_map_instrument_action_counter;
-	mongo::DBClientConnection * PositionConn;
-	mongo::DBClientConnection * TradeConn;
-	mongo::DBClientConnection * OrderConn;
-	mongo::DBClientConnection * OrderRefConn;
-	mongo::DBClientConnection * OrderActionConn;
 	DBManager *dbm;
 	long long stg_order_ref_base;
 	CTP_Manager *o_ctp;

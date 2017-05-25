@@ -86,7 +86,6 @@ Strategy::Strategy(User *stg_user) {
 	this->stg_lock_order_ref = "";
 	this->stg_tick_systime_record = "";		// 系统接收tick的时间
 	this->stg_update_position_detail_record_time = ""; // 最后一次修改持仓明细记录时间
-	this->stg_save_strategy_conn = DBManager::getDBConnection();
 	this->stg_last_saved_time = "";	// 最后一次保存策略时间
 
 	this->stg_user = stg_user;					// 默认用户为空
@@ -1115,7 +1114,14 @@ void Strategy::CopyTradeData(CThostFtdcTradeField *dst, CThostFtdcTradeField *sr
 
 /// 收盘保存数据
 void Strategy::DropPositionDetail() {
-	this->stg_save_strategy_conn->dropCollection("CTP.positiondetail");
+
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getStgUser()->getCTP_Manager()->getDBManager()->getConn();
+
+	client->dropCollection("CTP.positiondetail");
+
+	// 重新加到数据连接池队列
+	this->getStgUser()->getCTP_Manager()->getDBManager()->recycleConn(client);
 }
 
 /// 根据持仓明细进行统计持仓量
@@ -1194,18 +1200,22 @@ void Strategy::calPosition() {
 
 /// 更新策略
 void Strategy::UpdateStrategy(Strategy *stg) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getStgUser()->getCTP_Manager()->getDBManager()->getConn();
+
+
 	int count_number = 0;
 
 	this->getStgUser()->getXtsLogger()->info("Strategy::UpdateStrategy()");
 
 
-	count_number = this->stg_save_strategy_conn->count(DB_STRATEGY_COLLECTION,
+	count_number = client->count(DB_STRATEGY_COLLECTION,
 		BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true));
 
 	this->getStgUser()->getXtsLogger()->info("\t查找到 {} 条策略记录", count_number);
 
 	if (count_number > 0) {
-		this->stg_save_strategy_conn->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true), BSON("$set" << BSON("position_a_sell_today" << stg->getStgPositionASellToday()
+		client->update(DB_STRATEGY_COLLECTION, BSON("strategy_id" << (stg->getStgStrategyId().c_str()) << "user_id" << stg->getStgUserId().c_str() << "is_active" << true), BSON("$set" << BSON("position_a_sell_today" << stg->getStgPositionASellToday()
 			<< "position_b_sell" << stg->getStgPositionBSell()
 			<< "spread_shift" << stg->getStgSpreadShift()
 			<< "position_b_sell_today" << stg->getStgPositionBSellToday()
@@ -1267,16 +1277,23 @@ void Strategy::UpdateStrategy(Strategy *stg) {
 	{
 		USER_PRINT("Strategy ID Not Exists!");
 	}
+
+
+	// 重新加到数据连接池队列
+	this->getStgUser()->getCTP_Manager()->getDBManager()->recycleConn(client);
 }
 
 /// 创建持仓明细
 void Strategy::CreatePositionDetail(USER_CThostFtdcOrderField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getStgUser()->getCTP_Manager()->getDBManager()->getConn();
+
 	USER_PRINT("Strategy::CreatePositionDetail");
 
 	int posd_count_num = 0;
 
 	if (posd != NULL) {
-		posd_count_num = this->stg_save_strategy_conn->count(DB_POSITIONDETAIL_COLLECTION,
+		posd_count_num = client->count(DB_POSITIONDETAIL_COLLECTION,
 			BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "is_active" << ISACTIVE));
 
 		std::cout << "\t查找到 " << posd_count_num << " 条持仓明细记录(order)" << std::endl;
@@ -1313,27 +1330,33 @@ void Strategy::CreatePositionDetail(USER_CThostFtdcOrderField *posd) {
 
 			BSONObj p = b.obj();
 			create_position_detail_mtx.lock();
-			this->stg_save_strategy_conn->insert(DB_POSITIONDETAIL_COLLECTION, p);
+			client->insert(DB_POSITIONDETAIL_COLLECTION, p);
 			create_position_detail_mtx.unlock();
 			USER_PRINT("DBManager::CreatePositionDetail ok");
 		}
 	}
+
+	// 重新加到数据连接池队列
+	this->getStgUser()->getCTP_Manager()->getDBManager()->recycleConn(client);
 	USER_PRINT("Strategy::CreatePositionDetail OK");
 }
 
 /// 数据库更新策略持仓明细
 void Strategy::Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getStgUser()->getCTP_Manager()->getDBManager()->getConn();
+
 	USER_PRINT("Strategy::Update_Position_Detail_To_DB");
 	//std::cout << "Strategy::Update_Position_Detail_To_DB()" << std::endl;
 	int count_number = 0;
 
-	count_number = this->stg_save_strategy_conn->count(DB_POSITIONDETAIL_COLLECTION,
+	count_number = client->count(DB_POSITIONDETAIL_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
 		//std::cout << "Strategy::Update_Position_Detail_To_DB()" << std::endl;
 		//std::cout << "\t收盘保存持仓明细 找到(Order)!" << std::endl;
-		this->stg_save_strategy_conn->update(DB_POSITIONDETAIL_COLLECTION, BSON(
+		client->update(DB_POSITIONDETAIL_COLLECTION, BSON(
 			"userid" << posd->UserID 
 			<< "strategyid" << posd->StrategyID 
 			<< "tradingday" << posd->TradingDay 
@@ -1389,27 +1412,32 @@ void Strategy::Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
 
 		BSONObj p = b.obj();
 		create_position_detail_mtx.lock();
-		this->stg_save_strategy_conn->insert(DB_POSITIONDETAIL_COLLECTION, p);
+		client->insert(DB_POSITIONDETAIL_COLLECTION, p);
 		create_position_detail_mtx.unlock();
 		USER_PRINT("Strategy::Update_Position_Detail_To_DB ok");
 	}
 
+	// 重新加到数据连接池队列
+	this->getStgUser()->getCTP_Manager()->getDBManager()->recycleConn(client);
 	USER_PRINT("Strategy::Update_Position_Detail_To_DB OK");
 }
 
 /// 数据库更新策略持仓明细(order changed)
 void Strategy::Update_Position_Changed_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getStgUser()->getCTP_Manager()->getDBManager()->getConn();
+
 	USER_PRINT("Strategy::Update_Position_Changed_Detail_To_DB");
 	//std::cout << "Strategy::Update_Position_Changed_Detail_To_DB()" << std::endl;
 	int count_number = 0;
 
-	count_number = this->stg_save_strategy_conn->count(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION,
+	count_number = client->count(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
 		//std::cout << "Strategy::Update_Position_Changed_Detail_To_DB()" << std::endl;
 		//std::cout << "\t收盘保存持仓明细 找到(Order)!" << std::endl;
-		this->stg_save_strategy_conn->update(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, BSON(
+		client->update(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, BSON(
 			"userid" << posd->UserID
 			<< "strategyid" << posd->StrategyID
 			<< "tradingday" << posd->TradingDay
@@ -1465,22 +1493,27 @@ void Strategy::Update_Position_Changed_Detail_To_DB(USER_CThostFtdcOrderField *p
 
 		BSONObj p = b.obj();
 		create_position_detail_mtx.lock();
-		this->stg_save_strategy_conn->insert(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, p);
+		client->insert(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, p);
 		create_position_detail_mtx.unlock();
 		USER_PRINT("DBManager::Update_Position_Changed_Detail_To_DB ok");
 	}
 
+	// 重新加到数据连接池队列
+	this->getStgUser()->getCTP_Manager()->getDBManager()->recycleConn(client);
 	USER_PRINT("Strategy::Update_Position_Changed_Detail_To_DB OK");
 }
 
 /// 创建持仓明细
 void Strategy::CreatePositionTradeDetail(USER_CThostFtdcTradeField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getStgUser()->getCTP_Manager()->getDBManager()->getConn();
+
 	USER_PRINT("Strategy::CreatePositionTradeDetail");
 
 	int posd_count_num = 0;
 
 	if (posd != NULL) {
-		posd_count_num = this->stg_save_strategy_conn->count(DB_POSITIONDETAIL_TRADE_COLLECTION,
+		posd_count_num = client->count(DB_POSITIONDETAIL_TRADE_COLLECTION,
 			BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "is_active" << ISACTIVE));
 
 		std::cout << "\t查找到 " << posd_count_num << " 条持仓明细记录(trade)" << std::endl;
@@ -1511,27 +1544,32 @@ void Strategy::CreatePositionTradeDetail(USER_CThostFtdcTradeField *posd) {
 
 			BSONObj p = b.obj();
 			create_position_detail_mtx.lock();
-			this->stg_save_strategy_conn->insert(DB_POSITIONDETAIL_TRADE_COLLECTION, p);
+			client->insert(DB_POSITIONDETAIL_TRADE_COLLECTION, p);
 			create_position_detail_mtx.unlock();
 			USER_PRINT("DBManager::CreatePositionTradeDetail ok");
 		}
 	}
+	// 重新加到数据连接池队列
+	this->getStgUser()->getCTP_Manager()->getDBManager()->recycleConn(client);
 	USER_PRINT("Strategy::CreatePositionTradeDetail OK");
 }
 
 /// 数据库更新策略持仓明细(Trade)
 void Strategy::Update_Position_Trade_Detail_To_DB(USER_CThostFtdcTradeField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getStgUser()->getCTP_Manager()->getDBManager()->getConn();
+
 	USER_PRINT("Strategy::Update_Position_Trade_Detail_To_DB");
 	//std::cout << "Strategy::Update_Position_Trade_Detail_To_DB()" << std::endl;
 	int count_number = 0;
 
-	count_number = this->stg_save_strategy_conn->count(DB_POSITIONDETAIL_TRADE_COLLECTION,
+	count_number = client->count(DB_POSITIONDETAIL_TRADE_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
 		//std::cout << "Strategy::Update_Position_Trade_Detail_To_DB()" << std::endl;
 		//std::cout << "\t收盘保存持仓明细 已 找到(Trade)!" << std::endl;
-		this->stg_save_strategy_conn->update(DB_POSITIONDETAIL_TRADE_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON(
+		client->update(DB_POSITIONDETAIL_TRADE_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON(
 			"instrumentid" << posd->InstrumentID
 			<< "orderref" << posd->OrderRef
 			<< "userid" << posd->UserID
@@ -1574,27 +1612,32 @@ void Strategy::Update_Position_Trade_Detail_To_DB(USER_CThostFtdcTradeField *pos
 
 		BSONObj p = b.obj();
 		create_position_detail_mtx.lock();
-		this->stg_save_strategy_conn->insert(DB_POSITIONDETAIL_TRADE_COLLECTION, p);
+		client->insert(DB_POSITIONDETAIL_TRADE_COLLECTION, p);
 		create_position_detail_mtx.unlock();
 	}
 
+	// 重新加到数据连接池队列
+	this->getStgUser()->getCTP_Manager()->getDBManager()->recycleConn(client);
 	USER_PRINT("Strategy::Update_Position_Trade_Detail_To_DB OK");
 }
 
 /// 数据库更新策略持仓明细(trade changed)
 void Strategy::Update_Position_Trade_Changed_Detail_To_DB(USER_CThostFtdcTradeField *posd) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getStgUser()->getCTP_Manager()->getDBManager()->getConn();
+
 	USER_PRINT("Strategy::Update_Position_Trade_Changed_Detail_To_DB");
 	//std::cout << "Strategy::Update_Position_Trade_Changed_Detail_To_DB()" << std::endl;
 	this->getStgUser()->getXtsLogger()->info("Strategy::Update_Position_Trade_Changed_Detail_To_DB()");
 	int count_number = 0;
 
-	count_number = this->stg_save_strategy_conn->count(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION,
+	count_number = client->count(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION,
 		BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE));
 
 	if (count_number > 0) {
 		//std::cout << "\t收盘保存持仓明细 已 找到(Trade)!" << std::endl;
 		this->getStgUser()->getXtsLogger()->info("\t收盘保存持仓明细 已 找到(Trade)!");
-		this->stg_save_strategy_conn->update(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON(
+		client->update(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, BSON("userid" << posd->UserID << "strategyid" << posd->StrategyID << "tradingday" << posd->TradingDay << "orderref" << posd->OrderRef << "is_active" << ISACTIVE), BSON("$set" << BSON(
 			"instrumentid" << posd->InstrumentID
 			<< "orderref" << posd->OrderRef
 			<< "userid" << posd->UserID
@@ -1640,10 +1683,12 @@ void Strategy::Update_Position_Trade_Changed_Detail_To_DB(USER_CThostFtdcTradeFi
 
 		BSONObj p = b.obj();
 		create_position_detail_mtx.lock();
-		this->stg_save_strategy_conn->insert(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, p);
+		client->insert(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, p);
 		create_position_detail_mtx.unlock();
 	}
 
+	// 重新加到数据连接池队列
+	this->getStgUser()->getCTP_Manager()->getDBManager()->recycleConn(client);
 	USER_PRINT("Strategy::Update_Position_Trade_Changed_Detail_To_DB OK");
 }
 
@@ -4804,13 +4849,6 @@ void Strategy::setStgLockOrderRef(string stg_lock_order_ref) {
 }
 string Strategy::getStgLockOrderRef() {
 	return this->stg_lock_order_ref;
-}
-
-void Strategy::setStgSaveStrategyConn(mongo::DBClientConnection *stg_save_strategy_conn) {
-	this->stg_save_strategy_conn = stg_save_strategy_conn;
-}
-mongo::DBClientConnection * Strategy::getStgSaveStrategyConn() {
-	return this->stg_save_strategy_conn;
 }
 
 /************************************************************************/

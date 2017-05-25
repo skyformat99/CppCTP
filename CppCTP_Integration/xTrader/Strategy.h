@@ -239,9 +239,6 @@ public:
 	void setStgLockOrderRef(string stg_lock_order_ref);
 	string getStgLockOrderRef();
 
-	void setStgSaveStrategyConn(mongo::DBClientConnection *stg_save_strategy_conn);
-	mongo::DBClientConnection *getStgSaveStrategyConn();
-
 
 	/************************************************************************/
 	/* 交易相关的回报函数                                                      */
@@ -508,7 +505,6 @@ private:
 	list<string> *l_instruments;
 
 	DBManager *stg_DBM;			// 数据库连接实例
-	mongo::DBClientConnection *stg_save_strategy_conn; //收盘用于保存策略的数据库连接
 	User *stg_user;				// user实例
 	string stg_trader_id;		// 交易员账户id
 	string stg_user_id;			// user_id

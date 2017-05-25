@@ -14,6 +14,8 @@
 #include "Algorithm.h"
 #include "Session.h"
 #include "xTradeStruct.h"
+#include "concurrentqueue/blockingconcurrentqueue.h"
+using namespace moodycamel;
 
 class Strategy;
 class MarketConfig;
@@ -30,9 +32,8 @@ using namespace spdlog;
 class DBManager {
 
 public:
-	DBManager();
+	DBManager(int max_size = 200);
 	~DBManager();
-	static mongo::DBClientConnection * getDBConnection();
 
 	/************************************************************************/
 	/* 设置交易模式(simnow 盘中/离线                                           */
@@ -81,7 +82,7 @@ public:
 	void CreateFutureAccount(Trader *op, FutureAccount *fa);
 	void DeleteFutureAccount(FutureAccount *fa);
 	void UpdateFutureAccount(User *u);
-	void UpdateFutureAccountOrderRef(mongo::DBClientConnection * conn, User *u, string order_ref_base);
+	void UpdateFutureAccountOrderRef(User *u, string order_ref_base);
 	void SearchFutrueByUserID(string userid);
 	void SearchFutrueByTraderID(string traderid);
 	void SearchFutrueListByTraderID(string traderid, list<FutureAccount *> *l_futureaccount);
@@ -226,8 +227,8 @@ public:
 	void UpdateSystemRunningStatus(string value);
 	bool GetSystemRunningStatus();
 
-	void setConn(mongo::DBClientConnection *conn);
 	mongo::DBClientConnection *getConn();
+	void recycleConn(mongo::DBClientConnection *conn);
 
 	void setDB_Connect_Status(bool db_connect_status);
 	bool getDB_Connect_Status();
@@ -235,10 +236,10 @@ public:
 	std::shared_ptr<spdlog::logger> getXtsDBLogger();
 
 private:
-	mongo::DBClientConnection *conn;
 	bool is_online;
 	bool db_connect_status;
 	std::shared_ptr<spdlog::logger> xts_db_logger;
+	moodycamel::BlockingConcurrentQueue<DBClientConnection *> queue_DBClient; // queue of db client
 };
 
 #endif

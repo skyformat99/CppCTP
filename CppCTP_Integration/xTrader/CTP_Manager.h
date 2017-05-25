@@ -21,6 +21,7 @@ using std::map;
 
 
 class MdSpi;
+class MarketConfig;
 
 class CTP_Manager {
 
@@ -115,6 +116,12 @@ public:
 
 	/// 得到strategy_list
 	list<Strategy *> *getListStrategyYesterday();
+
+	/// 得到行情前置地址
+	list<MarketConfig *> *getL_MarketConfig();
+
+	/// 得到下单算法
+	list<Algorithm *> * getL_Alg();
 
 	/// 设置strategy_list
 	void setListStrategy(list<Strategy *> *l_strategys);
@@ -227,6 +234,8 @@ private:
 	list<string> *l_trader;
 	list<User *> *l_user;
 	list<Trader *> *l_obj_trader;
+	list<Algorithm *> *l_alg;
+	list<MarketConfig *> *l_marketconfig;
 	map<string, list<User *> *> m_trader;
 	map<string, list<int> *> m_socket_fds;
 	DBManager *dbm;
