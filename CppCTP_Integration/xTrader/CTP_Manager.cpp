@@ -3150,6 +3150,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 									create_info_array.PushBack(create_info_object, allocator);
 
+									ctp_m->getXtsLogger()->info("CTP_Manager.cpp msgtype == 12 begin delete");
 									//析构
 									delete order_ASellYesterdayClose;
 									delete trade_ASellYesterdayClose;
@@ -3170,6 +3171,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									delete trade_BSellTodayClose;
 									delete order_BBuyTodayClose;
 									delete trade_BBuyTodayClose;
+									ctp_m->getXtsLogger()->info("CTP_Manager.cpp msgtype == 12 after delete");
 
 								}
 								else {

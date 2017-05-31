@@ -2273,14 +2273,18 @@ void Strategy::clearStgPositionDetail() {
 	for (order_itor = this->stg_list_position_detail_from_order->begin();
 		order_itor != this->stg_list_position_detail_from_order->end();)
 	{
-		delete *order_itor;
+		this->getStgUser()->getXtsLogger()->info("Strategy::clearStgPositionDetail() before delete order");
+		delete (*order_itor);
 		order_itor = this->stg_list_position_detail_from_order->erase(order_itor);
+		this->getStgUser()->getXtsLogger()->info("Strategy::clearStgPositionDetail() after delete order");
 	}
 
 	list<USER_CThostFtdcTradeField *>::iterator trade_itor;
 	for (trade_itor = this->stg_list_position_detail_from_trade->begin(); trade_itor != this->stg_list_position_detail_from_trade->end();) {
-		delete *trade_itor;
+		this->getStgUser()->getXtsLogger()->info("Strategy::clearStgPositionDetail() before delete trade");
+		delete (*trade_itor);
 		trade_itor = this->stg_list_position_detail_from_trade->erase(trade_itor);
+		this->getStgUser()->getXtsLogger()->info("Strategy::clearStgPositionDetail() after delete trade");
 	}
 
 }
