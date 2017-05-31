@@ -172,6 +172,7 @@ void TdSpi::Login(User *user) {
 	strcpy(loginField->BrokerID, user->getBrokerID().c_str());
 	strcpy(loginField->UserID, user->getUserID().c_str());
 	strcpy(loginField->Password, user->getPassword().c_str());
+
 	this->tdapi->ReqUserLogin(loginField, user->getRequestID());
 
 	/*int ret = this->controlTimeOut(&login_sem);
@@ -186,7 +187,7 @@ void TdSpi::Login(User *user) {
 		std::cout << "TdSpi::Connect()" << std::endl;
 		std::cout << "\t登陆等待超时" << std::endl;
 		user->setIsLogged(false);
-		return;
+		break;
 	}
 
 	delete loginField;
@@ -2339,7 +2340,6 @@ void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFt
 	USER_PRINT("TdSpi::OnErrRtnOrderInsert");
 	if ((this->IsErrorRspInfo(pRspInfo))) {
 		if (pInputOrder) {
-			std::cout << "TdSpi::OnErrRtnOrderInsert()" << endl;
 			
 			//this->current_user->DB_OnErrRtnOrderInsert(this->current_user->getCTP_Manager()->getDBManager()->getConn(), pInputOrder);
 
@@ -2356,7 +2356,6 @@ void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFt
 						//break;
 					}
 				}
-
 			}
 		}
 	}
@@ -2433,6 +2432,9 @@ void TdSpi::OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction, CThost
 					}
 				}
 			}
+			else {
+				
+			}
 		}
 	}
 }
@@ -2488,11 +2490,11 @@ bool TdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo) {
 	if (bResult) {
 		codeDst[255] = { 0 };
 		Utils::Gb2312ToUtf8(codeDst, 255, pRspInfo->ErrorMsg, strlen(pRspInfo->ErrorMsg)); // Gb2312ToUtf8
-		//cerr << "TdSpi::IsErrorRspInfo() ErrorID = " << pRspInfo->ErrorID << ", ErrorMsg = " << codeDst << endl;
 		Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() ErrorID = ", pRspInfo->ErrorID);
 		Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() ErrorMsg = ", codeDst);
-		/*Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() ErrorID", pRspInfo->ErrorID);
-		Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() ErrorMsg", codeDst);*/
+		this->current_user->getXtsLogger()->info("TdSpi::IsErrorRspInfo() ErrorID = {}", pRspInfo->ErrorID);
+		this->current_user->getXtsLogger()->info("TdSpi::IsErrorRspInfo() ErrorMsg = {}", codeDst);
+		
 	}
 	return bResult;
 }

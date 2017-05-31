@@ -20,6 +20,7 @@ using std::auto_ptr;
 using std::unique_ptr;
 
 #define DB_NAME									"CTP"
+#define DB_AUTH_DB								"admin"
 #define DB_OPERATOR_COLLECTION					"CTP.trader"
 #define DB_SESSIONS_COLLECTION					"CTP.sessions"
 #define DB_ADMIN_COLLECTION						"CTP.admin"
@@ -39,14 +40,14 @@ using std::unique_ptr;
 #define ISACTIVE "1"
 #define ISNOTACTIVE "0"
 
-std::mutex update_futureaccount_mtx; // locks access to counter
-
 DBManager::DBManager(int max_size) {
 
 	bool auto_conn = true;
 	double time_out = 3;
 	// 默认连接状态为true
 	this->db_connect_status = true;
+	// 默认权限认证状态为true
+	this->auth_failed = false;
 
 	//建立连接队列
 	for (int i = 0; i < max_size; i++) {
@@ -58,6 +59,7 @@ DBManager::DBManager(int max_size) {
 			if (conn != NULL)
 			{
 				conn->connect("localhost");
+				conn->auth(BSON("mechanism"<< "SCRAM-SHA-1" << "user" << "" << "pwd" << "" << "db" << DB_AUTH_DB));
 				this->queue_DBClient.enqueue(conn);
 			}
 			else {
@@ -65,11 +67,11 @@ DBManager::DBManager(int max_size) {
 			}
 		}
 		catch (const mongo::ConnectException &e) {
-			std::cout << "MongoDB无法访问!" << std::endl;
+			std::cout << "MongoDB无法访问! 问题:" << e.what() << std::endl;
 			this->db_connect_status = false;
 		}
 		catch (const mongo::SocketException &e) {
-			std::cout << "MongoDB无法访问!" << std::endl;
+			std::cout << "MongoDB无法访问! 问题:" << e.what() << std::endl;
 			this->db_connect_status = false;
 		}
 		catch (const mongo::DBException &e) {

@@ -634,7 +634,7 @@ int main(int argc, char *argv[]) {
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
-	std::cout << "\033[32mTrade Server已就绪,等待连接...\033[0m" << std::endl;
+	Utils::printGreenColor("Trade Server已就绪,等待连接...");
 
 	while (1)
 	{

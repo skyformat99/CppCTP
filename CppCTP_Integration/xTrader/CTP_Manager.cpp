@@ -1589,7 +1589,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 	/*std::cout << "CTP_Manager::HandleMessage" << std::endl;
 	std::cout << "\t服务端收到的数据 = " << msg_tmp << std::endl;*/
 	
-	ctp_m->getXtsLogger()->info("CTP_Manager::HandleMessage");
+	ctp_m->getXtsLogger()->info("CTP_Manager::HandleMessage()");
 	ctp_m->getXtsLogger()->info("\t服务端收到的数据 = {}", msg_tmp);
 
 	//const char *rsp_msg;
@@ -1607,7 +1607,6 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 	strcpy(msg, msg_tmp);
 
 	if (doc.ParseInsitu(msg).HasParseError()) { // 解析出错
-		std::cout << "\tjson parse error" << std::endl;
 		//return;
 		build_doc.SetObject();
 		rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
@@ -2005,6 +2004,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							
 							if (((*stg_itor)->getStgUserId() == q_user_id) && ((*stg_itor)->getStgStrategyId() == q_strategy_id)) {
 								Utils::printGreenColor("找到即将修改的Strategy");
+								ctp_m->getXtsLogger()->info("找到即将修改的Strategy");
 								/* PyQt更新参数如下 */
 								(*stg_itor)->setStgUserId(object["user_id"].GetString());
 								(*stg_itor)->setStgStrategyId(object["strategy_id"].GetString());
@@ -2030,6 +2030,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								(*stg_itor)->setStgBuyOpenOnOff(object["buy_open_on_off"].GetInt());
 
 								Utils::printGreenColor("Strategy修改完成!");
+								ctp_m->getXtsLogger()->info("Strategy修改完成!");
 
 								ctp_m->getDBManager()->UpdateStrategy((*stg_itor));
 
@@ -2470,6 +2471,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					if (((*stg_itor)->getStgUserId() == s_UserID) && ((*stg_itor)->getStgStrategyId() == s_StrategyID)) {
 						//std::cout << "\t找到即将删除的Strategy" << std::endl;
 						Utils::printGreenColor("找到即将删除的Strategy");
+						ctp_m->getXtsLogger()->info("找到即将删除的Strategy");
 						int flag = ctp_m->getDBManager()->DeleteStrategy((*stg_itor));
 						int flag_1 = ctp_m->getDBManager()->DeleteStrategyYesterday((*stg_itor));
 
@@ -2481,6 +2483,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						else {
 							//std::cout << "\tStrategy删除完成!" << std::endl;
 							Utils::printGreenColor("Strategy删除完成!");
+							ctp_m->getXtsLogger()->info("Strategy删除完成!");
 							build_doc.AddMember("MsgResult", 0, allocator);
 							build_doc.AddMember("MsgErrorReason", "", allocator);
 						}
@@ -2866,6 +2869,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								if (((*stg_itor)->getStgUserId() == q_user_id) && ((*stg_itor)->getStgStrategyId() == q_strategy_id)) {
 									//std::cout << "\t找到即将修改的Strategy" << std::endl;
 									Utils::printGreenColor("找到即将修改的Strategy");
+									ctp_m->getXtsLogger()->info("找到即将修改的Strategy");
 									isFindStrategy = true;
 									USER_PRINT("判断修改持仓...");
 									/*/// 交易执行中无法修改持仓
@@ -2896,6 +2900,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									{
 										USER_PRINT("界面发送的修改数量大于系统中的数量,出错...");
 										Utils::printRedColor("界面发送的修改数量大于系统中的数量,出错...");
+										ctp_m->getXtsLogger()->info("界面发送的修改数量大于系统中的数量,出错...");
 										isPositionMeetChanged = false;
 										break;
 									}
@@ -4531,8 +4536,8 @@ void CTP_Manager::delSocketFD(string user_id, int fd) {
 /// 发送行情断线通知
 void CTP_Manager::sendMarketOffLineMessage() {
 	std::cout << "CTP_Manager::sendMarketOffLineMessage()" << std::endl;
-
-	std::cout << "服务端发送发送行情断线通知" << std::endl;
+	Utils::printRedColor("服务端发送发送行情断线通知");
+	this->getXtsLogger()->info("服务端发送发送行情断线通知");
 
 	/************************************************************************/
 	/*发送行情断线通知     msgtype == 18                                                       */
@@ -4574,9 +4579,6 @@ void CTP_Manager::sendMarketOffLineMessage() {
 
 /// 发送交易断线通知
 void CTP_Manager::sendTradeOffLineMessage(string user_id) {
-	std::cout << "CTP_Manager::sendTradeOffLineMessage()" << std::endl;
-	std::cout << "\t发送交易断线通知" << std::endl;
-
 	/************************************************************************/
 	/*发送交易断线通知     msgtype == 19                                       */
 	/************************************************************************/
@@ -4584,10 +4586,9 @@ void CTP_Manager::sendTradeOffLineMessage(string user_id) {
 	map<string, list<int> *>::iterator m_itor;
 	m_itor = this->m_socket_fds.find(user_id);
 	if (m_itor == (this->m_socket_fds.end())) {
-		std::cout << "m_socket_fds 未找到 该期货账户 = " << user_id << std::endl;
+		//std::cout << "m_socket_fds 未找到 该期货账户 = " << user_id << std::endl;
 	}
 	else {
-		std::cout << "m_socket_fds 找到 该期货账户 = " << user_id << std::endl;
 		/// 遍历该交易员的list集合，如果存在该fd，直接跳过，不存在直接存入
 		list<int>::iterator int_itor;
 		for (int_itor = m_itor->second->begin(); int_itor != m_itor->second->end(); int_itor++)
@@ -4615,7 +4616,7 @@ void CTP_Manager::sendTradeOffLineMessage(string user_id) {
 					printf("先前客户端已断开!!!\n");
 					//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
 					if (errno == EPIPE) {
-						std::cout << "\tEPIPE" << std::endl;
+						//std::cout << "\tEPIPE" << std::endl;
 						//break;
 					}
 					perror("\tprotocal error");

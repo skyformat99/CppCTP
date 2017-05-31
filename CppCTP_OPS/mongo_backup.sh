@@ -5,15 +5,15 @@ APP_NAME="xts"
 
 MONGO_HOST="127.0.0.1"
 MONGO_PORT="27017"
+AUTH_NAME=":)xTrader:)admin:)"
+AUTH_PASS=":)&xtrader&:)"
+AUTH_DATABASE="admin"
 TIMESTAMP=`date +%F-%H%M`
 MONGODUMP_PATH="/usr/bin/mongodump"
 BACKUPS_DIR="/root/xts_backup/$APP_NAME"
 BACKUP_NAME="$APP_NAME-$TIMESTAMP"
  
-# mongo admin --eval "printjson(db.fsyncLock())"
-# $MONGODUMP_PATH -h $MONGO_HOST:$MONGO_PORT -d $MONGO_DATABASE
-$MONGODUMP_PATH -d $MONGO_DATABASE
-# mongo admin --eval "printjson(db.fsyncUnlock())"
+$MONGODUMP_PATH --host $MONGO_HOST --port $MONGO_PORT --username $AUTH_NAME --password $AUTH_PASS --authenticationDatabase $AUTH_DATABASE --db $MONGO_DATABASE
  
 mkdir -p $BACKUPS_DIR
 mv dump $BACKUP_NAME

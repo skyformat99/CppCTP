@@ -14,7 +14,6 @@ using mongo::ConnectException;
 //std::mutex tick_mtx; // locks access to counter
 //std::mutex update_status_mtx; // locks access to counter
 //std::mutex select_order_algorithm_mtx; // locks access to counter
-std::mutex create_position_detail_mtx;
 
 #define ISACTIVE "1"
 #define ISNOTACTIVE "0"
@@ -1329,9 +1328,7 @@ void Strategy::CreatePositionDetail(USER_CThostFtdcOrderField *posd) {
 			b.append("is_active", ISACTIVE);
 
 			BSONObj p = b.obj();
-			create_position_detail_mtx.lock();
 			client->insert(DB_POSITIONDETAIL_COLLECTION, p);
-			create_position_detail_mtx.unlock();
 			USER_PRINT("DBManager::CreatePositionDetail ok");
 		}
 	}
@@ -1411,9 +1408,7 @@ void Strategy::Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd) {
 		b.append("volumetradedbatch", posd->VolumeTradedBatch);
 
 		BSONObj p = b.obj();
-		create_position_detail_mtx.lock();
 		client->insert(DB_POSITIONDETAIL_COLLECTION, p);
-		create_position_detail_mtx.unlock();
 		USER_PRINT("Strategy::Update_Position_Detail_To_DB ok");
 	}
 
@@ -1492,9 +1487,7 @@ void Strategy::Update_Position_Changed_Detail_To_DB(USER_CThostFtdcOrderField *p
 		b.append("volumetradedbatch", posd->VolumeTradedBatch);
 
 		BSONObj p = b.obj();
-		create_position_detail_mtx.lock();
 		client->insert(DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION, p);
-		create_position_detail_mtx.unlock();
 		USER_PRINT("DBManager::Update_Position_Changed_Detail_To_DB ok");
 	}
 
@@ -1543,9 +1536,7 @@ void Strategy::CreatePositionTradeDetail(USER_CThostFtdcTradeField *posd) {
 			b.append("is_active", ISACTIVE);
 
 			BSONObj p = b.obj();
-			create_position_detail_mtx.lock();
 			client->insert(DB_POSITIONDETAIL_TRADE_COLLECTION, p);
-			create_position_detail_mtx.unlock();
 			USER_PRINT("DBManager::CreatePositionTradeDetail ok");
 		}
 	}
@@ -1611,9 +1602,7 @@ void Strategy::Update_Position_Trade_Detail_To_DB(USER_CThostFtdcTradeField *pos
 		b.append("volume", posd->Volume);
 
 		BSONObj p = b.obj();
-		create_position_detail_mtx.lock();
 		client->insert(DB_POSITIONDETAIL_TRADE_COLLECTION, p);
-		create_position_detail_mtx.unlock();
 	}
 
 	// 重新加到数据连接池队列
@@ -1682,9 +1671,7 @@ void Strategy::Update_Position_Trade_Changed_Detail_To_DB(USER_CThostFtdcTradeFi
 		b.append("volume", posd->Volume);
 
 		BSONObj p = b.obj();
-		create_position_detail_mtx.lock();
 		client->insert(DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION, p);
-		create_position_detail_mtx.unlock();
 	}
 
 	// 重新加到数据连接池队列
@@ -3326,7 +3313,7 @@ void Strategy::Exec_OnErrRtnOrderInsert() {
 
 // 报单操作错误回报
 void Strategy::Exec_OnErrRtnOrderAction() {
-	USER_PRINT("Exec_OnErrRtnOrderAction()");
+	this->getStgUser()->getXtsLogger()->info("Strategy::Exec_OnErrRtnOrderAction()");
 }
 
 // 行情回调,执行交易任务
@@ -4907,6 +4894,7 @@ void Strategy::OrderAction(string ExchangeID, string OrderRef, string OrderSysID
 //撤单错误响应
 void Strategy::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction) {
 	USER_PRINT("Strategy::OnRspOrderAction");
+	this->getStgUser()->getXtsLogger()->info("Strategy::OnRspOrderAction()");
 }
 
 //撤单错误

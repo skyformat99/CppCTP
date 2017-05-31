@@ -238,6 +238,7 @@ public:
 private:
 	bool is_online;
 	bool db_connect_status;
+	bool auth_failed;
 	std::shared_ptr<spdlog::logger> xts_db_logger;
 	moodycamel::BlockingConcurrentQueue<DBClientConnection *> queue_DBClient; // queue of db client
 };

@@ -1546,7 +1546,6 @@ void User::DB_OnErrRtnOrderInsert(mongo::DBClientConnection *conn, CThostFtdcInp
 	BSONObj p = b.obj();
 	conn->insert(DB_ONERRRTNORDERINSERT_COLLECTION, p);
 	USER_PRINT("DBManager::DB_OnErrRtnOrderInsert ok");
-
 	this->getDBManager()->recycleConn(conn);
 
 } // 交易所认为报单错误
