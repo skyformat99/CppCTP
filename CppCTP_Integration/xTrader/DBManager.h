@@ -86,6 +86,7 @@ public:
 	void SearchFutrueByUserID(string userid);
 	void SearchFutrueByTraderID(string traderid);
 	void SearchFutrueListByTraderID(string traderid, list<FutureAccount *> *l_futureaccount);
+	void SearchFutrueListByTraderID(string traderid, list<User *> *l_user);
 	void getAllFutureAccount(list<User *> *l_user);
 
 	/************************************************************************/

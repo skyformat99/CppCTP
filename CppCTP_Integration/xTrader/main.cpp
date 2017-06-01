@@ -40,7 +40,7 @@ using spdlog::logger;
 
 /*宏定义*/
 #define MAXCONNECTIONS 100
-#define MAX_BUFFER_SIZE	80*1024
+#define MAX_BUFFER_SIZE	2*1024
 
 int sockfd;
 CTP_Manager *ctp_m = NULL;

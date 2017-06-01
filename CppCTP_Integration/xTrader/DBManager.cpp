@@ -59,7 +59,7 @@ DBManager::DBManager(int max_size) {
 			if (conn != NULL)
 			{
 				conn->connect("localhost");
-				conn->auth(BSON("mechanism"<< "SCRAM-SHA-1" << "user" << "" << "pwd" << "" << "db" << DB_AUTH_DB));
+				conn->auth(BSON("mechanism"<< "SCRAM-SHA-1" << "user" << ":)xTrader:)admin:)" << "pwd" << ":)&xtrader&:)" << "db" << DB_AUTH_DB));
 				this->queue_DBClient.enqueue(conn);
 			}
 			else {
@@ -640,6 +640,43 @@ void DBManager::SearchFutrueListByTraderID(string traderid, list<FutureAccount *
 		fa->setIsActive(p.getStringField("isactive"));
 		fa->setOn_Off(p.getIntField("on_off"));
 		l_futureaccount->push_back(fa);
+	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
+	USER_PRINT("DBManager::SearchFutrueByTraderName ok");
+}
+
+void DBManager::SearchFutrueListByTraderID(string traderid, list<User *> *l_user) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
+	string DB_FUTUREACCOUNT_COLLECTION;
+	if (this->is_online) {
+		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount";
+	}
+	else
+	{
+		DB_FUTUREACCOUNT_COLLECTION = "CTP.futureaccount_panhou";
+	}
+	/*list<FutureAccount *>::iterator Itor;
+	for (Itor = l_futureaccount->begin(); Itor != l_futureaccount->end();) {
+	Itor = l_futureaccount->erase(Itor);
+	}*/
+	if (l_user->size() > 0) {
+		list<User *>::iterator future_itor;
+		for (future_itor = l_user->begin(); future_itor != l_user->end();) {
+			delete (*future_itor);
+			future_itor = l_user->erase(future_itor);
+		}
+	}
+
+	unique_ptr<DBClientCursor> cursor = client->query(DB_FUTUREACCOUNT_COLLECTION, MONGO_QUERY("traderid" << traderid << "isactive" << ISACTIVE));
+	while (cursor->more()) {
+		BSONObj p = cursor->next();
+		this->getXtsDBLogger()->info("\t*brokerid:{} traderid:{} password:{} userid:{} frontAdress:{} on_off:{}",
+			p.getStringField("brokerid"), p.getStringField("traderid"), p.getStringField("password"), p.getStringField("userid"),
+			p.getStringField("frontaddress"), p.getIntField("on_off"));
+		User *user = new User(p.getStringField("frontaddress"), p.getStringField("brokerid"), p.getStringField("userid"), p.getStringField("password"), p.getStringField("userid"), p.getIntField("on_off"), p.getStringField("traderid"), p.getStringField("order_ref_base"));
+		l_user->push_back(user);
 	}
 	// 重新加到数据连接池队列
 	this->recycleConn(client);

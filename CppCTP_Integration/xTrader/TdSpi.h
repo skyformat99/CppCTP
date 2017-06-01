@@ -215,7 +215,7 @@ public:
                                  CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
     //登陆是否报错
-    bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
+    bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo, string source = "");
 
 	//得到BrokerID
 	string getBrokerID();

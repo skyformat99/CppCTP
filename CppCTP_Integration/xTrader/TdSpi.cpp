@@ -1989,7 +1989,7 @@ void TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
 ///报单录入请求响应
 void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspOrderInsert");
-	if ((this->IsErrorRspInfo(pRspInfo))) {
+	if ((this->IsErrorRspInfo(pRspInfo, "TdSpi::OnRspOrderInsert()"))) {
 		if (pInputOrder) {
 
 			/*std::cout << "TdSpi::OnRspOrderInsert()" << endl;
@@ -2050,6 +2050,9 @@ void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcR
 			string strategyid = "";
 			if (len_order_ref == 12 && result == "1") {
 				strategyid = temp.substr(len_order_ref - 2, 2);
+
+				this->current_user->getXtsLogger()->info("TdSpi::OnRspOrderInsert() OrderRef = {} strategyid = {}", pInputOrder->OrderRef, strategyid);
+
 				list<Strategy *>::iterator itor;
 				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 					if ((*itor)->getStgStrategyId() == strategyid) {
@@ -2338,7 +2341,7 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 //下单错误响应
 void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo) {
 	USER_PRINT("TdSpi::OnErrRtnOrderInsert");
-	if ((this->IsErrorRspInfo(pRspInfo))) {
+	if ((this->IsErrorRspInfo(pRspInfo, "TdSpi::OnErrRtnOrderInsert()"))) {
 		if (pInputOrder) {
 			
 			//this->current_user->DB_OnErrRtnOrderInsert(this->current_user->getCTP_Manager()->getDBManager()->getConn(), pInputOrder);
@@ -2349,6 +2352,7 @@ void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFt
 			string strategyid = "";
 			if (len_order_ref == 12 && result == "1") {
 				strategyid = temp.substr(len_order_ref - 2, 2);
+				this->current_user->getXtsLogger()->info("TdSpi::OnErrRtnOrderInsert() OrderRef = {} strategyid = {}", pInputOrder->OrderRef, strategyid);
 				list<Strategy *>::iterator itor;
 				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 					if ((*itor)->getStgStrategyId() == strategyid) {
@@ -2381,7 +2385,7 @@ void TdSpi::OrderAction(char *ExchangeID, char *OrderRef, char *OrderSysID) {
 //撤单错误响应
 void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspOrderAction");
-	if ((this->IsErrorRspInfo(pRspInfo))) {
+	if ((this->IsErrorRspInfo(pRspInfo, "TdSpi::OnRspOrderAction()"))) {
 		if (pInputOrderAction) {
 
 			//this->current_user->DB_OnRspOrderAction(this->current_user->getCTP_Manager()->getDBManager()->getConn(), pInputOrderAction);
@@ -2395,6 +2399,7 @@ void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction,
 				//this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pInputOrderAction);
 				//delete[] codeDst;
 				strategyid = temp.substr(len_order_ref - 2, 2);
+				this->current_user->getXtsLogger()->info("TdSpi::OnRspOrderAction() OrderRef = {} strategyid = {}", pInputOrderAction->OrderRef, strategyid);
 				list<Strategy *>::iterator itor;
 				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 					if ((*itor)->getStgStrategyId() == strategyid) {
@@ -2410,7 +2415,7 @@ void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction,
 //撤单错误
 void TdSpi::OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction, CThostFtdcRspInfoField *pRspInfo) {
 	USER_PRINT("TdSpi::OnErrRtnOrderAction");
-	if ((this->IsErrorRspInfo(pRspInfo))) {
+	if ((this->IsErrorRspInfo(pRspInfo, "TdSpi::OnErrRtnOrderAction()"))) {
 		if (pOrderAction) {
 
 			//this->current_user->DB_OnErrRtnOrderAction(this->current_user->getCTP_Manager()->getDBManager()->getConn(), pOrderAction);
@@ -2424,6 +2429,7 @@ void TdSpi::OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction, CThost
 				//this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pInputOrderAction);
 				//delete[] codeDst;
 				strategyid = temp.substr(len_order_ref - 2, 2);
+				this->current_user->getXtsLogger()->info("TdSpi::OnErrRtnOrderAction() OrderRef = {} strategyid = {}", pOrderAction->OrderRef, strategyid);
 				list<Strategy *>::iterator itor;
 				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 					if ((*itor)->getStgStrategyId() == strategyid) {
@@ -2484,17 +2490,17 @@ void TdSpi::OnRspUserPasswordUpdate(CThostFtdcUserPasswordUpdateField *pUserPass
     }
 }
 
-bool TdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo) {
+bool TdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo, string source) {
 	// 如果ErrorID != 0, 说明收到了错误的响应
 	bool bResult = ((pRspInfo) && (pRspInfo->ErrorID != 0));
 	if (bResult) {
 		codeDst[255] = { 0 };
+		memset(codeDst, 0x00, sizeof(codeDst));
 		Utils::Gb2312ToUtf8(codeDst, 255, pRspInfo->ErrorMsg, strlen(pRspInfo->ErrorMsg)); // Gb2312ToUtf8
+		Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() UserID = ", this->current_user->getUserID());
 		Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() ErrorID = ", pRspInfo->ErrorID);
 		Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() ErrorMsg = ", codeDst);
-		this->current_user->getXtsLogger()->info("TdSpi::IsErrorRspInfo() ErrorID = {}", pRspInfo->ErrorID);
-		this->current_user->getXtsLogger()->info("TdSpi::IsErrorRspInfo() ErrorMsg = {}", codeDst);
-		
+		this->current_user->getXtsLogger()->info("TdSpi::IsErrorRspInfo() UserID = {} source = {} ErrorID = {} ErrorMsg = {}", this->current_user->getUserID(), source, pRspInfo->ErrorID, codeDst);
 	}
 	return bResult;
 }

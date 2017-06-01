@@ -79,7 +79,7 @@ def read_msg(sockfd):
         #接收数据1038个字节(与服务器端统一:13位head+1位checknum+1024数据段)
         # print("read_msg receive %d bytes" % (30 * 1024 + 14))
         # data = sockfd.recv(30 * 1024 + 14)
-        data = RecvN(sockfd, 30 * 1024 + 14)
+        data = RecvN(sockfd, 20 * 1024 + 14)
         # print("len data", len(data))
     except socket.error as e:
         print(e)
@@ -104,16 +104,16 @@ if __name__ == '__main__':
     #创建socket套接字
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    send_size = s.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
+    #send_size = s.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
     # print("send = ", send_size)
 
-    recv_size = s.getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF)
+    #recv_size = s.getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF)
     # print("recv = ", recv_size)
 
     # s.setsockopt(socket.SOL_TCP, socket.TCP_NODELAY, 1)
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 40 * 1024)
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 40 * 1024)
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    #s.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 100 * 1024)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 500 * 1024)
+    #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     send_size = s.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
     # print("after send = ", send_size)
@@ -125,7 +125,7 @@ if __name__ == '__main__':
         # 连接服务器: IP,port
         try:
             #进行与服务端的连接(ip地址根据实际情况进行更改)
-            s.connect(("192.168.112.128", 8888))
+            s.connect(("192.168.112.129", 8888))
             #s.connect(("192.168.0.11", 8888))
         except socket.error as e:
             print("socket error", e)
