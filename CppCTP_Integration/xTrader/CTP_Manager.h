@@ -223,6 +223,9 @@ public:
 	void setIsMarketCloseDone(bool is_market_close_done);
 	bool getIsMarketCloseDone();
 
+	//获取属于某交易员所属期货账户
+	void getUserListByTraderID(string traderid, CTP_Manager *ctp_m, list<User *> *l_user_trader);
+
 	//// 设置系统xts_logger
 	//void setXtsLogger(std::shared_ptr<spdlog::logger> ptr);
 	std::shared_ptr<spdlog::logger> getXtsLogger();

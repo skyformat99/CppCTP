@@ -845,7 +845,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 			build_doc.Accept(writer);
 			//rsp_msg = const_cast<char *>(buffer.GetString());
 			//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-			std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+			//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 			if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 				printf("\t客户端已断开!!!\n");
@@ -879,7 +879,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 		build_doc.Accept(writer);
 		//rsp_msg = const_cast<char *>(buffer.GetString());
 		//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-		std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+		//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 		if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 			printf("\t客户端已断开!!!\n");
@@ -901,122 +901,75 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	ctp_m->getXtsLogger()->info("\t请求账户信息...");
 	//list<FutureAccount *> l_futureaccount;
 	//ctp_m->getDBManager()->SearchFutrueListByTraderID(s_TraderID, &l_futureaccount);
+	list<User *> l_user_trader;
+	ctp_m->getUserListByTraderID(s_TraderID, ctp_m, &l_user_trader);
 
-	if (ctp_m->getL_User()->size() > 0)
+	if (l_user_trader.size() > 0)
 	{
 		list<User *>::iterator future_itor;
-		for (future_itor = ctp_m->getL_User()->begin(); future_itor != ctp_m->getL_User()->end(); future_itor++) {
+		for (future_itor = l_user_trader.begin(); future_itor != l_user_trader.end(); future_itor++) {
 
-			// 如果userid和traderid不一致,那么就跳过
-			if ((*future_itor)->getTraderID() != s_TraderID)
+			rapidjson::Document build_doc2;
+			rapidjson::StringBuffer buffer2;
+			rapidjson::Writer<StringBuffer> writer2(buffer2);
+
+			/*构建UserInfo的Json*/
+			build_doc2.SetObject();
+			rapidjson::Document::AllocatorType& allocator2 = build_doc2.GetAllocator();
+			build_doc2.AddMember("MsgRef", server_msg_ref++, allocator2);
+			build_doc2.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator2);
+			build_doc2.AddMember("MsgType", 2, allocator2);
+			build_doc2.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator2);
+			build_doc2.AddMember("MsgResult", 0, allocator2);
+			build_doc2.AddMember("MsgErrorReason", "", allocator2);
+			//创建Info数组
+			rapidjson::Value info_array2(rapidjson::kArrayType);
+
+			rapidjson::Value info_object(rapidjson::kObjectType);
+			info_object.SetObject();
+			info_object.AddMember("brokerid", rapidjson::StringRef((*future_itor)->getBrokerID().c_str()), allocator2);
+			info_object.AddMember("traderid", rapidjson::StringRef((*future_itor)->getTraderID().c_str()), allocator2);
+			info_object.AddMember("password", rapidjson::StringRef((*future_itor)->getPassword().c_str()), allocator2);
+			info_object.AddMember("userid", rapidjson::StringRef((*future_itor)->getUserID().c_str()), allocator2);
+			info_object.AddMember("frontaddress", rapidjson::StringRef((*future_itor)->getFrontAddress().c_str()), allocator2);
+			info_object.AddMember("on_off", (*future_itor)->getOn_Off(), allocator2);
+			if ((*future_itor)->getIsPositionRight())
 			{
+				info_object.AddMember("positionflag", 1, allocator2);
+			}
+			else
+			{
+				info_object.AddMember("positionflag", 0, allocator2);
+			}
 
-				rapidjson::Document build_doc2;
-				rapidjson::StringBuffer buffer2;
-				rapidjson::Writer<StringBuffer> writer2(buffer2);
+			info_array2.PushBack(info_object, allocator2);
 
-				/*构建UserInfo的Json*/
-				build_doc2.SetObject();
-				rapidjson::Document::AllocatorType& allocator2 = build_doc2.GetAllocator();
-				build_doc2.AddMember("MsgRef", server_msg_ref++, allocator2);
-				build_doc2.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator2);
-				build_doc2.AddMember("MsgType", 2, allocator2);
-				build_doc2.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator2);
-				build_doc2.AddMember("MsgResult", 0, allocator2);
-				build_doc2.AddMember("MsgErrorReason", "", allocator2);
-				//创建Info数组
-				rapidjson::Value info_array2(rapidjson::kArrayType);
+			ctp_m->addSocketFD((*future_itor)->getUserID(), fd);
 
-				build_doc2.AddMember("Info", info_array2, allocator2);
-				build_doc2.AddMember("MsgSrc", i_MsgSrc, allocator2);
+			build_doc2.AddMember("Info", info_array2, allocator2);
+			build_doc2.AddMember("MsgSrc", i_MsgSrc, allocator2);
 
-				if (future_itor == std::prev(ctp_m->getL_User()->end()))
-				{
-					build_doc2.AddMember("IsLast", 1, allocator2);
-				}
-				else {
-					build_doc2.AddMember("IsLast", 0, allocator2);
-				}
-
-				build_doc2.Accept(writer2);
-				//rsp_msg = const_cast<char *>(buffer2.GetString());
-				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-				std::cout << "\t服务端响应数据 = " << buffer2.GetString() << std::endl;
-
-				if (write_msg(fd, const_cast<char *>(buffer2.GetString()), strlen(buffer2.GetString())) < 0) {
-					printf("\t客户端已断开!!!\n");
-					//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
-					if (errno == EPIPE) {
-						std::cout << "\tEPIPE" << std::endl;
-						//break;
-					}
-					perror("protocal error");
-				}
+			if (future_itor == std::prev(l_user_trader.end()))
+			{
+				build_doc2.AddMember("IsLast", 1, allocator2);
 			}
 			else {
+				build_doc2.AddMember("IsLast", 0, allocator2);
+			}
 
-				rapidjson::Document build_doc2;
-				rapidjson::StringBuffer buffer2;
-				rapidjson::Writer<StringBuffer> writer2(buffer2);
+			build_doc2.Accept(writer2);
+			//rsp_msg = const_cast<char *>(buffer2.GetString());
+			//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
+			//std::cout << "\t服务端响应数据 = " << buffer2.GetString() << std::endl;
 
-				/*构建UserInfo的Json*/
-				build_doc2.SetObject();
-				rapidjson::Document::AllocatorType& allocator2 = build_doc2.GetAllocator();
-				build_doc2.AddMember("MsgRef", server_msg_ref++, allocator2);
-				build_doc2.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator2);
-				build_doc2.AddMember("MsgType", 2, allocator2);
-				build_doc2.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator2);
-				build_doc2.AddMember("MsgResult", 0, allocator2);
-				build_doc2.AddMember("MsgErrorReason", "", allocator2);
-				//创建Info数组
-				rapidjson::Value info_array2(rapidjson::kArrayType);
-
-				rapidjson::Value info_object(rapidjson::kObjectType);
-				info_object.SetObject();
-				info_object.AddMember("brokerid", rapidjson::StringRef((*future_itor)->getBrokerID().c_str()), allocator2);
-				info_object.AddMember("traderid", rapidjson::StringRef((*future_itor)->getTraderID().c_str()), allocator2);
-				info_object.AddMember("password", rapidjson::StringRef((*future_itor)->getPassword().c_str()), allocator2);
-				info_object.AddMember("userid", rapidjson::StringRef((*future_itor)->getUserID().c_str()), allocator2);
-				info_object.AddMember("frontaddress", rapidjson::StringRef((*future_itor)->getFrontAddress().c_str()), allocator2);
-				info_object.AddMember("on_off", (*future_itor)->getOn_Off(), allocator2);
-				if ((*future_itor)->getIsPositionRight())
-				{
-					info_object.AddMember("positionflag", 1, allocator2);
+			if (write_msg(fd, const_cast<char *>(buffer2.GetString()), strlen(buffer2.GetString())) < 0) {
+				printf("\t客户端已断开!!!\n");
+				//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
+				if (errno == EPIPE) {
+					std::cout << "\tEPIPE" << std::endl;
+					//break;
 				}
-				else
-				{
-					info_object.AddMember("positionflag", 0, allocator2);
-				}
-
-				info_array2.PushBack(info_object, allocator2);
-
-				ctp_m->addSocketFD((*future_itor)->getUserID(), fd);
-
-				build_doc2.AddMember("Info", info_array2, allocator2);
-				build_doc2.AddMember("MsgSrc", i_MsgSrc, allocator2);
-
-				if (future_itor == std::prev(ctp_m->getL_User()->end()))
-				{
-					build_doc2.AddMember("IsLast", 1, allocator2);
-				}
-				else {
-					build_doc2.AddMember("IsLast", 0, allocator2);
-				}
-
-				build_doc2.Accept(writer2);
-				//rsp_msg = const_cast<char *>(buffer2.GetString());
-				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-				std::cout << "\t服务端响应数据 = " << buffer2.GetString() << std::endl;
-
-				if (write_msg(fd, const_cast<char *>(buffer2.GetString()), strlen(buffer2.GetString())) < 0) {
-					printf("\t客户端已断开!!!\n");
-					//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
-					if (errno == EPIPE) {
-						std::cout << "\tEPIPE" << std::endl;
-						//break;
-					}
-					perror("protocal error");
-				}
+				perror("protocal error");
 			}
 		}
 	} 
@@ -1046,7 +999,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 		build_doc2.Accept(writer2);
 		//rsp_msg = const_cast<char *>(buffer2.GetString());
 		//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-		std::cout << "\t服务端响应数据 = " << buffer2.GetString() << std::endl;
+		//std::cout << "\t服务端响应数据 = " << buffer2.GetString() << std::endl;
 
 		if (write_msg(fd, const_cast<char *>(buffer2.GetString()), strlen(buffer2.GetString())) < 0) {
 			printf("\t客户端已断开!!!\n");
@@ -1109,7 +1062,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 			build_doc11.Accept(writer11);
 			//rsp_msg = const_cast<char *>(buffer.GetString());
 			//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-			std::cout << "\t服务端响应数据 = " << buffer11.GetString() << std::endl;
+			//std::cout << "\t服务端响应数据 = " << buffer11.GetString() << std::endl;
 
 			if (write_msg(fd, const_cast<char *>(buffer11.GetString()), strlen(buffer11.GetString())) < 0) {
 				printf("\t客户端已断开!!!\n");
@@ -1148,7 +1101,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 		build_doc11.Accept(writer11);
 		//rsp_msg = const_cast<char *>(buffer.GetString());
 		//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-		std::cout << "\t服务端响应数据 = " << buffer11.GetString() << std::endl;
+		//std::cout << "\t服务端响应数据 = " << buffer11.GetString() << std::endl;
 
 		if (write_msg(fd, const_cast<char *>(buffer11.GetString()), strlen(buffer11.GetString())) < 0) {
 			printf("\t客户端已断开!!!\n");
@@ -1297,7 +1250,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 			build_doc3.Accept(writer3);
 			//rsp_msg = const_cast<char *>(buffer.GetString());
 			//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-			std::cout << "\t服务端响应数据 = " << buffer3.GetString() << std::endl;
+			//std::cout << "\t服务端响应数据 = " << buffer3.GetString() << std::endl;
 
 			if (write_msg(fd, const_cast<char *>(buffer3.GetString()), strlen(buffer3.GetString())) < 0) {
 				printf("\t客户端已断开!!!\n");
@@ -1336,7 +1289,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 		build_doc3.Accept(writer3);
 		//rsp_msg = const_cast<char *>(buffer.GetString());
 		//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-		std::cout << "\t服务端响应数据 = " << buffer3.GetString() << std::endl;
+		//std::cout << "\t服务端响应数据 = " << buffer3.GetString() << std::endl;
 
 		if (write_msg(fd, const_cast<char *>(buffer3.GetString()), strlen(buffer3.GetString())) < 0) {
 			printf("\t客户端已断开!!!\n");
@@ -1452,7 +1405,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 			build_doc15.Accept(writer15);
 			//rsp_msg = const_cast<char *>(buffer15.GetString());
 			//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-			std::cout << "\t服务端响应数据 = " << buffer15.GetString() << std::endl;
+			//std::cout << "\t服务端响应数据 = " << buffer15.GetString() << std::endl;
 
 			if (write_msg(fd, const_cast<char *>(buffer15.GetString()), strlen(buffer15.GetString())) < 0) {
 				printf("\t客户端已断开!!!\n");
@@ -1492,7 +1445,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 		build_doc15.Accept(writer15);
 		//rsp_msg = const_cast<char *>(buffer15.GetString());
 		//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-		std::cout << "\t服务端响应数据 = " << buffer15.GetString() << std::endl;
+		//std::cout << "\t服务端响应数据 = " << buffer15.GetString() << std::endl;
 
 		if (write_msg(fd, const_cast<char *>(buffer15.GetString()), strlen(buffer15.GetString())) < 0) {
 			printf("\t客户端已断开!!!\n");
@@ -1591,7 +1544,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 			build_doc17.Accept(writer17);
 			//rsp_msg = const_cast<char *>(buffer17.GetString());
 			//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-			std::cout << "\t服务端响应数据 = " << buffer17.GetString() << std::endl;
+			//std::cout << "\t服务端响应数据 = " << buffer17.GetString() << std::endl;
 
 			if (write_msg(fd, const_cast<char *>(buffer17.GetString()), strlen(buffer17.GetString())) < 0) {
 				printf("\t客户端已断开!!!\n");
@@ -1630,7 +1583,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 		build_doc17.Accept(writer17);
 		//rsp_msg = const_cast<char *>(buffer17.GetString());
 		//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-		std::cout << "\t服务端响应数据 = " << buffer17.GetString() << std::endl;
+		//std::cout << "\t服务端响应数据 = " << buffer17.GetString() << std::endl;
 
 		if (write_msg(fd, const_cast<char *>(buffer17.GetString()), strlen(buffer17.GetString())) < 0) {
 			printf("\t客户端已断开!!!\n");
@@ -1745,7 +1698,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 			build_doc20.Accept(writer20);
 			//rsp_msg = const_cast<char *>(buffer5.GetString());
 			//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-			std::cout << "\t服务端响应数据 = " << buffer20.GetString() << std::endl;
+			//std::cout << "\t服务端响应数据 = " << buffer20.GetString() << std::endl;
 
 			if (write_msg(fd, const_cast<char *>(buffer20.GetString()), strlen(buffer20.GetString())) < 0) {
 				printf("\t客户端已断开!!!\n");
@@ -1784,7 +1737,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 		build_doc20.Accept(writer20);
 		//rsp_msg = const_cast<char *>(buffer5.GetString());
 		//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-		std::cout << "\t服务端响应数据 = " << buffer20.GetString() << std::endl;
+		//std::cout << "\t服务端响应数据 = " << buffer20.GetString() << std::endl;
 
 		if (write_msg(fd, const_cast<char *>(buffer20.GetString()), strlen(buffer20.GetString())) < 0) {
 			printf("\t客户端已断开!!!\n");
@@ -1869,7 +1822,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 			build_doc21.Accept(writer21);
 			//rsp_msg = const_cast<char *>(buffer21.GetString());
 			//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-			std::cout << "\t服务端响应数据 = " << buffer21.GetString() << std::endl;
+			//std::cout << "\t服务端响应数据 = " << buffer21.GetString() << std::endl;
 
 			if (write_msg(fd, const_cast<char *>(buffer21.GetString()), strlen(buffer21.GetString())) < 0) {
 				printf("\t客户端已断开!!!\n");
@@ -1909,7 +1862,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 		build_doc21.Accept(writer21);
 		//rsp_msg = const_cast<char *>(buffer21.GetString());
 		//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-		std::cout << "\t服务端响应数据 = " << buffer21.GetString() << std::endl;
+		//std::cout << "\t服务端响应数据 = " << buffer21.GetString() << std::endl;
 
 		if (write_msg(fd, const_cast<char *>(buffer21.GetString()), strlen(buffer21.GetString())) < 0) {
 			printf("\t客户端已断开!!!\n");
@@ -1957,7 +1910,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 		build_doc.Accept(writer);
 		//rsp_msg = const_cast<char *>(buffer.GetString());
 		//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-		std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+		//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 		if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 			printf("\t客户端已断开!!!\n");
@@ -1982,7 +1935,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 			build_doc.Accept(writer);
 			//rsp_msg = const_cast<char *>(buffer.GetString());
 			//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-			std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+			//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 			if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 				printf("\t客户端已断开!!!\n");
@@ -2044,7 +1997,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					build_doc.Accept(writer);
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-					std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t客户端已断开!!!\n");
@@ -2089,7 +2042,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					build_doc.Accept(writer);
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-					std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t客户端已断开!!!\n");
@@ -2116,130 +2069,83 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
 
-				if (ctp_m->getL_User()->size() > 0)
+
+				list<User *> l_user_trader;
+				ctp_m->getUserListByTraderID(s_TraderID, ctp_m, &l_user_trader);
+
+				if (l_user_trader.size() > 0)
 				{
 					list<User *>::iterator future_itor;
-					for (future_itor = ctp_m->getL_User()->begin(); future_itor != ctp_m->getL_User()->end(); future_itor++) {
+					for (future_itor = l_user_trader.begin(); future_itor != l_user_trader.end(); future_itor++) {
 
-						// 如果userid和traderid不一致,那么就跳过
-						if ((*future_itor)->getTraderID() != s_TraderID)
+						rapidjson::Document doc;
+						rapidjson::Document build_doc;
+						rapidjson::StringBuffer buffer;
+						rapidjson::Writer<StringBuffer> writer(buffer);
+
+						/*构建UserInfo的Json*/
+						build_doc.SetObject();
+						rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
+						build_doc.AddMember("MsgRef", server_msg_ref++, allocator);
+						build_doc.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator);
+						build_doc.AddMember("MsgType", 2, allocator);
+						build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
+						build_doc.AddMember("MsgResult", 0, allocator);
+						build_doc.AddMember("MsgErrorReason", "", allocator);
+						//创建Info数组
+						rapidjson::Value info_array(rapidjson::kArrayType);
+
+						rapidjson::Value info_object(rapidjson::kObjectType);
+						info_object.SetObject();
+						info_object.AddMember("brokerid", rapidjson::StringRef((*future_itor)->getBrokerID().c_str()), allocator);
+						info_object.AddMember("traderid", rapidjson::StringRef((*future_itor)->getTraderID().c_str()), allocator);
+						info_object.AddMember("password", rapidjson::StringRef((*future_itor)->getPassword().c_str()), allocator);
+						info_object.AddMember("userid", rapidjson::StringRef((*future_itor)->getUserID().c_str()), allocator);
+						info_object.AddMember("frontaddress", rapidjson::StringRef((*future_itor)->getFrontAddress().c_str()), allocator);
+						info_object.AddMember("on_off", (*future_itor)->getOn_Off(), allocator);
+						if ((*future_itor)->getIsPositionRight())
 						{
-							rapidjson::Document doc;
-							rapidjson::Document build_doc;
-							rapidjson::StringBuffer buffer;
-							rapidjson::Writer<StringBuffer> writer(buffer);
-
-							/*构建UserInfo的Json*/
-							build_doc.SetObject();
-							rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
-							build_doc.AddMember("MsgRef", server_msg_ref++, allocator);
-							build_doc.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator);
-							build_doc.AddMember("MsgType", 2, allocator);
-							build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
-							build_doc.AddMember("MsgResult", 0, allocator);
-							build_doc.AddMember("MsgErrorReason", "", allocator);
-							//创建Info数组
-							rapidjson::Value info_array(rapidjson::kArrayType);
-							build_doc.AddMember("Info", info_array, allocator);
-							build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
-
-							if (future_itor == std::prev(ctp_m->getL_User()->end()))
-							{
-								build_doc.AddMember("IsLast", 1, allocator);
-							}
-							else
-							{
-								build_doc.AddMember("IsLast", 0, allocator);
-							}
-
-							build_doc.Accept(writer);
-							//rsp_msg = const_cast<char *>(buffer.GetString());
-							//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-							std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
-
-							if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
-								printf("\t先前客户端已断开!!!\n");
-								//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
-								if (errno == EPIPE) {
-									std::cout << "\tEPIPE信号" << std::endl;
-									//break;
-								}
-
-								perror("\tprotocal error\n");
-							}
+							info_object.AddMember("positionflag", 1, allocator);
 						}
-						else {
-
-							rapidjson::Document doc;
-							rapidjson::Document build_doc;
-							rapidjson::StringBuffer buffer;
-							rapidjson::Writer<StringBuffer> writer(buffer);
-
-							/*构建UserInfo的Json*/
-							build_doc.SetObject();
-							rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
-							build_doc.AddMember("MsgRef", server_msg_ref++, allocator);
-							build_doc.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator);
-							build_doc.AddMember("MsgType", 2, allocator);
-							build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
-							build_doc.AddMember("MsgResult", 0, allocator);
-							build_doc.AddMember("MsgErrorReason", "", allocator);
-							//创建Info数组
-							rapidjson::Value info_array(rapidjson::kArrayType);
-
-							rapidjson::Value info_object(rapidjson::kObjectType);
-							info_object.SetObject();
-							info_object.AddMember("brokerid", rapidjson::StringRef((*future_itor)->getBrokerID().c_str()), allocator);
-							info_object.AddMember("traderid", rapidjson::StringRef((*future_itor)->getTraderID().c_str()), allocator);
-							info_object.AddMember("password", rapidjson::StringRef((*future_itor)->getPassword().c_str()), allocator);
-							info_object.AddMember("userid", rapidjson::StringRef((*future_itor)->getUserID().c_str()), allocator);
-							info_object.AddMember("frontaddress", rapidjson::StringRef((*future_itor)->getFrontAddress().c_str()), allocator);
-							info_object.AddMember("on_off", (*future_itor)->getOn_Off(), allocator);
-							if ((*future_itor)->getIsPositionRight())
-							{
-								info_object.AddMember("positionflag", 1, allocator);
-							}
-							else
-							{
-								info_object.AddMember("positionflag", 0, allocator);
-							}
-
-							info_array.PushBack(info_object, allocator);
-
-
-
-							build_doc.AddMember("Info", info_array, allocator);
-							build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
-
-
-							if (future_itor == std::prev(ctp_m->getL_User()->end()))
-							{
-								build_doc.AddMember("IsLast", 1, allocator);
-							}
-							else
-							{
-								build_doc.AddMember("IsLast", 0, allocator);
-							}
-
-							build_doc.Accept(writer);
-							//rsp_msg = const_cast<char *>(buffer.GetString());
-							//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-							std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
-
-							if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
-								printf("\t先前客户端已断开!!!\n");
-								//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
-								if (errno == EPIPE) {
-									std::cout << "\tEPIPE信号" << std::endl;
-									//break;
-								}
-
-								perror("\tprotocal error\n");
-							}
-							ctp_m->addSocketFD((*future_itor)->getUserID(), fd);
+						else
+						{
+							info_object.AddMember("positionflag", 0, allocator);
 						}
 
-						
+						info_array.PushBack(info_object, allocator);
+
+
+
+						build_doc.AddMember("Info", info_array, allocator);
+						build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
+
+
+						if (future_itor == std::prev(l_user_trader.end()))
+						{
+							build_doc.AddMember("IsLast", 1, allocator);
+						}
+						else
+						{
+							build_doc.AddMember("IsLast", 0, allocator);
+						}
+
+						build_doc.Accept(writer);
+						//rsp_msg = const_cast<char *>(buffer.GetString());
+						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
+						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
+							printf("\t先前客户端已断开!!!\n");
+							//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
+							if (errno == EPIPE) {
+								std::cout << "\tEPIPE信号" << std::endl;
+								//break;
+							}
+
+							perror("\tprotocal error\n");
+						}
+						ctp_m->addSocketFD((*future_itor)->getUserID(), fd);
+
 					}
 				} 
 				else
@@ -2268,7 +2174,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					build_doc.Accept(writer);
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-					std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -2438,7 +2344,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						build_doc.Accept(writer);
 						//rsp_msg = const_cast<char *>(buffer.GetString());
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-						std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
@@ -2479,7 +2385,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					build_doc.Accept(writer);
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-					std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -2553,7 +2459,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						build_doc.Accept(writer);
 						//rsp_msg = const_cast<char *>(buffer.GetString());
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-						std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
@@ -2593,7 +2499,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					build_doc.Accept(writer);
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-					std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -2747,7 +2653,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.Accept(writer);
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-				std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -3102,7 +3008,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.Accept(writer);
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-				std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -3221,7 +3127,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.Accept(writer);
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-				std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -3289,7 +3195,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.Accept(writer);
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-				std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -3364,7 +3270,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.Accept(writer);
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-				std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -3502,7 +3408,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						build_doc.Accept(writer);
 						//rsp_msg = const_cast<char *>(buffer.GetString());
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-						std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
@@ -3543,7 +3449,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					build_doc.Accept(writer);
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-					std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -3619,7 +3525,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						build_doc.Accept(writer);
 						//rsp_msg = const_cast<char *>(buffer.GetString());
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-						std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
@@ -3658,7 +3564,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					build_doc.Accept(writer);
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-					std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -4104,7 +4010,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.Accept(writer);
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-				std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -4197,7 +4103,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.Accept(writer);
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-				std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -4286,7 +4192,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.Accept(writer);
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-				std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -4398,7 +4304,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						build_doc.Accept(writer);
 						//rsp_msg = const_cast<char *>(buffer.GetString());
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-						std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
@@ -4442,7 +4348,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					build_doc.Accept(writer);
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-					std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -4620,7 +4526,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						build_doc.Accept(writer);
 						//rsp_msg = const_cast<char *>(buffer.GetString());
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-						std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
@@ -4662,7 +4568,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					build_doc.Accept(writer);
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-					std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -4781,7 +4687,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						build_doc.Accept(writer);
 						//rsp_msg = const_cast<char *>(buffer.GetString());
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-						std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
@@ -4824,7 +4730,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					build_doc.Accept(writer);
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-					std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -4924,7 +4830,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						build_doc.Accept(writer);
 						//rsp_msg = const_cast<char *>(buffer.GetString());
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-						std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
@@ -4967,7 +4873,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					build_doc.Accept(writer);
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-					std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -5124,7 +5030,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						build_doc.Accept(writer);
 						//rsp_msg = const_cast<char *>(buffer.GetString());
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-						std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
@@ -5162,7 +5068,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.Accept(writer);
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-				std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -5850,6 +5756,18 @@ void CTP_Manager::setIsMarketCloseDone(bool is_market_close_done) {
 
 bool CTP_Manager::getIsMarketCloseDone() {
 	return this->is_market_close_done;
+}
+
+//获取属于某交易员所属期货账户
+void CTP_Manager::getUserListByTraderID(string traderid, CTP_Manager *ctp_m, list<User *> *l_user_trader) {
+	list<User *>::iterator future_itor;
+	for (future_itor = ctp_m->getL_User()->begin(); future_itor != ctp_m->getL_User()->end(); future_itor++) {
+		if ((*future_itor)->getTraderID() == traderid)
+		{
+			l_user_trader->push_back((*future_itor));
+		}
+	}
+
 }
 
 
