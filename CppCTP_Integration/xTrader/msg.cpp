@@ -34,7 +34,7 @@ static unsigned char msg_check(Msg *message) {
 int write_msg(int sockfd, char *buff, size_t len) {
 	//printf("msg.cpp write_msg()\n");
 	//printf("\t开始发消息... \n");
-	Utils::printGreenColorWithKV("真实长度", len);
+	//Utils::printGreenColorWithKV("真实长度", len);
 	Msg message;
 	memset(&message, 0, sizeof(message));
 	//strcpy(message.head, "gmqh_sh_2016");
@@ -44,7 +44,7 @@ int write_msg(int sockfd, char *buff, size_t len) {
 	//printf("write_msg2 \n");
 	//printf("write Message head %s\n", message.head);
 	//printf("write Message checknum %d\n", message.checknum);
-	Utils::printGreenColorWithKV("实际包长", sizeof(message));
+	//Utils::printGreenColorWithKV("实际包长", sizeof(message));
 	if (write(sockfd, &message, sizeof(message)) != sizeof(message)) {
 		return -1;
 	}
