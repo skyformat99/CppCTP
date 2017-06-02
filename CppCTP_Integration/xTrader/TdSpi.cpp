@@ -2051,7 +2051,7 @@ void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcR
 			if (len_order_ref == 12 && result == "1") {
 				strategyid = temp.substr(len_order_ref - 2, 2);
 
-				this->current_user->getXtsLogger()->info("TdSpi::OnRspOrderInsert() OrderRef = {} strategyid = {}", pInputOrder->OrderRef, strategyid);
+				this->current_user->getXtsLogger()->info("TdSpi::OnRspOrderInsert() UserID = {} OrderRef = {} strategyid = {}", this->current_user->getUserID(), pInputOrder->OrderRef, strategyid);
 
 				list<Strategy *>::iterator itor;
 				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
@@ -2352,7 +2352,7 @@ void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFt
 			string strategyid = "";
 			if (len_order_ref == 12 && result == "1") {
 				strategyid = temp.substr(len_order_ref - 2, 2);
-				this->current_user->getXtsLogger()->info("TdSpi::OnErrRtnOrderInsert() OrderRef = {} strategyid = {}", pInputOrder->OrderRef, strategyid);
+				this->current_user->getXtsLogger()->info("TdSpi::OnErrRtnOrderInsert() UserID = {} OrderRef = {} strategyid = {}", this->current_user->getUserID(), pInputOrder->OrderRef, strategyid);
 				list<Strategy *>::iterator itor;
 				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 					if ((*itor)->getStgStrategyId() == strategyid) {
@@ -2377,6 +2377,10 @@ void TdSpi::OrderAction(char *ExchangeID, char *OrderRef, char *OrderSysID) {
 	strcpy(pOrderAction.OrderRef, OrderRef);		//设置报单引用
 	strcpy(pOrderAction.OrderSysID, OrderSysID);
 	pOrderAction.ActionFlag = THOST_FTDC_AF_Delete; //删除
+
+	this->current_user->getXtsLogger()->info("TdSpi::OrderAction() UserID = {} OrderRef = {} InstrumentID = {}",
+		pOrderAction.UserID, pOrderAction.OrderRef, pOrderAction.InstrumentID);
+
 	this->tdapi->ReqOrderAction(&pOrderAction, this->getRequestID());
 
 	//this->current_user->DB_OrderAction(this->current_user->getCTP_Manager()->getDBManager()->getConn(), &pOrderAction);
@@ -2399,7 +2403,7 @@ void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction,
 				//this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pInputOrderAction);
 				//delete[] codeDst;
 				strategyid = temp.substr(len_order_ref - 2, 2);
-				this->current_user->getXtsLogger()->info("TdSpi::OnRspOrderAction() OrderRef = {} strategyid = {}", pInputOrderAction->OrderRef, strategyid);
+				this->current_user->getXtsLogger()->info("TdSpi::OnRspOrderAction() UserID = {} OrderRef = {} strategyid = {}", this->current_user->getUserID(), pInputOrderAction->OrderRef, strategyid);
 				list<Strategy *>::iterator itor;
 				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 					if ((*itor)->getStgStrategyId() == strategyid) {
@@ -2429,7 +2433,7 @@ void TdSpi::OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction, CThost
 				//this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pInputOrderAction);
 				//delete[] codeDst;
 				strategyid = temp.substr(len_order_ref - 2, 2);
-				this->current_user->getXtsLogger()->info("TdSpi::OnErrRtnOrderAction() OrderRef = {} strategyid = {}", pOrderAction->OrderRef, strategyid);
+				this->current_user->getXtsLogger()->info("TdSpi::OnErrRtnOrderAction() UserID = {} OrderRef = {} strategyid = {}", this->current_user->getUserID(), pOrderAction->OrderRef, strategyid);
 				list<Strategy *>::iterator itor;
 				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 					if ((*itor)->getStgStrategyId() == strategyid) {
@@ -2501,6 +2505,7 @@ bool TdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo, string source) {
 		Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() ErrorID = ", pRspInfo->ErrorID);
 		Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() ErrorMsg = ", codeDst);
 		this->current_user->getXtsLogger()->info("TdSpi::IsErrorRspInfo() UserID = {} source = {} ErrorID = {} ErrorMsg = {}", this->current_user->getUserID(), source, pRspInfo->ErrorID, codeDst);
+		this->current_user->getXtsLogger()->flush();
 	}
 	return bResult;
 }
