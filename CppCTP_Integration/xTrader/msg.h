@@ -9,7 +9,7 @@ typedef struct {
 	char head[13];
 	char checknum; //校验码
 	//协议体部
-	char buff[MAX_BUFFER_SIZE]; //数据
+	char buff[MAX_BUFFER_SIZE]; // 数据
 } Msg;
 
 /************************************************************************/

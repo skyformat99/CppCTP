@@ -902,10 +902,6 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	//list<FutureAccount *> l_futureaccount;
 	//ctp_m->getDBManager()->SearchFutrueListByTraderID(s_TraderID, &l_futureaccount);
 
-	rapidjson::Document build_doc2;
-	rapidjson::StringBuffer buffer2;
-	rapidjson::Writer<StringBuffer> writer2(buffer2);
-
 	if (ctp_m->getL_User()->size() > 0)
 	{
 		list<User *>::iterator future_itor;
@@ -914,6 +910,11 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 			// 如果userid和traderid不一致,那么就跳过
 			if ((*future_itor)->getTraderID() != s_TraderID)
 			{
+
+				rapidjson::Document build_doc2;
+				rapidjson::StringBuffer buffer2;
+				rapidjson::Writer<StringBuffer> writer2(buffer2);
+
 				/*构建UserInfo的Json*/
 				build_doc2.SetObject();
 				rapidjson::Document::AllocatorType& allocator2 = build_doc2.GetAllocator();
@@ -953,6 +954,11 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 				}
 			}
 			else {
+
+				rapidjson::Document build_doc2;
+				rapidjson::StringBuffer buffer2;
+				rapidjson::Writer<StringBuffer> writer2(buffer2);
+
 				/*构建UserInfo的Json*/
 				build_doc2.SetObject();
 				rapidjson::Document::AllocatorType& allocator2 = build_doc2.GetAllocator();
@@ -1016,6 +1022,11 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	} 
 	else
 	{
+
+		rapidjson::Document build_doc2;
+		rapidjson::StringBuffer buffer2;
+		rapidjson::Writer<StringBuffer> writer2(buffer2);
+
 		/*构建UserInfo的Json*/
 		build_doc2.SetObject();
 		rapidjson::Document::AllocatorType& allocator2 = build_doc2.GetAllocator();
@@ -1055,14 +1066,17 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	//std::cout << "\t请求查询算法..." << std::endl;
 	ctp_m->getXtsLogger()->info("\t请求查询算法...");
 
-	rapidjson::Document build_doc11;
-	rapidjson::StringBuffer buffer11;
-	rapidjson::Writer<StringBuffer> writer11(buffer11);
+	
 
 	if (ctp_m->getL_Alg()->size() > 0)
 	{
 		list<Algorithm *>::iterator alg_itor;
 		for (alg_itor = ctp_m->getL_Alg()->begin(); alg_itor != ctp_m->getL_Alg()->end(); alg_itor++) {
+
+
+			rapidjson::Document build_doc11;
+			rapidjson::StringBuffer buffer11;
+			rapidjson::Writer<StringBuffer> writer11(buffer11);
 
 			/*构建MarketInfo的Json*/
 			build_doc11.SetObject();
@@ -1110,6 +1124,11 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	} 
 	else
 	{
+
+		rapidjson::Document build_doc11;
+		rapidjson::StringBuffer buffer11;
+		rapidjson::Writer<StringBuffer> writer11(buffer11);
+
 		/*构建MarketInfo的Json*/
 		build_doc11.SetObject();
 		rapidjson::Document::AllocatorType& allocator11 = build_doc11.GetAllocator();
