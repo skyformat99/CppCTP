@@ -1130,7 +1130,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 		list<Strategy *>::iterator stg_itor;
 		for (stg_itor = l_strategys.begin(); stg_itor != l_strategys.end(); stg_itor++) {
 
-			std::cout << "\t请求查询策略信息 msgtype == 3..." << std::endl;
+			//std::cout << "\t请求查询策略信息 msgtype == 3..." << std::endl;
 
 			rapidjson::Document build_doc3;
 			rapidjson::StringBuffer buffer3;
@@ -3210,7 +3210,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 			}
 			else if (msgtype == 9) { // 期货账户开关
-				std::cout << "\t期货账户开关..." << std::endl;
+				ctp_m->getXtsLogger()->info("\t期货账户开关...");
 
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
@@ -3245,7 +3245,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				list<User *>::iterator user_itor;
 				for (user_itor = ctp_m->getL_User()->begin(); user_itor != ctp_m->getL_User()->end(); user_itor++) {
 					if ((*user_itor)->getUserID() == s_UserID) {
-						std::cout << "\t找到需要开关的期货账户ID" << std::endl;
+						ctp_m->getXtsLogger()->info("\t找到需要开关的期货账户ID");
 						(*user_itor)->setOn_Off(i_OnOff);
 						bFind = true;
 						//更新数据库

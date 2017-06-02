@@ -81,16 +81,16 @@ void sig_handler(int signo) {
 
 			bool isTrading = false;
 
-			//list<Strategy *>::iterator stg_itor;
-			//for (stg_itor = ctp_m->getListStrategy()->begin();
-			//	stg_itor != ctp_m->getListStrategy()->end(); stg_itor++) { // 遍历ctp_m维护的Strategy List
-			//	if ((*stg_itor)->isStgTradeTasking()) {
-			//		std::cout << "\t\033[31m策略(" << (*stg_itor)->getStgUserId() << ", " << (*stg_itor)->getStgStrategyId() << ") 处于交易状态\033[0m" << std::endl;
-			//		/// 一旦有策略仍然在交易中,跳出循环
-			//		isTrading = true;
-			//		break;
-			//	}
-			//}
+			list<Strategy *>::iterator stg_itor;
+			for (stg_itor = ctp_m->getListStrategy()->begin();
+				stg_itor != ctp_m->getListStrategy()->end(); stg_itor++) { // 遍历ctp_m维护的Strategy List
+				if ((*stg_itor)->isStgTradeTasking()) {
+					std::cout << "\t\033[31m策略(" << (*stg_itor)->getStgUserId() << ", " << (*stg_itor)->getStgStrategyId() << ") 处于交易状态\033[0m" << std::endl;
+					/// 一旦有策略仍然在交易中,跳出循环
+					isTrading = true;
+					break;
+				}
+			}
 
 			if (!isTrading) { // 如果策略全部处于非交易状态,则可以进行关闭
 				if (!ctp_m->getCTPFinishedPositionInit()) { // ctp_m未初始化成功，则不做保存工作
