@@ -110,6 +110,16 @@ void MdSpi::OnFrontConnected() {
 	//this->Login("9999", "058176", "669822");
 }
 
+//通信断开
+void MdSpi::OnFrontDisconnected(int nReason) {
+	USER_PRINT("MdSpi::OnFrontDisconnected");
+	USER_PRINT(nReason);
+	std::cout << "MdSpi::OnFrontDisconnected()" << std::endl;
+	std::cout << "\t断线原因 = " << nReason << std::endl;
+	this->isFirstTimeLogged = false;
+	this->ctp_m->sendMarketOffLineMessage();
+}
+
 //登录
 void MdSpi::Login(char *BrokerID, char *UserID, char *Password) {
 	USER_PRINT("MdSpi::Login")
@@ -521,12 +531,4 @@ void MdSpi::CopyTickData(CThostFtdcDepthMarketDataField *dst, CThostFtdcDepthMar
 	strcpy(dst->ActionDay, src->ActionDay);
 }
 
-//通信断开
-void MdSpi::OnFrontDisconnected(int nReason) {
-	USER_PRINT("MdSpi::OnFrontDisconnected");
-	USER_PRINT(nReason);
-	std::cout << "MdSpi::OnFrontDisconnected()" << std::endl;
-	std::cout << "\t断线原因 = " << nReason << std::endl;
-	this->isFirstTimeLogged = false;
-	this->ctp_m->sendMarketOffLineMessage();
-}
+

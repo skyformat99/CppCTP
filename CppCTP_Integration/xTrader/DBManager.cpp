@@ -4,6 +4,7 @@
 #include "DBManager.h"
 #include "Debug.h"
 #include "Utils.h"
+#include "INIReader.h"
 
 using namespace std;
 using mongo::BSONArray;
@@ -49,6 +50,25 @@ DBManager::DBManager(int max_size) {
 	// 默认权限认证状态为true
 	this->auth_failed = false;
 
+	// 读取mongo配置文件
+	INIReader reader("config/mongo.ini");
+
+	if (reader.ParseError() < 0) {
+		Utils::printRedColor("无法打开mongo.ini配置文件");
+		exit(1);
+	}
+
+	string str_mechanism = reader.Get("manager", "mechanism", "UNKNOWN");
+	string str_user = reader.Get("manager", "user", "UNKNOWN");
+	string str_password = reader.Get("manager", "password", "UNKNOWN");
+
+	if (str_mechanism == "UNKNOWN" || str_user == "UNKNOWN" || str_password == "UNKNOWN")
+	{
+		Utils::printRedColor("mongo.ini配置有误");
+		exit(1);
+	}
+
+
 	//建立连接队列
 	for (int i = 0; i < max_size; i++) {
 		if (!this->db_connect_status) {
@@ -59,7 +79,7 @@ DBManager::DBManager(int max_size) {
 			if (conn != NULL)
 			{
 				conn->connect("localhost");
-				conn->auth(BSON("mechanism"<< "SCRAM-SHA-1" << "user" << ":)xTrader:)admin:)" << "pwd" << ":)&xtrader&:)" << "db" << DB_AUTH_DB));
+				conn->auth(BSON("mechanism" << str_mechanism << "user" << str_user << "pwd" << str_password << "db" << DB_AUTH_DB));
 				this->queue_DBClient.enqueue(conn);
 			}
 			else {

@@ -1,6 +1,9 @@
 #ifndef QUANT_STRATEGY_H
 #define QUANT_STRATEGY_H
 #include <list>
+#include <semaphore.h>
+#include <pthread.h>
+#include <unistd.h>
 #include "Trader.h"
 #include "Algorithm.h"
 #include "Debug.h"
@@ -495,6 +498,16 @@ public:
 	// trade回调队列
 	void thread_queue_OnRtnTrade();
 
+	// 行情队列开关
+	void setQueue_OnRtnDepthMarketData_on_off(bool queue_OnRtnDepthMarketData);
+	bool getQueue_OnRtnDepthMarketData_on_off();
+	// order回调队列开关
+	void setQueue_OnRtnOrder_on_off(bool queue_OnRtnOrder_on_off);
+	bool getQueue_OnRtnOrder_on_off();
+	// trade回调队列开关
+	void setQueue_OnRtnTrade_on_off(bool queue_OnRtnTrade_on_off);
+	bool getQueue_OnRtnTrade_on_off();
+
 private:
 	Trader *trader;
 	User *user;
@@ -609,6 +622,12 @@ private:
 	moodycamel::BlockingConcurrentQueue<CThostFtdcDepthMarketDataField *> queue_OnRtnDepthMarketData;	// 行情队列
 	moodycamel::BlockingConcurrentQueue<CThostFtdcOrderField *> queue_OnRtnOrder;						// order回调队列
 	moodycamel::BlockingConcurrentQueue<CThostFtdcTradeField *> queue_OnRtnTrade;						// trade回调队列
+
+	bool queue_OnRtnDepthMarketData_on_off; // 行情队列开关
+	bool queue_OnRtnOrder_on_off;			// order回调队列开关
+	bool queue_OnRtnTrade_on_off;			// trade回调队列开关
+
+	sem_t sem_list_order_pending;			// 信号量,用来保证同一时间只能一处地方调用挂单列表
 };
 
 #endif

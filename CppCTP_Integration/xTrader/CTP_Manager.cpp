@@ -5491,13 +5491,13 @@ void CTP_Manager::addSocketFD(string user_id, int fd) {
 	map<string, list<int> *>::iterator m_itor;
 	m_itor = this->m_socket_fds.find(user_id);
 	if (m_itor == (this->m_socket_fds.end())) {
-		std::cout << "m_socket_fds 未找到 该期货账户 = " << user_id << std::endl;
+		//std::cout << "m_socket_fds 未找到 该期货账户 = " << user_id << std::endl;
 		list<int> * l_fds = new list<int>();
 		l_fds->push_back(fd);
 		this->m_socket_fds.insert(pair<string, list<int> *>(user_id, l_fds));
 	}
 	else {
-		std::cout << "m_socket_fds 找到 该期货账户 = " << user_id << std::endl;
+		//std::cout << "m_socket_fds 找到 该期货账户 = " << user_id << std::endl;
 		bool is_find = false;
 		/// 遍历该交易员的list集合，如果存在该fd，直接跳过，不存在直接存入
 		list<int>::iterator int_itor;
