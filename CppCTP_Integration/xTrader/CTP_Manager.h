@@ -3,6 +3,9 @@
 
 #include <list>
 #include <map>
+#include <semaphore.h>
+#include <pthread.h>
+#include <unistd.h>
 #include <string>
 #include "Login.h"
 #include "MdSpi.h"
@@ -230,6 +233,8 @@ public:
 	//void setXtsLogger(std::shared_ptr<spdlog::logger> ptr);
 	std::shared_ptr<spdlog::logger> getXtsLogger();
 
+	sem_t *getSem_strategy_handler();
+
 private:
 	//Login *login;
 	list<string> *l_instrument;
@@ -270,5 +275,7 @@ private:
 	static bool one_second_flag;
 	bool system_init_flag;
 	std::shared_ptr<spdlog::logger> xts_logger;
+
+	sem_t sem_strategy_handler;			// 信号量,用来保证同一时间只能一个线程操作策略
 };
 #endif

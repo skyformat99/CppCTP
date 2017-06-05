@@ -47,6 +47,13 @@ CTP_Manager::CTP_Manager() {
 	this->is_start_end_task = false;
 	this->is_market_close_done = false;
 
+
+	// 同一时间只能有一个线程调用生成报单引用(避免带来段错误)
+	if (sem_init(&(this->sem_strategy_handler), 0, 1) != 0) {
+		Utils::printRedColor("CTP_Manager::CTP_Manager() sem_strategy_handler init failed!");
+		exit(1);
+	}
+
 	try {
 		// 设置缓冲区大小
 		spdlog::set_async_mode(4096);
@@ -2559,6 +2566,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						std::string q_user_id = object["user_id"].GetString();
 						std::string q_strategy_id = object["strategy_id"].GetString();
 						list<Strategy *>::iterator stg_itor;
+
+						// 当有其他地方调用策略列表,阻塞,信号量P操作
+						sem_wait((ctp_m->getSem_strategy_handler()));
+
 						for (stg_itor = ctp_m->getListStrategy()->begin(); stg_itor != ctp_m->getListStrategy()->end(); stg_itor++) {
 							
 							if (((*stg_itor)->getStgUserId() == q_user_id) && ((*stg_itor)->getStgStrategyId() == q_strategy_id)) {
@@ -2639,6 +2650,11 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								ctp_m->getXtsLogger()->info("\t未能找到修改的Strategy");
 							}
 						}
+
+
+						// 释放信号量,信号量V操作
+						sem_post((ctp_m->getSem_strategy_handler()));
+
 					}
 				}
 				else {
@@ -2891,11 +2907,19 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								delete new_stg;
 							}
 							else {
-								std::cout << "Strategy新建完成!" << std::endl;
+								//std::cout << "Strategy新建完成!" << std::endl;
+								ctp_m->getXtsLogger()->info("Strategy新建完成!");
+
+								// 当有其他地方调用策略列表,阻塞,信号量P操作
+								sem_wait((ctp_m->getSem_strategy_handler()));
+
 								/// 将策略加到维护列表里
 								ctp_m->getListStrategy()->push_back(new_stg);
 								/// 将策略添加到User策略列表里
 								ctp_m->syncStrategyAddToUsers(new_stg);
+
+								// 释放信号量,信号量V操作
+								sem_post((ctp_m->getSem_strategy_handler()));
 
 								/// 订阅合约
 								/// 添加策略的合约到l_instrument
@@ -3058,6 +3082,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//std::cout << "收到要删除的策略ID = " << s_StrategyID << std::endl;
 				ctp_m->getXtsLogger()->info("\t收到要删除的策略ID = {}", s_StrategyID);
 
+				// 当有其他地方调用策略列表,阻塞,信号量P操作
+				sem_wait((ctp_m->getSem_strategy_handler()));
+
 				/*1:进行策略的删除,更新到数据库*/
 				list<Strategy *>::iterator stg_itor;
 				for (stg_itor = ctp_m->getListStrategy()->begin(); stg_itor != ctp_m->getListStrategy()->end();) {
@@ -3119,6 +3146,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						stg_itor++;
 					}
 				}
+
+				// 释放信号量,信号量V操作
+				sem_post((ctp_m->getSem_strategy_handler()));
 
 				//build_doc.AddMember("Info", create_info_array, allocator);
 				build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
@@ -3635,6 +3665,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 						if (!isFindStrategy) // 没找到对应的策略
 						{
+
+							// 当有其他地方调用策略列表,阻塞,信号量P操作
+							sem_wait((ctp_m->getSem_strategy_handler()));
+
 							for (stg_itor = ctp_m->getListStrategy()->begin(); stg_itor != ctp_m->getListStrategy()->end(); stg_itor++) {
 								if (((*stg_itor)->getStgUserId() == q_user_id) && ((*stg_itor)->getStgStrategyId() == q_strategy_id)) {
 									//std::cout << "\t找到即将修改的Strategy" << std::endl;
@@ -3970,6 +4004,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									ctp_m->getXtsLogger()->info("\t未能找到修改的Strategy");
 								}
 							}
+
+							// 释放信号量,信号量V操作
+							sem_post((ctp_m->getSem_strategy_handler()));
+
 						}
 					}
 				}
@@ -4058,6 +4096,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 				/*1:进行策略的删除,更新到数据库*/
 				list<Strategy *>::iterator stg_itor;
+
+				// 当有其他地方调用策略列表,阻塞,信号量P操作
+				sem_wait((ctp_m->getSem_strategy_handler()));
+
 				for (stg_itor = ctp_m->getListStrategy()->begin(); stg_itor != ctp_m->getListStrategy()->end();) {
 
 					//ctp_m->getXtsLogger()->info("\t存在UserID = {}", (*stg_itor)->getStgUserId());
@@ -4095,6 +4137,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						stg_itor++;
 					}
 				}
+
+				// 释放信号量,信号量V操作
+				sem_post((ctp_m->getSem_strategy_handler()));
 
 				//build_doc.AddMember("Info", create_info_array, allocator);
 				build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
@@ -4916,6 +4961,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//ctp_m->getDBManager()->getAllStrategyByActiveUser(&l_strategys, ctp_m->getL_User(), s_TraderID);
 
 				list<Strategy *>::iterator stg_itor;
+
+				// 当有其他地方调用策略列表,阻塞,信号量P操作
+				sem_wait((ctp_m->getSem_strategy_handler()));
+
 				for (stg_itor = ctp_m->getListStrategy()->begin(); stg_itor != ctp_m->getListStrategy()->end(); stg_itor++) {
 
 					//策略id，期货账户id，交易员id均相同
@@ -5047,6 +5096,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						break;
 					}
 				}
+
+				// 释放信号量,信号量V操作
+				sem_post((ctp_m->getSem_strategy_handler()));
+
 			}
 			else {
 				std::cout << "请求类型错误!" << endl;
@@ -5780,6 +5833,9 @@ std::shared_ptr<spdlog::logger> CTP_Manager::getXtsLogger() {
 	return this->xts_logger;
 }
 
+sem_t * CTP_Manager::getSem_strategy_handler() {
+	return &(this->sem_strategy_handler);
+}
 
 
 ///// 初始化昨仓明细
