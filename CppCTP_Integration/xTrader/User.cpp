@@ -346,8 +346,7 @@ void User::add_instrument_id_action_counter(CThostFtdcOrderField *pOrder) {
 			/*std::cout << "\t撤单列表里不存在该合约 = " << pOrder->InstrumentID << std::endl;
 			std::cout << "\t添加 " << pOrder->InstrumentID << " 合约到列表中..." << std::endl;*/
 
-			this->getXtsLogger()->info("\t撤单列表里不存在该合约 = {}", pOrder->InstrumentID);
-			this->getXtsLogger()->info("\t添加 {} 合约到列表中", pOrder->InstrumentID);
+			this->getXtsLogger()->info("User::add_instrument_id_action_counter() 撤单列表里不存在该合约 = {} 添加 {} 合约到列表中", pOrder->InstrumentID, pOrder->InstrumentID);
 
 			//this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0));
 			this->init_instrument_id_action_counter(string(pOrder->InstrumentID));

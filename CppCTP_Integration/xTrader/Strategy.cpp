@@ -2573,12 +2573,10 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 		this->getStgUser()->getXtsLogger()->info("Strategy::Select_Order_Algorithm()");
 		list<CThostFtdcOrderField *>::iterator itor;
 		for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end(); itor++) {
-			this->getStgUser()->getXtsLogger()->info("\t挂单合约ID:{}", (*itor)->InstrumentID);
+			this->getStgUser()->getXtsLogger()->info("Strategy::Select_Order_Algorithm() 挂单合约ID:{}", (*itor)->InstrumentID);
 		}
 		
-		this->getStgUser()->getXtsLogger()->info("\t期货账户:{}", this->stg_user_id);
-		this->getStgUser()->getXtsLogger()->info("\t策略编号:{}", this->stg_strategy_id);
-		this->getStgUser()->getXtsLogger()->info("\t有挂单,返回");
+		this->getStgUser()->getXtsLogger()->info("Strategy::Select_Order_Algorithm() 有挂单返回 期货账户 = {} 策略编号 = {}", this->stg_user_id, this->stg_strategy_id);
 		this->setStgSelectOrderAlgorithmFlag("Strategy::Select_Order_Algorithm() 有挂单", false); // 关闭下单锁
 		// 释放信号量,信号量V操作
 		sem_post(&(this->sem_list_order_pending));
@@ -2594,8 +2592,7 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 	// 如果有撇腿
 	if (!((this->stg_position_a_sell == this->stg_position_b_buy) && 
 		(this->stg_position_a_buy == this->stg_position_b_sell))) {
-		this->getStgUser()->getXtsLogger()->info("Strategy::Select_Order_Algorithm()");
-		this->getStgUser()->getXtsLogger()->info("\t有撇腿,返回");
+		this->getStgUser()->getXtsLogger()->info("Strategy::Select_Order_Algorithm() 有撇腿,返回");
 		this->setStgSelectOrderAlgorithmFlag("Strategy::Select_Order_Algorithm() 有撇腿", false); // 关闭下单锁
 		return;
 	}
@@ -2650,8 +2647,8 @@ void Strategy::Order_Algorithm_One() {
 	{
 		//this->printStrategyInfo("策略跳过异常行情");
 		//this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One()_1", false);
-		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One()");
-		this->getStgUser()->getXtsLogger()->info("\t策略跳过异常行情");
+		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One() 策略跳过异常行情");
+		/*this->getStgUser()->getXtsLogger()->info("\t策略跳过异常行情");*/
 		return;
 	}
 
@@ -2678,8 +2675,8 @@ void Strategy::Order_Algorithm_One() {
 		//this->update_task_status();
 
 		/// 市场多头价差大于触发参数， AB持仓量相等且大于0
-		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One()");
-		this->getStgUser()->getXtsLogger()->info("\t策略编号:{}, 交易信号触发，价差卖平", this->stg_strategy_id);
+		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One() 策略编号 = {}, 交易信号触发，价差卖平", this->stg_strategy_id);
+		//this->getStgUser()->getXtsLogger()->info("\t策略编号:{}, 交易信号触发，价差卖平", this->stg_strategy_id);
 		
 
 		/*std::cout << "user_id = " << this->stg_user_id << ", "
@@ -2800,8 +2797,8 @@ void Strategy::Order_Algorithm_One() {
 		//this->update_task_status();
 
 		/// 市场空头价差小于等于触发参数， AB持仓量相等且大于0
-		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One()");
-		this->getStgUser()->getXtsLogger()->info("\t策略编号:{}, 交易信号触发，价差买平", this->stg_strategy_id);
+		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One() 策略编号 = {}, 交易信号触发，价差买平", this->stg_strategy_id);
+		//this->getStgUser()->getXtsLogger()->info("\t策略编号:{}, 交易信号触发，价差买平", this->stg_strategy_id);
 
 		/*std::cout << "user_id = " << this->stg_user_id << ", "
 			<< "strategy_id = " << this->stg_strategy_id << ", "
@@ -2927,8 +2924,8 @@ void Strategy::Order_Algorithm_One() {
 			return;
 			}*/
 
-		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One()");
-		this->getStgUser()->getXtsLogger()->info("\t策略编号:{}, 交易信号触发，价差卖开", this->stg_strategy_id);
+		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One() 策略编号 = {}, 交易信号触发，价差卖开", this->stg_strategy_id);
+		//this->getStgUser()->getXtsLogger()->info("\t策略编号:{}, 交易信号触发，价差卖开", this->stg_strategy_id);
 
 		/// 满足交易任务之前的tick
 		this->CopyTickData(stg_instrument_A_tick_last, stg_instrument_A_tick);
@@ -3021,8 +3018,8 @@ void Strategy::Order_Algorithm_One() {
 		//this->stg_trade_tasking = true;
 		//this->printStrategyInfo("价差买开");
 		//this->update_task_status();
-		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One()");
-		this->getStgUser()->getXtsLogger()->info("\t策略编号:{}, 交易信号触发，价差买开", this->stg_strategy_id);
+		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One() 策略编号 = {}, 交易信号触发，价差买开", this->stg_strategy_id);
+		//this->getStgUser()->getXtsLogger()->info("\t策略编号:{}, 交易信号触发，价差买开", this->stg_strategy_id);
 
 		/// 满足交易任务之前的tick
 		this->CopyTickData(stg_instrument_A_tick_last, stg_instrument_A_tick);
@@ -3097,7 +3094,6 @@ void Strategy::Order_Algorithm_One() {
 
 		/// 执行下单任务
 		this->Exec_OrderInsert(this->stg_a_order_insert_args);
-		
 	}
 }
 //下单算法2
