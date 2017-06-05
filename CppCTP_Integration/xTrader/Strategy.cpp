@@ -2542,10 +2542,7 @@ void Strategy::thread_queue_OnRtnDepthMarketData() {
 			}
 			else {
 				if (this->getOn_Off()) {
-					this->getStgUser()->getXtsLogger()->info("Strategy::OnRtnDepthMarketData():");
-					this->getStgUser()->getXtsLogger()->info("\t期货账户:{}", this->stg_user_id);
-					this->getStgUser()->getXtsLogger()->info("\t策略编号:{}", this->stg_strategy_id);
-					this->getStgUser()->getXtsLogger()->info("\ttick锁已上锁:{}", this->stg_select_order_algorithm_flag);
+					this->getStgUser()->getXtsLogger()->info("Strategy::OnRtnDepthMarketData() 期货账户 = {} 策略编号 = {} tick锁 = {}", this->stg_user_id, this->stg_strategy_id, this->stg_select_order_algorithm_flag);
 				}
 			}
 		}
@@ -3509,18 +3506,14 @@ void Strategy::Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketDat
 /// 更新挂单list
 void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 
-	this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list() 期货账户:{} 策略编号:{}", this->stg_user_id, this->stg_strategy_id);
-
 	if (strlen(pOrder->OrderSysID) != 0) { // 如果报单编号不为空，为交易所返回
 		if (pOrder->OrderStatus == '0') { // 全部成交
-			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = 0 全部成交");
+			this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list() 期货账户 = {} 策略编号 = {} pOrder->OrderStatus = '0' 全部成交", this->stg_user_id, this->stg_strategy_id);
 			list<CThostFtdcOrderField *>::iterator itor;
 			// 当有其他地方调用挂单列表,阻塞,信号量P操作
 			sem_wait(&(this->sem_list_order_pending));
 
 			for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
-				this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderRef = {}", pOrder->OrderRef);
-				this->getStgUser()->getXtsLogger()->info("\t(*itor)->OrderRef = {}", (*itor)->OrderRef);
 				if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
 					delete (*itor);
 					itor = this->stg_list_order_pending->erase(itor); //移除
@@ -3535,15 +3528,14 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 			sem_post(&(this->sem_list_order_pending));
 		}
 		else if (pOrder->OrderStatus == '1') { // 部分成交还在队列中
-			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = 1 部分成交还在队列中");
+			this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list() 期货账户 = {} 策略编号 = {} pOrder->OrderStatus = '1' 部分成交还在队列中", this->stg_user_id, this->stg_strategy_id);
+
 			list<CThostFtdcOrderField *>::iterator itor;
 
 			// 当有其他地方调用挂单列表,阻塞,信号量P操作
 			sem_wait(&(this->sem_list_order_pending));
 
 			for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end(); itor++) {
-				this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderRef = {}", pOrder->OrderRef);
-				this->getStgUser()->getXtsLogger()->info("\t(*itor)->OrderRef = {}", (*itor)->OrderRef);
 				if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
 					this->CopyOrderData(*itor, pOrder);
 					//break;
@@ -3555,10 +3547,12 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 
 		}
 		else if (pOrder->OrderStatus == '2') { ///部分成交不在队列中
-			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = 2 部分成交不在队列中");
+			this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list() 期货账户 = {} 策略编号 = {} pOrder->OrderStatus = '2' 部分成交不在队列中", this->stg_user_id, this->stg_strategy_id);
+
 		}
 		else if (pOrder->OrderStatus == '3') { // 未成交还在队列中
-			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = 3 未成交还在队列中");
+			this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list() 期货账户 = {} 策略编号 = {} pOrder->OrderStatus = '3' 未成交还在队列中", this->stg_user_id, this->stg_strategy_id);
+
 			bool isExists = false;
 			// 判断挂单列表是否存在
 			list<CThostFtdcOrderField *>::iterator itor;
@@ -3567,8 +3561,6 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 			sem_wait(&(this->sem_list_order_pending));
 
 			for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end(); itor++) {
-				this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderRef = {}", pOrder->OrderRef);
-				this->getStgUser()->getXtsLogger()->info("\t(*itor)->OrderRef = {}", (*itor)->OrderRef);
 				if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
 					// 存在置flag标志位
 					isExists = true;
@@ -3592,18 +3584,18 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 		}
 		else if (pOrder->OrderStatus == '4') //未成交不在队列中
 		{
-			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = 4 未成交不在队列中");
+			this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list() 期货账户 = {} 策略编号 = {} pOrder->OrderStatus = '4' 未成交不在队列中", this->stg_user_id, this->stg_strategy_id);
+
 		}
 		else if (pOrder->OrderStatus == '5') { // 撤单
-			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = 5 撤单");
+			this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list() 期货账户 = {} 策略编号 = {} pOrder->OrderStatus = '5' 撤单", this->stg_user_id, this->stg_strategy_id);
+
 			list<CThostFtdcOrderField *>::iterator itor;
 
 			// 当有其他地方调用挂单列表,阻塞,信号量P操作
 			sem_wait(&(this->sem_list_order_pending));
 
 			for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
-				this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderRef = {}", pOrder->OrderRef);
-				this->getStgUser()->getXtsLogger()->info("\t(*itor)->OrderRef = {}", (*itor)->OrderRef);
 				if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
 					delete (*itor);
 					itor = this->stg_list_order_pending->erase(itor); //移除
@@ -3619,13 +3611,16 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 
 		}
 		else if (pOrder->OrderStatus == 'a') { // 未知
-			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = a 未知");
+			this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list() 期货账户 = {} 策略编号 = {} pOrder->OrderStatus = 'a' 未知", this->stg_user_id, this->stg_strategy_id);
+
 		}
 		else if (pOrder->OrderStatus == 'b') { // 尚未触发
-			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = b 尚未触发");
+			this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list() 期货账户 = {} 策略编号 = {} pOrder->OrderStatus = 'b' 尚未触发", this->stg_user_id, this->stg_strategy_id);
+
 		}
 		else if (pOrder->OrderStatus == 'c') { // 已触发
-			this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderStatus = c 已触发");
+			this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list() 期货账户 = {} 策略编号 = {} pOrder->OrderStatus = 'c' 已触发发", this->stg_user_id, this->stg_strategy_id);
+
 		}
 
 		// 遍历挂单列表，找出A合约开仓未成交的量
@@ -3654,7 +3649,8 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 		/************************************************************************/
 		/* 2：报单发往交易所未收到回报                                                                     */
 		/************************************************************************/
-		this->getStgUser()->getXtsLogger()->info("\t报单编号长度为0,CTP直接返回的错误或者还未发到交易所");
+		this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list() 期货账户 = {} 策略编号 = {} 报单编号长度为0,CTP直接返回的错误或者还未发到交易所", this->stg_user_id, this->stg_strategy_id);
+
 	}
 }
 
@@ -4264,14 +4260,16 @@ void Strategy::add_VolumeTradedBatch(CThostFtdcOrderField *pOrder, USER_CThostFt
 	
 	this->CopyOrderDataToNew(new_Order, pOrder);
 
-	this->getStgUser()->getXtsLogger()->info("Strategy::add_VolumeTradedBatch() 期货账户:{} 策略编号:{}", this->stg_user_id, this->stg_strategy_id);
-
 	if (new_Order->OrderStatus == '0') { // 全部成交
 		new_Order->VolumeTradedBatch = new_Order->VolumeTotalOriginal;
 		
 	}
 	else if (new_Order->OrderStatus == '1') // 部分成交还在队列中
 	{
+
+		this->getStgUser()->getXtsLogger()->info("Strategy::add_VolumeTradedBatch() 期货账户 = {} 策略编号 = {} new_Order->OrderStatus == '1' 部分成交还在队列中", this->stg_user_id, this->stg_strategy_id);
+
+
 		bool is_exists = false;
 		/// 遍历挂单列表
 		list<CThostFtdcOrderField *>::iterator Itor;
@@ -4299,49 +4297,56 @@ void Strategy::add_VolumeTradedBatch(CThostFtdcOrderField *pOrder, USER_CThostFt
 	else if (new_Order->OrderStatus == '2') ///部分成交不在队列中
 	{
 		//std::cout << "\tnew_Order->OrderStatus == '2' 部分成交不在队列中" << std::endl;
-		this->getStgUser()->getXtsLogger()->info("\tnew_Order->OrderStatus == '2' 部分成交不在队列中");
+		this->getStgUser()->getXtsLogger()->info("Strategy::add_VolumeTradedBatch() 期货账户 = {} 策略编号 = {} new_Order->OrderStatus == '2' 部分成交不在队列中", this->stg_user_id, this->stg_strategy_id);
 		new_Order->VolumeTradedBatch = 0;
 	}
 	else if (new_Order->OrderStatus == '3') ///未成交还在队列中
 	{
 		//std::cout << "\tnew_Order->OrderStatus == '3' 未成交还在队列中" << std::endl;
-		this->getStgUser()->getXtsLogger()->info("\tnew_Order->OrderStatus == '3' 未成交还在队列中");
+		this->getStgUser()->getXtsLogger()->info("Strategy::add_VolumeTradedBatch() 期货账户 = {} 策略编号 = {} new_Order->OrderStatus == '3' 未成交还在队列中", this->stg_user_id, this->stg_strategy_id);
+
 		new_Order->VolumeTradedBatch = 0;
 	}
 	else if (new_Order->OrderStatus == '4') ///未成交不在队列中
 	{
 		//std::cout << "\tnew_Order->OrderStatus == '4' 未成交不在队列中" << std::endl;
-		this->getStgUser()->getXtsLogger()->info("\tnew_Order->OrderStatus == '4' 未成交不在队列中");
+		this->getStgUser()->getXtsLogger()->info("Strategy::add_VolumeTradedBatch() 期货账户 = {} 策略编号 = {} new_Order->OrderStatus == '4' 未成交不在队列中", this->stg_user_id, this->stg_strategy_id);
+
 		new_Order->VolumeTradedBatch = 0;
 	}
 	else if (new_Order->OrderStatus == '5') ///撤单
 	{
 		//std::cout << "\tnew_Order->OrderStatus == '5' 撤单" << std::endl;
-		this->getStgUser()->getXtsLogger()->info("\tnew_Order->OrderStatus == '5' 撤单");
+		this->getStgUser()->getXtsLogger()->info("Strategy::add_VolumeTradedBatch() 期货账户 = {} 策略编号 = {} new_Order->OrderStatus == '5' 撤单", this->stg_user_id, this->stg_strategy_id);
+
 		new_Order->VolumeTradedBatch = 0;
 	}
 	else if (new_Order->OrderStatus == 'a') ///未知
 	{
 		//std::cout << "\tnew_Order->OrderStatus == 'a' 未知" << std::endl;
-		this->getStgUser()->getXtsLogger()->info("\tnew_Order->OrderStatus == 'a' 未知");
+		this->getStgUser()->getXtsLogger()->info("Strategy::add_VolumeTradedBatch() 期货账户 = {} 策略编号 = {} new_Order->OrderStatus == 'a' 未知", this->stg_user_id, this->stg_strategy_id);
+
 		new_Order->VolumeTradedBatch = 0;
 	}
 	else if (new_Order->OrderStatus == 'b') ///尚未触发
 	{
 		//std::cout << "\tnew_Order->OrderStatus == 'b' 尚未触发" << std::endl;
-		this->getStgUser()->getXtsLogger()->info("\tnew_Order->OrderStatus == 'b' 尚未触发");
+		this->getStgUser()->getXtsLogger()->info("Strategy::add_VolumeTradedBatch() 期货账户 = {} 策略编号 = {} new_Order->OrderStatus == 'b' 尚未触发", this->stg_user_id, this->stg_strategy_id);
+
 		new_Order->VolumeTradedBatch = 0;
 	}
 	else if (new_Order->OrderStatus == 'c') ///已触发
 	{
 		//std::cout << "\tnew_Order->OrderStatus == 'c' 已触发" << std::endl;
-		this->getStgUser()->getXtsLogger()->info("\tnew_Order->OrderStatus == 'c' 已触发");
+		this->getStgUser()->getXtsLogger()->info("Strategy::add_VolumeTradedBatch() 期货账户 = {} 策略编号 = {} new_Order->OrderStatus == 'c' 已触发", this->stg_user_id, this->stg_strategy_id);
+
 		new_Order->VolumeTradedBatch = 0;
 	}
 	else
 	{
 		//std::cout << "\tnew_Order->OrderStatus不在系统范围内!" << std::endl;
-		this->getStgUser()->getXtsLogger()->info("\tnew_Order->OrderStatus不在系统范围内!");
+		this->getStgUser()->getXtsLogger()->info("Strategy::add_VolumeTradedBatch() 期货账户 = {} 策略编号 = {} new_Order->OrderStatus 不在系统范围内", this->stg_user_id, this->stg_strategy_id);
+
 		new_Order->VolumeTradedBatch = 0;
 	}
 	/*std::cout << "Strategy::add_VolumeTradedBatch()" << std::endl;

@@ -303,17 +303,14 @@ void User::init_instrument_id_action_counter(string instrument_id) {
 
 /// 获得合约撤单次数,例如"cu1710":0
 int User::get_instrument_id_action_counter(string instrument_id) {
-	USER_PRINT("User::get_instrument_id_action_counter");
 	//std::cout << "User::get_instrument_id_action_counter()" << std::endl;
-	this->getXtsLogger()->info("User::get_instrument_id_action_counter()");
 	//对某个合约进行加1操作
 	map<string, int>::iterator m_itor;
 	m_itor = this->stg_map_instrument_action_counter->find(instrument_id);
 	if (m_itor == (this->stg_map_instrument_action_counter->end())) {
 		/*std::cout << "\t撤单列表里不存在该合约 = " << instrument_id << endl;
 		std::cout << "\t撤单次数累计 = " << 0 << std::endl;*/
-		this->getXtsLogger()->info("\t撤单列表里不存在该合约 = {}", instrument_id);
-		this->getXtsLogger()->info("\t撤单次数累计 = {}", 0);
+		this->getXtsLogger()->info("User::get_instrument_id_action_counter() 撤单列表里不存在该合约 = {} 撤单次数累计 = {}", instrument_id, 0);
 		// this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0));
 		// this->init_instrument_id_action_counter(string(pOrder->InstrumentID));
 		return 0;
@@ -321,8 +318,7 @@ int User::get_instrument_id_action_counter(string instrument_id) {
 	else {
 		/*std::cout << "\t撤单合约 = " << instrument_id << std::endl;
 		std::cout << "\t撤单次数累计 = " << m_itor->second << std::endl;*/
-		this->getXtsLogger()->info("\t撤单合约 = {}", instrument_id);
-		this->getXtsLogger()->info("\t撤单次数累计 = {}", m_itor->second);
+		this->getXtsLogger()->info("User::get_instrument_id_action_counter() 撤单合约 = {} 撤单次数累计 = {}", instrument_id, m_itor->second);
 		return m_itor->second;
 	}
 }
