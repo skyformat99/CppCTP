@@ -68,7 +68,6 @@ DBManager::DBManager(int max_size) {
 		exit(1);
 	}
 
-
 	//建立连接队列
 	for (int i = 0; i < max_size; i++) {
 		if (!this->db_connect_status) {

@@ -2356,7 +2356,7 @@ void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFt
 				list<Strategy *>::iterator itor;
 				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 					if ((*itor)->getStgStrategyId() == strategyid) {
-						(*itor)->OnRspOrderInsert(pInputOrder);
+						(*itor)->OnErrRtnOrderInsert(pInputOrder);
 						//break;
 					}
 				}
@@ -2378,8 +2378,7 @@ void TdSpi::OrderAction(char *ExchangeID, char *OrderRef, char *OrderSysID) {
 	strcpy(pOrderAction.OrderSysID, OrderSysID);
 	pOrderAction.ActionFlag = THOST_FTDC_AF_Delete; //删除
 
-	this->current_user->getXtsLogger()->info("TdSpi::OrderAction() UserID = {} OrderRef = {} InstrumentID = {}",
-		pOrderAction.UserID, pOrderAction.OrderRef, pOrderAction.InstrumentID);
+	this->current_user->getXtsLogger()->info("TdSpi::OrderAction() OrderRef = {}", pOrderAction.OrderRef);
 
 	this->tdapi->ReqOrderAction(&pOrderAction, this->getRequestID());
 
@@ -2501,9 +2500,12 @@ bool TdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo, string source) {
 		codeDst[255] = { 0 };
 		memset(codeDst, 0x00, sizeof(codeDst));
 		Utils::Gb2312ToUtf8(codeDst, 255, pRspInfo->ErrorMsg, strlen(pRspInfo->ErrorMsg)); // Gb2312ToUtf8
-		Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() UserID = ", this->current_user->getUserID());
-		Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() ErrorID = ", pRspInfo->ErrorID);
-		Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() ErrorMsg = ", codeDst);
+		Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() UserID ", this->current_user->getUserID());
+		Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() ErrorID ", pRspInfo->ErrorID);
+		Utils::printRedColorWithKV("TdSpi::IsErrorRspInfo() ErrorMsg ", codeDst);
+
+
+
 		this->current_user->getXtsLogger()->info("TdSpi::IsErrorRspInfo() UserID = {} source = {} ErrorID = {} ErrorMsg = {}", this->current_user->getUserID(), source, pRspInfo->ErrorID, codeDst);
 		this->current_user->getXtsLogger()->flush();
 	}

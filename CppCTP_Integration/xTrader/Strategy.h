@@ -571,7 +571,7 @@ private:
 	int stg_position_b_sell;			// B合约卖持仓总仓位
 	int stg_pending_a_open;				// A合约挂单买开仓量
 	bool stg_select_order_algorithm_flag;	// 下单算法锁标志位
-	string stg_lock_order_ref;			// 选择下单算法过程中产生的order_ref
+	//string stg_lock_order_ref;			// 选择下单算法过程中产生的order_ref
 	string stg_tick_systime_record;		// 收到tick的系统时间
 
 	CThostFtdcDepthMarketDataField *stg_instrument_Last_tick;	// A合约tick（第一腿）
@@ -628,6 +628,7 @@ private:
 	bool queue_OnRtnTrade_on_off;			// trade回调队列开关
 
 	sem_t sem_list_order_pending;			// 信号量,用来保证同一时间只能一处地方调用挂单列表
+	sem_t sem_generate_order_ref;			// 信号量,用来保证同一时间只能一处地方调用生成报单引用
 };
 
 #endif

@@ -158,7 +158,7 @@ MdSpi * CTP_Manager::CreateMd(string md_frontAddress, string md_broker, string m
 	string flowpath = "conn/md/" + md_frontAddress + "/";
 	int flag = Utils::CreateFolder(flowpath.c_str());
 	if (flag != 0) {
-		cout << "无法创建行情流文件!" << endl;
+		Utils::printRedColor("无法创建行情流文件!");
 		return NULL;
 	} else {
 		mdapi = CThostFtdcMdApi::CreateFtdcMdApi(flowpath.c_str());

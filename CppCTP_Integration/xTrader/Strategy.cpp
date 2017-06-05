@@ -82,7 +82,7 @@ Strategy::Strategy(User *stg_user) {
 	this->stg_trading_day = "";
 	this->stg_pending_a_open = 0;			//A开仓挂单
 	this->stg_select_order_algorithm_flag = false; //默认允许选择下单算法锁为false，可以选择
-	this->stg_lock_order_ref = "";
+	//this->stg_lock_order_ref = "";
 	this->stg_tick_systime_record = "";		// 系统接收tick的时间
 	this->stg_update_position_detail_record_time = ""; // 最后一次修改持仓明细记录时间
 	this->stg_last_saved_time = "";	// 最后一次保存策略时间
@@ -118,6 +118,13 @@ Strategy::Strategy(User *stg_user) {
 	// 同一时间只能有一个线程调用挂单列表(避免带来段错误)
 	if (sem_init(&(this->sem_list_order_pending), 0, 1) != 0) {
 		this->stg_user->getXtsLogger()->info("Strategy::Strategy() sem_list_order_pending init failed!");
+		this->stg_user->getXtsLogger()->flush();
+	}
+
+	
+	// 同一时间只能有一个线程调用生成报单引用(避免带来段错误)
+	if (sem_init(&(this->sem_generate_order_ref), 0, 1) != 0) {
+		this->stg_user->getXtsLogger()->info("Strategy::Strategy() sem_generate_order_ref init failed!");
 		this->stg_user->getXtsLogger()->flush();
 	}
 	
@@ -2376,10 +2383,10 @@ void Strategy::finish_pending_order_list() {
 			// 发单手数:(剩余的数量)
 			this->stg_b_order_insert_args->VolumeTotalOriginal = (*itor)->VolumeTotal;
 
-			// 报单引用
-			this->stg_order_ref_b = this->Generate_Order_Ref();
-			this->stg_order_ref_last = this->stg_order_ref_b;
-			strcpy(this->stg_b_order_insert_args->OrderRef, this->stg_order_ref_b.c_str());
+			//// 报单引用
+			//this->stg_order_ref_b = this->Generate_Order_Ref();
+			//this->stg_order_ref_last = this->stg_order_ref_b;
+			//strcpy(this->stg_b_order_insert_args->OrderRef, this->stg_order_ref_b.c_str());
 
 			// 调用发单方法
 			this->Exec_OrderInsert(this->stg_b_order_insert_args);
@@ -2731,16 +2738,14 @@ void Strategy::Order_Algorithm_One() {
 			//std::cout << "发单手数 = " << order_volume << endl;
 		}
 
-		this->stg_order_ref_a = this->Generate_Order_Ref();
-		this->stg_order_ref_last = this->stg_order_ref_a;
-		this->stg_lock_order_ref = this->stg_order_ref_a;
-
-		USER_PRINT("OrderRef");
-		USER_PRINT(this->stg_order_ref_a);
+		
 
 		/// A合约报单参数，全部确定
 		// 报单引用
-		strcpy(this->stg_a_order_insert_args->OrderRef, this->stg_order_ref_a.c_str());
+		/*this->stg_order_ref_a = this->Generate_Order_Ref();
+		this->stg_order_ref_last = this->stg_order_ref_a;
+		strcpy(this->stg_a_order_insert_args->OrderRef, this->stg_order_ref_a.c_str());*/
+
 		// 合约代码
 		std::strcpy(this->stg_a_order_insert_args->InstrumentID, this->stg_instrument_id_A.c_str());
 		// 限价
@@ -2860,16 +2865,14 @@ void Strategy::Order_Algorithm_One() {
 			//std::cout << "发单手数 = " << order_volume << endl;
 		}
 
-		this->stg_order_ref_a = this->Generate_Order_Ref();
-		this->stg_order_ref_last = this->stg_order_ref_a;
-		this->stg_lock_order_ref = this->stg_order_ref_a;
-
-		//USER_PRINT("OrderRef");
-		USER_PRINT(this->stg_order_ref_a);
+		
 
 		/// A合约报单参数，全部确定
 		// 报单引用
-		strcpy(this->stg_a_order_insert_args->OrderRef, this->stg_order_ref_a.c_str());
+		/*this->stg_order_ref_a = this->Generate_Order_Ref();
+		this->stg_order_ref_last = this->stg_order_ref_a;
+		strcpy(this->stg_a_order_insert_args->OrderRef, this->stg_order_ref_a.c_str());*/
+
 		// 合约代码
 		std::strcpy(this->stg_a_order_insert_args->InstrumentID, this->stg_instrument_id_A.c_str());
 		// 限价
@@ -2958,16 +2961,13 @@ void Strategy::Order_Algorithm_One() {
 			//std::cout << "发单手数 = " << order_volume << endl;
 		}
 
-		this->stg_order_ref_a = this->Generate_Order_Ref();
-		this->stg_order_ref_last = this->stg_order_ref_a;
-		this->stg_lock_order_ref = this->stg_order_ref_a;
-
-		USER_PRINT("OrderRef");
-		USER_PRINT(this->stg_order_ref_a);
+		
 
 		// A合约报单参数,全部确定
 		// 报单引用
-		std::strcpy(this->stg_a_order_insert_args->OrderRef, this->stg_order_ref_a.c_str());
+		/*this->stg_order_ref_a = this->Generate_Order_Ref();
+		this->stg_order_ref_last = this->stg_order_ref_a;
+		std::strcpy(this->stg_a_order_insert_args->OrderRef, this->stg_order_ref_a.c_str());*/
 		// 合约代码
 		std::strcpy(this->stg_a_order_insert_args->InstrumentID, this->stg_instrument_id_A.c_str());
 		// 限价
@@ -3052,16 +3052,13 @@ void Strategy::Order_Algorithm_One() {
 			//std::cout << "发单手数 = " << order_volume << endl;
 		}
 
-		this->stg_order_ref_a = this->Generate_Order_Ref();
-		this->stg_order_ref_last = this->stg_order_ref_a;
-		this->stg_lock_order_ref = this->stg_order_ref_a;
-
-		USER_PRINT("OrderRef");
-		USER_PRINT(this->stg_order_ref_a);
+		
 
 		// A合约报单参数,全部确定
 		// 报单引用
-		std::strcpy(this->stg_a_order_insert_args->OrderRef, this->stg_order_ref_a.c_str());
+		/*this->stg_order_ref_a = this->Generate_Order_Ref();
+		this->stg_order_ref_last = this->stg_order_ref_a;
+		std::strcpy(this->stg_a_order_insert_args->OrderRef, this->stg_order_ref_a.c_str());*/
 		// 合约代码
 		std::strcpy(this->stg_a_order_insert_args->InstrumentID, this->stg_instrument_id_A.c_str());
 		// 限价
@@ -3123,16 +3120,13 @@ string Strategy::Generate_Order_Ref() {
 	strstream << (this->stg_order_ref_base + 1L);
 	strstream >> number;
 	string order_ref_base = number + this->stg_strategy_id;*/
-	
-	//USER_PRINT("Strategy::Generate_Order_Ref()");
-	//USER_PRINT("this->stg_user");
-	//USER_PRINT(this->stg_user);
-	USER_PRINT(this->stg_user->getStgOrderRefBase());
+
+	// 当有其他地方调用报单引用,阻塞,信号量P操作
+	sem_wait(&(this->sem_generate_order_ref));
+
 	this->stg_user->setStgOrderRefBase(this->stg_user->getStgOrderRefBase() + 1);
 	this->stg_order_ref_base = this->stg_user->getStgOrderRefBase(); // 更新基准数
-	USER_PRINT(this->stg_order_ref_base);
 	string order_ref_base = std::to_string(this->stg_order_ref_base) + this->stg_strategy_id;
-	USER_PRINT(order_ref_base);
 
 	//USER_PRINT("Generate_Order_Ref");
 	//USER_PRINT(order_ref_base);
@@ -3140,6 +3134,10 @@ string Strategy::Generate_Order_Ref() {
 	//stringstream strValue;
 	//strValue << order_ref_base;
 	//strValue << this->stg_order_ref_base; // 更新
+
+	// 释放信号量,信号量V操作
+	sem_post(&(this->sem_generate_order_ref));
+
 	return order_ref_base;
 }
 
@@ -3154,6 +3152,10 @@ void Strategy::Exec_OrderInsert(CThostFtdcInputOrderField *insert_order) {
 	", Direction = " << insert_order->Direction <<
 	", CombOffsetFlag = " << insert_order->CombOffsetFlag[0] <<
 	", CombHedgeFlag = " << insert_order->CombHedgeFlag[0] << std::endl;*/
+
+	// 报单引用
+	this->stg_order_ref_last = this->Generate_Order_Ref();
+	strcpy(insert_order->OrderRef, this->stg_order_ref_last.c_str());
 
 	this->getStgUser()->getXtsLogger()->info("Strategy::Exec_OrderInsert() OrderRef = {} InstrumentID = {} LimitPrice = {} VolumeTotalOriginal = {} Direction = {} CombOffsetFlag = {} CombHedgeFlag = {}",
 		insert_order->OrderRef, insert_order->InstrumentID, insert_order->LimitPrice, insert_order->VolumeTotalOriginal, insert_order->Direction,
@@ -3267,10 +3269,9 @@ void Strategy::thread_queue_OnRtnOrder() {
 			// 释放信号量,信号量V操作
 			sem_post(&(this->sem_list_order_pending));
 
-			this->stg_order_ref_b = this->Generate_Order_Ref();
+			/*this->stg_order_ref_b = this->Generate_Order_Ref();
 			this->stg_order_ref_last = this->stg_order_ref_b;
-
-			strcpy(this->stg_b_order_insert_args->OrderRef, this->stg_order_ref_b.c_str());
+			strcpy(this->stg_b_order_insert_args->OrderRef, this->stg_order_ref_b.c_str());*/
 
 			//this->stg_user->getUserTradeSPI()->OrderInsert(this->stg_user, this->stg_b_order_insert_args);
 			this->Exec_OrderInsert(this->stg_b_order_insert_args);
@@ -3281,11 +3282,11 @@ void Strategy::thread_queue_OnRtnOrder() {
 		}
 		/// B撤单回报，启动B重新发单一定成交策略
 		else if ((!strcmp(pOrder->InstrumentID, this->stg_instrument_id_B.c_str())) && (pOrder->OrderStatus == '5') && (strlen(pOrder->OrderSysID) != 0)) {
-			this->stg_order_ref_b = this->Generate_Order_Ref();
+			
+			// 报单引用
+			/*this->stg_order_ref_b = this->Generate_Order_Ref();
 			this->stg_order_ref_last = this->stg_order_ref_b;
-
-			USER_PRINT("OrderRef");
-			USER_PRINT(this->stg_order_ref_b);
+			strcpy(this->stg_b_order_insert_args->OrderRef, this->stg_order_ref_b.c_str());*/
 
 			if (pOrder->Direction == '0') {
 				this->stg_b_order_insert_args->LimitPrice = this->stg_instrument_B_tick->AskPrice1;
@@ -3294,7 +3295,8 @@ void Strategy::thread_queue_OnRtnOrder() {
 				this->stg_b_order_insert_args->LimitPrice = this->stg_instrument_B_tick->BidPrice1;
 			}
 
-			strcpy(this->stg_b_order_insert_args->OrderRef, this->stg_order_ref_b.c_str());
+			
+
 			this->stg_b_order_insert_args->VolumeTotalOriginal = pOrder->VolumeTotal;
 			this->stg_b_order_insert_args->Direction = pOrder->Direction;
 			this->stg_b_order_insert_args->CombOffsetFlag[0] = pOrder->CombOffsetFlag[0];
@@ -3520,7 +3522,6 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 				this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderRef = {}", pOrder->OrderRef);
 				this->getStgUser()->getXtsLogger()->info("\t(*itor)->OrderRef = {}", (*itor)->OrderRef);
 				if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
-					this->getStgUser()->getXtsLogger()->info("更新挂单,有挂单");
 					delete (*itor);
 					itor = this->stg_list_order_pending->erase(itor); //移除
 					//break;
@@ -3544,7 +3545,6 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 				this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderRef = {}", pOrder->OrderRef);
 				this->getStgUser()->getXtsLogger()->info("\t(*itor)->OrderRef = {}", (*itor)->OrderRef);
 				if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
-					this->getStgUser()->getXtsLogger()->info("更新挂单,有挂单");
 					this->CopyOrderData(*itor, pOrder);
 					//break;
 				}
@@ -3572,7 +3572,6 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 				if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
 					// 存在置flag标志位
 					isExists = true;
-					this->getStgUser()->getXtsLogger()->info("更新挂单,有挂单");
 					this->CopyOrderData(*itor, pOrder);
 					//break;
 				}
@@ -3580,7 +3579,6 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 
 			// 如果不存在直接加入
 			if (!isExists) {
-				this->getStgUser()->getXtsLogger()->info("更新挂单,无挂单");
 				// 深复制对象
 				CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
 				memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
@@ -3607,7 +3605,6 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 				this->getStgUser()->getXtsLogger()->info("\tpOrder->OrderRef = {}", pOrder->OrderRef);
 				this->getStgUser()->getXtsLogger()->info("\t(*itor)->OrderRef = {}", (*itor)->OrderRef);
 				if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
-					this->getStgUser()->getXtsLogger()->info("更新挂单,有挂单");
 					delete (*itor);
 					itor = this->stg_list_order_pending->erase(itor); //移除
 					//break;
@@ -4264,9 +4261,10 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 
 /// 添加字段本次成交量至order构体中
 void Strategy::add_VolumeTradedBatch(CThostFtdcOrderField *pOrder, USER_CThostFtdcOrderField *new_Order) {
-	USER_PRINT("Strategy::add_VolumeTradedBatch");
+	
 	this->CopyOrderDataToNew(new_Order, pOrder);
-	USER_PRINT(new_Order->OrderStatus);
+
+	this->getStgUser()->getXtsLogger()->info("Strategy::add_VolumeTradedBatch() 期货账户:{} 策略编号:{}", this->stg_user_id, this->stg_strategy_id);
 
 	if (new_Order->OrderStatus == '0') { // 全部成交
 		new_Order->VolumeTradedBatch = new_Order->VolumeTotalOriginal;
@@ -4947,12 +4945,12 @@ bool Strategy::getStgSelectOrderAlgorithmFlag() {
 	return this->stg_select_order_algorithm_flag;
 }
 
-void Strategy::setStgLockOrderRef(string stg_lock_order_ref) {
-	this->stg_lock_order_ref = stg_lock_order_ref;
-}
-string Strategy::getStgLockOrderRef() {
-	return this->stg_lock_order_ref;
-}
+//void Strategy::setStgLockOrderRef(string stg_lock_order_ref) {
+//	this->stg_lock_order_ref = stg_lock_order_ref;
+//}
+//string Strategy::getStgLockOrderRef() {
+//	return this->stg_lock_order_ref;
+//}
 
 /************************************************************************/
 /* 交易相关的回报函数                                                      */
@@ -4981,12 +4979,21 @@ void Strategy::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 }
 
 //下单错误响应
-void Strategy::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder) {
+void Strategy::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pOrder) {
 	USER_PRINT("Strategy::OnErrRtnOrderInsert");
 	////如果已经收盘,不再接收
 	//if (this->getStgUser()->getCTP_Manager()->getIsMarketCloseDone()) {
 	//	return;
 	//}
+
+	//string compare_date = pOrder->InsertDate; //报单日期
+	//string compare_time = pOrder->InsertTime; //报单时间
+
+	//// 如果pOrder的时间在修改持仓之前 return
+	//if (!Utils::compareTradingDaySeconds((compare_date + compare_time).c_str(), this->getStgLastSavedTime().c_str())) {
+	//	return;
+	//}
+
 	this->Exec_OnErrRtnOrderInsert();
 }
 
