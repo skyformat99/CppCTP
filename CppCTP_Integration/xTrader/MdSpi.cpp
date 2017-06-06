@@ -18,7 +18,7 @@ struct timespec outtime = {3, 0};
 std::condition_variable md_cv;
 std::mutex md_mtx;
 
-#define MD_RSP_TIMEOUT	120
+#define MD_RSP_TIMEOUT	2
 
 //初始化构造函数
 MdSpi::MdSpi(CThostFtdcMdApi *mdapi) {
@@ -91,8 +91,17 @@ void MdSpi::Connect(char *frontAddress) {
 //响应连接
 void MdSpi::OnFrontConnected() {
 	//std::unique_lock <std::mutex> lck(md_mtx);
-	USER_PRINT("MdSpi::OnFrontConnected");
-	md_cv.notify_one();
+	
+
+	if (!this->isFirstTimeLogged) // 非第一次登陆
+	{
+		Utils::printRedColor("MdSpi::OnFrontConnected() 断线重连...");
+		this->ctp_m->getXtsLogger()->info("MdSpi::OnFrontConnected() 断线重连...");
+		this->Login(const_cast<char *>(this->BrokerID.c_str()), const_cast<char *>(this->UserID.c_str()), const_cast<char *>(this->Password.c_str()));
+	}
+	else { // 第一次登陆
+		md_cv.notify_one();
+	}
 
 	/*const char *BrokerID = this->BrokerID.c_str();
 	char *r_BrokerID = new char[strlen(BrokerID) + 1];
@@ -112,17 +121,25 @@ void MdSpi::OnFrontConnected() {
 
 //通信断开
 void MdSpi::OnFrontDisconnected(int nReason) {
-	USER_PRINT("MdSpi::OnFrontDisconnected");
-	USER_PRINT(nReason);
-	std::cout << "MdSpi::OnFrontDisconnected()" << std::endl;
-	std::cout << "\t断线原因 = " << nReason << std::endl;
 	this->isFirstTimeLogged = false;
-	this->ctp_m->sendMarketOffLineMessage();
+	if (this->ctp_m)
+	{
+		Utils::printRedColor("MdSpi::OnFrontDisconnected() 断线!");
+		this->ctp_m->sendMarketOffLineMessage(1);
+		this->ctp_m->getXtsLogger()->info("MdSpi::OnFrontDisconnected() 断线原因 = {}", nReason);
+		this->ctp_m->getXtsLogger()->flush();
+	}
+	
 }
 
 //登录
 void MdSpi::Login(char *BrokerID, char *UserID, char *Password) {
-	USER_PRINT("MdSpi::Login")
+	
+	if (!this->isFirstTimeLogged)
+	{
+		this->ctp_m->getXtsLogger()->info("MdSpi::Login() 自动登录...");
+	}
+
 	this->BrokerID = BrokerID;
 	this->UserID = UserID;
 	this->Password = Password;
@@ -139,10 +156,14 @@ void MdSpi::Login(char *BrokerID, char *UserID, char *Password) {
 	//等待回调
 	std::unique_lock<std::mutex> md_lck(md_mtx);
 	while (md_cv.wait_for(md_lck, std::chrono::seconds(MD_RSP_TIMEOUT)) == std::cv_status::timeout) {
-		std::cout << "MdSpi::Connect()" << std::endl;
-		std::cout << "\t行情登录等待超时" << std::endl;
+		this->ctp_m->getXtsLogger()->info("MdSpi::Connect() 行情登录等待超时");
+		delete loginField;
+		loginField = NULL;
 		return;
 	}
+
+	delete loginField;
+	loginField = NULL;
 }
 
 //响应登录
@@ -180,7 +201,7 @@ void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtd
 		cout << "能源中心时间" << pRspUserLogin->INETime << ", ";
 		this->isLogged = true;
 		string s_trading_day = this->mdapi->GetTradingDay();
-		std::cout << "MdSpi.cpp s_trading_day = " << s_trading_day << std::endl;
+		this->ctp_m->getXtsLogger()->info("MdSpi::OnRspUserLogin() TradingDay = {}", s_trading_day);
 		this->ctp_m->setTradingDay(s_trading_day);
 		this->ctp_m->setMdLogin(true);
 		/*sem_post(&login_sem);
@@ -188,6 +209,16 @@ void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtd
 		sem_init(&submarket_sem, 0, 1);
 		this->SubMarketData(this->ppInstrumentID, this->nCount);
 		}*/
+
+		if (!this->isFirstTimeLogged)
+		{
+			sleep(1);
+			// 断线重连登录后自动订阅行情
+			this->SubMarket(this->ctp_m->getL_Instrument());
+			// 通知客户端
+			this->ctp_m->sendMarketOffLineMessage(0);
+		}
+
 	}
 	//释放
 	md_cv.notify_one();

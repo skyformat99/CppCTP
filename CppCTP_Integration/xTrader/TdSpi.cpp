@@ -17,7 +17,7 @@ char codeDst[255];
 std::condition_variable cv;
 std::mutex mtx;
 std::mutex position_add_mtx;
-#define RSP_TIMEOUT	30
+#define RSP_TIMEOUT	3
 
 
 
@@ -69,6 +69,7 @@ TdSpi::TdSpi() {
 	this->l_strategys = NULL;
 	this->isFirstQryTrade = true;
 	this->isFirstQryOrder = true;
+	this->isFirstTimeLogged = true;
 	this->l_query_trade = new list<CThostFtdcTradeField *>();
 	this->l_query_order = new list<CThostFtdcOrderField *>();
 }
@@ -126,7 +127,7 @@ void TdSpi::Connect(User *user, bool init_flag) {
 
 //当客户端与交易后台建立起通信连接时（还未登录前），该方法被调用。
 void TdSpi::OnFrontConnected() {
-	USER_PRINT("TdSpi::OnFrontConnected");
+	
 	//if (this->isFirstTimeLogged) {
 	//	//sem_post(&connect_sem);
 	//	//this->Login("0187", "86001525", "206029");
@@ -136,7 +137,18 @@ void TdSpi::OnFrontConnected() {
 	//	
 	//	//this->Login(this->c_BrokerID, this->c_UserID, this->c_Password);
 	//}
-	cv.notify_one();
+
+	if (!this->isFirstTimeLogged) // 非第一次登陆
+	{
+		Utils::printRedColor("TdSpi::OnFrontConnected() 断线重连...");
+		this->current_user->getXtsLogger()->info("TdSpi::OnFrontConnected() 断线重连...");
+		this->Login(this->current_user);
+	}
+	else { // 第一次登陆系统
+		cv.notify_one();
+	}
+
+	
 }
 
 ///当客户端与交易后台通信连接断开时，该方法被调用。当发生这个情况后，API会自动重新连接，客户端可不做处理。
@@ -147,11 +159,13 @@ void TdSpi::OnFrontConnected() {
 ///        0x2002 发送心跳失败
 ///        0x2003 收到错误报文
 void TdSpi::OnFrontDisconnected(int nReason) {
-	std::cout << "TdSpi::OnFrontDisconnected()" << std::endl;
-	std::cout << "\t断线原因 = " << nReason << std::endl;
-	//std::cout << "\t当前用户 = " << this-> << std::endl;
-	if (this->current_user) {
-		this->ctp_m->sendTradeOffLineMessage(this->current_user->getUserID());
+	this->isFirstTimeLogged = false;
+	if (this->current_user && this->ctp_m) {
+		Utils::printRedColor("TdSpi::OnFrontDisconnected() 断线!");
+		this->ctp_m->sendTradeOffLineMessage(this->current_user->getUserID(), 1);
+		this->current_user->getXtsLogger()->info("TdSpi::OnFrontDisconnected() 断线原因 = {}", nReason);
+		this->current_user->getXtsLogger()->flush();
+		
 	}
 }
 
@@ -184,13 +198,19 @@ void TdSpi::Login(User *user) {
 	//等待登陆回调
 	std::unique_lock<std::mutex> lck(mtx);
 	while (cv.wait_for(lck, std::chrono::seconds(RSP_TIMEOUT)) == std::cv_status::timeout) {
-		std::cout << "TdSpi::Connect()" << std::endl;
-		std::cout << "\t登陆等待超时" << std::endl;
+
+		this->current_user->getXtsLogger()->info("TdSpi::Connect() 登陆等待超时");
+
 		user->setIsLogged(false);
+
+		delete loginField;
+		loginField = NULL;
+
 		break;
 	}
 
 	delete loginField;
+	loginField = NULL;
 }
 
 ///登录请求响应
@@ -251,12 +271,14 @@ void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 		//this->current_user->getL_Sessions()->push_back(sid);
 		//this->current_user->getDBManager()->CreateSession(sid);
 
-		USER_PRINT(this->current_user);
-		USER_PRINT(this->current_user->getUserID());
+		if (!this->isFirstTimeLogged)
+		{
+			this->ctp_m->sendTradeOffLineMessage(this->current_user->getUserID(), 0);
+		}
 	}
 	else {
 		//std::cout << "TdSpi::OnRspUserLogin()" << std::endl;
-		std::cout << "\t登陆出错!" << std::endl;
+		this->current_user->getXtsLogger()->info("TdSpi::OnRspUserLogin() 登陆出错!");
 		this->current_user->setIsLoggedError(true);
 		return;
 	}

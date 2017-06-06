@@ -199,10 +199,10 @@ public:
 	void delSocketFD(string user_id, int fd);
 
 	/// 发送行情断线通知
-	void sendMarketOffLineMessage();
+	void sendMarketOffLineMessage(int on_off_status);
 
 	/// 发送交易断线通知
-	void sendTradeOffLineMessage(string user_id);
+	void sendTradeOffLineMessage(string user_id, int on_off_status);
 
 	/// 初始化昨仓明细
 	//bool initYesterdayPositionDetail();

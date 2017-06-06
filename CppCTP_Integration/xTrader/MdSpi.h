@@ -18,6 +18,7 @@
 #include "User.h"
 #include "Strategy.h"
 #include "CTP_Manager.h"
+#include "Utils.h"
 
 
 using std::map;

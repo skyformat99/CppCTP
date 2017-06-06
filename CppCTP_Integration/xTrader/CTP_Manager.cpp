@@ -5592,9 +5592,8 @@ void CTP_Manager::delSocketFD(string user_id, int fd) {
 }
 
 /// 发送行情断线通知
-void CTP_Manager::sendMarketOffLineMessage() {
-	std::cout << "CTP_Manager::sendMarketOffLineMessage()" << std::endl;
-	Utils::printRedColor("服务端发送发送行情断线通知");
+void CTP_Manager::sendMarketOffLineMessage(int on_off_status) {
+	Utils::printRedColor("CTP_Manager::sendMarketOffLineMessage() 服务端发送发送行情断线通知");
 	this->getXtsLogger()->info("服务端发送发送行情断线通知");
 
 	/************************************************************************/
@@ -5615,9 +5614,20 @@ void CTP_Manager::sendMarketOffLineMessage() {
 		build_doc.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator);
 		build_doc.AddMember("MsgType", 18, allocator);
 		build_doc.AddMember("MsgSrc", 1, allocator);
-		build_doc.AddMember("MsgResult", 1, allocator);
-		build_doc.AddMember("MsgErrorReason", "CTP行情已断开连接", allocator);
+		build_doc.AddMember("IsLast", 1, allocator);
+		build_doc.AddMember("MsgResult", on_off_status, allocator);
+		if (on_off_status == 1)
+		{
+			build_doc.AddMember("MsgErrorReason", "CTP行情已断开连接", allocator);
+		}
+		else if (on_off_status == 0)
+		{
+			build_doc.AddMember("MsgErrorReason", "CTP行情已连接", allocator);
+		}
+		
 		build_doc.Accept(writer);
+
+		std::cout << "CTP_Manager::sendMarketOffLineMessage() message = " << buffer.GetString() << std::endl;
 
 		list<int>::iterator int_itor;
 		for (int_itor = m_itor->second->begin(); int_itor != m_itor->second->end(); int_itor++)
@@ -5636,7 +5646,9 @@ void CTP_Manager::sendMarketOffLineMessage() {
 }
 
 /// 发送交易断线通知
-void CTP_Manager::sendTradeOffLineMessage(string user_id) {
+void CTP_Manager::sendTradeOffLineMessage(string user_id, int on_off_status) {
+	Utils::printRedColor("CTP_Manager::sendTradeOffLineMessage() 服务端发送发送行情断线通知");
+	this->getXtsLogger()->info("服务端发送发送交易断线通知");
 	/************************************************************************/
 	/*发送交易断线通知     msgtype == 19                                       */
 	/************************************************************************/
@@ -5664,9 +5676,21 @@ void CTP_Manager::sendTradeOffLineMessage(string user_id) {
 			build_doc.AddMember("UserID", rapidjson::StringRef(user_id.c_str()), allocator);
 			build_doc.AddMember("MsgSrc", 1, allocator);
 			build_doc.AddMember("IsLast", 1, allocator);
-			build_doc.AddMember("MsgResult", 1, allocator);
-			build_doc.AddMember("MsgErrorReason", "CTP交易已断开连接", allocator);
+			build_doc.AddMember("MsgResult", on_off_status, allocator);
+
+			if (on_off_status == 1)
+			{
+				build_doc.AddMember("MsgErrorReason", "CTP交易已断开连接", allocator);
+			} 
+			else if (on_off_status == 0)
+			{
+				build_doc.AddMember("MsgErrorReason", "CTP交易已连接", allocator);
+			}
+
+			
 			build_doc.Accept(writer);
+
+			std::cout << "CTP_Manager::sendTradeOffLineMessage() message = " << buffer.GetString() << std::endl;
 
 			list<int>::iterator int_itor;
 			for (int_itor = m_itor->second->begin(); int_itor != m_itor->second->end(); int_itor++)

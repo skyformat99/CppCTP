@@ -143,6 +143,13 @@ Strategy::Strategy(User *stg_user) {
 		this->stg_user->getXtsLogger()->flush();
 		exit(1);
 	}
+
+	// 同一时间只能有一个线程调用生成报单引用(避免带来段错误)
+	if (sem_init(&(this->sem_order_insert), 0, 1) != 0) {
+		this->stg_user->getXtsLogger()->info("Strategy::Strategy() sem_order_insert init failed!");
+		this->stg_user->getXtsLogger()->flush();
+		exit(1);
+	}
 	
 	// 创建三个线程,分别处理tick, OnRtnOrder, OnRtnTrade
 	std::thread thread_tick(&Strategy::thread_queue_OnRtnDepthMarketData, this);
@@ -3187,6 +3194,9 @@ void Strategy::Exec_OrderInsert(CThostFtdcInputOrderField *insert_order) {
 	", CombOffsetFlag = " << insert_order->CombOffsetFlag[0] <<
 	", CombHedgeFlag = " << insert_order->CombHedgeFlag[0] << std::endl;*/
 
+	// 当有其他地方调用报单插入,阻塞,信号量P操作
+	sem_wait(&(this->sem_order_insert));
+
 	// 报单引用
 	this->stg_order_ref_last = this->Generate_Order_Ref();
 	strcpy(insert_order->OrderRef, this->stg_order_ref_last.c_str());
@@ -3196,6 +3206,9 @@ void Strategy::Exec_OrderInsert(CThostFtdcInputOrderField *insert_order) {
 		insert_order->CombOffsetFlag[0], insert_order->CombHedgeFlag[0]);
 	//下单操作
 	this->stg_user->getUserTradeSPI()->OrderInsert(this->stg_user, insert_order);
+
+	// 释放信号量,信号量V操作
+	sem_post(&(this->sem_order_insert));
 }
 
 // 报单录入请求

@@ -15,6 +15,7 @@
 #include "ThostFtdcUserApiStruct.h"
 #include "Strategy.h"
 #include "CTP_Manager.h"
+#include "Utils.h"
 
 using std::string;
 using std::list;
