@@ -43,6 +43,9 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 	this->l_position_detail_from_local_trade = new list<USER_INSTRUMENT_POSITION *>();
 	this->thread_init_status = false;
 
+	
+
+
 	try {
 		this->xts_user_logger = spdlog::get("xts_async_" + UserID + "_logger");
 		if (!this->xts_user_logger)
@@ -61,7 +64,12 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 		exit(1);
 	}
 
-	USER_PRINT(this->stg_order_ref_base);
+	// 同一时间只能有一个线程调用持仓明细(避免带来空指针错误)
+	if (sem_init(&(this->sem_get_order_ref), 0, 1) != 0) {
+		this->xts_user_logger->info("User::User() sem_get_order_ref init failed!");
+		this->xts_user_logger->flush();
+		exit(1);
+	}
 }
 
 User::User(string BrokerID, string UserID, int nRequestID, string stg_order_ref_base) {
@@ -383,6 +391,15 @@ void User::setStgOrderRefBase(long long stg_order_ref_base) {
 }
 
 long long User::getStgOrderRefBase() {
+
+	// 当有其他地方调用操作报单引用,阻塞,信号量P操作
+	sem_wait(&(this->sem_get_order_ref));
+
+	this->stg_order_ref_base += 1;
+
+	// 释放信号量,信号量V操作
+	sem_post(&(this->sem_get_order_ref));
+
 	return this->stg_order_ref_base;
 }
 

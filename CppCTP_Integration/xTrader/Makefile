@@ -45,7 +45,7 @@ EQUALS = =
 CMAKE_SOURCE_DIR = /root/xTrader
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader
+CMAKE_BINARY_DIR = /root/xTrader
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -72,9 +72,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/xTrader/CMakeFiles /root/xTrader/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/hgfs/CTP/CppCTP/CppCTP_Integration/xTrader/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /root/xTrader/CMakeFiles 0
 .PHONY : all
 
 # The main clean target

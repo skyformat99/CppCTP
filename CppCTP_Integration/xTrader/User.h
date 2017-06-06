@@ -202,6 +202,7 @@ private:
 	list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_local_trade;
 	bool thread_init_status;
 	std::shared_ptr<spdlog::logger> xts_user_logger;
+	sem_t sem_get_order_ref;					// 信号量,用来保证同一时间只能一处地方操作报单引用
 };
 
 #endif

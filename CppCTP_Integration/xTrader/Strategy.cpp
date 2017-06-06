@@ -3165,7 +3165,7 @@ string Strategy::Generate_Order_Ref() {
 	// 当有其他地方调用报单引用,阻塞,信号量P操作
 	sem_wait(&(this->sem_generate_order_ref));
 
-	this->stg_user->setStgOrderRefBase(this->stg_user->getStgOrderRefBase() + 1);
+	//this->stg_user->setStgOrderRefBase(this->stg_user->getStgOrderRefBase() + 1);
 	this->stg_order_ref_base = this->stg_user->getStgOrderRefBase(); // 更新基准数
 	string order_ref_base = std::to_string(this->stg_order_ref_base) + this->stg_strategy_id;
 
