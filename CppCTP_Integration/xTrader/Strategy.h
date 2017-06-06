@@ -629,6 +629,9 @@ private:
 
 	sem_t sem_list_order_pending;			// 信号量,用来保证同一时间只能一处地方调用挂单列表
 	sem_t sem_generate_order_ref;			// 信号量,用来保证同一时间只能一处地方调用生成报单引用
+	sem_t sem_list_position_detail_order;	// 信号量,用来保证同一时间只能一处地方调用操作持仓明细(order)
+	sem_t sem_list_position_detail_trade;	// 信号量,用来保证同一时间只能一处地方调用操作持仓明细(trade)
+	
 };
 
 #endif

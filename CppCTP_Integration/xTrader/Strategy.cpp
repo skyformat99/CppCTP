@@ -119,6 +119,21 @@ Strategy::Strategy(User *stg_user) {
 	if (sem_init(&(this->sem_list_order_pending), 0, 1) != 0) {
 		this->stg_user->getXtsLogger()->info("Strategy::Strategy() sem_list_order_pending init failed!");
 		this->stg_user->getXtsLogger()->flush();
+		exit(1);
+	}
+
+	// 同一时间只能有一个线程调用持仓明细(避免带来空指针错误)
+	if (sem_init(&(this->sem_list_position_detail_order), 0, 1) != 0) {
+		this->stg_user->getXtsLogger()->info("Strategy::Strategy() sem_list_position_detail_order init failed!");
+		this->stg_user->getXtsLogger()->flush();
+		exit(1);
+	}
+
+	// 同一时间只能有一个线程调用持仓明细(避免带来空指针错误)
+	if (sem_init(&(this->sem_list_position_detail_trade), 0, 1) != 0) {
+		this->stg_user->getXtsLogger()->info("Strategy::Strategy() sem_list_position_detail_trade init failed!");
+		this->stg_user->getXtsLogger()->flush();
+		exit(1);
 	}
 
 	
@@ -126,6 +141,7 @@ Strategy::Strategy(User *stg_user) {
 	if (sem_init(&(this->sem_generate_order_ref), 0, 1) != 0) {
 		this->stg_user->getXtsLogger()->info("Strategy::Strategy() sem_generate_order_ref init failed!");
 		this->stg_user->getXtsLogger()->flush();
+		exit(1);
 	}
 	
 	// 创建三个线程,分别处理tick, OnRtnOrder, OnRtnTrade
@@ -1157,6 +1173,10 @@ void Strategy::calPosition() {
 	this->stg_position_b_buy_today = 0;		//持仓B今买
 
 	list<USER_CThostFtdcOrderField *>::iterator itor;
+
+	// 当有其他地方调用持仓明细,阻塞,信号量P操作
+	sem_wait(&(this->sem_list_position_detail_order));
+
 	for (itor = this->stg_list_position_detail_from_order->begin();
 		itor != this->stg_list_position_detail_from_order->end(); itor++) {
 		if (!strcmp((*itor)->TradingDay, this->getStgTradingDay().c_str())) // 交易日相同,今仓
@@ -1212,6 +1232,9 @@ void Strategy::calPosition() {
 	this->stg_position_b_buy = this->stg_position_b_buy_today + this->stg_position_b_buy_yesterday;
 	this->stg_position_b_sell = this->stg_position_b_sell_today + this->stg_position_b_sell_yesterday;
 	this->stg_position = this->stg_position_b_buy + this->stg_position_b_sell;
+
+	// 释放信号量,信号量V操作
+	sem_post(&(this->sem_list_position_detail_order));
 }
 
 /// 更新策略
@@ -2102,7 +2125,11 @@ void Strategy::add_position_detail(USER_CThostFtdcOrderField *posd) {
 	/*USER_CThostFtdcOrderField *new_order = new USER_CThostFtdcOrderField();
 	memset(new_order, 0, sizeof(USER_CThostFtdcOrderField));
 	this->CopyPositionData(posd, new_order);*/
+	// 当有其他地方调用持仓明细,阻塞,信号量P操作
+	sem_wait(&(this->sem_list_position_detail_order));
 	this->stg_list_position_detail_from_order->push_back(posd);
+	// 释放信号量,信号量V操作
+	sem_post(&(this->sem_list_position_detail_order));
 }
 
 //void Strategy::CopyPositionData(PositionDetail *posd, USER_CThostFtdcOrderField *order) {
@@ -2292,6 +2319,10 @@ bool Strategy::getStgIsPositionRight() {
 void Strategy::clearStgPositionDetail() {
 	this->getStgUser()->getXtsLogger()->info("Strategy::clearStgPositionDetail()");
 	list<USER_CThostFtdcOrderField *>::iterator order_itor;
+
+	// 当有其他地方调用持仓明细,阻塞,信号量P操作
+	sem_wait(&(this->sem_list_position_detail_order));
+
 	for (order_itor = this->stg_list_position_detail_from_order->begin();
 		order_itor != this->stg_list_position_detail_from_order->end();)
 	{
@@ -2301,6 +2332,13 @@ void Strategy::clearStgPositionDetail() {
 		this->getStgUser()->getXtsLogger()->info("Strategy::clearStgPositionDetail() after delete order");
 	}
 
+	// 释放信号量,信号量V操作
+	sem_post(&(this->sem_list_position_detail_order));
+
+
+	// 当有其他地方调用持仓明细,阻塞,信号量P操作
+	sem_wait(&(this->sem_list_position_detail_trade));
+
 	list<USER_CThostFtdcTradeField *>::iterator trade_itor;
 	for (trade_itor = this->stg_list_position_detail_from_trade->begin(); trade_itor != this->stg_list_position_detail_from_trade->end();) {
 		this->getStgUser()->getXtsLogger()->info("Strategy::clearStgPositionDetail() before delete trade");
@@ -2308,6 +2346,9 @@ void Strategy::clearStgPositionDetail() {
 		trade_itor = this->stg_list_position_detail_from_trade->erase(trade_itor);
 		this->getStgUser()->getXtsLogger()->info("Strategy::clearStgPositionDetail() after delete trade");
 	}
+
+	// 释放信号量,信号量V操作
+	sem_post(&(this->sem_list_position_detail_trade));
 
 }
 
@@ -4033,11 +4074,19 @@ void Strategy::update_position_detail(USER_CThostFtdcTradeField *pTrade) {
 		memset(new_trade, 0, sizeof(USER_CThostFtdcTradeField));
 		this->CopyNewTradeData(new_trade, pTrade);
 
+		// 当有其他地方调用持仓明细,阻塞,信号量P操作
+		sem_wait(&(this->sem_list_position_detail_trade));
 		this->stg_list_position_detail_from_trade->push_back(new_trade);
+		// 释放信号量,信号量V操作
+		sem_post(&(this->sem_list_position_detail_trade));
 
 	}
 	else if (pTrade->OffsetFlag == '3') { //pTrade中"OffsetFlag"值 = "3"为平今
 		list<USER_CThostFtdcTradeField *>::iterator itor;
+
+		// 当有其他地方调用持仓明细,阻塞,信号量P操作
+		sem_wait(&(this->sem_list_position_detail_trade));
+
 		for (itor = this->stg_list_position_detail_from_trade->begin(); itor != this->stg_list_position_detail_from_trade->end();) {
 
 			USER_PRINT((*itor)->TradeDate);
@@ -4078,9 +4127,17 @@ void Strategy::update_position_detail(USER_CThostFtdcTradeField *pTrade) {
 				itor++;
 			}
 		}
+
+		// 释放信号量,信号量V操作
+		sem_post(&(this->sem_list_position_detail_trade));
+
 	}
 	else if (pTrade->OffsetFlag == '4') { //pTrade中"OffsetFlag"值 = "4"为平昨
 		list<USER_CThostFtdcTradeField *>::iterator itor;
+
+		// 当有其他地方调用持仓明细,阻塞,信号量P操作
+		sem_wait(&(this->sem_list_position_detail_trade));
+
 		for (itor = this->stg_list_position_detail_from_trade->begin(); itor != this->stg_list_position_detail_from_trade->end();) {
 			if ((strcmp((*itor)->TradingDay, pTrade->TradingDay)) &&
 				(!strcmp((*itor)->InstrumentID, pTrade->InstrumentID)) &&
@@ -4108,6 +4165,9 @@ void Strategy::update_position_detail(USER_CThostFtdcTradeField *pTrade) {
 				itor++;
 			}
 		}
+
+		// 释放信号量,信号量V操作
+		sem_post(&(this->sem_list_position_detail_trade));
 	}
 
 	USER_PRINT("Strategy::update_position_detail out");
@@ -4148,13 +4208,20 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 		memset(new_order, 0, sizeof(USER_CThostFtdcOrderField));
 		this->CopyNewOrderData(new_order, pOrder);
 		USER_PRINT(new_order);
-
+		// 当有其他地方调用持仓明细,阻塞,信号量P操作
+		sem_wait(&(this->sem_list_position_detail_order));
 		this->stg_list_position_detail_from_order->push_back(new_order);
+		// 释放信号量,信号量V操作
+		sem_post(&(this->sem_list_position_detail_order));
 		USER_PRINT("pOrder->CombOffsetFlag[0] == 0 away");
 	} 
 	else if (pOrder->CombOffsetFlag[0] == '3') { // 平今
 		USER_PRINT("平今in");
 		list<USER_CThostFtdcOrderField *>::iterator itor;
+
+		// 当有其他地方调用持仓明细,阻塞,信号量P操作
+		sem_wait(&(this->sem_list_position_detail_order));
+
 		for (itor = this->stg_list_position_detail_from_order->begin(); 
 			itor != this->stg_list_position_detail_from_order->end();)
 		{
@@ -4177,8 +4244,6 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 				&& ((*itor)->Direction != pOrder->Direction)) { // 日期,合约代码,投保标志相同
 
 				if (pOrder->VolumeTradedBatch == (*itor)->VolumeTradedBatch) { // order_new的VolumeTradedBatch等于持仓列表首个满足条件的order的VolumeTradedBatch
-					USER_PRINT("order_new的VolumeTradedBatch等于持仓列表首个满足条件的order的VolumeTradedBatch");
-					USER_PRINT((*itor));
 					delete *itor;
 					USER_PRINT("delete itor");
 					itor = this->stg_list_position_detail_from_order->erase(itor);
@@ -4199,11 +4264,19 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 				itor++;
 			}
 		}
+
+		// 释放信号量,信号量V操作
+		sem_post(&(this->sem_list_position_detail_order));
+
 		USER_PRINT("平今out");
 	}
 	else if (pOrder->CombOffsetFlag[0] == '4') // 平昨
 	{
 		list<USER_CThostFtdcOrderField *>::iterator itor;
+
+		// 当有其他地方调用持仓明细,阻塞,信号量P操作
+		sem_wait(&(this->sem_list_position_detail_order));
+
 		for (itor = this->stg_list_position_detail_from_order->begin();
 			itor != this->stg_list_position_detail_from_order->end();)
 		{
@@ -4246,6 +4319,10 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 				itor++;
 			}
 		}
+
+		// 释放信号量,信号量V操作
+		sem_post(&(this->sem_list_position_detail_order));
+
 	}
 
 	USER_PRINT("Strategy::update_position_detail out");
