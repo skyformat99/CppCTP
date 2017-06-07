@@ -2076,12 +2076,19 @@ void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcR
 				this->current_user->getXtsLogger()->info("TdSpi::OnRspOrderInsert() UserID = {} OrderRef = {} strategyid = {}", this->current_user->getUserID(), pInputOrder->OrderRef, strategyid);
 
 				list<Strategy *>::iterator itor;
+
+				// 当有其他地方调用策略列表,阻塞,信号量P操作
+				sem_wait((this->ctp_m->getSem_strategy_handler()));
+
 				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 					if ((*itor)->getStgStrategyId() == strategyid) {
 						(*itor)->OnRspOrderInsert(pInputOrder);
 						//break;
 					}
 				}
+
+				// 当有其他地方调用策略列表,阻塞,信号量P操作
+				sem_post((this->ctp_m->getSem_strategy_handler()));
 
 			}
 		}
@@ -2248,6 +2255,10 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 			strategyid = temp.substr(len_order_ref - 2, 2);
 			//std::cout << "\t回报策略编号 = " << strategyid << std::endl;
 			list<Strategy *>::iterator itor;
+
+			// 当有其他地方调用策略列表,阻塞,信号量P操作
+			sem_wait((this->ctp_m->getSem_strategy_handler()));
+
 			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 				//std::cout << "\t系统策略编号 = " << (*itor)->getStgStrategyId() << std::endl;
 				if ((*itor)->getStgStrategyId() == strategyid) {
@@ -2255,6 +2266,9 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 					//break;
 				}
 			}
+
+			// 当有其他地方调用策略列表,阻塞,信号量P操作
+			sem_post((this->ctp_m->getSem_strategy_handler()));
 		}
 
 	} else {
@@ -2349,6 +2363,10 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 			strategyid = temp.substr(len_order_ref - 2, 2);
 			//std::cout << "\t回报策略编号 = " << strategyid << std::endl;
 			list<Strategy *>::iterator itor;
+
+			// 当有其他地方调用策略列表,阻塞,信号量P操作
+			sem_wait((this->ctp_m->getSem_strategy_handler()));
+
 			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 				//std::cout << "\t系统策略编号 = " << (*itor)->getStgStrategyId() << std::endl;
 				if ((*itor)->getStgStrategyId() == strategyid) {
@@ -2356,6 +2374,9 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 					//break;
 				}
 			}
+
+			// 释放信号量,信号量V操作
+			sem_post((this->ctp_m->getSem_strategy_handler()));
 		}
 	}
 }
@@ -2376,12 +2397,19 @@ void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFt
 				strategyid = temp.substr(len_order_ref - 2, 2);
 				this->current_user->getXtsLogger()->info("TdSpi::OnErrRtnOrderInsert() UserID = {} OrderRef = {} strategyid = {}", this->current_user->getUserID(), pInputOrder->OrderRef, strategyid);
 				list<Strategy *>::iterator itor;
+				// 当有其他地方调用策略列表,阻塞,信号量P操作
+				sem_wait((this->ctp_m->getSem_strategy_handler()));
+
 				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 					if ((*itor)->getStgStrategyId() == strategyid) {
 						(*itor)->OnErrRtnOrderInsert(pInputOrder);
 						//break;
 					}
 				}
+
+				// 当有其他地方调用策略列表,阻塞,信号量P操作
+				sem_post((this->ctp_m->getSem_strategy_handler()));
+
 			}
 		}
 	}
@@ -2426,12 +2454,19 @@ void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction,
 				strategyid = temp.substr(len_order_ref - 2, 2);
 				this->current_user->getXtsLogger()->info("TdSpi::OnRspOrderAction() UserID = {} OrderRef = {} strategyid = {}", this->current_user->getUserID(), pInputOrderAction->OrderRef, strategyid);
 				list<Strategy *>::iterator itor;
+
+				// 当有其他地方调用策略列表,阻塞,信号量P操作
+				sem_wait((this->ctp_m->getSem_strategy_handler()));
+
 				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 					if ((*itor)->getStgStrategyId() == strategyid) {
 						(*itor)->OnRspOrderAction(pInputOrderAction);
 						//break;
 					}
 				}
+
+				// 当有其他地方调用策略列表,阻塞,信号量P操作
+				sem_post((this->ctp_m->getSem_strategy_handler()));
 			}
 		}
 	}
@@ -2456,12 +2491,19 @@ void TdSpi::OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction, CThost
 				strategyid = temp.substr(len_order_ref - 2, 2);
 				this->current_user->getXtsLogger()->info("TdSpi::OnErrRtnOrderAction() UserID = {} OrderRef = {} strategyid = {}", this->current_user->getUserID(), pOrderAction->OrderRef, strategyid);
 				list<Strategy *>::iterator itor;
+
+				// 当有其他地方调用策略列表,阻塞,信号量P操作
+				sem_wait((this->ctp_m->getSem_strategy_handler()));
+
 				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 					if ((*itor)->getStgStrategyId() == strategyid) {
 						(*itor)->OnErrRtnOrderAction(pOrderAction);
 						//break;
 					}
 				}
+
+				// 当有其他地方调用策略列表,阻塞,信号量P操作
+				sem_post((this->ctp_m->getSem_strategy_handler()));
 			}
 			else {
 				

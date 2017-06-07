@@ -461,11 +461,18 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
 	//}
 
 	list<Strategy *>::iterator itor;
+
+	// 当有其他地方调用策略列表,阻塞,信号量P操作
+	sem_wait((this->ctp_m->getSem_strategy_handler()));
+
 	for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 		USER_PRINT(((*itor)));
 		//std::cout << "\tcount = " << count++ << std::endl;
 		(*itor)->OnRtnDepthMarketData(pDepthMarketData);
 	}
+
+	// 释放信号量,信号量V操作
+	sem_post((this->ctp_m->getSem_strategy_handler()));
 
 	//cout << "===========================================" << endl;
 	USER_PRINT("MdSpi::OnRtnDepthMarketData OUT");
