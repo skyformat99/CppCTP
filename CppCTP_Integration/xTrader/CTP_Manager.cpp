@@ -5573,19 +5573,22 @@ void CTP_Manager::delSocketFD(string user_id, int fd) {
 	map<string, list<int> *>::iterator m_itor;
 	m_itor = this->m_socket_fds.find(user_id);
 	if (m_itor == (this->m_socket_fds.end())) {
-		std::cout << "m_socket_fds 未找到 该期货账户 = " << user_id << std::endl;
+		//std::cout << "m_socket_fds 未找到 该期货账户 = " << user_id << std::endl;
 		// this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0));
 		// this->init_instrument_id_action_counter(string(pOrder->InstrumentID));
 		//return 0;
 	}
 	else {
-		std::cout << "m_socket_fds 找到 该期货账户 = " << user_id << std::endl;
-		/// 遍历该交易员的list集合，如果存在该fd，直接跳过，不存在直接存入
+		//std::cout << "m_socket_fds 找到 该期货账户 = " << user_id << std::endl;
+		/// 遍历该交易员的list集合，如果存在该fd，删除
 		list<int>::iterator int_itor;
-		for (int_itor = m_itor->second->begin(); int_itor != m_itor->second->end(); int_itor++)
+		for (int_itor = m_itor->second->begin(); int_itor != m_itor->second->end();)
 		{
 			if ((*int_itor) == fd) {
 				int_itor = m_itor->second->erase(int_itor);
+			}
+			else {
+				int_itor++;
 			}
 		}
 	}
@@ -5692,18 +5695,14 @@ void CTP_Manager::sendTradeOffLineMessage(string user_id, int on_off_status) {
 
 			std::cout << "CTP_Manager::sendTradeOffLineMessage() message = " << buffer.GetString() << std::endl;
 
-			list<int>::iterator int_itor;
-			for (int_itor = m_itor->second->begin(); int_itor != m_itor->second->end(); int_itor++)
-			{
-				if (write_msg((*int_itor), const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
-					printf("先前客户端已断开!!!\n");
-					//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
-					if (errno == EPIPE) {
-						//std::cout << "\tEPIPE" << std::endl;
-						//break;
-					}
-					perror("\tprotocal error");
+			if (write_msg((*int_itor), const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
+				printf("先前客户端已断开!!!\n");
+				//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
+				if (errno == EPIPE) {
+					//std::cout << "\tEPIPE" << std::endl;
+					//break;
 				}
+				perror("\tprotocal error");
 			}
 		}
 	}

@@ -43,9 +43,6 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 	this->l_position_detail_from_local_trade = new list<USER_INSTRUMENT_POSITION *>();
 	this->thread_init_status = false;
 
-	
-
-
 	try {
 		this->xts_user_logger = spdlog::get("xts_async_" + UserID + "_logger");
 		if (!this->xts_user_logger)
@@ -70,6 +67,12 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 		this->xts_user_logger->flush();
 		exit(1);
 	}
+
+
+	std::thread thread_order_insert(&User::thread_queue_OrderInsert, this);
+
+	thread_order_insert.detach();
+
 }
 
 User::User(string BrokerID, string UserID, int nRequestID, string stg_order_ref_base) {
@@ -106,6 +109,13 @@ User::User(string BrokerID, string UserID, int nRequestID, string stg_order_ref_
 	catch (const spdlog::spdlog_ex& ex) {
 		Utils::printRedColor("Log初始化失败,错误!");
 		Utils::printRedColor(ex.what());
+		exit(1);
+	}
+
+	// 同一时间只能有一个线程调用持仓明细(避免带来空指针错误)
+	if (sem_init(&(this->sem_get_order_ref), 0, 1) != 0) {
+		this->xts_user_logger->info("User::User() sem_get_order_ref init failed!");
+		this->xts_user_logger->flush();
 		exit(1);
 	}
 }
@@ -390,17 +400,25 @@ void User::setStgOrderRefBase(long long stg_order_ref_base) {
 	this->stg_order_ref_base = stg_order_ref_base;
 }
 
-long long User::getStgOrderRefBase() {
+void User::OrderInsert(CThostFtdcInputOrderField *insert_order, string strategy_id) {
 
 	// 当有其他地方调用操作报单引用,阻塞,信号量P操作
 	sem_wait(&(this->sem_get_order_ref));
 
 	this->stg_order_ref_base += 1;
+	string order_ref_base = std::to_string(this->stg_order_ref_base) + strategy_id;
+	strcpy(insert_order->OrderRef, order_ref_base.c_str());
+
+	this->getXtsLogger()->info("User::OrderInsert() 报单参数 OrderRef = {} InstrumentID = {} LimitPrice = {} VolumeTotalOriginal = {} Direction = {} CombOffsetFlag = {} CombHedgeFlag = {}",
+		insert_order->OrderRef, insert_order->InstrumentID, insert_order->LimitPrice, insert_order->VolumeTotalOriginal, insert_order->Direction,
+		insert_order->CombOffsetFlag[0], insert_order->CombHedgeFlag[0]);
+
+	this->getUserTradeSPI()->OrderInsert(this, insert_order);
 
 	// 释放信号量,信号量V操作
 	sem_post(&(this->sem_get_order_ref));
 
-	return this->stg_order_ref_base;
+	
 }
 
 /// 设置策略内合约最小跳价格
@@ -1708,6 +1726,11 @@ void User::QueryTrade() {
 
 void User::QueryOrder() {
 	this->UserTradeSPI->QryOrder();
+}
+
+// order_insert回调队列
+void User::thread_queue_OrderInsert() {
+	
 }
 
 /// 得到数据库操作对象

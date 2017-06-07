@@ -282,7 +282,7 @@ public:
 	void Order_Algorithm_Three();
 
 	/// 生成报单引用
-	string Generate_Order_Ref();
+	void Generate_Order_Ref(CThostFtdcInputOrderField *insert_order);
 
 	/// 执行任务函数
 	void Exec_OrderInsert(CThostFtdcInputOrderField *insert_order);			// 报单

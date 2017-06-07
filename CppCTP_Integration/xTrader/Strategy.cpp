@@ -3154,7 +3154,7 @@ void Strategy::Order_Algorithm_Three() {
 }
 
 /// 生成报单引用
-string Strategy::Generate_Order_Ref() {
+void Strategy::Generate_Order_Ref(CThostFtdcInputOrderField *insert_order) {
 
 	/*std::stringstream strstream;
 	std::string number;
@@ -3162,24 +3162,14 @@ string Strategy::Generate_Order_Ref() {
 	strstream >> number;
 	string order_ref_base = number + this->stg_strategy_id;*/
 
-	// 当有其他地方调用报单引用,阻塞,信号量P操作
-	sem_wait(&(this->sem_generate_order_ref));
-
-	//this->stg_user->setStgOrderRefBase(this->stg_user->getStgOrderRefBase() + 1);
-	this->stg_order_ref_base = this->stg_user->getStgOrderRefBase(); // 更新基准数
-	string order_ref_base = std::to_string(this->stg_order_ref_base) + this->stg_strategy_id;
-
-	//USER_PRINT("Generate_Order_Ref");
-	//USER_PRINT(order_ref_base);
+	this->stg_user->OrderInsert(insert_order, this->stg_strategy_id); // 更新基准数
 
 	//stringstream strValue;
 	//strValue << order_ref_base;
 	//strValue << this->stg_order_ref_base; // 更新
 
-	// 释放信号量,信号量V操作
-	sem_post(&(this->sem_generate_order_ref));
 
-	return order_ref_base;
+
 }
 
 
@@ -3197,15 +3187,7 @@ void Strategy::Exec_OrderInsert(CThostFtdcInputOrderField *insert_order) {
 	// 当有其他地方调用报单插入,阻塞,信号量P操作
 	sem_wait(&(this->sem_order_insert));
 
-	// 报单引用
-	this->stg_order_ref_last = this->Generate_Order_Ref();
-	strcpy(insert_order->OrderRef, this->stg_order_ref_last.c_str());
-
-	this->getStgUser()->getXtsLogger()->info("Strategy::Exec_OrderInsert() OrderRef = {} InstrumentID = {} LimitPrice = {} VolumeTotalOriginal = {} Direction = {} CombOffsetFlag = {} CombHedgeFlag = {}",
-		insert_order->OrderRef, insert_order->InstrumentID, insert_order->LimitPrice, insert_order->VolumeTotalOriginal, insert_order->Direction,
-		insert_order->CombOffsetFlag[0], insert_order->CombHedgeFlag[0]);
-	//下单操作
-	this->stg_user->getUserTradeSPI()->OrderInsert(this->stg_user, insert_order);
+	this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
 
 	// 释放信号量,信号量V操作
 	sem_post(&(this->sem_order_insert));

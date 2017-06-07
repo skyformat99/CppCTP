@@ -14,6 +14,7 @@
 #include "CTP_Manager.h"
 #include "Session.h"
 #include "xTradeStruct.h"
+#include "concurrentqueue/blockingconcurrentqueue.h"
 #include <spdlog/spdlog.h>
 using namespace spdlog;
 using spdlog::logger;
@@ -23,6 +24,7 @@ using namespace std;
 using std::string;
 using mongo::DBClientConnection;
 using mongo::BSONObjBuilder;
+using namespace moodycamel;
 
 class CTP_Manager;
 class Session;
@@ -89,7 +91,7 @@ public:
 
 	/// 报单引用基准
 	void setStgOrderRefBase(long long stg_order_ref_base);
-	long long getStgOrderRefBase();
+	void OrderInsert(CThostFtdcInputOrderField *insert_order, string strategy_id);
 
 	/// 设置策略内合约最小跳价格
 	void setStgInstrumnetPriceTick();
@@ -153,6 +155,9 @@ public:
 
 	void QueryOrder();
 
+	// order_insert回调队列
+	void thread_queue_OrderInsert();
+
 	/// 得到数据库操作对象
 	DBManager *getDBManager();
 	void setDBManager(DBManager *dbm);
@@ -203,6 +208,10 @@ private:
 	bool thread_init_status;
 	std::shared_ptr<spdlog::logger> xts_user_logger;
 	sem_t sem_get_order_ref;					// 信号量,用来保证同一时间只能一处地方操作报单引用
+
+	// 阻塞队列
+	moodycamel::BlockingConcurrentQueue<CThostFtdcDepthMarketDataField *> queue_OrderInsert;	// 行情队列
+
 };
 
 #endif

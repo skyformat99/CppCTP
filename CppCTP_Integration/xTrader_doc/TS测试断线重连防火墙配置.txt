@@ -1,0 +1,52 @@
+#打开27017,8888端口
+iptables -I INPUT -p tcp --dport 27017 -j ACCEPT
+iptables -I INPUT -p tcp --dport 8888 -j ACCEPT
+service iptables save
+service iptables status
+service iptables restart
+
+
+#屏蔽某ip
+iptables -I INPUT -s 180.168.146.187 -j DROP
+service iptables save  
+service iptables status
+service iptables restart
+
+
+#解封某ip
+iptables -D INPUT -s 180.168.146.187 -j DROP
+service iptables save  
+service iptables status
+service iptables restart
+
+
+#禁止行情端口
+iptables -I INPUT -p tcp --dport 10011 -j DROP
+iptables -I OUTPUT -p tcp --dport 10011 -j DROP
+service iptables save  
+service iptables status
+service iptables restart
+
+#允许行情端口
+iptables -I INPUT -p tcp --dport 10011 -j ACCEPT
+iptables -I OUTPUT -p tcp --dport 10011 -j ACCEPT
+service iptables save  
+service iptables status
+service iptables restart
+
+
+#禁止交易端口
+iptables -I INPUT -p tcp --dport 10000 -j DROP
+iptables -I OUTPUT -p tcp --dport 10000 -j DROP
+service iptables save  
+service iptables status
+service iptables restart
+
+#允许交易端口
+iptables -I INPUT -p tcp --dport 10000 -j ACCEPT
+iptables -I OUTPUT -p tcp --dport 10000 -j ACCEPT
+service iptables save  
+service iptables status
+service iptables restart
+
+
