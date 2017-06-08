@@ -25,7 +25,7 @@ using mongo::ConnectException;
 #define DB_POSITIONDETAIL_ORDER_CHANGED_COLLECTION	"CTP.positiondetail_changed"
 #define DB_POSITIONDETAIL_TRADE_CHANGED_COLLECTION	"CTP.positiondetail_trade_changed"
 
-Strategy::Strategy(User *stg_user) {
+Strategy::Strategy(bool fake, User *stg_user) {
 
 	this->on_off = 0;						//开关	
 	this->on_off_end_task = false;			//收盘任务默认允许执行
@@ -151,14 +151,18 @@ Strategy::Strategy(User *stg_user) {
 		exit(1);
 	}
 	
-	// 创建三个线程,分别处理tick, OnRtnOrder, OnRtnTrade
-	std::thread thread_tick(&Strategy::thread_queue_OnRtnDepthMarketData, this);
-	std::thread thread_order(&Strategy::thread_queue_OnRtnOrder, this);
-	std::thread thread_trade(&Strategy::thread_queue_OnRtnTrade, this);
-	// 线程分离
-	thread_tick.detach();
-	thread_order.detach();
-	thread_trade.detach();
+	if (fake == false)
+	{
+		// 创建三个线程,分别处理tick, OnRtnOrder, OnRtnTrade
+		std::thread thread_tick(&Strategy::thread_queue_OnRtnDepthMarketData, this);
+		std::thread thread_order(&Strategy::thread_queue_OnRtnOrder, this);
+		std::thread thread_trade(&Strategy::thread_queue_OnRtnTrade, this);
+		// 线程分离
+		thread_tick.detach();
+		thread_order.detach();
+		thread_trade.detach();
+	}
+
 }
 
 
@@ -2187,6 +2191,10 @@ void Strategy::printStrategyInfo(string message) {
 	this->getStgUser()->getXtsLogger()->info("\t策略开关:{}", this->getOn_Off());
 	this->getStgUser()->getXtsLogger()->info("\tA合约撤单次数:{}, A合约撤单限制:{}", this->getStgAOrderActionCount(), this->getStgAOrderActionTiresLimit());
 	this->getStgUser()->getXtsLogger()->info("\tB合约撤单次数:{}, B合约撤单限制:{}", this->getStgBOrderActionCount(), this->getStgBOrderActionTiresLimit());
+
+	this->getStgUser()->getXtsLogger()->info("\t卖开价差:{}, 买平价差:{}", this->stg_sell_open, this->stg_buy_close);
+	this->getStgUser()->getXtsLogger()->info("\t买开价差:{}, 卖平价差:{}", this->stg_buy_open, this->stg_sell_close);
+
 	this->getStgUser()->getXtsLogger()->info("\tA总卖:{}, A昨卖:{}", this->stg_position_a_sell, this->stg_position_a_sell_yesterday);
 	this->getStgUser()->getXtsLogger()->info("\tB总买:{}, B昨买:{}", this->stg_position_b_buy, this->stg_position_b_buy_yesterday);
 	this->getStgUser()->getXtsLogger()->info("\tA总买:{}, A昨买:{}", this->stg_position_a_buy, this->stg_position_a_buy_yesterday);
@@ -2533,6 +2541,13 @@ void Strategy::thread_queue_OnRtnDepthMarketData() {
 		//this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnDepthMarketData()");
 		//this->getStgUser()->getXtsLogger()->info("\t期货账号 = {}, 策略id = {}, 合约id = {}, 接收tick时间 = {}", this->getStgUserId(), this->getStgStrategyId(), pDepthMarketData_tmp->InstrumentID, pDepthMarketData_tmp->UpdateTime);
 
+		//删除策略调用
+		if (pDepthMarketData_tmp == NULL)
+		{
+			break;
+		}
+
+
 		//执行tick处理
 		if (!strcmp(pDepthMarketData_tmp->InstrumentID, this->getStgInstrumentIdA().c_str())) {
 			this->CopyTickData(stg_instrument_A_tick, pDepthMarketData_tmp);
@@ -2601,6 +2616,8 @@ void Strategy::thread_queue_OnRtnDepthMarketData() {
 		delete pDepthMarketData_tmp;
 		pDepthMarketData_tmp = NULL;
 	}
+
+	this->queue_OnRtnDepthMarketData_on_off = false;
 }
 
 //选择下单算法
@@ -3221,6 +3238,12 @@ void Strategy::thread_queue_OnRtnOrder() {
 		//执行order处理
 		this->queue_OnRtnOrder.wait_dequeue(pOrder);
 
+		//删除策略调用
+		if (pOrder == NULL)
+		{
+			break;
+		}
+
 		string compare_date = pOrder->InsertDate; //报单日期
 		string compare_time = pOrder->InsertTime; //报单时间
 		// 如果pOrder的时间在修改持仓之前 return
@@ -3339,6 +3362,7 @@ void Strategy::thread_queue_OnRtnOrder() {
 		delete pOrder;
 		pOrder = NULL;
 	}
+	this->queue_OnRtnOrder_on_off = false;
 }
 
 // 成交回报
@@ -3346,6 +3370,23 @@ void Strategy::ExEc_OnRtnTrade(CThostFtdcTradeField *pTrade) {
 	CThostFtdcTradeField *pTrade_tmp = new CThostFtdcTradeField();
 	this->CopyTradeData(pTrade_tmp, pTrade);
 	this->queue_OnRtnTrade.enqueue(pTrade_tmp);
+}
+
+// 停止线程
+void Strategy::end_thread() {
+	this->queue_OnRtnDepthMarketData.enqueue(NULL);
+	this->queue_OnRtnOrder.enqueue(NULL);
+	this->queue_OnRtnTrade.enqueue(NULL);
+}
+
+// 获取停止线程状态
+bool Strategy::getEndThreadStatus() {
+	bool flag = false;
+	if (this->queue_OnRtnDepthMarketData_on_off && this->queue_OnRtnOrder_on_off && this->queue_OnRtnTrade_on_off)
+	{
+		flag = true;
+	}
+	return flag;
 }
 
 // trade回调队列处理
@@ -3356,6 +3397,12 @@ void Strategy::thread_queue_OnRtnTrade() {
 		CThostFtdcTradeField *pTrade = NULL;
 
 		this->queue_OnRtnTrade.wait_dequeue(pTrade);
+
+		//删除策略调用
+		if (pTrade == NULL)
+		{
+			break;
+		}
 
 		/*1:更新持仓明细*/
 		string compare_date = pTrade->TradeDate; //报单日期
@@ -3375,6 +3422,7 @@ void Strategy::thread_queue_OnRtnTrade() {
 		delete pTrade;
 		pTrade = NULL;
 	}
+	this->queue_OnRtnTrade_on_off = false;
 }
 
 // 行情队列开关

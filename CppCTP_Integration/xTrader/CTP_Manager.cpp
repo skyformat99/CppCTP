@@ -1129,8 +1129,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 
 	
 	list<Strategy *> l_strategys;
-	ctp_m->getDBManager()->getAllStrategyByActiveUser(&l_strategys, ctp_m->getL_User(), s_TraderID);
-
+	ctp_m->getDBManager()->getAllStrategyByActiveUser(true, &l_strategys, ctp_m->getL_User(), s_TraderID);
 
 	if (l_strategys.size() > 0)
 	{
@@ -2226,7 +2225,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//ctp_m->getDBManager()->getAllStrategyByActiveUser(&l_strategys, ctp_m->getL_User(), s_TraderID);
 
 				list<Strategy *> l_strategys;
-				ctp_m->getDBManager()->getAllStrategyByActiveUser(&l_strategys, ctp_m->getL_User(), s_TraderID);
+				ctp_m->getDBManager()->getAllStrategyByActiveUser(true, &l_strategys, ctp_m->getL_User(), s_TraderID);
 
 				if (l_strategys.size() > 0)
 				{
@@ -2525,7 +2524,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 			}
 			else if (msgtype == 5) { // 修改Strategy（修改Strategy参数,不带修改持仓信息）
 				ctp_m->getXtsLogger()->info("\t请求策略修改...");
-
+				// 当有其他地方调用策略列表,阻塞,信号量P操作
+				sem_wait((ctp_m->getSem_strategy_handler()));
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
 				rapidjson::Value &MsgRef = doc["MsgRef"];
@@ -2567,8 +2567,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						std::string q_strategy_id = object["strategy_id"].GetString();
 						list<Strategy *>::iterator stg_itor;
 
-						// 当有其他地方调用策略列表,阻塞,信号量P操作
-						sem_wait((ctp_m->getSem_strategy_handler()));
+						
 
 						for (stg_itor = ctp_m->getListStrategy()->begin(); stg_itor != ctp_m->getListStrategy()->end(); stg_itor++) {
 							
@@ -2652,8 +2651,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						}
 
 
-						// 释放信号量,信号量V操作
-						sem_post((ctp_m->getSem_strategy_handler()));
+						
 
 					}
 				}
@@ -2682,9 +2680,16 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					perror("\tprotocal error\n");
 				}
 
+				// 释放信号量,信号量V操作
+				sem_post((ctp_m->getSem_strategy_handler()));
+
 			}
 			else if (msgtype == 6) { // 新建Strategy新建策略
-				std::cout << "\t新建Strategy..." << std::endl;
+				//std::cout << "\t新建Strategy..." << std::endl;
+				ctp_m->getXtsLogger()->info("\t新建Strategy...");
+
+				// 当有其他地方调用策略列表,阻塞,信号量P操作
+				sem_wait((ctp_m->getSem_strategy_handler()));
 
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
@@ -2725,8 +2730,6 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						
 						for (user_itor = ctp_m->getL_User()->begin(); user_itor != ctp_m->getL_User()->end(); user_itor++) { // 遍历User
 
-							USER_PRINT((*user_itor)->getUserID());
-
 							//(*user_itor)->setCTP_Manager(this); //每个user对象设置CTP_Manager对象
 
 							if (object["user_id"].GetString() == (*user_itor)->getUserID()) {
@@ -2736,190 +2739,44 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						}
 
 						if (is_user_exists == true) {
-							USER_PRINT(user_tmp);
-							Strategy *new_stg = new Strategy(user_tmp);
 
-							new_stg->setStgTraderId(object["trader_id"].GetString());
-							new_stg->setStgUserId(object["user_id"].GetString());
-							new_stg->setStgStrategyId(object["strategy_id"].GetString());
-							new_stg->setStgInstrumentIdA(object["a_instrument_id"].GetString());
-							new_stg->setStgInstrumentIdB(object["b_instrument_id"].GetString());
-							new_stg->setStgTradingDay(ctp_m->getTradingDay());
-							// 最新修改时间
-							new_stg->setStgUpdatePositionDetailRecordTime(Utils::getDate());
-							new_stg->setStgIsPositionRight(false);
+							//int flag = ctp_m->getDBManager()->CreateStrategy(new_stg);
+							//int flag1 = ctp_m->getDBManager()->CreateStrategyYesterday(new_stg);
 
-							//new_stg->setStgPositionASellToday(object["position_a_sell_today"].GetInt());
-							//new_stg->setStgPositionBSell(object["position_b_sell"].GetInt());
-							//new_stg->setStgSpreadShift(object["spread_shift"].GetDouble());
-							//new_stg->setStgALimitPriceShift(object["a_limit_price_shift"].GetInt());
-							//new_stg->setStgBLimitPriceShift(object["b_limit_price_shift"].GetInt());
-							//new_stg->setStgPositionBSellToday(object["position_b_sell_today"].GetInt());
-							//new_stg->setStgPositionBBuyToday(object["position_b_buy_today"].GetInt());
-							//new_stg->setStgPositionASell(object["position_a_sell"].GetInt());
-							//new_stg->setStgBuyClose(object["buy_close"].GetDouble());
-							//new_stg->setStgStopLoss(object["stop_loss"].GetDouble());
-							//new_stg->setStgPositionBBuyYesterday(object["position_b_buy_yesterday"].GetInt());
-							////new_stg->setStgIsActive(object["is_active"].GetBool());
-							//new_stg->setStgPositionBSellYesterday(object["position_b_sell_yesterday"].GetInt());
-							//
-							//new_stg->setStgPositionBBuy(object["position_b_buy"].GetInt());
-							//new_stg->setStgLotsBatch(object["lots_batch"].GetInt());
-							//new_stg->setStgPositionABuy(object["position_a_buy"].GetInt());
-							//new_stg->setStgSellOpen(object["sell_open"].GetDouble());
-							//new_stg->setStgOrderAlgorithm(object["order_algorithm"].GetString());
-							//
-							//new_stg->setStgAOrderActionTiresLimit(object["a_order_action_limit"].GetInt());
-							//new_stg->setStgBOrderActionTiresLimit(object["b_order_action_limit"].GetInt());
-							//new_stg->setStgSellClose(object["sell_close"].GetDouble());
-							//new_stg->setStgBuyOpen(object["buy_open"].GetDouble());
-
-
-							/*new_stg->setStgOnlyClose(object["only_close"].GetInt());
-							new_stg->setOn_Off(object["strategy_on_off"].GetInt());
-							new_stg->setStgSellOpenOnOff(object["sell_open_on_off"].GetInt());
-							new_stg->setStgBuyCloseOnOff(object["buy_close_on_off"].GetInt());
-							new_stg->setStgSellCloseOnOff(object["sell_close_on_off"].GetInt());
-							new_stg->setStgBuyOpenOnOff(object["buy_open_on_off"].GetInt());*/
-
-							/*新增字段*/
-							/*new_stg->setStgTradeModel(object["trade_model"].GetString());
-							new_stg->setStgHoldProfit(object["hold_profit"].GetDouble());
-							new_stg->setStgCloseProfit(object["close_profit"].GetDouble());
-							new_stg->setStgCommisstion(object["commission"].GetDouble());
-							new_stg->setStgPosition(object["position"].GetInt());
-							new_stg->setStgPositionBuy(object["position_buy"].GetInt());
-							new_stg->setStgPositionSell(object["position_sell"].GetInt());
-							new_stg->setStgTradeVolume(object["trade_volume"].GetInt());
-							new_stg->setStgAmount(object["amount"].GetDouble());
-							new_stg->setStgAverageShift(object["average_shift"].GetDouble());*/
-
-
-							////遍历list_instrument_id
-							//const Value& info_object = object["list_instrument_id"];
-							//if (info_object.IsArray()) {
-							//	for (int j = 0; j < info_object.Size(); j++) {
-							//		std::string instrument = info_object[j].GetString();
-							//		std::cout << "instrument[" << j << "] = " << instrument << std::endl;
-							//		if (j == 0) {
-							//			new_stg->setStgInstrumentIdA(instrument);
-							//		}
-							//		else if (j == 1) {
-							//			new_stg->setStgInstrumentIdB(instrument);
-							//		}
-							//	}
-							//}
-
-
-							//new_stg->setStgPositionABuyYesterday(object["position_a_buy_yesterday"].GetInt());
-							//
-							//new_stg->setStgPositionABuyToday(object["position_a_buy_today"].GetInt());
-							//new_stg->setStgPositionASellYesterday(object["position_a_sell_yesterday"].GetInt());
-							//new_stg->setStgLots(object["lots"].GetInt());
-							//new_stg->setStgAWaitPriceTick(object["a_wait_price_tick"].GetDouble());
-							//new_stg->setStgBWaitPriceTick(object["b_wait_price_tick"].GetDouble());
-
-							int flag = ctp_m->getDBManager()->CreateStrategy(new_stg);
-							int flag1 = ctp_m->getDBManager()->CreateStrategyYesterday(new_stg);
+							int flag = ctp_m->getDBManager()->CheckStrategyExist(object["strategy_id"].GetString(), object["user_id"].GetString(), ctp_m->getTradingDay());
 
 							if (flag) {
-								std::cout << "Strategy已存在无需新建!" << std::endl;
+								Utils::printRedColor("\tStrategy已存在无需新建!");
 								build_doc.AddMember("MsgResult", 1, allocator);
 								build_doc.AddMember("MsgErrorReason", "策略已存在,不能重复创建!", allocator);
-
-								/*构造内容json*/
-								rapidjson::Value create_info_object(rapidjson::kObjectType);
-								create_info_object.SetObject();
-								create_info_object.AddMember("position_a_sell_today", new_stg->getStgPositionASellToday(), allocator);
-								create_info_object.AddMember("position_b_sell", new_stg->getStgPositionBSell(), allocator);
-								create_info_object.AddMember("spread_shift", new_stg->getStgSpreadShift(), allocator);
-								create_info_object.AddMember("a_limit_price_shift", new_stg->getStgALimitPriceShift(), allocator);
-								create_info_object.AddMember("b_limit_price_shift", new_stg->getStgBLimitPriceShift(), allocator);
-								create_info_object.AddMember("position_b_sell_today", new_stg->getStgPositionBSellToday(), allocator);
-								create_info_object.AddMember("position_b_buy_today", new_stg->getStgPositionBBuyToday(), allocator);
-								create_info_object.AddMember("position_a_sell", new_stg->getStgPositionASell(), allocator);
-								create_info_object.AddMember("buy_close", new_stg->getStgBuyClose(), allocator);
-								create_info_object.AddMember("stop_loss", new_stg->getStgStopLoss(), allocator);
-								create_info_object.AddMember("position_b_buy_yesterday", new_stg->getStgPositionBBuyYesterday(), allocator);
-								//create_info_object.AddMember("is_active", new_stg->isStgIsActive(), allocator);
-								create_info_object.AddMember("position_b_sell_yesterday", new_stg->getStgPositionBSellYesterday(), allocator);
-								create_info_object.AddMember("strategy_id", rapidjson::StringRef(new_stg->getStgStrategyId().c_str()), allocator);
-								create_info_object.AddMember("position_b_buy", new_stg->getStgPositionBBuy(), allocator);
-								create_info_object.AddMember("lots_batch", new_stg->getStgLotsBatch(), allocator);
-								create_info_object.AddMember("position_a_buy", new_stg->getStgPositionABuy(), allocator);
-								create_info_object.AddMember("sell_open", new_stg->getStgSellOpen(), allocator);
-								create_info_object.AddMember("order_algorithm", rapidjson::StringRef(new_stg->getStgOrderAlgorithm().c_str()), allocator);
-								create_info_object.AddMember("trader_id", rapidjson::StringRef(new_stg->getStgTraderId().c_str()), allocator);
-								create_info_object.AddMember("a_order_action_limit", new_stg->getStgAOrderActionTiresLimit(), allocator);
-								create_info_object.AddMember("b_order_action_limit", new_stg->getStgBOrderActionTiresLimit(), allocator);
-								create_info_object.AddMember("sell_close", new_stg->getStgSellClose(), allocator);
-								create_info_object.AddMember("buy_open", new_stg->getStgBuyOpen(), allocator);
-								create_info_object.AddMember("update_position_detail_record_time", rapidjson::StringRef(new_stg->getStgUpdatePositionDetailRecordTime().c_str()), allocator);
-
-
-								create_info_object.AddMember("only_close", new_stg->isStgOnlyClose(), allocator);
-								create_info_object.AddMember("strategy_on_off", new_stg->getOn_Off(), allocator);
-								create_info_object.AddMember("sell_open_on_off", new_stg->getStgSellOpenOnOff(), allocator);
-								create_info_object.AddMember("buy_close_on_off", new_stg->getStgBuyCloseOnOff(), allocator);
-								create_info_object.AddMember("sell_close_on_off", new_stg->getStgSellCloseOnOff(), allocator);
-								create_info_object.AddMember("buy_open_on_off", new_stg->getStgBuyOpenOnOff(), allocator);
-
-
-								create_info_object.AddMember("trade_model", rapidjson::StringRef(new_stg->getStgTradeModel().c_str()), allocator);
-
-								create_info_object.AddMember("hold_profit", new_stg->getStgHoldProfit(), allocator);
-								create_info_object.AddMember("close_profit", new_stg->getStgCloseProfit(), allocator);
-								create_info_object.AddMember("commission", new_stg->getStgCommission(), allocator);
-								create_info_object.AddMember("position", new_stg->getStgPosition(), allocator);
-								create_info_object.AddMember("position_buy", new_stg->getStgPositionBuy(), allocator);
-								create_info_object.AddMember("position_sell", new_stg->getStgPositionSell(), allocator);
-								create_info_object.AddMember("trade_volume", new_stg->getStgTradeVolume(), allocator);
-								create_info_object.AddMember("amount", new_stg->getStgAmount(), allocator);
-								create_info_object.AddMember("average_shift", new_stg->getStgAverageShift(), allocator);
-
-								create_info_object.AddMember("a_instrument_id", rapidjson::StringRef(new_stg->getStgInstrumentIdA().c_str()), allocator);
-								create_info_object.AddMember("b_instrument_id", rapidjson::StringRef(new_stg->getStgInstrumentIdB().c_str()), allocator);
-
-								/*rapidjson::Value instrument_array(rapidjson::kArrayType);
-								for (int j = 0; j < 2; j++) {
-								rapidjson::Value instrument_object(rapidjson::kObjectType);
-								instrument_object.SetObject();
-								if (j == 0) {
-								instrument_object.SetString(rapidjson::StringRef(new_stg->getStgInstrumentIdA().c_str()));
-								}
-								else if (j == 1) {
-								instrument_object.SetString(rapidjson::StringRef(new_stg->getStgInstrumentIdB().c_str()));
-								}
-
-								instrument_array.PushBack(instrument_object, allocator);
-								}
-								create_info_object.AddMember("list_instrument_id", instrument_array, allocator);*/
-								create_info_object.AddMember("position_a_buy_yesterday", new_stg->getStgPositionABuyYesterday(), allocator);
-								create_info_object.AddMember("user_id", rapidjson::StringRef(new_stg->getStgUserId().c_str()), allocator);
-								create_info_object.AddMember("position_a_buy_today", new_stg->getStgPositionABuyToday(), allocator);
-								create_info_object.AddMember("position_a_sell_yesterday", new_stg->getStgPositionASellYesterday(), allocator);
-								create_info_object.AddMember("lots", new_stg->getStgLots(), allocator);
-								create_info_object.AddMember("a_wait_price_tick", new_stg->getStgAWaitPriceTick(), allocator);
-								create_info_object.AddMember("b_wait_price_tick", new_stg->getStgBWaitPriceTick(), allocator);
-
-								create_info_array.PushBack(create_info_object, allocator);
-
-								delete new_stg;
 							}
 							else {
+
+								Strategy *new_stg = new Strategy(false, user_tmp);
+
+								new_stg->setStgTraderId(object["trader_id"].GetString());
+								new_stg->setStgUserId(object["user_id"].GetString());
+								new_stg->setStgStrategyId(object["strategy_id"].GetString());
+								new_stg->setStgInstrumentIdA(object["a_instrument_id"].GetString());
+								new_stg->setStgInstrumentIdB(object["b_instrument_id"].GetString());
+								new_stg->setStgTradingDay(ctp_m->getTradingDay());
+								// 最新修改时间
+								new_stg->setStgUpdatePositionDetailRecordTime(Utils::getDate());
+								new_stg->setStgIsPositionRight(false);
+
+
+								ctp_m->getDBManager()->CreateStrategy(new_stg);
+								ctp_m->getDBManager()->CreateStrategyYesterday(new_stg);
+
 								//std::cout << "Strategy新建完成!" << std::endl;
 								ctp_m->getXtsLogger()->info("Strategy新建完成!");
 
-								// 当有其他地方调用策略列表,阻塞,信号量P操作
-								sem_wait((ctp_m->getSem_strategy_handler()));
-
 								/// 将策略加到维护列表里
 								ctp_m->getListStrategy()->push_back(new_stg);
+								
 								/// 将策略添加到User策略列表里
 								ctp_m->syncStrategyAddToUsers(new_stg);
 
-								// 释放信号量,信号量V操作
-								sem_post((ctp_m->getSem_strategy_handler()));
 
 								/// 订阅合约
 								/// 添加策略的合约到l_instrument
@@ -2928,7 +2785,6 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								/// 订阅合约
 								ctp_m->SubmarketData(ctp_m->getMdSpi(), ctp_m->getL_Instrument());
 
-								std::cout << "CTP_Manager包含策略个数 = " << ctp_m->getListStrategy()->size() << std::endl;
 								build_doc.AddMember("MsgResult", 0, allocator);
 								build_doc.AddMember("MsgErrorReason", "", allocator);
 
@@ -3009,6 +2865,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 								create_info_array.PushBack(create_info_object, allocator);
 							}
+
 						}
 						else
 						{
@@ -3017,6 +2874,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							build_doc.AddMember("MsgErrorReason", "未找到策略对应账户信息!", allocator);
 							break;
 						}
+
 					}
 				}
 				else {
@@ -3041,13 +2899,18 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						std::cout << "\tEPIPE信号" << std::endl;
 						//break;
 					}
-
 					perror("\tprotocal error\n");
 				}
+
+				// 释放信号量,信号量V操作
+				sem_post((ctp_m->getSem_strategy_handler()));
 			}
 			else if (msgtype == 7) { // 删除Strategy
 				//std::cout << "\t删除策略..." << std::endl;
 				ctp_m->getXtsLogger()->info("\t删除策略...");
+
+				// 当有其他地方调用策略列表,阻塞,信号量P操作
+				sem_wait((ctp_m->getSem_strategy_handler()));
 
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
@@ -3082,8 +2945,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//std::cout << "收到要删除的策略ID = " << s_StrategyID << std::endl;
 				ctp_m->getXtsLogger()->info("\t收到要删除的策略ID = {}", s_StrategyID);
 
-				// 当有其他地方调用策略列表,阻塞,信号量P操作
-				sem_wait((ctp_m->getSem_strategy_handler()));
+				
 
 				/*1:进行策略的删除,更新到数据库*/
 				list<Strategy *>::iterator stg_itor;
@@ -3096,15 +2958,15 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						int flag = ctp_m->getDBManager()->DeleteStrategy((*stg_itor));
 						int flag_1 = ctp_m->getDBManager()->DeleteStrategyYesterday((*stg_itor));
 
-						if (flag || flag_1) {
-							std::cout << "\tStrategy未找到删除项!" << std::endl;
+						if (flag) {
+							Utils::printRedColor("Strategy数据库删除失败!");
+							ctp_m->getXtsLogger()->info("Strategy数据库删除失败!");
 							build_doc.AddMember("MsgResult", 1, allocator);
 							build_doc.AddMember("MsgErrorReason", "未找到删除的策略!", allocator);
 						}
 						else {
-							//std::cout << "\tStrategy删除完成!" << std::endl;
-							Utils::printGreenColor("Strategy删除完成!");
-							ctp_m->getXtsLogger()->info("Strategy删除完成!");
+							Utils::printGreenColor("Strategy数据库删除成功!");
+							ctp_m->getXtsLogger()->info("Strategy数据库删除成功!");
 							build_doc.AddMember("MsgResult", 0, allocator);
 							build_doc.AddMember("MsgErrorReason", "", allocator);
 						}
@@ -3114,7 +2976,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						sleep(1);
 						ctp_m->UnSubmarketData(ctp_m->getMdSpi(), (*stg_itor)->getStgInstrumentIdB(), ctp_m->getL_UnsubInstrument());
 
-						//从数据库删除
+						//从数据库删除策略持仓明细(order)
 						list<USER_CThostFtdcOrderField *>::iterator order_itor;
 						for (order_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
 							order_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end();
@@ -3124,6 +2986,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							ctp_m->getDBManager()->DeletePositionDetailYesterday((*order_itor));
 						}
 
+						//从数据库删除策略持仓明细(trade)
 						list<USER_CThostFtdcTradeField *>::iterator trade_itor;
 						for (trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin(); 
 							trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end();
@@ -3132,12 +2995,18 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							ctp_m->getDBManager()->DeletePositionDetailTradeYesterday((*trade_itor));
 						}
 
-						// 析构策略对应的持仓明细(order, trade)
+						// 内存删除策略对应的持仓明细(order, trade)
 						(*stg_itor)->clearStgPositionDetail();
+
+						//// 停止线程
+						//(*stg_itor)->end_thread();
+
+						//Utils::printGreenColor("策略内部线程停止工作...");
 
 						// 删除策略
 						//delete (*stg_itor);
 						stg_itor = ctp_m->getListStrategy()->erase(stg_itor);
+						
 						// 同步删除到User策略列表
 						ctp_m->syncStrategyDeleteToUsers(s_TraderID, s_UserID, s_StrategyID);
 					}
@@ -3147,9 +3016,6 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					}
 				}
 
-				// 释放信号量,信号量V操作
-				sem_post((ctp_m->getSem_strategy_handler()));
-
 				//build_doc.AddMember("Info", create_info_array, allocator);
 				build_doc.AddMember("MsgSrc", i_MsgSrc, allocator);
 				build_doc.AddMember("IsLast", 1, allocator);
@@ -3157,7 +3023,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.Accept(writer);
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+				std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -3169,6 +3035,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 					perror("\tprotocal error\n");
 				}
+
+				// 信号量V操作
+				sem_post((ctp_m->getSem_strategy_handler()));
 			}
 			else if (msgtype == 8) { // 交易员开关
 				std::cout << "\t交易员开关..." << std::endl;
@@ -6033,7 +5902,7 @@ bool CTP_Manager::init(bool is_online) {
 	/// 查询策略
 	//this->dbm->getAllStrategyYesterday(this->l_strategys);
 	//this->dbm->getAllStrategy(this->l_strategys);
-	this->dbm->getAllStrategyByActiveUser(this->l_strategys, this->l_user);
+	this->dbm->getAllStrategyByActiveUser(false, this->l_strategys, this->l_user);
 
 	/// 查询昨仓策略
 	//this->dbm->getAllStrategyYesterday(this->l_strategys_yesterday);
@@ -6132,6 +6001,7 @@ bool CTP_Manager::init(bool is_online) {
 		USER_PRINT("初始化策略，仓位失败...");
 		//std::cout << "\t初始化策略，仓位失败..." << std::endl;
 		Utils::printRedColor("\t初始化策略，仓位失败...");
+		this->getXtsLogger()->flush();
 		init_flag = false;
 		return init_flag;
 	}
@@ -6199,7 +6069,8 @@ bool CTP_Manager::init(bool is_online) {
 			break;
 		}
 
-		sleep(2);
+		// 经测试,最少2秒否则无法确认结算
+		sleep(3);
 	}
 	
 	/// 进行登录检查,把登录失败的user从当前账户列表移出去

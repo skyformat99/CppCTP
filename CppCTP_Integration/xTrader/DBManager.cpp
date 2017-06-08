@@ -755,6 +755,24 @@ void DBManager::getAllFutureAccount(list<User *> *l_user) {
 	this->recycleConn(client);
 }
 
+
+int DBManager::CheckStrategyExist(string strategy_id, string user_id, string trading_day) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
+	std::cout << "DBManager::CheckStrategyExist()" << std::endl;
+	int count_number = 0;
+	int flag = 0;
+
+	count_number = client->count(DB_STRATEGY_COLLECTION,
+		BSON("strategy_id" << (strategy_id.c_str()) << "user_id" << (user_id.c_str()) << "trading_day" << (trading_day.c_str()) << "is_active" << true));
+
+	if (count_number > 0) {
+		std::cout << "\t策略已经存在!!" << std::endl;
+		flag = 1;
+	}
+	return flag;
+}
+
 int DBManager::CreateStrategy(Strategy *stg) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
@@ -1166,7 +1184,7 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 	USER_PRINT("DBManager::getAllStragegy ok");
 }
 
-void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<User *> *l_users, string traderid) {
+void DBManager::getAllStrategyByActiveUser(bool fake, list<Strategy *> *l_strategys, list<User *> *l_users, string traderid) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::getAllStrategyByActiveUser()");
@@ -1194,7 +1212,7 @@ void DBManager::getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<U
 
 		while (cursor->more()) {
 			BSONObj p = cursor->next();
-			Strategy *stg = new Strategy();
+			Strategy *stg = new Strategy(fake);
 			//cout << "\t*position_a_sell_today = " << p.getIntField("position_a_sell_today") << ", ";
 			//cout << "position_b_sell = " << p.getIntField("position_b_sell") << ", ";
 			//cout << "spread_shift = " << p.getField("spread_shift").Double() << ", ";

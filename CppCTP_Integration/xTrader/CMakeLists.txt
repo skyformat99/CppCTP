@@ -7,7 +7,7 @@
     #set compiler for c++ language
 	#-fvisibility=hidden -fvisibility-inlines-hidden -ffunction-sections -fdata-sections
 	#(to solve double free)options  -fvisibility=hidden
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++0x -pthread -lrt -I. -D_GLIBCXX_USE_NANOSLEEP")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fPIC -std=c++0x -pthread -lrt -I. -D_GLIBCXX_USE_NANOSLEEP")
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++0x -pthread -lrt -I. -D_GLIBCXX_USE_NANOSLEEP -Wall -Wshadow -Wextra -pedantic -O2")
 
     #source files(can add source files manually)

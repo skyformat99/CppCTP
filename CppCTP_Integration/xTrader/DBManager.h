@@ -95,13 +95,14 @@ public:
 	   更新策略
 	   查找策略				                                                */
 	/************************************************************************/
+	int CheckStrategyExist(string strategy_id, string user_id, string trading_day);
 	int CreateStrategy(Strategy *stg);
 	int DeleteStrategy(Strategy *stg);
 	void UpdateStrategy(Strategy *stg);
 	int UpdateStrategyOnOff(Strategy *stg);
 	int UpdateStrategyOnlyCloseOnOff(Strategy *stg);
 	void getAllStrategy(list<Strategy *> *l_strategys, string traderid = "", string userid = "");
-	void getAllStrategyByActiveUser(list<Strategy *> *l_strategys, list<User *> *l_users, string traderid = "");
+	void getAllStrategyByActiveUser(bool fake, list<Strategy *> *l_strategys, list<User *> *l_users, string traderid = "");
 
 	/************************************************************************/
 	/* 创建策略(昨仓)

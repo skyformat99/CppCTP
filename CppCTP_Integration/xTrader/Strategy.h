@@ -26,7 +26,7 @@ class Strategy {
 
 public:
 
-	Strategy(User *stg_user=NULL);
+	Strategy(bool fake = true, User *stg_user=NULL);
 
 	void OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData);
 
@@ -497,6 +497,10 @@ public:
 	void thread_queue_OnRtnOrder();
 	// trade回调队列
 	void thread_queue_OnRtnTrade();
+	// 停止线程
+	void end_thread();
+	// 获取停止线程状态
+	bool getEndThreadStatus();
 
 	// 行情队列开关
 	void setQueue_OnRtnDepthMarketData_on_off(bool queue_OnRtnDepthMarketData);
