@@ -3624,7 +3624,7 @@ void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 	
 	this->CopyThreadTickData(pDepthMarketData_tmp, pDepthMarketData);
 	this->queue_OnRtnDepthMarketData.enqueue(pDepthMarketData_tmp);
-	this->getStgUser()->getXtsLogger()->info("Strategy::OnRtnDepthMarketData() queue_OnRtnDepthMarketData.enqueue()");
+	//this->getStgUser()->getXtsLogger()->info("Strategy::OnRtnDepthMarketData() queue_OnRtnDepthMarketData.enqueue()");
 }
 
 // 行情队列处理
@@ -3637,14 +3637,17 @@ void Strategy::thread_queue_OnRtnDepthMarketData() {
 
 		if (this->queue_OnRtnDepthMarketData_on_off == false)
 		{
-			if (!this->queue_OnRtnDepthMarketData.wait_dequeue_timed(pDepthMarketData_tmp, 5000)){
-				break;
-			}
+			break;
 		}
 		else {
-			this->queue_OnRtnDepthMarketData.wait_dequeue(pDepthMarketData_tmp);
+			pDepthMarketData_tmp = this->queue_OnRtnDepthMarketData.dequeue();
 		}
 
+		if (pDepthMarketData_tmp == NULL)
+		{
+			sem_post(&(this->sem_thread_queue_OnRtnDepthMarketData));
+			continue;
+		}
 
 		//this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnDepthMarketData()");
 		//this->getStgUser()->getXtsLogger()->info("\t期货账号 = {}, 策略id = {}, 合约id = {}, 接收tick时间 = {}", this->getStgUserId(), this->getStgStrategyId(), pDepthMarketData_tmp->InstrumentID, pDepthMarketData_tmp->UpdateTime);
@@ -4349,7 +4352,7 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 	this->CopyThreadOrderData(pOrder_tmp, pOrder);
 
 	this->queue_OnRtnOrder.enqueue(pOrder_tmp);
-	this->getStgUser()->getXtsLogger()->info("Strategy::Exec_OnRtnOrder() queue_OnRtnOrder.enqueue()");
+	//this->getStgUser()->getXtsLogger()->info("Strategy::Exec_OnRtnOrder() queue_OnRtnOrder.enqueue()");
 }
 
 // order回调队列处理
@@ -4363,16 +4366,19 @@ void Strategy::thread_queue_OnRtnOrder() {
 
 		if (this->queue_OnRtnOrder_on_off == false)
 		{
-			//执行order处理
-			if (!this->queue_OnRtnOrder.wait_dequeue_timed(pOrder, 5000))
-			{
-				break;
-			}
+			break;
 		}
 		else {
 			//执行order处理
-			this->queue_OnRtnOrder.wait_dequeue(pOrder);
+			pOrder = this->queue_OnRtnOrder.dequeue();
 		}
+
+		if (pOrder == NULL)
+		{
+			sem_post(&(this->sem_thread_queue_OnRtnOrder));
+			continue;
+		}
+
 
 		//删除策略调用
 		if (pOrder->IsLastElement == true)
@@ -4516,7 +4522,7 @@ void Strategy::ExEc_OnRtnTrade(CThostFtdcTradeField *pTrade) {
 
 	this->CopyTradeData(pTrade_tmp, pTrade);
 	this->queue_OnRtnTrade.enqueue(pTrade_tmp);
-	this->getStgUser()->getXtsLogger()->info("Strategy::ExEc_OnRtnTrade() queue_OnRtnTrade.enqueue()");
+	//this->getStgUser()->getXtsLogger()->info("Strategy::ExEc_OnRtnTrade() queue_OnRtnTrade.enqueue()");
 }
 
 // 停止线程
@@ -4557,13 +4563,16 @@ void Strategy::thread_queue_OnRtnTrade() {
 
 		if (this->queue_OnRtnTrade_on_off == false)
 		{
-			if (!this->queue_OnRtnTrade.wait_dequeue_timed(pTrade, 5000))
-			{
-				break;
-			}
+			break;
 		}
 		else {
-			this->queue_OnRtnTrade.wait_dequeue(pTrade);
+			pTrade = this->queue_OnRtnTrade.dequeue();
+		}
+
+		if (pTrade == NULL)
+		{
+			sem_post(&(this->sem_thread_queue_OnRtnTrade));
+			continue;
 		}
 
 

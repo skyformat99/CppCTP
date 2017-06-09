@@ -9,11 +9,12 @@
 #include "Debug.h"
 #include "DBManager.h"
 #include "xTradeStruct.h"
-#include "concurrentqueue/blockingconcurrentqueue.h"
+//#include "concurrentqueue/blockingconcurrentqueue.h"
+#include "safequeue.h"
 #include <spdlog/spdlog.h>
 using namespace spdlog;
 using spdlog::logger;
-using namespace moodycamel;
+//using namespace moodycamel;
 using std::list;
 class DBManager;
 
@@ -647,9 +648,9 @@ private:
 	std::shared_ptr<spdlog::logger> xts_logger;
 
 	// 阻塞队列
-	moodycamel::BlockingConcurrentQueue<THREAD_CThostFtdcDepthMarketDataField *> queue_OnRtnDepthMarketData;	// 行情队列
-	moodycamel::BlockingConcurrentQueue<THREAD_CThostFtdcOrderField *> queue_OnRtnOrder;						// order回调队列
-	moodycamel::BlockingConcurrentQueue<THREAD_CThostFtdcTradeField *> queue_OnRtnTrade;						// trade回调队列
+	SafeQueue<THREAD_CThostFtdcDepthMarketDataField *> queue_OnRtnDepthMarketData;	// 行情队列
+	SafeQueue<THREAD_CThostFtdcOrderField *> queue_OnRtnOrder;						// order回调队列
+	SafeQueue<THREAD_CThostFtdcTradeField *> queue_OnRtnTrade;						// trade回调队列
 
 	bool queue_OnRtnDepthMarketData_on_off; // 行情队列开关
 	bool queue_OnRtnOrder_on_off;			// order回调队列开关

@@ -524,6 +524,9 @@ void CTP_Manager::saveAllStrategyPositionDetail() {
 	list<USER_CThostFtdcOrderField *>::iterator posd_itor;
 	list<USER_CThostFtdcTradeField *>::iterator posd_itor_trade;
 	this->getXtsLogger()->info("CTP_Manager::saveAllStrategyPositionDetail()");
+
+	sem_wait((this->getSem_strategy_handler()));
+
 	for (stg_itor = this->l_strategys->begin();
 		stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
 
@@ -596,6 +599,8 @@ void CTP_Manager::saveAllStrategyPositionDetail() {
 			(*stg_itor)->Update_Position_Trade_Detail_To_DB((*posd_itor_trade));
 		}
 	}
+
+	sem_post((this->getSem_strategy_handler()));
 }
 
 /// 保存一个策略持仓明细

@@ -1875,6 +1875,9 @@ void TdSpi::OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *
 
 //下单
 void TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
+
+	int request_error = 0;
+
 	///经纪公司代码
 	strcpy(pInputOrder->BrokerID, user->getBrokerID().c_str());
 
@@ -1992,10 +1995,27 @@ void TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
 		", CombHedgeFlag:" << pInputOrder->CombHedgeFlag[0] <<
 		std::endl;*/
 
-	this->tdapi->ReqOrderInsert(pInputOrder, 1);
+	request_error = this->tdapi->ReqOrderInsert(pInputOrder, 1);
 
-	USER_PRINT(this->current_user);
-	USER_PRINT(user);
+	/*-1，表示网络连接失败；
+	-2，表示未处理请求超过许可数；
+	-3，表示每秒发送请求数超过许可数*/
+
+	if (request_error == -1)
+	{
+		Utils::printRedColor("TdSpi::OrderInsert() 网络连接失败");
+		// 保存最后策略参数,更新运行状态正常收盘
+		this->ctp_m->saveAllStrategyPositionDetail();
+	}
+	else if (request_error == -2)
+	{
+		Utils::printRedColor("TdSpi::OrderInsert() 未处理请求超过许可数");
+	}
+	else if (request_error == -3)
+	{
+		Utils::printRedColor("TdSpi::OrderInsert() 每秒发送请求数超过许可数");
+	}
+
 	//this->current_user->DB_OrderInsert(this->current_user->GetOrderConn(), pInputOrder);
 
 	// 存储报单参数
@@ -2417,6 +2437,9 @@ void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFt
 
 //撤单
 void TdSpi::OrderAction(char *ExchangeID, char *OrderRef, char *OrderSysID) {
+
+	int request_error = 0;
+
 	CThostFtdcInputOrderActionField pOrderAction;
 	memset(&pOrderAction, 0x00, sizeof(CThostFtdcInputOrderActionField));
 
@@ -2430,7 +2453,22 @@ void TdSpi::OrderAction(char *ExchangeID, char *OrderRef, char *OrderSysID) {
 
 	this->current_user->getXtsLogger()->info("TdSpi::OrderAction() OrderRef = {}", pOrderAction.OrderRef);
 
-	this->tdapi->ReqOrderAction(&pOrderAction, this->getRequestID());
+	request_error = this->tdapi->ReqOrderAction(&pOrderAction, this->getRequestID());
+
+	if (request_error == -1)
+	{
+		Utils::printRedColor("TdSpi::OrderInsert() 网络连接失败");
+		// 保存最后策略参数,更新运行状态正常收盘
+		this->ctp_m->saveAllStrategyPositionDetail();
+	}
+	else if (request_error == -2)
+	{
+		Utils::printRedColor("TdSpi::OrderInsert() 未处理请求超过许可数");
+	}
+	else if (request_error == -3)
+	{
+		Utils::printRedColor("TdSpi::OrderInsert() 每秒发送请求数超过许可数");
+	}
 
 	//this->current_user->DB_OrderAction(this->current_user->getCTP_Manager()->getDBManager()->getConn(), &pOrderAction);
 }

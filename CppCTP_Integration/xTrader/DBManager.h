@@ -32,7 +32,7 @@ using namespace spdlog;
 class DBManager {
 
 public:
-	DBManager(int max_size = 200);
+	DBManager(int max_size = 100);
 	~DBManager();
 
 	/************************************************************************/
