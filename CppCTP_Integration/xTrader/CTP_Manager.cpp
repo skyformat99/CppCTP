@@ -2999,7 +2999,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						(*stg_itor)->clearStgPositionDetail();
 
 						//// 停止线程
-						//(*stg_itor)->end_thread();
+						(*stg_itor)->end_thread();
 
 						//Utils::printGreenColor("策略内部线程停止工作...");
 
@@ -4806,6 +4806,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//std::cout << "\t请求查询策略信息..." << std::endl;
 				ctp_m->getXtsLogger()->info("\t请求查询策略信息...");
 
+				
+
 				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
 				rapidjson::Value &TraderID = doc["TraderID"];
 				rapidjson::Value &MsgRef = doc["MsgRef"];
@@ -4830,9 +4832,6 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//ctp_m->getDBManager()->getAllStrategyByActiveUser(&l_strategys, ctp_m->getL_User(), s_TraderID);
 
 				list<Strategy *>::iterator stg_itor;
-
-				// 当有其他地方调用策略列表,阻塞,信号量P操作
-				sem_wait((ctp_m->getSem_strategy_handler()));
 
 				for (stg_itor = ctp_m->getListStrategy()->begin(); stg_itor != ctp_m->getListStrategy()->end(); stg_itor++) {
 
@@ -4961,13 +4960,14 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							perror("\tprotocal error\n");
 						}
 
+						
+
 						(*stg_itor)->printStrategyInfo("msgtype == 22");
+
 						break;
 					}
 				}
 
-				// 释放信号量,信号量V操作
-				sem_post((ctp_m->getSem_strategy_handler()));
 
 			}
 			else {

@@ -292,7 +292,7 @@ public:
 	void ExEc_OnRtnTrade(CThostFtdcTradeField *pTrade);				// 成交回报
 	void Exec_OnErrRtnOrderInsert();	// 报单录入错误回报
 	void Exec_OnErrRtnOrderAction();	// 报单操作错误回报
-	void Exec_OnTickComing(CThostFtdcDepthMarketDataField *pDepthMarketData);			// 行情回调,执行交易任务
+	void Exec_OnTickComing(THREAD_CThostFtdcDepthMarketDataField *pDepthMarketData);			// 行情回调,执行交易任务
 
 	/// 更新挂单list
 	void update_pending_order_list(CThostFtdcOrderField *pOrder);
@@ -322,7 +322,7 @@ public:
 	void update_tick_lock_status(USER_CThostFtdcOrderField *order);
 
 	/// 添加字段本次成交量至order构体中
-	void add_VolumeTradedBatch(CThostFtdcOrderField *pOrder, USER_CThostFtdcOrderField *new_Order);
+	void add_VolumeTradedBatch(THREAD_CThostFtdcOrderField *pOrder, USER_CThostFtdcOrderField *new_Order);
 
 	/// 得到三个数最小值
 	int getMinNum(int num1, int num2, int num3);
@@ -333,10 +333,25 @@ public:
 	/// 拷贝结构体CThostFtdcDepthMarketDataField
 	void CopyTickData(CThostFtdcDepthMarketDataField *dst, CThostFtdcDepthMarketDataField *src);
 
+	
+
+	/// 拷贝结构体THREAD_CThostFtdcDepthMarketDataField
+	void CopyThreadTickData(THREAD_CThostFtdcDepthMarketDataField *dst, CThostFtdcDepthMarketDataField *src, bool isLastElement = false);
+
+
+	/// 拷贝结构体CThostFtdcDepthMarketDataField
+	void CopyTickData(CThostFtdcDepthMarketDataField *dst, THREAD_CThostFtdcDepthMarketDataField *src);
+
 	/// 拷贝结构体CThostFtdcOrderField
 	void CopyOrderData(CThostFtdcOrderField *dst, CThostFtdcOrderField *src);
 
+	void CopyThreadOrderData(THREAD_CThostFtdcOrderField *dst, CThostFtdcOrderField *src, bool isLastElement = false);
+
+	void CopyOrderData(CThostFtdcOrderField *dst, THREAD_CThostFtdcOrderField *src);
+
 	void CopyOrderDataToNew(USER_CThostFtdcOrderField *dst, CThostFtdcOrderField *src);
+
+	void CopyThreadOrderDataToNew(USER_CThostFtdcOrderField *dst, THREAD_CThostFtdcOrderField *src);
 
 	/// 拷贝结构体USER_CThostFtdcOrderField
 	void CopyNewOrderData(USER_CThostFtdcOrderField *dst, USER_CThostFtdcOrderField *src);
@@ -345,8 +360,17 @@ public:
 	/// 拷贝结构体CThostFtdcTradeField
 	void CopyTradeData(CThostFtdcTradeField *dst, CThostFtdcTradeField *src);
 
+	void CopyThreadTradeData(USER_CThostFtdcTradeField *dst, THREAD_CThostFtdcTradeField *src);
+
+	void CopyTradeData(THREAD_CThostFtdcTradeField *dst, CThostFtdcTradeField *src, bool isLastElement = false);
+
 	/// 拷贝结构体CThostFtdcTradeField
 	void CopyTradeDataToNew(USER_CThostFtdcTradeField *dst, CThostFtdcTradeField *src);
+
+
+	void CopyThreadTradeDataToNew(USER_CThostFtdcTradeField *dst, THREAD_CThostFtdcTradeField *src);
+
+
 
 	void CopyNewTradeData(USER_CThostFtdcTradeField *dst, USER_CThostFtdcTradeField *src);
 
@@ -623,9 +647,9 @@ private:
 	std::shared_ptr<spdlog::logger> xts_logger;
 
 	// 阻塞队列
-	moodycamel::BlockingConcurrentQueue<CThostFtdcDepthMarketDataField *> queue_OnRtnDepthMarketData;	// 行情队列
-	moodycamel::BlockingConcurrentQueue<CThostFtdcOrderField *> queue_OnRtnOrder;						// order回调队列
-	moodycamel::BlockingConcurrentQueue<CThostFtdcTradeField *> queue_OnRtnTrade;						// trade回调队列
+	moodycamel::BlockingConcurrentQueue<THREAD_CThostFtdcDepthMarketDataField *> queue_OnRtnDepthMarketData;	// 行情队列
+	moodycamel::BlockingConcurrentQueue<THREAD_CThostFtdcOrderField *> queue_OnRtnOrder;						// order回调队列
+	moodycamel::BlockingConcurrentQueue<THREAD_CThostFtdcTradeField *> queue_OnRtnTrade;						// trade回调队列
 
 	bool queue_OnRtnDepthMarketData_on_off; // 行情队列开关
 	bool queue_OnRtnOrder_on_off;			// order回调队列开关
@@ -636,6 +660,10 @@ private:
 	sem_t sem_list_position_detail_order;	// 信号量,用来保证同一时间只能一处地方调用操作持仓明细(order)
 	sem_t sem_list_position_detail_trade;	// 信号量,用来保证同一时间只能一处地方调用操作持仓明细(trade)
 	sem_t sem_order_insert;					// 信号量,用来保证同一时间只能一处地方调用下单，避免orderref重复
+	
+	sem_t sem_thread_queue_OnRtnDepthMarketData;
+	sem_t sem_thread_queue_OnRtnOrder;	
+	sem_t sem_thread_queue_OnRtnTrade;
 	
 };
 
