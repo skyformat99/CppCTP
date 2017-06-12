@@ -3798,7 +3798,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									b:更新交易执行状态标志位task_status
 									c:更新tick锁stg_select_order_algorithm_flag为释放*/
 									/************************************************************************/
-									(*stg_itor)->getStgUser()->setOn_Off(1);
+									
+									//(*stg_itor)->getStgUser()->setOn_Off(1);
+
 									// 更新trade_task标志位
 									(*stg_itor)->update_task_status();
 									//(*stg_itor)->setStgTradeTaskingRecovery();

@@ -3290,6 +3290,8 @@ void Strategy::printStrategyInfo(string message) {
 
 	this->getStgUser()->getXtsLogger()->info("\t卖开价差:{}, 买平价差:{}", this->stg_sell_open, this->stg_buy_close);
 	this->getStgUser()->getXtsLogger()->info("\t买开价差:{}, 卖平价差:{}", this->stg_buy_open, this->stg_sell_close);
+	this->getStgUser()->getXtsLogger()->info("\t多头价差:{}, 多头价差挂单量:{}", this->stg_spread_long, this->stg_spread_long_volume);
+	this->getStgUser()->getXtsLogger()->info("\t空头价差:{}, 空头价差挂单量:{}", this->stg_spread_short, this->stg_spread_short_volume);
 
 	this->getStgUser()->getXtsLogger()->info("\tA总卖:{}, A昨卖:{}", this->stg_position_a_sell, this->stg_position_a_sell_yesterday);
 	this->getStgUser()->getXtsLogger()->info("\tB总买:{}, B昨买:{}", this->stg_position_b_buy, this->stg_position_b_buy_yesterday);
@@ -3412,6 +3414,7 @@ void Strategy::printStrategyInfoPosition() {
 void Strategy::setStgUpdatePositionDetailRecordTime(string stg_update_position_detail_record_time) {
 	this->stg_update_position_detail_record_time = stg_update_position_detail_record_time;
 }
+
 string Strategy::getStgUpdatePositionDetailRecordTime() {
 	return this->stg_update_position_detail_record_time;
 }
@@ -3621,9 +3624,9 @@ bool Strategy::CompareTickData(CThostFtdcDepthMarketDataField *last_tick_data, C
 void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 
 	THREAD_CThostFtdcDepthMarketDataField *pDepthMarketData_tmp = new THREAD_CThostFtdcDepthMarketDataField();
-	
 	this->CopyThreadTickData(pDepthMarketData_tmp, pDepthMarketData);
 	this->queue_OnRtnDepthMarketData.enqueue(pDepthMarketData_tmp);
+
 	//this->getStgUser()->getXtsLogger()->info("Strategy::OnRtnDepthMarketData() queue_OnRtnDepthMarketData.enqueue()");
 }
 
@@ -3745,7 +3748,6 @@ void Strategy::thread_queue_OnRtnDepthMarketData() {
 
 //选择下单算法
 void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
-	USER_PRINT("Strategy::Select_Order_Algorithm");
 
 	//如果正在交易,直接返回
 	if (this->stg_trade_tasking) {
@@ -3782,6 +3784,7 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 		(this->stg_position_a_buy == this->stg_position_b_sell))) {
 		this->getStgUser()->getXtsLogger()->info("Strategy::Select_Order_Algorithm() 有撇腿,返回");
 		this->setStgSelectOrderAlgorithmFlag("Strategy::Select_Order_Algorithm() 有撇腿", false); // 关闭下单锁
+		
 		return;
 	}
 
@@ -3798,6 +3801,7 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 	else {
 		//std::cout << "Select_Order_Algorithm has no algorithm for you!" << endl;
 	}
+	
 }
 
 //下单算法1
