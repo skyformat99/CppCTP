@@ -18,7 +18,7 @@ struct timespec outtime = {3, 0};
 std::condition_variable md_cv;
 std::mutex md_mtx;
 
-#define MD_RSP_TIMEOUT	2
+#define MD_RSP_TIMEOUT	5
 
 //初始化构造函数
 MdSpi::MdSpi(CThostFtdcMdApi *mdapi) {
@@ -322,12 +322,9 @@ void MdSpi::UnSubMarket(list<string> *l_instrument) {
 
 //订阅行情应答
 void MdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-	USER_PRINT("OnRspSubMarketData");
-	std::cout << "MdSpi::OnRspSubMarketData()" << std::endl;
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (pSpecificInstrument) {
-			std::cout << "\t订阅行情应答" << std::endl;
-			std::cout << "\t订阅行情合约代码:\033[32m" << pSpecificInstrument->InstrumentID << "\033[0m" << std::endl;
+			this->ctp_m->getXtsLogger()->info("MdSpi::OnRspSubMarketData() 订阅行情合约代码 = {}", pSpecificInstrument->InstrumentID);
 		}
 	}
 }
@@ -335,9 +332,8 @@ void MdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstr
 //取消订阅行情
 void MdSpi::UnSubscribeMarketData(char *ppInstrumentID[], int nCount) {
 	USER_PRINT("MdSpi::UnSubscribeMarketData");
-	std::cout << "MdSpi::UnSubscribeMarketData()" << std::endl;
 	if (this->isLogged) {
-		USER_PRINT("UnSubscribeMarketData");
+		
 		this->mdapi->UnSubscribeMarketData(ppInstrumentID, nCount);
 		/*int ret = this->controlTimeOut(&unsubmarket_sem);
 		if (ret == -1) {
@@ -388,12 +384,8 @@ CTP_Manager * MdSpi::getCtpManager() {
 
 //取消订阅行情应答
 void MdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-	USER_PRINT(bIsLast);
-	std::cout << "MdSpi::OnRspUnSubMarketData()" << std::endl;
 	if (bIsLast && !(this->IsErrorRspInfo(pRspInfo))) {
-		USER_PRINT("OnRspUnSubMarketData");
-		cout << "\t取消合约代码:\033[32m" << pSpecificInstrument->InstrumentID << "\033[0m" << endl;
-		cout << "\t取消应答信息:" << pRspInfo->ErrorID << ", " << pRspInfo->ErrorMsg << endl;
+		this->ctp_m->getXtsLogger()->info("MdSpi::OnRspUnSubMarketData() 取消合约代码 = {} 取消应答信息 = {}", pSpecificInstrument->InstrumentID, pRspInfo->ErrorMsg);
 		//sem_post(&unsubmarket_sem);
 	}
 }

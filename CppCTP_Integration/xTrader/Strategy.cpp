@@ -3749,13 +3749,13 @@ void Strategy::thread_queue_OnRtnDepthMarketData() {
 //选择下单算法
 void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 
-	//如果正在交易,直接返回
+	// 如果正在交易,直接返回
 	if (this->stg_trade_tasking) {
-		this->getStgUser()->getXtsLogger()->info("\t正在交易,不能选择下单算法");
+		this->getStgUser()->getXtsLogger()->info("Strategy::Select_Order_Algorithm() 正在交易,不能选择下单算法");
 		return;
 	}
 
-	//如果有挂单,返回0
+	// 如果有挂单,返回0
 	// 当有其他地方调用挂单列表,阻塞,信号量P操作
 	sem_wait(&(this->sem_list_order_pending));
 
@@ -3777,13 +3777,11 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 		sem_post(&(this->sem_list_order_pending));
 	}
 
-	
-
-	// 如果有撇腿
+	// 如果有撇腿, 关闭下单锁
 	if (!((this->stg_position_a_sell == this->stg_position_b_buy) && 
 		(this->stg_position_a_buy == this->stg_position_b_sell))) {
-		this->getStgUser()->getXtsLogger()->info("Strategy::Select_Order_Algorithm() 有撇腿,返回");
-		this->setStgSelectOrderAlgorithmFlag("Strategy::Select_Order_Algorithm() 有撇腿", false); // 关闭下单锁
+		
+		this->setStgSelectOrderAlgorithmFlag("Strategy::Select_Order_Algorithm() 有撇腿", false); 
 		
 		return;
 	}
@@ -3799,14 +3797,14 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 		this->Order_Algorithm_Three();
 	}
 	else {
-		//std::cout << "Select_Order_Algorithm has no algorithm for you!" << endl;
+		Utils::printRedColor("Strategy::Select_Order_Algorithm() 不存在的下单算法");
 	}
 	
 }
 
 //下单算法1
 void Strategy::Order_Algorithm_One() {
-	USER_PRINT("Order_Algorithm_One");
+
 	// 计算盘口价差，量
 	if ((this->stg_instrument_A_tick->AskPrice1 != 0) &&
 		(this->stg_instrument_A_tick->BidPrice1 != 0) &&
@@ -3821,11 +3819,9 @@ void Strategy::Order_Algorithm_One() {
 		this->stg_spread_long = this->stg_instrument_A_tick->BidPrice1 - 
 								this->stg_instrument_B_tick->AskPrice1;
 
-
 		//市场多头价差挂单量
 		this->stg_spread_long_volume = std::min(this->stg_instrument_A_tick->BidVolume1,
 			this->stg_instrument_B_tick->AskVolume1);
-
 
 		// 市场空头价差
 		this->stg_spread_short = this->stg_instrument_A_tick->AskPrice1 -
@@ -3844,7 +3840,6 @@ void Strategy::Order_Algorithm_One() {
 		return;
 	}
 
-
 	/// 策略开关，期货账户开关，交易员开关，系统总开关
 	if (!((this->getOn_Off()) && 
 		(this->stg_user->getOn_Off()) && 
@@ -3853,7 +3848,7 @@ void Strategy::Order_Algorithm_One() {
 		return;
 	}
 
-	/// 价差卖平(b)
+	/// 价差卖平
 	if ((this->sell_close_on_off) &&
 		(this->stg_position_a_sell == this->stg_position_b_buy) &&
 		(this->stg_position_a_buy > 0) &&
@@ -3894,8 +3889,6 @@ void Strategy::Order_Algorithm_One() {
 
 		int order_volume = 0;
 
-		//this->printStrategyInfo("计算发单手数");
-
 		/// 优先平昨仓
 		/// 报单手数：盘口挂单量、每份发单手数、持仓量
 		if (this->stg_position_a_buy_yesterday > 0) {
@@ -3917,7 +3910,7 @@ void Strategy::Order_Algorithm_One() {
 			this->stg_b_order_insert_args->CombOffsetFlag[0] = '3'; /// 平今
 		}
 		if ((order_volume <= 0)) {
-			//std::cout << "发单手数错误值 = " << order_volume << endl;
+			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One() 发单手数错误值 = {}", order_volume);
 			this->setStgTradeTasking(false);
 			return;
 		} else {
@@ -3975,7 +3968,7 @@ void Strategy::Order_Algorithm_One() {
 		
 
 	}
-	/// 价差买平(f)
+	/// 价差买平
 	else if ((this->buy_close_on_off) && 
 		(this->stg_position_a_sell == this->stg_position_b_buy) &&
 		(this->stg_position_a_sell > 0) && 
@@ -4044,7 +4037,7 @@ void Strategy::Order_Algorithm_One() {
 			this->stg_b_order_insert_args->CombOffsetFlag[0] = '3'; /// 平今
 		}
 		if ((order_volume <= 0)) {
-			//std::cout << "发单手数错误值 = " << order_volume << endl;
+			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One() 发单手数错误值 = {}", order_volume);
 			this->setStgTradeTasking(false);
 			return;
 		} else {
@@ -4100,7 +4093,7 @@ void Strategy::Order_Algorithm_One() {
 		
 	}
 
-	/// 价差卖开(f)
+	/// 价差卖开
 	else if ((this->sell_open_on_off) && 
 		((this->stg_position_a_buy + this->stg_position_a_sell + this->stg_pending_a_open) < this->stg_lots) &&
 		(this->stg_spread_long >= (this->stg_sell_open + this->stg_spread_shift * this->stg_a_price_tick)) &&
@@ -4140,7 +4133,7 @@ void Strategy::Order_Algorithm_One() {
 
 
 		if (order_volume <= 0) {
-			//std::cout << "发单手数错误值 = " << order_volume << endl;
+			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One() 发单手数错误值 = {}", order_volume);
 			this->setStgTradeTasking(false);
 			return;
 		} else {
@@ -4232,6 +4225,7 @@ void Strategy::Order_Algorithm_One() {
 
 		if (order_volume <= 0) {
 			//std::cout << "发单手数错误值 = " << order_volume << endl;
+			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One() 发单手数错误值 = {}", order_volume);
 			this->setStgTradeTasking(false);
 			return;
 		} else {
@@ -4306,7 +4300,7 @@ void Strategy::Generate_Order_Ref(CThostFtdcInputOrderField *insert_order) {
 	strstream >> number;
 	string order_ref_base = number + this->stg_strategy_id;*/
 
-	this->stg_user->OrderInsert(insert_order, this->stg_strategy_id); // 更新基准数
+	//this->stg_user->OrderInsert(insert_order, this->stg_strategy_id); // 更新基准数
 
 	//stringstream strValue;
 	//strValue << order_ref_base;

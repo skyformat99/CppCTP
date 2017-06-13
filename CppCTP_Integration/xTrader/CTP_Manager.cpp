@@ -1313,6 +1313,14 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 		}
 	}
 
+	/// 释放 new strategy 内存
+	if (l_strategys.size() > 0) {
+		list<Strategy *>::iterator Itor;
+		for (Itor = l_strategys.begin(); Itor != l_strategys.end();) {
+			delete (*Itor);
+			Itor = l_strategys.erase(Itor);
+		}
+	}
 
 
 	/************************************************************************/
@@ -1320,8 +1328,6 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 	/************************************************************************/
 	// 查询期货账户昨日持仓明细
 	ctp_m->getXtsLogger()->info("\t查询期货账户昨日持仓明细...");
-
-	
 
 	bool bFind = false;
 
@@ -1469,6 +1475,15 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 		}
 	}
 
+	/// 清空 new position detail
+	if (l_posd.size() > 0) {
+		list<USER_CThostFtdcOrderField *>::iterator itor;
+		for (itor = l_posd.begin(); itor != l_posd.end();) {
+			delete (*itor);
+			itor = l_posd.erase(itor);
+		}
+	}
+
 
 	/************************************************************************/
 	/*查询期货账户昨日持仓明细(trade) msgtype == 17                                                                      */
@@ -1606,7 +1621,15 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 			perror("\tprotocal error");
 		}
 	}
-	
+
+	/// 析构
+	if (l_posd_trade.size() > 0) {
+		list<USER_CThostFtdcTradeField *>::iterator itor;
+		for (itor = l_posd_trade.begin(); itor != l_posd_trade.end();) {
+			delete (*itor);
+			itor = l_posd_trade.erase(itor);
+		}
+	}
 
 	
 
@@ -1761,6 +1784,16 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 		}
 	}
 
+	/// 析构
+	if (l_posd.size() > 0) {
+		list<USER_CThostFtdcOrderField *>::iterator itor;
+		for (itor = l_posd.begin(); itor != l_posd.end();) {
+			delete (*itor);
+			itor = l_posd.erase(itor);
+		}
+	}
+
+
 
 	/************************************************************************/
 	/*查询期货账户昨日持仓明细(trade) msgtype == 21                                                                      */
@@ -1883,6 +1916,15 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 				//break;
 			}
 			perror("\tprotocal error");
+		}
+	}
+
+	/// 析构
+	if (l_posd_trade.size() > 0) {
+		list<USER_CThostFtdcTradeField *>::iterator itor;
+		for (itor = l_posd_trade.begin(); itor != l_posd_trade.end();) {
+			delete (*itor);
+			itor = l_posd_trade.erase(itor);
 		}
 	}
 	
@@ -2407,6 +2449,15 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						}
 
 						perror("\tprotocal error\n");
+					}
+				}
+
+				/// 释放 new strategy 内存
+				if (l_strategys.size() > 0) {
+					list<Strategy *>::iterator Itor;
+					for (Itor = l_strategys.begin(); Itor != l_strategys.end();) {
+						delete (*Itor);
+						Itor = l_strategys.erase(Itor);
 					}
 				}
 
@@ -4283,8 +4334,14 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					}
 				}
 
-				
-
+				/// 清空 new position detail
+				if (l_posd.size() > 0) {
+					list<USER_CThostFtdcOrderField *>::iterator itor;
+					for (itor = l_posd.begin(); itor != l_posd.end();) {
+						delete (*itor);
+						itor = l_posd.erase(itor);
+					}
+				}
 				
 			}
 			//else if (msgtype == 16) { // 查询服务端sessions
@@ -4503,8 +4560,14 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					}
 				}
 
-				
-
+				/// 析构
+				if (l_posd.size() > 0) {
+					list<USER_CThostFtdcTradeField *>::iterator itor;
+					for (itor = l_posd.begin(); itor != l_posd.end();) {
+						delete (*itor);
+						itor = l_posd.erase(itor);
+					}
+				}
 				
 			}
 			else if (msgtype == 20) { // 查询期货账户今日持仓明细(order)
@@ -4663,7 +4726,17 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 						perror("\tprotocal error\n");
 					}
-				}		
+				}
+
+				/// 析构
+				if (l_posd.size() > 0) {
+					list<USER_CThostFtdcOrderField *>::iterator itor;
+					for (itor = l_posd.begin(); itor != l_posd.end();) {
+						delete (*itor);
+						itor = l_posd.erase(itor);
+					}
+				}
+
 			}
 			else if (msgtype == 21) { // 查询期货账户今日持仓明细(trade)
 				std::cout << "\t查询期货账户今日持仓明细(trade)..." << std::endl;
@@ -4807,6 +4880,15 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						perror("\tprotocal error\n");
 					}
 
+				}
+
+				/// 析构
+				if (l_posd.size() > 0) {
+					list<USER_CThostFtdcTradeField *>::iterator itor;
+					for (itor = l_posd.begin(); itor != l_posd.end();) {
+						delete (*itor);
+						itor = l_posd.erase(itor);
+					}
 				}
 			}
 			else if (msgtype == 22) { // 请求查询策略信息(单条策略信息)

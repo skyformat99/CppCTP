@@ -3,7 +3,6 @@
 #include <list>
 #include <mongo/client/dbclient.h>
 #include <stdio.h>
-
 /*socket头文件*/
 #include <netdb.h>
 #include <sys/socket.h>
@@ -15,9 +14,8 @@
 #include <time.h>
 #include <pthread.h>
 #include <errno.h>
-#include <arpa/inet.h>  // inet_ntoa
+#include <arpa/inet.h>
 #include <spdlog/spdlog.h>
-
 #include "ThostFtdcTraderApi.h"
 #include "TdSpi.h"
 #include "CTP_Manager.h"
@@ -54,33 +52,31 @@ string stopsave_time = "15:00:02";
 string stop_start_from_today_position_time = "20:00:00";
 
 
-string morning_open_time = "08:59:55"; // 早上开盘时间
-string moring_break_time = "10:14:55"; // 中午休盘
-string morning_continue_time = "10:29:55"; // 中午休盘结束时间
-string morning_close_time = "11:29:55"; // 中午收盘
-string afternoon_open_time = "13:29:55"; // 下午开盘
-string afternoon_close_time = "14:59:50"; // 下午收盘(停止新的发单任务)
-string afternoon_end_task_time_one_time = "14:59:55"; // 下午收盘(把挂单列表全部成交)
-string afternoon_end_task_time_second_time = "14:59:56"; // 下午收盘(把挂单列表全部成交)
-string afternoon_end_task_time_third_time = "14:59:58"; // 下午收盘(把挂单列表全部成交)
-string night_open_time = "20:59:55"; // 夜盘开始
-string night_day_time = "00:00:00"; // 凌晨12点
-string night_start_close_time = "02:29:55"; // 夜盘准备收盘,停止新的交易任务
-string night_close_time = "02:30:00"; // 夜盘收盘时间
-string night_stop_save_time = "02:30:02"; // 夜盘存储数据时间
+string morning_open_time = "08:59:55";						// 早上开盘时间
+string moring_break_time = "10:14:55";						// 中午休盘
+string morning_continue_time = "10:29:55";					// 中午休盘结束时间
+string morning_close_time = "11:29:55";						// 中午收盘
+string afternoon_open_time = "13:29:55";					// 下午开盘
+string afternoon_close_time = "14:59:50";					// 下午收盘(停止新的发单任务)
+string afternoon_end_task_time_one_time = "14:59:55";		// 下午收盘(把挂单列表全部成交)
+string afternoon_end_task_time_second_time = "14:59:56";	// 下午收盘(把挂单列表全部成交)
+string afternoon_end_task_time_third_time = "14:59:58";		// 下午收盘(把挂单列表全部成交)
+string night_open_time = "20:59:55";						// 夜盘开始
+string night_day_time = "00:00:00";							// 凌晨12点
+string night_start_close_time = "02:29:55";					// 夜盘准备收盘,停止新的交易任务
+string night_close_time = "02:30:00";						// 夜盘收盘时间
+string night_stop_save_time = "02:30:02";					// 夜盘存储数据时间
 
-/*信号处理*/
+/* ctrl + c 信号处理 */
 void sig_handler(int signo) {
 
-	std::cout << "main.cpp sig_handler()" << std::endl;
-
 	if (signo == SIGINT) {
-		printf("main.cpp sig_handler()\n");
 
 		if (ctp_m) {
 
 			bool isTrading = false;
 
+			// 遍历策略列表，看是否还有正在交易中的策略，如果是不能关闭
 			list<Strategy *>::iterator stg_itor;
 			for (stg_itor = ctp_m->getListStrategy()->begin();
 				stg_itor != ctp_m->getListStrategy()->end(); stg_itor++) { // 遍历ctp_m维护的Strategy List
@@ -94,15 +90,13 @@ void sig_handler(int signo) {
 
 			if (!isTrading) { // 如果策略全部处于非交易状态,则可以进行关闭
 				if (!ctp_m->getCTPFinishedPositionInit()) { // ctp_m未初始化成功，则不做保存工作
-					printf("\t\033[31m服务端 未 完成初始化!!!\033[0m\n");
+					Utils::printRedColor("服务端 未 完成初始化!!!");
 				}
 				else {
-					printf("\t\033[32m服务端正常关闭，开始保存策略持仓明细.\033[0m\n");
+					Utils::printGreenColor("服务端正常关闭，开始保存策略持仓明细.");
 					ctp_m->saveAllStrategyPositionDetail();
 
 				}
-				///// 刷新log
-				//ctp_m->getXtsLogger()->flush();
 				/// 正常关闭,更新标志位
 				ctp_m->updateSystemFlag();
 				/// 关闭所有的log
@@ -111,11 +105,11 @@ void sig_handler(int signo) {
 				exit(1);
 			}
 			else {
-				printf("\t\033[31m服务端 有 策略处于交易状态,稍后再试!!!\033[0m\n");
+				Utils::printRedColor("服务端 有 策略处于交易状态,稍后再试!!!");
 			}
 		}
 		else {
-			printf("\t\033[31m服务端 未 正常关闭!!!\033[0m\n");
+			Utils::printRedColor("服务端 未 正常关闭!!!");
 			close(sockfd);
 			exit(1);
 		}
@@ -130,7 +124,7 @@ void out_addr(struct sockaddr_in *clientaddr) {
 	memset(ip, 0, sizeof(ip));
 	//将ip地址从网络字节序转换成点分十进制
 	inet_ntop(AF_INET, &clientaddr->sin_addr.s_addr, ip, sizeof(ip));
-	printf("client: %s(%d) connected\n", ip, port);
+	printf("客户端IP:%s 端口:%d 已连接\n", ip, port);
 }
 
 /*输出服务器端时间*/
@@ -138,7 +132,6 @@ void do_service(int fd) {
 	printf("main.cpp do_service()");
 	/*和客户端进行读写操作(双向通信)*/
 	char buff[MAX_BUFFER_SIZE];
-	printf("\t服务端开始监听...\n");
 	while (1)
 	{
 		memset(buff, 0, sizeof(buff));
@@ -173,7 +166,6 @@ void do_service(int fd) {
 
 /*输出文件描述符*/
 void out_fd(int fd) {
-	printf("main.cpp out_fd()");
 	struct sockaddr_in addr;
 	socklen_t len = sizeof(addr);
 	//从fd中获取连接的客户端相关信息
@@ -185,7 +177,7 @@ void out_fd(int fd) {
 	memset(ip, 0, sizeof(ip));
 	int port = ntohs(addr.sin_port);
 	inet_ntop(AF_INET, &addr.sin_addr.s_addr, ip, sizeof(ip));
-	printf("\t来自ip地址:%16s(%5d) 已连接!!!\n", ip, port);
+	printf("客户端IP:%16s 端口:%5d 已连接\n", ip, port);
 }
 
 /*线程调用*/
@@ -397,12 +389,14 @@ void timer_handler() {
 		Utils::printGreenColorWithKV("现在时间", nowtime);
 		Utils::printGreenColor("收盘工作:保存策略参数,更新运行状态.");
 
-		// 保存最后策略参数,更新运行状态正常收盘
+		/// 保存最后策略参数,更新运行状态正常收盘
 		ctp_m->saveAllStrategyPositionDetail();
 		ctp_m->updateSystemFlag();
 
-		// 保存策略参数,关闭定时器
+		/// 保存策略参数,关闭定时器
 		//ctp_m->getCalTimer()->stop();
+		/// 关闭所有的log
+		spdlog::drop_all();
 		Utils::printGreenColor("系统收盘工作正常结束.");
 	}
 
