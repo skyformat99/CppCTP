@@ -1,0 +1,197 @@
+Script started on Thu 04 Aug 2016 02:52:22 PM CST
+[root@localhost xTrader]# make clean
+[root@localhost xTrader]# make
+[ 10%] [32mBuilding CXX object CMakeFiles/quant_ctp_XTrader.dir/main.cpp.o
+[0m[ 20%] [32mBuilding CXX object CMakeFiles/quant_ctp_XTrader.dir/MdSpi.cpp.o
+[0m[ 30%] [32mBuilding CXX object CMakeFiles/quant_ctp_XTrader.dir/TdSpi.cpp.o
+[0m[ 40%] [32mBuilding CXX object CMakeFiles/quant_ctp_XTrader.dir/CTP_Manager.cpp.o
+[0m[ 50%] [32mBuilding CXX object CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.o
+[0m[ 60%] [32mBuilding CXX object CMakeFiles/quant_ctp_XTrader.dir/User.cpp.o
+[0m[ 70%] [32mBuilding CXX object CMakeFiles/quant_ctp_XTrader.dir/Utils.cpp.o
+[0m[ 80%] [32mBuilding CXX object CMakeFiles/quant_ctp_XTrader.dir/DBManager.cpp.o
+[0m[ 90%] [32mBuilding CXX object CMakeFiles/quant_ctp_XTrader.dir/Trader.cpp.o
+[0m[100%] [32mBuilding CXX object CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.o
+[0m[31m[1mLinking CXX executable quant_ctp_XTrader
+[0m[100%] Built target quant_ctp_XTrader
+[root@localhost xTrader]# ./quant_ctp_XTrader 
+|===========================|
+|欢迎登录期货多账户交易系统!|
+|===========================|
+|==============================|
+|请输入您的操作编号:           |
+|【1】:交易员登陆              |
+|【2】:管理员登陆              |
+|【q】:退出                    |
+|==============================|
+2
+请输入管理员账号:
+yuanpengfei
+请输入管理员密码:
+111111
+|=============|
+|[40;32m【登陆成功!】[0m|
+|=============|
+|==============================|
+|请输入您的操作编号:           |
+|【1】:交易员管理              |
+|【2】:期货账户管理            |
+|【q】:退出                    |
+|==============================|
+1
+交易员管理
+|==============================|
+|请输入您的操作编号:           |
+|【1】:查看所有交易员          |
+|【2】:增加交易员              |
+|【3】:删除交易员              |
+|【4】:修改交易员              |
+|【q】:退出                    |
+|==============================|
+1
+*traderid:1111  tradername:lucas  password:xxxx  isactive:1*
+*traderid:3  tradername:yyy  password:yyy  isactive:1*
+*traderid:4  tradername:ywy  password:ddd  isactive:1*
+*traderid:5  tradername:hahaha  password:hahaha  isactive:1*
+*traderid:6  tradername:zhangsan  password:zhansan  isactive:0*
+*traderid:7  tradername:dafasd  password:adfads  isactive:1*
+|==============================|
+|请输入您的操作编号:           |
+|【1】:查看所有交易员          |
+|【2】:增加交易员              |
+|【3】:删除交易员              |
+|【4】:修改交易员              |
+|【q】:退出                    |
+|==============================|
+2
+当前系统已存在交易员
+*traderid:1111  tradername:lucas  password:xxxx  isactive:1*
+*traderid:3  tradername:yyy  password:yyy  isactive:1*
+*traderid:4  tradername:ywy  password:ddd  isactive:1*
+*traderid:5  tradername:hahaha  password:hahaha  isactive:1*
+*traderid:6  tradername:zhangsan  password:zhansan  isactive:0*
+*traderid:7  tradername:dafasd  password:adfads  isactive:1*
+请输入交易员ID:
+8
+请输入交易员名字:
+dd
+请输入交易员密码:
+ddd
+|==============================|
+|请输入您的操作编号:           |
+|【1】:查看所有交易员          |
+|【2】:增加交易员              |
+|【3】:删除交易员              |
+|【4】:修改交易员              |
+|【q】:退出                    |
+|==============================|
+1
+*traderid:1111  tradername:lucas  password:xxxx  isactive:1*
+*traderid:3  tradername:yyy  password:yyy  isactive:1*
+*traderid:4  tradername:ywy  password:ddd  isactive:1*
+*traderid:5  tradername:hahaha  password:hahaha  isactive:1*
+*traderid:6  tradername:zhangsan  password:zhansan  isactive:0*
+*traderid:7  tradername:dafasd  password:adfads  isactive:1*
+*traderid:8  tradername:dd  password:ddd  isactive:1*
+|==============================|
+|请输入您的操作编号:           |
+|【1】:查看所有交易员          |
+|【2】:增加交易员              |
+|【3】:删除交易员              |
+|【4】:修改交易员              |
+|【q】:退出                    |
+|==============================|
+3
+当前系统已存在交易员
+*traderid:1111  tradername:lucas  password:xxxx  isactive:1*
+*traderid:3  tradername:yyy  password:yyy  isactive:1*
+*traderid:4  tradername:ywy  password:ddd  isactive:1*
+*traderid:5  tradername:hahaha  password:hahaha  isactive:1*
+*traderid:6  tradername:zhangsan  password:zhansan  isactive:0*
+*traderid:7  tradername:dafasd  password:adfads  isactive:1*
+*traderid:8  tradername:dd  password:ddd  isactive:1*
+请输入要删除的交易员的ID
+8
+|==============================|
+|请输入您的操作编号:           |
+|【1】:查看所有交易员          |
+|【2】:增加交易员              |
+|【3】:删除交易员              |
+|【4】:修改交易员              |
+|【q】:退出                    |
+|==============================|
+1
+*traderid:1111  tradername:lucas  password:xxxx  isactive:1*
+*traderid:3  tradername:yyy  password:yyy  isactive:1*
+*traderid:4  tradername:ywy  password:ddd  isactive:1*
+*traderid:5  tradername:hahaha  password:hahaha  isactive:1*
+*traderid:6  tradername:zhangsan  password:zhansan  isactive:0*
+*traderid:7  tradername:dafasd  password:adfads  isactive:1*
+*traderid:8  tradername:dd  password:ddd  isactive:0*
+|==============================|
+|请输入您的操作编号:           |
+|【1】:查看所有交易员          |
+|【2】:增加交易员              |
+|【3】:删除交易员              |
+|【4】:修改交易员              |
+|【q】:退出                    |
+|==============================|
+4
+当前系统已存在交易员
+*traderid:1111  tradername:lucas  password:xxxx  isactive:1*
+*traderid:3  tradername:yyy  password:yyy  isactive:1*
+*traderid:4  tradername:ywy  password:ddd  isactive:1*
+*traderid:5  tradername:hahaha  password:hahaha  isactive:1*
+*traderid:6  tradername:zhangsan  password:zhansan  isactive:0*
+*traderid:7  tradername:dafasd  password:adfads  isactive:1*
+*traderid:8  tradername:dd  password:ddd  isactive:0*
+请输入交易员ID:
+1111
+请输入交易员名字:
+yfy
+请输入交易员密码:
+dad
+请输入交易员新ID:
+1
+|==============================|
+|请输入您的操作编号:           |
+|【1】:查看所有交易员          |
+|【2】:增加交易员              |
+|【3】:删除交易员              |
+|【4】:修改交易员              |
+|【q】:退出                    |
+|==============================|
+1
+*traderid:1  tradername:yfy  password:dad  isactive:1*
+*traderid:3  tradername:yyy  password:yyy  isactive:1*
+*traderid:4  tradername:ywy  password:ddd  isactive:1*
+*traderid:5  tradername:hahaha  password:hahaha  isactive:1*
+*traderid:6  tradername:zhangsan  password:zhansan  isactive:0*
+*traderid:7  tradername:dafasd  password:adfads  isactive:1*
+*traderid:8  tradername:dd  password:ddd  isactive:0*
+|==============================|
+|请输入您的操作编号:           |
+|【1】:查看所有交易员          |
+|【2】:增加交易员              |
+|【3】:删除交易员              |
+|【4】:修改交易员              |
+|【q】:退出                    |
+|==============================|
+q
+|==============================|
+|请输入您的操作编号:           |
+|【1】:交易员管理              |
+|【2】:期货账户管理            |
+|【q】:退出                    |
+|==============================|
+q
+|==============================|
+|请输入您的操作编号:           |
+|【1】:交易员登陆              |
+|【2】:管理员登陆              |
+|【q】:退出                    |
+|==============================|
+^C
+[root@localhost xTrader]# ei[Kxit
+exit
+
+Script done on Thu 04 Aug 2016 02:53:44 PM CST

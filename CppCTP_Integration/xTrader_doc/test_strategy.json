@@ -1,0 +1,119 @@
+msgtype = 1
+查询交易员/交易员登陆:
+	请求:{"MsgRef":6,"MsgSendFlag":0,"MsgType":1,"TraderID":"1601","Password":"123456","MsgSrc":0}
+	成功:{"MsgRef":1,"MsgSendFlag":1,"MsgType":1,"TraderName":"yuanpengfei","TraderID":"1601","OnOff":1,"MsgResult":0,"MsgErrorReason":"","MsgSrc":0, "IsLast":1}
+	失败:{"MsgRef":1,"MsgSendFlag":1,"MsgType":1,"TraderName":"","TraderID":"1601","OnOff":0,"MsgResult":1,"MsgErrorReason":"用户名或者密码错误!","MsgSrc":0}
+
+msgtype = 2	
+查询期货账户(positionflag:整型 1:表示仓位统计不一致,有问题 0:表示仓位统计正确,无问题):
+	请求:{"MsgRef":1,"MsgSendFlag": 0,"MsgType":2,"TraderID":"1601","MsgSrc":0}
+	成功有数据:{"MsgRef":0,"MsgSendFlag":1,"MsgType":2,"TraderID":"1601","MsgResult":0,"MsgErrorReason":"","Info":[{"brokerid":"9999","traderid":"1601","password":"123456","userid":"091921","frontaddress":"tcp://180.168.146.187:10000","on_off":1,"positionflag":1}],"MsgSrc":0,"IsLast":1}
+	成功无数据:{"MsgRef":48,"MsgSendFlag":1,"MsgType":2,"TraderID":"161","MsgResult":0,"MsgErrorReason":"","Info":[],"MsgSrc":0}
+
+msgtype = 3
+查询所有策略参数:
+	请求:{"TraderID": "1601", "MsgType": 3, "StrategyID": "", "MsgSendFlag": 0, "MsgSrc": 0, "MsgRef": 9, "UserID": ""}
+	成功有数据:{"MsgRef":2,"MsgSendFlag":1,"MsgType":3,"TraderID":"1601","MsgResult":0,"MsgErrorReason":"","StrategyID":"","Info":[{"position_a_sell_today":0,"position_b_sell":0,"spread_shift":0.0,"position_b_sell_today":0,"position_b_buy_today":0,"position_a_sell":0,"buy_close":0.0,"stop_loss":0.0,"position_b_buy_yesterday":0,"position_b_sell_yesterday":0,"strategy_id":"03","position_b_buy":0,"lots_batch":0,"position_a_buy":0,"sell_open":0.0,"order_algorithm":"","trader_id":"1601","a_order_action_limit":0,"b_order_action_limit":0,"sell_close":0.0,"buy_open":0.0,"only_close":0,"strategy_on_off":0,"sell_open_on_off":1,"buy_close_on_off":1,"sell_close_on_off":1,"buy_open_on_off":1,"trade_model":"","update_position_detail_record_time":"","hold_profit":0.0,"close_profit":0.0,"commission":0.0,"position":0,"position_buy":0,"position_sell":0,"trade_volume":0,"amount":0.0,"average_shift":0.0,"a_limit_price_shift":0,"b_limit_price_shift":0,"on_off":0,"a_instrument_id":"cu1708","b_instrument_id":"cu1707","a_limit_price_shift":0,"b_limit_price_shift":0,"sell_open_on_off":1,"buy_close_on_off":1,"buy_open_on_off":1,"sell_close_on_off":1,"list_instrument_id":["cu1708","cu1707"],"position_a_buy_yesterday":0,"user_id":"091921","position_a_buy_today":0,"position_a_sell_yesterday":0,"lots":0,"a_wait_price_tick":0.0,"b_wait_price_tick":0.0}],"MsgSrc":0,"IsLast":1}
+	
+msgtype = 4
+查询行情配置:
+	请求:{"MsgRef":1,"MsgSendFlag": 0,"MsgType":4,"TraderID":"1601","MsgSrc":0}
+	成功有数据:{"MsgRef":0,"MsgSendFlag":1,"MsgType":4,"TraderID":"1601","MsgResult":0,"MsgErrorReason":"","Info":[{"brokerid":"1","traderid":"tcp://180.168.146.187:10011","password":"9999","userid":"058176","frontaddress":"123456"}],"MsgSrc":0}
+	成功无数据:{"MsgRef":1,"MsgSendFlag":1,"MsgType":4,"TraderID":"1601","MsgResult":0,"MsgErrorReason":"","Info":[],"MsgSrc":0}
+
+
+
+msgtype = 5	
+修改单个策略参数(不带持仓修改):
+	请求:{"Info": [{"trader_id": "1601", "sell_close": 1000.0, "a_order_action_limit": 400, "order_algorithm": "01", "buy_close": 3.0, "stop_loss": 0.0, "a_wait_price_tick": 1.0, "trade_model": "", "lots_batch": 1, "sell_open": -1000.0, "spread_shift": 0.0, "buy_open": -1000.0, "b_order_action_limit": 400, "b_wait_price_tick": 0.0, "strategy_id": "03", "user_id": "058176", "lots": 1}], "TraderID": "1601", "MsgType": 5, "StrategyID": "03", "MsgSendFlag": 0, "UserID": "058176", "MsgRef": 12, "MsgSrc": 0}
+	响应:{"Info": [{"sell_close": 1000.0, "amount": 0.0, "close_profit": 0.0, "stop_loss": 0.0, "hold_profit": 0.0, "buy_close": 3.0, "commission": 0.0, "buy_open": -1000.0, "b_wait_price_tick": 0.0, "b_order_action_limit": 400, "strategy_id": "03", "trade_volume": 0, "lots_batch": 1, "trader_id": "1601", "user_id": "058176", "order_algorithm": "01", "spread_shift": 0.0, "list_instrument_id": ["al1701", "al1702"], "trade_model": "", "lots": 1, "only_close": 1, "a_wait_price_tick": 1.0, "average_shift": 0.0, "sell_open": -1000.0, "a_order_action_limit": 400, "StrategyOnoff": 1}], "MsgResult": 0, "TraderID": "1601", "MsgType": 5, "StrategyID": "03", "MsgErrorReason": "", "MsgSendFlag": 1, "UserID": "058176", "MsgRef": 271, "MsgSrc": 0}
+
+	
+msgtype = 6	
+新建策略:
+	请求:{"MsgRef":1,"MsgSendFlag": 0,"MsgType":6,"TraderID":"1603","UserID":"058176","Info":[{"position_a_sell_today":0,"position_b_sell":0,"spread_shift":0.0,"position_b_sell_today":0,"position_b_buy_today":0,"position_a_sell":0,"buy_close":0.0,"stop_loss":0.0,"position_b_buy_yesterday":0,"is_active":1,"position_b_sell_yesterday":0,"strategy_id":"11","position_b_buy":0,"lots_batch":1,"position_a_buy":0,"sell_open":-1000.0,"trader_id":"1604","a_order_action_limit":100,"b_order_action_limit":100,"sell_close":1000.0,"buy_open":-1000.0,"only_close":0,"trade_model":"MA","order_algorithm":"01","hold_profit":1.0,"close_profit":1.0,"commission":0.0,"position":0,"position_buy":0,"position_sell":0,"trade_volume":0,"amount":0.0,"average_shift":0.0,"list_instrument_id":["zn1701","zn1702"],"position_a_buy_yesterday":0,"user_id":"058176","position_a_buy_today":0,"position_a_sell_yesterday":0,"lots":10,"a_wait_price_tick":1.0,"b_wait_price_tick":0.0,"StrategyOnoff":1}],"MsgSrc":0}
+	响应:{"MsgRef":2,"MsgSendFlag":1,"MsgType":6,"TraderID":"1603","MsgResult":0,"MsgErrorReason":"","Info":[{"position_a_sell_today":0,"position_b_sell":0,"spread_shift":0.0,"position_b_sell_today":0,"position_b_buy_today":0,"position_a_sell":0,"buy_close":0.0,"stop_loss":0.0,"position_b_buy_yesterday":0,"position_b_sell_yesterday":0,"strategy_id":"11","position_b_buy":0,"lots_batch":1,"position_a_buy":0,"sell_open":-1000.0,"order_algorithm":"01","trader_id":"1604","a_order_action_limit":100,"b_order_action_limit":100,"sell_close":1000.0,"buy_open":-1000.0,"list_instrument_id":["zn1701","zn1702"],"position_a_buy_yesterday":0,"user_id":"058176","position_a_buy_today":0,"position_a_sell_yesterday":0,"lots":10,"a_wait_price_tick":1.0,"b_wait_price_tick":0.0,"StrategyOnoff":1}],"MsgSrc":0}
+
+msgtype = 7	
+删除策略:
+	请求:{"MsgRef":1,"MsgSendFlag": 0,"MsgType":7,"TraderID":"1602","UserID":"123456","Info":[{"position_a_sell_today":0,"position_b_sell":0,"spread_shift":0.0,"position_b_sell_today":0,"position_b_buy_today":0,"position_a_sell":0,"buy_close":0.0,"stop_loss":0.0,"position_b_buy_yesterday":0,"is_active":true,"position_b_sell_yesterday":0,"strategy_id":"01","position_b_buy":0,"lots_batch":1,"position_a_buy":0,"sell_open":-1000.0,"order_algorithm":"01","trader_id":"1601","order_action_tires_limit":100,"sell_close":1000.0,"buy_open":-1000.0,"only_close":false,"list_instrument_id":["zn1701","zn1702"],"position_a_buy_yesterday":0,"user_id":"123456","position_a_buy_today":0,"position_a_sell_yesterday":0,"lots":10,"a_wait_price_tick":1.0,"b_wait_price_tick":0.0,"StrategyOnoff":1}],"MsgSrc":0}	
+	响应:{"MsgRef":0,"MsgSendFlag":1,"MsgType":7,"TraderID":"1602","MsgResult":0,"MsgErrorReason":"","Info":[{"position_a_sell_today":0,"position_b_sell":0,"spread_shift":0.0,"position_b_sell_today":0,"position_b_buy_today":0,"position_a_sell":0,"buy_close":0.0,"stop_loss":0.0,"position_b_buy_yesterday":0,"position_b_sell_yesterday":0,"strategy_id":"01","position_b_buy":0,"lots_batch":1,"position_a_buy":0,"sell_open":-1000.0,"order_algorithm":"01","trader_id":"1601","order_action_tires_limit":100,"sell_close":1000.0,"buy_open":-1000.0,"list_instrument_id":["zn1701","zn1702"],"position_a_buy_yesterday":0,"user_id":"123456","position_a_buy_today":0,"position_a_sell_yesterday":0,"lots":1,"a_wait_price_tick":1.0,"b_wait_price_tick":0.0,"StrategyOnoff":1}],"MsgSrc":0}
+	
+msgtype = 8	
+修改交易员开关:
+	请求:{"MsgRef":1,"MsgSendFlag":0,"MsgType":8,"TraderID":"1601","OnOff":1,"MsgSrc":0}
+	响应:{"MsgRef":0,"MsgSendFlag":1,"MsgType":8,"TraderID":"1601","MsgSrc":0,"MsgResult":0,"MsgErrorReason":"","OnOff":1}
+	错误:{"MsgRef":1,"MsgSendFlag":1,"MsgType":8,"TraderID":"160111","MsgSrc":0,"MsgResult":1,"MsgErrorReason":"交易员开关未开启","OnOff":0}
+
+msgtype	= 9
+修改期货账户开关:
+	请求:{"MsgRef":1,"MsgSendFlag": 0,"MsgType":9,"TraderID":"1601","UserID":"058176","OnOff":1,"MsgSrc":0}
+	响应:{"MsgRef":0,"MsgSendFlag":1,"MsgType":9,"TraderID":"1601","UserID":"058176","MsgSrc":0,"MsgResult":0,"MsgErrorReason":"","OnOff":1}
+	错误:{"MsgRef":1,"MsgSendFlag":1,"MsgType":9,"TraderID":"1601","UserID":"058176ddd","MsgSrc":0,"MsgResult":1,"MsgErrorReason":"期货账户开关未开启","OnOff":0}
+
+msgtype = 10
+查询策略昨仓:
+	请求:{"MsgRef":1,"MsgSendFlag":0,"MsgType":10,"TraderID":"1601","UserID":"058176","MsgSrc":0}
+	成功有数据:{"MsgRef":2,"MsgSendFlag":1,"MsgType":10,"TraderID":"1601","UserID":"058176","MsgResult":0,"MsgErrorReason":"","Info":[{"position_a_sell_today":0,"position_b_sell":0,"spread_shift":0.0,"position_b_sell_today":0,"position_b_buy_today":0,"position_a_sell":0,"buy_close":0.0,"stop_loss":0.0,"position_b_buy_yesterday":0,"position_b_sell_yesterday":0,"strategy_id":"03","position_b_buy":0,"lots_batch":1,"position_a_buy":0,"sell_open":-7000.0,"order_algorithm":"01","trader_id":"1601","order_action_tires_limit":400,"sell_close":7000.0,"buy_open":-7000.0,"list_instrument_id":["zn1701","zn1702"],"position_a_buy_yesterday":0,"user_id":"058176","position_a_buy_today":0,"position_a_sell_yesterday":0,"lots":1,"a_wait_price_tick":1.0,"b_wait_price_tick":0.0,"StrategyOnoff":1}],"MsgSrc":0}
+	成功无数据:{"MsgRef":3,"MsgSendFlag":1,"MsgType":10,"TraderID":"1601","UserID":"058176","MsgResult":1,"MsgErrorReason":"未找到该策略昨仓信息","Info":[],"MsgSrc":0}
+
+msgtype = 11	
+查询下单算法:
+	请求:{"MsgRef":1,"MsgSendFlag": 0,"MsgType":11,"TraderID":"1601","MsgSrc":0}
+	响应:{"MsgRef":0,"MsgSendFlag":1,"MsgType":11,"TraderID":"1601","MsgResult":0,"MsgErrorReason":"","Info":[{"name":"01"}],"MsgSrc":0}
+	响应无数据:{"MsgRef":1,"MsgSendFlag":1,"MsgType":11,"TraderID":"1601","MsgResult":0,"MsgErrorReason":"","Info":[],"MsgSrc":0}
+
+msgtype = 12	
+修改单个策略持仓(带持仓修改):
+	请求:{"Info": [{"trader_id": "1601", "position_a_buy": 0, "position_b_sell": 0, "position_a_buy_yesterday": 0, "position_a_sell": 0, "position_a_sell_today": 0, "position_b_sell_yesterday": 0, "position_b_buy_today": 0, "position_b_buy_yesterday": 0, "user_id": "058176", "position_b_sell_today": 0, "strategy_id": "03", "position_a_sell_yesterday": 0, "position_a_buy_today": 0, "position_b_buy": 0}], "TraderID": "1601", "MsgType": 12, "StrategyID": "03", "MsgSendFlag": 0, "UserID": "058176", "MsgRef": 10, "MsgSrc": 0}
+	响应:{"Info": [{"trader_id": "1601", "position_a_buy": 0, "position_b_sell": 0, "position_a_buy_yesterday": 0, "position_a_sell": 0, "position_a_sell_today": 0, "position_b_sell_yesterday": 0, "position_b_buy_today": 0, "position_b_buy_yesterday": 0, "user_id": "058176", "position_b_sell_today": 0, "strategy_id": "03", "position_a_sell_yesterday": 0, "position_a_buy_today": 0, "position_b_buy": 0}], "MsgResult": 0, "TraderID": "1601", "MsgType": 12, "StrategyID": "03", "MsgErrorReason": "", "MsgSendFlag": 1, "UserID": "058176", "MsgRef": 269, "MsgSrc": 0}
+	
+msgtype = 13
+修改策略开关：
+	请求:{"MsgRef":1,"MsgSendFlag": 0,"MsgType":13,"TraderID":"1602","UserID":"123456","MsgSrc":0, "StrategyID":"01", "OnOff":1}
+
+
+msgtype = 14
+策略只平开关：
+	请求:{"MsgRef":1,"MsgSendFlag": 0,"MsgType":14,"TraderID":"1602","UserID":"123456","MsgSrc":0, "StrategyID":"01", "OnOff":1}	
+	
+
+	
+msgtype = 15	
+查询期货账户昨日持仓明细(order)("UserID"值如果为空返回所有昨仓持仓明细，如果为某个期货账户，只返回对应期货账户的昨持仓明细):
+	请求:{"MsgRef":1,"MsgSendFlag":0,"MsgType":15,"TraderID":"1601","UserID":"063802","MsgSrc":0}
+	成功有数据:{"MsgRef":0,"MsgSendFlag":1,"MsgType":15,"TraderID":"1601","UserID":"063802","MsgResult":0,"MsgErrorReason":"","Info":[{"instrumentid":"rb1710","orderref":"100000000401","userid":"063802","direction":"1","comboffsetflag":"0","combhedgeflag":"1","limitprice":3401.0,"volumetotaloriginal":1,"tradingday":"20170220","tradingdayrecord":"20170228","orderstatus":48,"volumetraded":1,"volumetotal":0,"insertdate":"20170220","inserttime":"11:18:30","strategyid":"01","volumetradedbatch":1}],"MsgSrc":0}
+	成功无数据:{"MsgRef":0,"MsgSendFlag":1,"MsgType":15,"TraderID":"1601","UserID":"063802","MsgResult":0,"MsgErrorReason":"未找到该策略昨仓明细","Info":[],"MsgSrc":0}
+
+msgtype = 16	
+查询sessions("UserID"值如果为空返回所有，如果为某个期货账户，只返回对应期货账户sessions):
+	请求:{"MsgRef":1,"MsgSendFlag":0,"MsgType":16,"TraderID":"1601","UserID":"","MsgSrc":0}
+	成功有数据:{"MsgRef":0,"MsgSendFlag":1,"MsgType":2,"TraderID":"1601","UserID":"","MsgResult":0,"MsgErrorReason":"","Info":[{"userid":"058176","sessionid":971701323,"frontid":1,"trading_day":"20170113"},{"userid":"063802","sessionid":972029030,"frontid":1,"trading_day":"20170113"}],"MsgSrc":0}
+	成功无数据:{"MsgRef":0,"MsgSendFlag":1,"MsgType":2,"TraderID":"1601","UserID":"058176","MsgResult":0,"MsgErrorReason":"","Info":[],"MsgSrc":0}
+	
+msgtype = 17	
+查询期货账户昨日持仓明细(trade)("UserID"值如果为空返回所有昨仓持仓明细，如果为某个期货账户，只返回对应期货账户的昨持仓明细):
+	请求:{"MsgRef":1,"MsgSendFlag":0,"MsgType":17,"TraderID":"1601","UserID":"058176","MsgSrc":0}
+	成功有数据:{"MsgRef":0,"MsgSendFlag":1,"MsgType":15,"TraderID":"1601","UserID":"063802","MsgResult":0,"MsgErrorReason":"","Info":[{"instrumentid":"","orderref":"100000000401","userid":"063802","direction":49,"offsetflag":"0","hedgeflag":"1","price":3401.0,"tradingday":"20170220","tradingdayrecord":"20170221","tradedate":20170221,"strategyid":"01","volume":1}],"MsgSrc":0}
+	成功无数据:{"MsgRef":0,"MsgSendFlag":1,"MsgType":15,"TraderID":"1601","UserID":"063802","MsgResult":0,"MsgErrorReason":"未找到该策略昨仓明细(trade)","Info":[],"MsgSrc":0}
+	
+msgtype = 18
+CTP行情断线通知(MsgResult(Integer):0正常 1断开连接)
+	主动推送:{"MsgRef":1,"MsgSendFlag":1,"MsgType":18,"MsgSrc":1, "MsgResult":1,"MsgErrorReason":"CTP行情已断开连接"}
+
+msgtype = 19
+CTP交易断线通知(MsgResult(Integer):0正常 1断开连接)
+	主动推送:{"MsgRef":1,"MsgSendFlag":1,"MsgType":19,"UserID":"058176","MsgSrc":1, "MsgResult":1,"MsgErrorReason":"CTP交易已断开连接"}
+	
+msgtype = 20
+查询期货账户今日持仓明细(order)("UserID"值如果为空返回所有持仓明细，如果为某个期货账户，只返回对应期货账户的持仓明细):
+	
+
+msgtype = 21
+查询期货账户今日持仓明细(trade)("UserID"值如果为空返回所有持仓明细，如果为某个期货账户，只返回对应期货账户的持仓明细):
+
+msgtype = 22
+查询单条策略参数:
+	请求:{"TraderID": "1601", "MsgType": 22, "StrategyID": "01", "MsgSendFlag": 0, "MsgSrc": 0, "MsgRef": 9, "UserID": "091921"}
+	成功有数据:{"MsgRef":0,"MsgSendFlag":1,"MsgType":22,"TraderID":"1601","StrategyID":"01","UserID": "058176","MsgResult":0,"MsgErrorReason":"","Info":[{"position_a_sell_today":0,"position_b_sell":2,"spread_shift":0.0,"position_b_sell_today":1,"position_b_buy_today":0,"position_a_sell":0,"buy_close":0.0,"stop_loss":0.0,"position_b_buy_yesterday":0,"position_b_sell_yesterday":1,"strategy_id":"01","position_b_buy":0,"lots_batch":1,"position_a_buy":2,"sell_open":0.0,"order_algorithm":"01","trader_id":"1601","a_order_action_limit":400,"b_order_action_limit":400,"sell_close":0.0,"buy_open":-50.0,"only_close":0,"strategy_on_off":1,"sell_open_on_off":0,"buy_close_on_off":0,"sell_close_on_off":0,"buy_open_on_off":1,"trade_model":"","update_position_detail_record_time":"2017042121:11:12","hold_profit":0.0,"close_profit":0.0,"commission":0.0,"position":2,"position_buy":0,"position_sell":0,"trade_volume":0,"amount":0.0,"average_shift":0.0,"a_limit_price_shift":0,"b_limit_price_shift":0,"on_off":1,"a_instrument_id":"cu1705","b_instrument_id":"cu1706","a_limit_price_shift":0,"b_limit_price_shift":0,"sell_open_on_off":0,"buy_close_on_off":0,"buy_open_on_off":1,"sell_close_on_off":0,"list_instrument_id":["cu1705","cu1706"],"position_a_buy_yesterday":1,"user_id":"058176","position_a_buy_today":1,"position_a_sell_yesterday":0,"lots":2,"a_wait_price_tick":0.0,"b_wait_price_tick":0.0}],"MsgSrc":0}
+	失败无数据:{"MsgRef":1,"MsgSendFlag":1,"MsgType":22,"TraderID":"1601","StrategyID":"01","MsgResult":1,"MsgErrorReason":"未找到该策略!","Info":[],"MsgSrc":0}

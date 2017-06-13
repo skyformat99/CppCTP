@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/base/client/socket_client.c
+sys/socket.h
+-
+unistd.h
+-
+string.h
+-
+stdio.h
+-
+memory.h
+-
+signal.h
+-
+time.h
+-
+

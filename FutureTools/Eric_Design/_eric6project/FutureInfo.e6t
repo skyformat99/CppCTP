@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Tasks SYSTEM "Tasks-6.0.dtd">
+<!-- eric6 tasks file for project FutureInfo -->
+<!-- Saved: 2016-11-23, 13:35:50 -->
+<Tasks version="6.0">
+  <ProjectScanFilter></ProjectScanFilter>
+  <Task priority="1" completed="False" type="1" uid="{9256da20-4736-49a4-9024-e57a8dd189f4}">
+    <Summary>TODO: not implemented yet</Summary>
+    <Description></Description>
+    <Created>2016-11-12, 14:50:22</Created>
+    <Resource>
+      <Filename>ToolWindow.py</Filename>
+      <Linenumber>32</Linenumber>
+    </Resource>
+  </Task>
+  <Task priority="1" completed="False" type="1" uid="{c7e93a67-b16f-4c95-91fd-5428ccb868e3}">
+    <Summary>TODO: not implemented yet</Summary>
+    <Description></Description>
+    <Created>2016-11-12, 14:50:22</Created>
+    <Resource>
+      <Filename>ToolWindow.py</Filename>
+      <Linenumber>40</Linenumber>
+    </Resource>
+  </Task>
+  <Task priority="1" completed="False" type="1" uid="{7f3c4449-51a3-417f-b68f-f506f692da5e}">
+    <Summary>TODO: not implemented yet</Summary>
+    <Description></Description>
+    <Created>2016-11-12, 14:50:22</Created>
+    <Resource>
+      <Filename>ToolWindow.py</Filename>
+      <Linenumber>48</Linenumber>
+    </Resource>
+  </Task>
+  <Task priority="1" completed="False" type="1" uid="{13633119-a71d-4802-85ca-8eb6ac0d789e}">
+    <Summary>TODO: not implemented yet</Summary>
+    <Description></Description>
+    <Created>2016-11-23, 13:35:35</Created>
+    <Resource>
+      <Filename>FutureTab.py</Filename>
+      <Linenumber>37</Linenumber>
+    </Resource>
+  </Task>
+</Tasks>

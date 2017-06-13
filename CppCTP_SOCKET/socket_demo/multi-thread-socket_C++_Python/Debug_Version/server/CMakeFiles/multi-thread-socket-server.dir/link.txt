@@ -1,0 +1,1 @@
+/usr/bin/cc      CMakeFiles/multi-thread-socket-server.dir/msg.c.o CMakeFiles/multi-thread-socket-server.dir/socket_server.c.o  -o multi-thread-socket-server -rdynamic -lpthread 

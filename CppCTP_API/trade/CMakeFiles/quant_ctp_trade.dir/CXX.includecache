@@ -1,0 +1,46 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/TdSpi.h
+map
+-
+string
+-
+pthread.h
+-
+semaphore.h
+-
+unistd.h
+-
+time.h
+-
+sys/time.h
+-
+ThostFtdcTraderApi.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/ThostFtdcTraderApi.h
+ThostFtdcUserApiStruct.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/ThostFtdcUserApiStruct.h
+
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/ThostFtdcTraderApi.h
+ThostFtdcUserApiStruct.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/ThostFtdcUserApiStruct.h
+
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/ThostFtdcUserApiDataType.h
+
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/ThostFtdcUserApiStruct.h
+ThostFtdcUserApiDataType.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/ThostFtdcUserApiDataType.h
+
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/main.cpp
+iostream
+-
+ThostFtdcTraderApi.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/ThostFtdcTraderApi.h
+TdSpi.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_API/trade/TdSpi.h
+

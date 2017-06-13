@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Debug_Version/server/msg.h
+sys/types.h
+-
+
+/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Debug_Version/server/socket_server.c
+netdb.h
+-
+sys/socket.h
+-
+unistd.h
+-
+string.h
+-
+stdio.h
+-
+stdlib.h
+-
+memory.h
+-
+signal.h
+-
+time.h
+-
+pthread.h
+-
+errno.h
+-
+msg.h
+/mnt/hgfs/CTP/CppCTP/CppCTP_SOCKET/socket_demo/multi-thread-socket_C++_Python/Debug_Version/server/msg.h
+

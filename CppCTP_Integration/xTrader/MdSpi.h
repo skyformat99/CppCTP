@@ -12,12 +12,20 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/time.h>
+#include <list>
 #include "ThostFtdcMdApi.h"
 #include "ThostFtdcUserApiStruct.h"
+#include "User.h"
+#include "Strategy.h"
+#include "CTP_Manager.h"
+#include "Utils.h"
 
 
 using std::map;
 using std::string;
+
+class CTP_Manager;
+class Strategy;
 
 class MdSpi :public CThostFtdcMdSpi{
 
@@ -32,7 +40,7 @@ public:
 	//增加毫秒
 	void timeraddMS(struct timeval *a, int ms);
 	//协程控制
-	int controlTimeOut(sem_t *t, int timeout = 5000);
+	//int controlTimeOut(sem_t *t, int timeout = 5000);
 	//登录
 	void Login(char *BrokerID, char *UserID, char *Password);
     ///登录请求响应
@@ -41,16 +49,23 @@ public:
 	//登出
 	void Logout(char *BrokerID, char *UserID);
     ///登出请求响应
-    void OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout, CThostFtdcRspInfoField *pRspInfo,
-                         int nRequestID, bool bIsLast);
+    void OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
+	///订阅行情
+	void SubMarket(list<string> *l_instrument);
+
+	///取消订阅行情
+	void UnSubMarket(list<string> *l_instrument);
+
     ///订阅行情应答
-    void OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo,
-                            int nRequestID, bool bIsLast);
+    void OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
     ///取消订阅行情应答
-    void OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo,
-                              int nRequestID, bool bIsLast);
+    void OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
     ///深度行情通知
     void OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData);
+	void CopyTickData(CThostFtdcDepthMarketDataField *dst, CThostFtdcDepthMarketDataField *src);
 
 	//通信断开
 	void OnFrontDisconnected(int nReason);
@@ -73,6 +88,18 @@ public:
 	//得到Password
 	string getPassword();
 
+	//添加strategy
+	void addStrategyToList(Strategy *stg);
+
+	/// 得到strategy_list
+	list<Strategy *> *getListStrategy();
+
+	/// 设置strategy_list
+	void setListStrategy(list<Strategy *> *l_strategys);
+
+	void setCtpManager(CTP_Manager *ctp_m);
+	CTP_Manager *getCtpManager();
+
 private:
     CThostFtdcMdApi *mdapi;
     CThostFtdcReqUserLoginField *loginField;
@@ -85,10 +112,13 @@ private:
 	string BrokerID;
 	string UserID;
 	string Password;
-	sem_t connect_sem;
+	/*sem_t connect_sem;
 	sem_t login_sem;
 	sem_t logout_sem;
 	sem_t submarket_sem;
-	sem_t unsubmarket_sem;
+	sem_t unsubmarket_sem;*/
+	list<Strategy *> *l_strategys;
+	CTP_Manager *ctp_m;
+	CThostFtdcDepthMarketDataField *last_tick_data;
 };
 #endif //QUANT_CTP_MDSPI_H

@@ -1,0 +1,1 @@
+/usr/bin/cc      CMakeFiles/socket_client.dir/socket_client.c.o  -o socket_client -rdynamic 
