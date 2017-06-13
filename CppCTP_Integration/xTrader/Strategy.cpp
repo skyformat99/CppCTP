@@ -3797,7 +3797,7 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 		this->Order_Algorithm_Three();
 	}
 	else {
-		Utils::printRedColor("Strategy::Select_Order_Algorithm() 不存在的下单算法");
+		this->getStgUser()->getXtsLogger()->info("Strategy::Select_Order_Algorithm() 不存在的下单算法 user_id = {} strategy_id = {}", this->getStgUserId(), this->getStgStrategyId());
 	}
 	
 }

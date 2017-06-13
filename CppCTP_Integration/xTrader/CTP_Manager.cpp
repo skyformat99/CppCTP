@@ -138,6 +138,7 @@ User * CTP_Manager::CreateAccount(User *user, list<Strategy *> *l_strategys) {
 		user->getUserTradeSPI()->Login(user); // 登陆
 		sleep(1);
 		user->getUserTradeSPI()->QrySettlementInfoConfirm(user); // 确认交易结算
+		sleep(1);
 		/// 设置初始化状态完成
 		user->setThread_Init_Status(true);
 
