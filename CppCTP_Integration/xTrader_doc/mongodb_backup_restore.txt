@@ -1,0 +1,24 @@
+创建管理员数据库:
+db.createUser({ user: ":)xTrader:)admin:)" , pwd: ":)&xtrader&:)", roles: ["userAdminAnyDatabase", "dbAdminAnyDatabase", "readWriteAnyDatabase", "clusterAdmin", "clusterMonitor"]});
+
+登陆权限:
+db.auth(":)xTrader:)admin:)", ":)&xtrader&:)");
+
+修改配置文件:
+security:
+   authorization: "enabled"
+
+备份:
+/usr/bin/mongodump --host "127.0.0.1" --port "27017" --username ":)xTrader:)admin:)" --password ":)&xtrader&:)" --authenticationDatabase "admin" --db "CTP"
+mongorestore --username ":)xTrader:)admin:)" --password ":)&xtrader&:)" --authenticationDatabase "admin" --db "CTP" --drop want_to_restore_db/
+
+查看状态:
+mongostat --username=":)xTrader:)admin:)" --password=":)&xtrader&:)" --authenticationDatabase="admin"
+
+db.updateUser(":)xTrader:)admin:)", {roles: [{role: "clusterAdmin", db: "admin"}, {role: "userAdminAnyDatabase", db: "admin"}, {role: "dbAdminAnyDatabase", db: "admin"}, {role: "readWriteAnyDatabase", db: "admin"}, {role: "clusterMonitor", db: "admin"}]})
+
+给管理员增加查看mongo状态权限
+db.grantRolesToUser(":)xTrader:)admin:)", [{role: "userAdminAnyDatabase", db: "admin"}, {role: "dbAdminAnyDatabase", db: "admin"}, {role: "readWriteAnyDatabase", db: "admin"}]);
+
+
+yum install -y mongodb-org-3.2.8 mongodb-org-server-3.2.8 mongodb-org-shell-3.2.8 mongodb-org-mongos-3.2.8 mongodb-org-tools-3.2.8

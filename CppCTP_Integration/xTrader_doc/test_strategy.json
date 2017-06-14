@@ -99,11 +99,11 @@ msgtype = 17
 	
 msgtype = 18
 CTP行情断线通知(MsgResult(Integer):0正常 1断开连接)
-	主动推送:{"MsgRef":1,"MsgSendFlag":1,"MsgType":18,"MsgSrc":1, "MsgResult":1,"MsgErrorReason":"CTP行情已断开连接"}
+	主动推送:{"MsgRef":1,"MsgSendFlag":1,"MsgType":18,"MsgSrc":1, "MsgResult":1,"MsgErrorReason":"CTP行情已断开连接","IsLast":1}
 
 msgtype = 19
 CTP交易断线通知(MsgResult(Integer):0正常 1断开连接)
-	主动推送:{"MsgRef":1,"MsgSendFlag":1,"MsgType":19,"UserID":"058176","MsgSrc":1, "MsgResult":1,"MsgErrorReason":"CTP交易已断开连接"}
+	主动推送:{"MsgRef":1,"MsgSendFlag":1,"MsgType":19,"UserID":"058176","MsgSrc":1, "MsgResult":1,"MsgErrorReason":"CTP交易已断开连接","IsLast":1}
 	
 msgtype = 20
 查询期货账户今日持仓明细(order)("UserID"值如果为空返回所有持仓明细，如果为某个期货账户，只返回对应期货账户的持仓明细):
@@ -117,3 +117,12 @@ msgtype = 22
 	请求:{"TraderID": "1601", "MsgType": 22, "StrategyID": "01", "MsgSendFlag": 0, "MsgSrc": 0, "MsgRef": 9, "UserID": "091921"}
 	成功有数据:{"MsgRef":0,"MsgSendFlag":1,"MsgType":22,"TraderID":"1601","StrategyID":"01","UserID": "058176","MsgResult":0,"MsgErrorReason":"","Info":[{"position_a_sell_today":0,"position_b_sell":2,"spread_shift":0.0,"position_b_sell_today":1,"position_b_buy_today":0,"position_a_sell":0,"buy_close":0.0,"stop_loss":0.0,"position_b_buy_yesterday":0,"position_b_sell_yesterday":1,"strategy_id":"01","position_b_buy":0,"lots_batch":1,"position_a_buy":2,"sell_open":0.0,"order_algorithm":"01","trader_id":"1601","a_order_action_limit":400,"b_order_action_limit":400,"sell_close":0.0,"buy_open":-50.0,"only_close":0,"strategy_on_off":1,"sell_open_on_off":0,"buy_close_on_off":0,"sell_close_on_off":0,"buy_open_on_off":1,"trade_model":"","update_position_detail_record_time":"2017042121:11:12","hold_profit":0.0,"close_profit":0.0,"commission":0.0,"position":2,"position_buy":0,"position_sell":0,"trade_volume":0,"amount":0.0,"average_shift":0.0,"a_limit_price_shift":0,"b_limit_price_shift":0,"on_off":1,"a_instrument_id":"cu1705","b_instrument_id":"cu1706","a_limit_price_shift":0,"b_limit_price_shift":0,"sell_open_on_off":0,"buy_close_on_off":0,"buy_open_on_off":1,"sell_close_on_off":0,"list_instrument_id":["cu1705","cu1706"],"position_a_buy_yesterday":1,"user_id":"058176","position_a_buy_today":1,"position_a_sell_yesterday":0,"lots":2,"a_wait_price_tick":0.0,"b_wait_price_tick":0.0}],"MsgSrc":0}
 	失败无数据:{"MsgRef":1,"MsgSendFlag":1,"MsgType":22,"TraderID":"1601","StrategyID":"01","MsgResult":1,"MsgErrorReason":"未找到该策略!","Info":[],"MsgSrc":0}
+	
+msgtype = 23
+心跳包处理:
+	请求:{"TraderID": "1601", "MsgType": 23, "MsgSendFlag": 0, "MsgSrc": 0, "MsgRef": 9}
+	成功有数据:{"MsgRef":0,"MsgSendFlag":1,"MsgType":23,"TraderID":"1601","MsgResult":0,"MsgErrorReason":"","MsgSrc":0}
+	
+	
+	
+	

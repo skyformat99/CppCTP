@@ -79,7 +79,7 @@ def read_msg(sockfd):
         #接收数据1038个字节(与服务器端统一:13位head+1位checknum+1024数据段)
         # print("read_msg receive %d bytes" % (30 * 1024 + 14))
         # data = sockfd.recv(30 * 1024 + 14)
-        data = RecvN(sockfd, 20 * 1024 + 14)
+        data = RecvN(sockfd, 2 * 1024 + 14)
         # print("len data", len(data))
     except socket.error as e:
         print(e)
@@ -125,7 +125,7 @@ if __name__ == '__main__':
         # 连接服务器: IP,port
         try:
             #进行与服务端的连接(ip地址根据实际情况进行更改)
-            s.connect(("192.168.112.129", 8888))
+            s.connect(("192.168.112.131", 8888))
             #s.connect(("192.168.0.11", 8888))
         except socket.error as e:
             print("socket error", e)
