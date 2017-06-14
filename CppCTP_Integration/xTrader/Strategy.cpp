@@ -3665,6 +3665,32 @@ void Strategy::thread_queue_OnRtnDepthMarketData() {
 			continue;
 		}
 		else {
+
+			// 区分交易所
+			if (!strcmp(pDepthMarketData_tmp->ExchangeID, "INE")) // 能源交易中心
+			{
+
+			}
+			else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "CFFEX")) // 中金所
+			{
+
+			}
+			else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "CZCE")) // 郑商所
+			{
+
+			}
+			else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "DCE")) // 大商所
+			{
+
+			}
+			else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "SHFE")) // 上期所
+			{
+
+			}
+			else {
+				this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnDepthMarketData() Tick ExchangeID有误!");
+			}
+
 			//执行tick处理
 			if (!strcmp(pDepthMarketData_tmp->InstrumentID, this->getStgInstrumentIdA().c_str())) {
 				this->CopyTickData(stg_instrument_A_tick, pDepthMarketData_tmp);
@@ -5429,8 +5455,6 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 	}
 	USER_PRINT(pOrder->CombOffsetFlag[0]);
 	if (pOrder->CombOffsetFlag[0] == '0') { // 开仓
-		USER_PRINT("pOrder->CombOffsetFlag[0] == 0 come in");
-		USER_PRINT(pOrder);
 
 		USER_CThostFtdcOrderField *new_order = new USER_CThostFtdcOrderField();
 		memset(new_order, 0, sizeof(USER_CThostFtdcOrderField));
@@ -5444,7 +5468,6 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 		USER_PRINT("pOrder->CombOffsetFlag[0] == 0 away");
 	} 
 	else if (pOrder->CombOffsetFlag[0] == '3') { // 平今
-		USER_PRINT("平今in");
 		list<USER_CThostFtdcOrderField *>::iterator itor;
 
 		// 当有其他地方调用持仓明细,阻塞,信号量P操作

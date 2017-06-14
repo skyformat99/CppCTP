@@ -6044,7 +6044,7 @@ bool CTP_Manager::init(bool is_online) {
 
 	/// 查询昨仓策略
 	//this->dbm->getAllStrategyYesterday(this->l_strategys_yesterday);
-	this->dbm->getAllStrategyYesterdayByActiveUser(this->l_strategys_yesterday, this->l_user);
+	//this->dbm->getAllStrategyYesterdayByActiveUser(this->l_strategys_yesterday, this->l_user);
 	
 	//std::cout << "\t初始化策略完成..." << std::endl;
 	this->getXtsLogger()->info("\t初始化策略完成...");

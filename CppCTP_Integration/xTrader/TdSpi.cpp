@@ -2122,6 +2122,10 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 		//	USER_PRINT((*sid_itor)->getSessionID());
 		//	if (pOrder->SessionID == (*sid_itor)->getSessionID()) {
 		
+
+		this->current_user->getXtsLogger()->info("TdSpi::OnRtnOrder() 合约代码 = {} 报单引用 = {} 用户代码 = {} 交易所代码 = {} 组合开平标志 = {} 报单状态 = {}",
+			pOrder->InstrumentID, pOrder->OrderRef, pOrder->UserID, pOrder->ExchangeID, pOrder->CombOffsetFlag, pOrder->OrderStatus);
+
 		//std::cout << "=================================================================================" << endl;
 		//经纪公司代码
 		//std::cout << "\t*经纪公司代码:" << pOrder->BrokerID << ", ";
@@ -2292,6 +2296,11 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 	USER_PRINT("TdSpi::OnRtnTrade");
 	//std::cout << "TdSpi::OnRtnTrade()" << std::endl;
 	if (pTrade) {
+
+		this->current_user->getXtsLogger()->info("TdSpi::OnRtnTrade() 合约代码 = {} 报单引用 = {} 用户代码 = {} 交易所代码 = {} 报单编号 = {} 开平标志 = {}",
+			pTrade->InstrumentID, pTrade->OrderRef, pTrade->UserID, pTrade->ExchangeID, pTrade->OrderSysID, pTrade->OffsetFlag);
+
+
 		//std::cout << "===========================TdSpi::OnRtnTrade()===================================" << std::endl;
 		/////经纪公司代码
 		//cout << "\t*经纪公司代码:" << pTrade->BrokerID << ", ";
