@@ -5092,6 +5092,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.AddMember("MsgResult", 0, allocator);
 				build_doc.AddMember("MsgErrorReason", "", allocator);
 				build_doc.AddMember("MsgSrc", 0, allocator);
+				build_doc.AddMember("IsLast", 1, allocator);
 
 				build_doc.Accept(writer);
 
