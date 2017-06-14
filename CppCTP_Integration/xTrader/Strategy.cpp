@@ -3666,30 +3666,30 @@ void Strategy::thread_queue_OnRtnDepthMarketData() {
 		}
 		else {
 
-			// 区分交易所
-			if (!strcmp(pDepthMarketData_tmp->ExchangeID, "INE")) // 能源交易中心
-			{
+			//// 区分交易所
+			//if (!strcmp(pDepthMarketData_tmp->ExchangeID, "INE")) // 能源交易中心
+			//{
 
-			}
-			else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "CFFEX")) // 中金所
-			{
+			//}
+			//else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "CFFEX")) // 中金所
+			//{
 
-			}
-			else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "CZCE")) // 郑商所
-			{
+			//}
+			//else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "CZCE")) // 郑商所
+			//{
 
-			}
-			else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "DCE")) // 大商所
-			{
+			//}
+			//else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "DCE")) // 大商所
+			//{
 
-			}
-			else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "SHFE")) // 上期所
-			{
+			//}
+			//else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "SHFE")) // 上期所
+			//{
 
-			}
-			else {
-				this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnDepthMarketData() Tick ExchangeID有误!");
-			}
+			//}
+			//else {
+			//	this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnDepthMarketData() Tick ExchangeID有误!");
+			//}
 
 			//执行tick处理
 			if (!strcmp(pDepthMarketData_tmp->InstrumentID, this->getStgInstrumentIdA().c_str())) {
