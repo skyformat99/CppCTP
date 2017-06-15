@@ -5060,57 +5060,57 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 
 			}
-			else if (msgtype == 23) { // 心跳包处理
-				//std::cout << "\t请求查询策略信息..." << std::endl;
-				ctp_m->getXtsLogger()->info("\t心跳包处理...");
+			//else if (msgtype == 23) { // 心跳包处理
+			//	//std::cout << "\t请求查询策略信息..." << std::endl;
+			//	ctp_m->getXtsLogger()->info("\t心跳包处理...");
 
-				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
-				rapidjson::Value &TraderID = doc["TraderID"];
-				rapidjson::Value &MsgRef = doc["MsgRef"];
-				rapidjson::Value &MsgSrc = doc["MsgSrc"];
+			//	rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
+			//	rapidjson::Value &TraderID = doc["TraderID"];
+			//	rapidjson::Value &MsgRef = doc["MsgRef"];
+			//	rapidjson::Value &MsgSrc = doc["MsgSrc"];
 
-				string s_TraderID = TraderID.GetString();
-				int i_MsgRef = MsgRef.GetInt();
-				int i_MsgSendFlag = MsgSendFlag.GetInt();
-				int i_MsgSrc = MsgSrc.GetInt();
+			//	string s_TraderID = TraderID.GetString();
+			//	int i_MsgRef = MsgRef.GetInt();
+			//	int i_MsgSendFlag = MsgSendFlag.GetInt();
+			//	int i_MsgSrc = MsgSrc.GetInt();
 
-				/*std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
-				std::cout << "\t收到期货账户ID = " << s_UserID << std::endl;*/
-				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
+			//	/*std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
+			//	std::cout << "\t收到期货账户ID = " << s_UserID << std::endl;*/
+			//	ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
 
-				//list<Strategy *> l_strategys;
-				//ctp_m->getDBManager()->getAllStrategy(&l_strategys, s_TraderID, s_UserID);
-				//ctp_m->getDBManager()->getAllStrategyByActiveUser(&l_strategys, ctp_m->getL_User(), s_TraderID);
+			//	//list<Strategy *> l_strategys;
+			//	//ctp_m->getDBManager()->getAllStrategy(&l_strategys, s_TraderID, s_UserID);
+			//	//ctp_m->getDBManager()->getAllStrategyByActiveUser(&l_strategys, ctp_m->getL_User(), s_TraderID);
 
-				/*构建StrategyInfo的Json*/
-				build_doc.SetObject();
-				rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
-				build_doc.AddMember("MsgRef", server_msg_ref++, allocator);
-				build_doc.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator);
-				build_doc.AddMember("MsgType", 23, allocator);
-				build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
-				build_doc.AddMember("MsgResult", 0, allocator);
-				build_doc.AddMember("MsgErrorReason", "", allocator);
-				build_doc.AddMember("MsgSrc", 0, allocator);
-				build_doc.AddMember("IsLast", 1, allocator);
+			//	/*构建StrategyInfo的Json*/
+			//	build_doc.SetObject();
+			//	rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
+			//	build_doc.AddMember("MsgRef", server_msg_ref++, allocator);
+			//	build_doc.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator);
+			//	build_doc.AddMember("MsgType", 23, allocator);
+			//	build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
+			//	build_doc.AddMember("MsgResult", 0, allocator);
+			//	build_doc.AddMember("MsgErrorReason", "", allocator);
+			//	build_doc.AddMember("MsgSrc", 0, allocator);
+			//	build_doc.AddMember("IsLast", 1, allocator);
 
-				build_doc.Accept(writer);
+			//	build_doc.Accept(writer);
 
-				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
-					printf("\t先前客户端已断开!!!\n");
-					//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
-					if (errno == EPIPE) {
-						std::cout << "\tEPIPE信号" << std::endl;
-						//break;
-					}
+			//	if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
+			//		printf("\t先前客户端已断开!!!\n");
+			//		//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
+			//		if (errno == EPIPE) {
+			//			std::cout << "\tEPIPE信号" << std::endl;
+			//			//break;
+			//		}
 
-					perror("\tprotocal error\n");
-				}
+			//		perror("\tprotocal error\n");
+			//	}
 
 
-			}
+			//}
 			else {
-				std::cout << "请求类型错误!" << endl;
+				Utils::printRedColor("请求类型错误!");
 				/*构建StrategyInfo的Json*/
 				build_doc.SetObject();
 				rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();

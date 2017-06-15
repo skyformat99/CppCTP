@@ -3623,6 +3623,8 @@ bool Strategy::CompareTickData(CThostFtdcDepthMarketDataField *last_tick_data, C
 
 void Strategy::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
 
+	//this->getStgUser()->getXtsLogger()->info("Strategy::OnRtnDepthMarketData() Tick ExchangeID = {}", pDepthMarketData->ExchangeID);
+
 	THREAD_CThostFtdcDepthMarketDataField *pDepthMarketData_tmp = new THREAD_CThostFtdcDepthMarketDataField();
 	this->CopyThreadTickData(pDepthMarketData_tmp, pDepthMarketData);
 	this->queue_OnRtnDepthMarketData.enqueue(pDepthMarketData_tmp);
@@ -3666,30 +3668,32 @@ void Strategy::thread_queue_OnRtnDepthMarketData() {
 		}
 		else {
 
-			//// 区分交易所
-			//if (!strcmp(pDepthMarketData_tmp->ExchangeID, "INE")) // 能源交易中心
-			//{
+			//this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnDepthMarketData() Tick ExchangeID = {}", pDepthMarketData_tmp->ExchangeID);
 
-			//}
-			//else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "CFFEX")) // 中金所
-			//{
+			// 区分交易所
+			if (!strcmp(pDepthMarketData_tmp->ExchangeID, "INE")) // 能源交易中心
+			{
 
-			//}
-			//else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "CZCE")) // 郑商所
-			//{
+			}
+			else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "CFFEX")) // 中金所
+			{
 
-			//}
-			//else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "DCE")) // 大商所
-			//{
+			}
+			else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "CZCE")) // 郑商所
+			{
 
-			//}
-			//else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "SHFE")) // 上期所
-			//{
+			}
+			else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "DCE")) // 大商所
+			{
 
-			//}
-			//else {
-			//	this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnDepthMarketData() Tick ExchangeID有误!");
-			//}
+			}
+			else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "SHFE")) // 上期所
+			{
+
+			}
+			else {
+				//this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnDepthMarketData() Tick ExchangeID有误!");
+			}
 
 			//执行tick处理
 			if (!strcmp(pDepthMarketData_tmp->InstrumentID, this->getStgInstrumentIdA().c_str())) {
@@ -3861,7 +3865,7 @@ void Strategy::Order_Algorithm_One() {
 	{
 		//this->printStrategyInfo("策略跳过异常行情");
 		//this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One()_1", false);
-		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One() 策略跳过异常行情");
+		//this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One() 策略跳过异常行情");
 		/*this->getStgUser()->getXtsLogger()->info("\t策略跳过异常行情");*/
 		return;
 	}

@@ -460,6 +460,7 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
 	for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 		USER_PRINT(((*itor)));
 		//std::cout << "\tcount = " << count++ << std::endl;
+		//std::cout << "ExchangeID = " << pDepthMarketData->ExchangeID << std::endl;
 		(*itor)->OnRtnDepthMarketData(pDepthMarketData);
 	}
 
