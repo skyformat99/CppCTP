@@ -2053,6 +2053,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 1, buffer.GetString());
+
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t客户端已断开!!!\n");
 						//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -2097,6 +2099,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 1, buffer.GetString());
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t客户端已断开!!!\n");
@@ -2188,6 +2192,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+						ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 2, buffer.GetString());
+
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
 							//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -2229,6 +2235,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 2, buffer.GetString());
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -2400,6 +2408,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+						ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 3, buffer.GetString());
+
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
 							//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -2440,6 +2450,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 3, buffer.GetString());
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -2524,6 +2536,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+						ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 4, buffer.GetString());
+
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
 							//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -2563,6 +2577,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 4, buffer.GetString());
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -2725,6 +2741,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+
+				ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 5, buffer.GetString());
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -2949,6 +2968,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+
+				ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 6, buffer.GetString());
+
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
 					//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -3080,7 +3102,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.Accept(writer);
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-				std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+				ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 7, buffer.GetString());
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -3152,6 +3175,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+				ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 8, buffer.GetString());
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -3227,6 +3252,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+				ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 9, buffer.GetString());
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -3366,6 +3393,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+
+						ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 10, buffer.GetString());
+
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
 							//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -3406,6 +3436,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 10, buffer.GetString());
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -3483,6 +3515,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+						ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 11, buffer.GetString());
+
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
 							//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -3521,6 +3555,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 11, buffer.GetString());
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -3978,6 +4014,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+				ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 12, buffer.GetString());
+
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
 					//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -4077,6 +4115,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+				
+				ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 13, buffer.GetString());
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -4166,6 +4206,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+				ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 14, buffer.GetString());
+
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -4279,6 +4322,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+						ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 15, buffer.GetString());
+
+
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
 							//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -4322,6 +4368,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 15, buffer.GetString());
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -4507,6 +4555,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+						ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 17, buffer.GetString());
+
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
 							//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -4548,6 +4598,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 17, buffer.GetString());
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -4674,6 +4726,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+						ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 20, buffer.GetString());
+
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
 							//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -4716,6 +4770,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 20, buffer.GetString());
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -4827,6 +4883,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+						ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 21, buffer.GetString());
+
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
 							//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -4869,6 +4927,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 21, buffer.GetString());
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -5039,6 +5099,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+						ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 22, buffer.GetString());
+
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
 							//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -5130,6 +5192,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+				ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 99, buffer.GetString());
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");

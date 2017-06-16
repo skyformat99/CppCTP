@@ -3180,32 +3180,6 @@ void Strategy::setL_query_trade(list<CThostFtdcTradeField *> *l_query_trade) {
 				<< "B合约昨卖 = " << this->stg_position_b_buy_yesterday << ", "
 				<< "B合约总卖 = " << this->stg_position_b_sell << std::endl;*/
 
-			USER_PRINT("A合约今买");
-			USER_PRINT(this->stg_position_a_buy_today);
-			USER_PRINT("A合约昨买");
-			USER_PRINT(this->stg_position_a_buy_yesterday);
-			USER_PRINT("A合约总买");
-			USER_PRINT(this->stg_position_a_buy);
-			USER_PRINT("A合约今卖");
-			USER_PRINT(this->stg_position_a_sell_today);
-			USER_PRINT("A合约昨卖");
-			USER_PRINT(this->stg_position_a_sell_yesterday);
-			USER_PRINT("A合约总卖");
-			USER_PRINT(this->stg_position_a_sell);
-
-			USER_PRINT("B合约今买");
-			USER_PRINT(this->stg_position_b_buy_today);
-			USER_PRINT("B合约昨买");
-			USER_PRINT(this->stg_position_b_buy_yesterday);
-			USER_PRINT("B合约总买");
-			USER_PRINT(this->stg_position_b_buy);
-			USER_PRINT("B合约今卖");
-			USER_PRINT(this->stg_position_b_sell_today);
-			USER_PRINT("B合约昨卖");
-			USER_PRINT(this->stg_position_b_sell_yesterday);
-			USER_PRINT("B合约总卖");
-			USER_PRINT(this->stg_position_b_sell);
-
 		}
 	}
 }
@@ -3285,14 +3259,15 @@ void Strategy::printStrategyInfo(string message) {
 	this->getStgUser()->getXtsLogger()->info("\t期货账户开关:{}", this->stg_user->getOn_Off());
 	this->getStgUser()->getXtsLogger()->info("\t交易员开关:{}", this->stg_user->GetTrader()->getOn_Off());
 	this->getStgUser()->getXtsLogger()->info("\t策略开关:{}", this->getOn_Off());
+	this->getStgUser()->getXtsLogger()->info("\t是否正在交易:{}", this->stg_trade_tasking);
+	this->getStgUser()->getXtsLogger()->info("\t下单算法锁:{}", this->stg_select_order_algorithm_flag);
 	this->getStgUser()->getXtsLogger()->info("\tA合约撤单次数:{}, A合约撤单限制:{}", this->getStgAOrderActionCount(), this->getStgAOrderActionTiresLimit());
 	this->getStgUser()->getXtsLogger()->info("\tB合约撤单次数:{}, B合约撤单限制:{}", this->getStgBOrderActionCount(), this->getStgBOrderActionTiresLimit());
-
-	this->getStgUser()->getXtsLogger()->info("\t卖开价差:{}, 买平价差:{}", this->stg_sell_open, this->stg_buy_close);
-	this->getStgUser()->getXtsLogger()->info("\t买开价差:{}, 卖平价差:{}", this->stg_buy_open, this->stg_sell_close);
-	this->getStgUser()->getXtsLogger()->info("\t多头价差:{}, 多头价差挂单量:{}", this->stg_spread_long, this->stg_spread_long_volume);
-	this->getStgUser()->getXtsLogger()->info("\t空头价差:{}, 空头价差挂单量:{}", this->stg_spread_short, this->stg_spread_short_volume);
-
+	this->getStgUser()->getXtsLogger()->info("\t市场多头价差:{}, 市场空头价差:{}", this->stg_spread_long, this->stg_spread_short);
+	this->getStgUser()->getXtsLogger()->info("\t交易员卖开价差:{}, 交易员买平价差:{}", this->stg_sell_open, this->stg_buy_close);
+	this->getStgUser()->getXtsLogger()->info("\t市场空头价差:{}, 市场多头价差:{}", this->stg_spread_short, this->stg_spread_long);
+	this->getStgUser()->getXtsLogger()->info("\t交易员买开价差:{}, 交易员卖平价差:{}", this->stg_buy_open, this->stg_sell_close);
+	this->getStgUser()->getXtsLogger()->info("\t市场多头价差挂单量:{}, 市场空头价差挂单量:{}", this->stg_spread_long_volume, this->stg_spread_short_volume);
 	this->getStgUser()->getXtsLogger()->info("\tA总卖:{}, A昨卖:{}", this->stg_position_a_sell, this->stg_position_a_sell_yesterday);
 	this->getStgUser()->getXtsLogger()->info("\tB总买:{}, B昨买:{}", this->stg_position_b_buy, this->stg_position_b_buy_yesterday);
 	this->getStgUser()->getXtsLogger()->info("\tA总买:{}, A昨买:{}", this->stg_position_a_buy, this->stg_position_a_buy_yesterday);
@@ -3816,7 +3791,7 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 		return;
 	}
 
-	if (stg_order_algorithm == ALGORITHM_ONE) { //下单算法1
+	if (stg_order_algorithm == ALGORITHM_ONE) { // 下单算法1
 		this->Order_Algorithm_One();
 	}
 	else if (stg_order_algorithm == ALGORITHM_TWO) { // 下单算法2
@@ -3827,7 +3802,7 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 		this->Order_Algorithm_Three();
 	}
 	else {
-		this->getStgUser()->getXtsLogger()->info("Strategy::Select_Order_Algorithm() 不存在的下单算法 user_id = {} strategy_id = {}", this->getStgUserId(), this->getStgStrategyId());
+		//this->getStgUser()->getXtsLogger()->info("Strategy::Select_Order_Algorithm() 不存在的下单算法 user_id = {} strategy_id = {}", this->getStgUserId(), this->getStgStrategyId());
 	}
 	
 }
@@ -6174,6 +6149,24 @@ string Strategy::getStgStrategyId() {
 void Strategy::setStgStrategyId(string stgStrategyId) {
 	stg_strategy_id = stgStrategyId;
 }
+
+
+int Strategy::getStgInstrumentAScale() {
+	return this->stg_instrument_A_scale;
+}
+
+void Strategy::setStgInstrumentAScale(int stg_instrument_A_scale) {
+	this->stg_instrument_A_scale = stg_instrument_A_scale;
+}
+
+int Strategy::getStgInstrumentBScale() {
+	return this->stg_instrument_B_scale;
+}
+
+void Strategy::setStgInstrumentBScale(int stg_instrument_B_scale) {
+	this->stg_instrument_B_scale = stg_instrument_B_scale;
+}
+
 
 bool Strategy::isStgTradeTasking() {
 	return this->stg_trade_tasking;

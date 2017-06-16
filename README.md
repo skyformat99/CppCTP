@@ -35,6 +35,7 @@ CppCTP
 CppCTP中使用了一些第三方开源库，非常感谢开源作者提供优秀的库，下面列举出该系统使用的开源库：
 * log日志库:spdlog
 * 多线程安全队列:concurrentqueue
+* C++高性能json解析库:rapidjson
 
 ## 相关开发教程
 整个CppCTP的开发周期还是比较漫长的，从接触API文档到后期策略级别上的开发，中间踩过不少坑。

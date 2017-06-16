@@ -217,6 +217,12 @@ public:
 
 	string getStgStrategyId();
 	void setStgStrategyId(string stgStrategyId);
+			
+	int getStgInstrumentAScale();		// A合约比例乘数
+	void setStgInstrumentAScale(int stg_instrument_A_scale);
+
+	int getStgInstrumentBScale();		// B合约比例乘数
+	void setStgInstrumentBScale(int stg_instrument_B_scale);
 
 	bool isStgTradeTasking();
 	void setStgTradeTasking(bool stgTradeTasking);
@@ -585,6 +591,9 @@ private:
 	string stg_trading_day;				// 交易日
 	string stg_update_position_detail_record_time; // 策略持仓明细修改记录时间
 	string stg_last_saved_time;			// 策略最后一次保存的时间
+
+	int stg_instrument_A_scale;			// A合约比例乘数
+	int stg_instrument_B_scale;			// B合约比例乘数
 
 	int stg_position_a_buy_today;		// A合约买持仓今仓
 	int stg_position_a_buy_yesterday;	// A合约买持仓昨仓
