@@ -9,6 +9,7 @@
 #include "Debug.h"
 #include "DBManager.h"
 #include "xTradeStruct.h"
+#include "INIReader.h"
 //#include "concurrentqueue/blockingconcurrentqueue.h"
 #include "safequeue.h"
 #include <spdlog/spdlog.h>
@@ -543,6 +544,152 @@ public:
 	void setQueue_OnRtnTrade_on_off(bool queue_OnRtnTrade_on_off);
 	bool getQueue_OnRtnTrade_on_off();
 
+	string getMorning_opentime();
+
+	void setMorning_opentime(string morning_opentime);
+
+	string getMorning_begin_breaktime();
+
+	void setMorning_begin_breaktime(string morning_begin_breaktime);
+
+	string getMorning_breaktime();
+
+	void setMorning_breaktime(string morning_breaktime);
+
+	string getMorning_recoverytime();
+
+	void setMorning_recoverytime(string morning_recoverytime);
+
+	string getMorning_begin_closetime();
+
+	void setMorning_begin_closetime(string morning_begin_closetime);
+
+	string getMorning_closetime();
+
+	void setMorning_closetime(string morning_closetime);
+
+	string getAfternoon_opentime();
+
+	void setAfternoon_opentime(string afternoon_opentime);
+
+	string getAfternoon_begin_closetime();
+
+	void setAfternoon_begin_closetime(string afternoon_begin_closetime);
+
+	string getAfternoon_closetime();
+
+	void setAfternoon_closetime(string afternoon_closetime);
+
+	string getEvening_opentime();
+
+	void setEvening_opentime(string evening_opentime);
+
+	string getEvening_begin_closetime();
+
+	void setEvening_begin_closetime(string evening_begin_closetime);
+
+	string getEvening_closetime();
+
+	void setEvening_closetime(string evening_closetime);
+
+	string getMorning_opentime_instrument_A();
+
+	void setMorning_opentime_instrument_A(string morning_opentime_instrument_A);
+
+	string getMorning_begin_breaktime_instrument_A();
+
+	void setMorning_begin_breaktime_instrument_A(string morning_begin_breaktime_instrument_A);
+
+	string getMorning_breaktime_instrument_A();
+
+	void setMorning_breaktime_instrument_A(string morning_breaktime_instrument_A);
+
+	string getMorning_recoverytime_instrument_A();
+
+	void setMorning_recoverytime_instrument_A(string morning_recoverytime_instrument_A);
+
+	string getMorning_begin_closetime_instrument_A();
+
+	void setMorning_begin_closetime_instrument_A(string morning_begin_closetime_instrument_A);
+
+	string getMorning_closetime_instrument_A();
+
+	void setMorning_closetime_instrument_A(string morning_closetime_instrument_A);
+
+	string getAfternoon_opentime_instrument_A();
+
+	void setAfternoon_opentime_instrument_A(string afternoon_opentime_instrument_A);
+
+	string getAfternoon_begin_closetime_instrument_A();
+
+	void setAfternoon_begin_closetime_instrument_A(string afternoon_begin_closetime_instrument_A);
+
+	string getAfternoon_closetime_instrument_A();
+
+	void setAfternoon_closetime_instrument_A(string afternoon_closetime_instrument_A);
+
+	string getEvening_opentime_instrument_A();
+
+	void setEvening_opentime_instrument_A(string evening_opentime_instrument_A);
+
+	string getEvening_begin_closetime_instrument_A();
+
+	void setEvening_begin_closetime_instrument_A(string evening_begin_closetime_instrument_A);
+
+	string getEvening_closetime_instrument_A();
+
+	void setEvening_closetime_instrument_A(string evening_closetime_instrument_A);
+
+	string getMorning_opentime_instrument_B();
+
+	void setMorning_opentime_instrument_B(string morning_opentime_instrument_B);
+
+	string getMorning_begin_breaktime_instrument_B();
+
+	void setMorning_begin_breaktime_instrument_B(string morning_begin_breaktime_instrument_B);
+
+	string getMorning_breaktime_instrument_B();
+
+	void setMorning_breaktime_instrument_B(string morning_breaktime_instrument_B);
+
+	string getMorning_recoverytime_instrument_B();
+
+	void setMorning_recoverytime_instrument_B(string morning_recoverytime_instrument_B);
+
+	string getMorning_begin_closetime_instrument_B();
+
+	void setMorning_begin_closetime_instrument_B(string morning_begin_closetime_instrument_B);
+
+	string getMorning_closetime_instrument_B();
+
+	void setMorning_closetime_instrument_B(string morning_closetime_instrument_B);
+
+	string getAfternoon_opentime_instrument_B();
+
+	void setAfternoon_opentime_instrument_B(string afternoon_opentime_instrument_B);
+
+	string getAfternoon_begin_closetime_instrument_B();
+
+	void setAfternoon_begin_closetime_instrument_B(string afternoon_begin_closetime_instrument_B);
+
+	string getAfternoon_closetime_instrument_B();
+
+	void setAfternoon_closetime_instrument_B(string afternoon_closetime_instrument_B);
+
+	string getEvening_opentime_instrument_B();
+
+	void setEvening_opentime_instrument_B(string evening_opentime_instrument_B);
+
+	string getEvening_begin_closetime_instrument_B();
+
+	void setEvening_begin_closetime_instrument_B(string evening_begin_closetime_instrument_B);
+
+	string getEvening_closetime_instrument_B();
+
+	void setEvening_closetime_instrument_B(string evening_closetime_instrument_B);
+
+	void StgTimeCal();
+
 private:
 	Trader *trader;
 	User *user;
@@ -622,6 +769,45 @@ private:
 	double stg_spread_short;								// 市场空头价差：A合约卖一价 - B合约卖一价
 	int stg_spread_short_volume;							// 市场空头价差盘口挂单量：min(A合约买一量 - B合约买一量)
 	double stg_spread;										// 市场最新价价差
+
+	string morning_opentime;								// 中午开盘时间
+	string morning_begin_breaktime;							// 中午休盘时间前10秒
+	string morning_breaktime;								// 中午休盘时间
+	string morning_recoverytime;							// 中午休盘恢复时间
+	string morning_begin_closetime;							// 中午收盘时间前10秒
+	string morning_closetime;								// 中午收盘
+	string afternoon_opentime;								// 下午开盘时间
+	string afternoon_begin_closetime;						// 下午收盘时间前10秒
+	string afternoon_closetime;								// 下午收盘时间
+	string evening_opentime;								// 夜间开盘时间
+	string evening_begin_closetime;							// 夜间收盘时间前10秒
+	string evening_closetime;								// 夜间收盘时间
+
+	string morning_opentime_instrument_A;								// 中午开盘时间_instrument_A
+	string morning_begin_breaktime_instrument_A;						// 中午休盘时间前10秒_instrument_A
+	string morning_breaktime_instrument_A;								// 中午休盘时间_instrument_A
+	string morning_recoverytime_instrument_A;							// 中午休盘恢复时间_instrument_A
+	string morning_begin_closetime_instrument_A;						// 中午收盘时间前10秒_instrument_A
+	string morning_closetime_instrument_A;								// 中午收盘_instrument_A
+	string afternoon_opentime_instrument_A;								// 下午开盘时间_instrument_A
+	string afternoon_begin_closetime_instrument_A;						// 下午收盘时间前10秒_instrument_A
+	string afternoon_closetime_instrument_A;							// 下午收盘时间_instrument_A
+	string evening_opentime_instrument_A;								// 夜间开盘时间_instrument_A
+	string evening_begin_closetime_instrument_A;						// 夜间收盘时间前10秒_instrument_A
+	string evening_closetime_instrument_A;								// 夜间收盘时间_instrument_A
+
+	string morning_opentime_instrument_B;								// 中午开盘时间_instrument_B
+	string morning_begin_breaktime_instrument_B;						// 中午休盘时间前10秒_instrument_B
+	string morning_breaktime_instrument_B;								// 中午休盘时间_instrument_B
+	string morning_recoverytime_instrument_B;							// 中午休盘恢复时间_instrument_B
+	string morning_begin_closetime_instrument_B;						// 中午收盘时间前10秒_instrument_B
+	string morning_closetime_instrument_B;								// 中午收盘_instrument_B
+	string afternoon_opentime_instrument_B;								// 下午开盘时间_instrument_B
+	string afternoon_begin_closetime_instrument_B;						// 下午收盘时间前10秒_instrument_B
+	string afternoon_closetime_instrument_B;							// 下午收盘时间_instrument_B
+	string evening_opentime_instrument_B;								// 夜间开盘时间_instrument_B
+	string evening_begin_closetime_instrument_B;						// 夜间收盘时间前10秒_instrument_B
+	string evening_closetime_instrument_B;								// 夜间收盘时间_instrument_B
 
 	string stg_order_ref_last;	// 最后一次实际使用的报单引用
 	string stg_order_ref_a;		// A合约报单引用

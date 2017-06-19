@@ -793,7 +793,7 @@ void TdSpi::CopyInstrumentInfo(CThostFtdcInstrumentField *dst, CThostFtdcInstrum
 }
 
 ///合约交易状态通知
-void TdSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus) {
+ void TdSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus) {
 	//USER_PRINT("TdSpi::OnRtnInstrumentStatus");
 	if (pInstrumentStatus) {
 		/*///交易所代码
@@ -813,7 +813,7 @@ void TdSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentSt
 		///进入本状态原因
 		std::cout << "进入本状态原因 = " << pInstrumentStatus->EnterReason << endl;*/
 
-		this->current_user->getXtsLogger()->info("|交易所代码 = {} 合约在交易所的代码 = {} 结算组代码 = {} 合约代码 = {} 合约交易状态 = {} 交易阶段编号 = {} 进入本状态时间 = {} 进入本状态原因 = {}", 
+		this->current_user->getXtsLogger()->info("TdSpi::OnRtnInstrumentStatus() 交易所代码 = {} 合约在交易所的代码 = {} 结算组代码 = {} 合约代码 = {} 合约交易状态 = {} 交易阶段编号 = {} 进入本状态时间 = {} 进入本状态原因 = {}", 
 			pInstrumentStatus->ExchangeID, pInstrumentStatus->ExchangeInstID, pInstrumentStatus->SettlementGroupID, pInstrumentStatus->InstrumentID, 
 			pInstrumentStatus->InstrumentStatus, pInstrumentStatus->TradingSegmentSN, pInstrumentStatus->EnterTime, pInstrumentStatus->EnterReason);
 

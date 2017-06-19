@@ -1345,6 +1345,10 @@ void DBManager::getAllStrategyByActiveUser(bool fake, list<Strategy *> *l_strate
 			if (elements.size() > 1) {
 				stg->setStgInstrumentIdA(elements[0].String());
 				stg->setStgInstrumentIdB(elements[1].String());
+
+				// 计算策略时间
+				stg->StgTimeCal();
+
 				stg->addInstrumentToList(stg->getStgInstrumentIdA());
 				stg->addInstrumentToList(stg->getStgInstrumentIdB());
 				//cout << "stg->setStgInstrumentIdA(elements[0]) = " << stg->getStgInstrumentIdA() << ", ";
@@ -2031,6 +2035,10 @@ void DBManager::getAllStrategyYesterdayByActiveUser(list<Strategy *> *l_strategy
 			if (elements.size() > 1) {
 				stg->setStgInstrumentIdA(elements[0].String());
 				stg->setStgInstrumentIdB(elements[1].String());
+
+				// 计算策略时间
+				stg->StgTimeCal();
+
 				stg->addInstrumentToList(stg->getStgInstrumentIdA());
 				stg->addInstrumentToList(stg->getStgInstrumentIdB());
 				//cout << "stg->setStgInstrumentIdA(elements[0]) = " << stg->getStgInstrumentIdA() << ", ";

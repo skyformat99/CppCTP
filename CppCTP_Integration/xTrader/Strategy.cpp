@@ -3260,6 +3260,20 @@ void Strategy::printStrategyInfo(string message) {
 	this->getStgUser()->getXtsLogger()->info("\t交易员开关:{}", this->stg_user->GetTrader()->getOn_Off());
 	this->getStgUser()->getXtsLogger()->info("\t策略开关:{}", this->getOn_Off());
 	this->getStgUser()->getXtsLogger()->info("\t是否正在交易:{}", this->stg_trade_tasking);
+	this->getStgUser()->getXtsLogger()->info("\tmorning_opentime = {} morning_begin_breaktime = {} morning_breaktime = {} morning_recoverytime = {} morning_begin_closetime = {} morning_closetime = {} afternoon_opentime = {} afternoon_begin_closetime = {} afternoon_closetime = {} evening_opentime = {} evening_begin_closetime = {} evening_closetime = {}",
+		this->morning_opentime,
+		this->morning_begin_breaktime,
+		this->morning_breaktime,
+		this->morning_recoverytime,
+		this->morning_begin_closetime,
+		this->morning_closetime,
+		this->afternoon_opentime,
+		this->afternoon_begin_closetime,
+		this->afternoon_closetime,
+		this->evening_opentime,
+		this->evening_begin_closetime,
+		this->evening_closetime);
+	
 	this->getStgUser()->getXtsLogger()->info("\t下单算法锁:{}", this->stg_select_order_algorithm_flag);
 	this->getStgUser()->getXtsLogger()->info("\tA合约撤单次数:{}, A合约撤单限制:{}", this->getStgAOrderActionCount(), this->getStgAOrderActionTiresLimit());
 	this->getStgUser()->getXtsLogger()->info("\tB合约撤单次数:{}, B合约撤单限制:{}", this->getStgBOrderActionCount(), this->getStgBOrderActionTiresLimit());
@@ -4642,6 +4656,348 @@ bool Strategy::getQueue_OnRtnTrade_on_off() {
 	return this->queue_OnRtnTrade_on_off;
 }
 
+string Strategy::getMorning_opentime() {
+	return morning_opentime;
+}
+void Strategy::setMorning_opentime(string morning_opentime) {
+	this->morning_opentime = morning_opentime;
+}
+string Strategy::getMorning_begin_breaktime() {
+	return morning_begin_breaktime;
+}
+void Strategy::setMorning_begin_breaktime(string morning_begin_breaktime) {
+	this->morning_begin_breaktime = morning_begin_breaktime;
+}
+string Strategy::getMorning_breaktime() {
+	return morning_breaktime;
+}
+void Strategy::setMorning_breaktime(string morning_breaktime) {
+	this->morning_breaktime = morning_breaktime;
+}
+string Strategy::getMorning_recoverytime() {
+	return morning_recoverytime;
+}
+void Strategy::setMorning_recoverytime(string morning_recoverytime) {
+	this->morning_recoverytime = morning_recoverytime;
+}
+string Strategy::getMorning_begin_closetime() {
+	return morning_begin_closetime;
+}
+void Strategy::setMorning_begin_closetime(string morning_begin_closetime) {
+	this->morning_begin_closetime = morning_begin_closetime;
+}
+string Strategy::getMorning_closetime() {
+	return morning_closetime;
+}
+void Strategy::setMorning_closetime(string morning_closetime) {
+	this->morning_closetime = morning_closetime;
+}
+string Strategy::getAfternoon_opentime() {
+	return afternoon_opentime;
+}
+void Strategy::setAfternoon_opentime(string afternoon_opentime) {
+	this->afternoon_opentime = afternoon_opentime;
+}
+string Strategy::getAfternoon_begin_closetime() {
+	return afternoon_begin_closetime;
+}
+void Strategy::setAfternoon_begin_closetime(string afternoon_begin_closetime) {
+	this->afternoon_begin_closetime = afternoon_begin_closetime;
+}
+string Strategy::getAfternoon_closetime() {
+	return afternoon_closetime;
+}
+void Strategy::setAfternoon_closetime(string afternoon_closetime) {
+	this->afternoon_closetime = afternoon_closetime;
+}
+string Strategy::getEvening_opentime() {
+	return evening_opentime;
+}
+void Strategy::setEvening_opentime(string evening_opentime) {
+	this->evening_opentime = evening_opentime;
+}
+string Strategy::getEvening_begin_closetime() {
+	return evening_begin_closetime;
+}
+void Strategy::setEvening_begin_closetime(string evening_begin_closetime) {
+	this->evening_begin_closetime = evening_begin_closetime;
+}
+string Strategy::getEvening_closetime() {
+	return evening_closetime;
+}
+void Strategy::setEvening_closetime(string evening_closetime) {
+	this->evening_closetime = evening_closetime;
+}
+string Strategy::getMorning_opentime_instrument_A() {
+	return morning_opentime_instrument_A;
+}
+void Strategy::setMorning_opentime_instrument_A(string morning_opentime_instrument_A) {
+	this->morning_opentime_instrument_A = morning_opentime_instrument_A;
+}
+string Strategy::getMorning_begin_breaktime_instrument_A() {
+	return morning_begin_breaktime_instrument_A;
+}
+void Strategy::setMorning_begin_breaktime_instrument_A(string morning_begin_breaktime_instrument_A) {
+	this->morning_begin_breaktime_instrument_A = morning_begin_breaktime_instrument_A;
+}
+string Strategy::getMorning_breaktime_instrument_A() {
+	return morning_breaktime_instrument_A;
+}
+void Strategy::setMorning_breaktime_instrument_A(string morning_breaktime_instrument_A) {
+	this->morning_breaktime_instrument_A = morning_breaktime_instrument_A;
+}
+string Strategy::getMorning_recoverytime_instrument_A() {
+	return morning_recoverytime_instrument_A;
+}
+void Strategy::setMorning_recoverytime_instrument_A(string morning_recoverytime_instrument_A) {
+	this->morning_recoverytime_instrument_A = morning_recoverytime_instrument_A;
+}
+string Strategy::getMorning_begin_closetime_instrument_A() {
+	return morning_begin_closetime_instrument_A;
+}
+void Strategy::setMorning_begin_closetime_instrument_A(string morning_begin_closetime_instrument_A) {
+	this->morning_begin_closetime_instrument_A = morning_begin_closetime_instrument_A;
+}
+string Strategy::getMorning_closetime_instrument_A() {
+	return morning_closetime_instrument_A;
+}
+void Strategy::setMorning_closetime_instrument_A(string morning_closetime_instrument_A) {
+	this->morning_closetime_instrument_A = morning_closetime_instrument_A;
+}
+string Strategy::getAfternoon_opentime_instrument_A() {
+	return afternoon_opentime_instrument_A;
+}
+void Strategy::setAfternoon_opentime_instrument_A(string afternoon_opentime_instrument_A) {
+	this->afternoon_opentime_instrument_A = afternoon_opentime_instrument_A;
+}
+string Strategy::getAfternoon_begin_closetime_instrument_A() {
+	return afternoon_begin_closetime_instrument_A;
+}
+void Strategy::setAfternoon_begin_closetime_instrument_A(string afternoon_begin_closetime_instrument_A) {
+	this->afternoon_begin_closetime_instrument_A = afternoon_begin_closetime_instrument_A;
+}
+string Strategy::getAfternoon_closetime_instrument_A() {
+	return afternoon_closetime_instrument_A;
+}
+void Strategy::setAfternoon_closetime_instrument_A(string afternoon_closetime_instrument_A) {
+	this->afternoon_closetime_instrument_A = afternoon_closetime_instrument_A;
+}
+string Strategy::getEvening_opentime_instrument_A() {
+	return evening_opentime_instrument_A;
+}
+void Strategy::setEvening_opentime_instrument_A(string evening_opentime_instrument_A) {
+	this->evening_opentime_instrument_A = evening_opentime_instrument_A;
+}
+string Strategy::getEvening_begin_closetime_instrument_A() {
+	return evening_begin_closetime_instrument_A;
+}
+void Strategy::setEvening_begin_closetime_instrument_A(string evening_begin_closetime_instrument_A) {
+	this->evening_begin_closetime_instrument_A = evening_begin_closetime_instrument_A;
+}
+string Strategy::getEvening_closetime_instrument_A() {
+	return evening_closetime_instrument_A;
+}
+void Strategy::setEvening_closetime_instrument_A(string evening_closetime_instrument_A) {
+	this->evening_closetime_instrument_A = evening_closetime_instrument_A;
+}
+string Strategy::getMorning_opentime_instrument_B() {
+	return morning_opentime_instrument_B;
+}
+void Strategy::setMorning_opentime_instrument_B(string morning_opentime_instrument_B) {
+	this->morning_opentime_instrument_B = morning_opentime_instrument_B;
+}
+string Strategy::getMorning_begin_breaktime_instrument_B() {
+	return morning_begin_breaktime_instrument_B;
+}
+void Strategy::setMorning_begin_breaktime_instrument_B(string morning_begin_breaktime_instrument_B) {
+	this->morning_begin_breaktime_instrument_B = morning_begin_breaktime_instrument_B;
+}
+string Strategy::getMorning_breaktime_instrument_B() {
+	return morning_breaktime_instrument_B;
+}
+void Strategy::setMorning_breaktime_instrument_B(string morning_breaktime_instrument_B) {
+	this->morning_breaktime_instrument_B = morning_breaktime_instrument_B;
+}
+string Strategy::getMorning_recoverytime_instrument_B() {
+	return morning_recoverytime_instrument_B;
+}
+void Strategy::setMorning_recoverytime_instrument_B(string morning_recoverytime_instrument_B) {
+	this->morning_recoverytime_instrument_B = morning_recoverytime_instrument_B;
+}
+string Strategy::getMorning_begin_closetime_instrument_B() {
+	return morning_begin_closetime_instrument_B;
+}
+void Strategy::setMorning_begin_closetime_instrument_B(string morning_begin_closetime_instrument_B) {
+	this->morning_begin_closetime_instrument_B = morning_begin_closetime_instrument_B;
+}
+string Strategy::getMorning_closetime_instrument_B() {
+	return morning_closetime_instrument_B;
+}
+void Strategy::setMorning_closetime_instrument_B(string morning_closetime_instrument_B) {
+	this->morning_closetime_instrument_B = morning_closetime_instrument_B;
+}
+string Strategy::getAfternoon_opentime_instrument_B() {
+	return afternoon_opentime_instrument_B;
+}
+void Strategy::setAfternoon_opentime_instrument_B(string afternoon_opentime_instrument_B) {
+	this->afternoon_opentime_instrument_B = afternoon_opentime_instrument_B;
+}
+string Strategy::getAfternoon_begin_closetime_instrument_B() {
+	return afternoon_begin_closetime_instrument_B;
+}
+void Strategy::setAfternoon_begin_closetime_instrument_B(string afternoon_begin_closetime_instrument_B) {
+	this->afternoon_begin_closetime_instrument_B = afternoon_begin_closetime_instrument_B;
+}
+string Strategy::getAfternoon_closetime_instrument_B() {
+	return afternoon_closetime_instrument_B;
+}
+void Strategy::setAfternoon_closetime_instrument_B(string afternoon_closetime_instrument_B) {
+	this->afternoon_closetime_instrument_B = afternoon_closetime_instrument_B;
+}
+string Strategy::getEvening_opentime_instrument_B() {
+	return evening_opentime_instrument_B;
+}
+void Strategy::setEvening_opentime_instrument_B(string evening_opentime_instrument_B) {
+	this->evening_opentime_instrument_B = evening_opentime_instrument_B;
+}
+string Strategy::getEvening_begin_closetime_instrument_B() {
+	return evening_begin_closetime_instrument_B;
+}
+void Strategy::setEvening_begin_closetime_instrument_B(string evening_begin_closetime_instrument_B) {
+	this->evening_begin_closetime_instrument_B = evening_begin_closetime_instrument_B;
+}
+string Strategy::getEvening_closetime_instrument_B() {
+	return evening_closetime_instrument_B;
+}
+void Strategy::setEvening_closetime_instrument_B(string evening_closetime_instrument_B) {
+	this->evening_closetime_instrument_B = evening_closetime_instrument_B;
+}
+
+void Strategy::StgTimeCal() {
+
+	// 中午开盘时间
+	// 如果A大于B
+	if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->morning_opentime_instrument_A).c_str(), (Utils::getYMDDate() + this->morning_opentime_instrument_B).c_str()))
+	{
+		this->morning_opentime = this->morning_opentime_instrument_B;
+	}
+	else {
+		this->morning_opentime = this->morning_opentime_instrument_A;
+	}
+
+	// 中午休盘时间前10秒
+	// 如果A大于B
+	if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->morning_begin_breaktime_instrument_A).c_str(), (Utils::getYMDDate() + this->morning_begin_breaktime_instrument_B).c_str()))
+	{
+		this->morning_begin_breaktime = this->morning_begin_breaktime_instrument_B;
+	}
+	else {
+		this->morning_begin_breaktime = this->morning_begin_breaktime_instrument_A;
+	}
+
+	// 中午休盘时间
+	// 如果A大于B
+	if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->morning_breaktime_instrument_A).c_str(), (Utils::getYMDDate() + this->morning_breaktime_instrument_B).c_str()))
+	{
+		this->morning_breaktime = this->morning_breaktime_instrument_B;
+	}
+	else {
+		this->morning_breaktime = this->morning_breaktime_instrument_A;
+	}
+
+	// 中午休盘恢复时间
+	// 如果A大于B
+	if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->morning_recoverytime_instrument_A).c_str(), (Utils::getYMDDate() + this->morning_recoverytime_instrument_B).c_str()))
+	{
+		this->morning_recoverytime = this->morning_recoverytime_instrument_B;
+	}
+	else {
+		this->morning_recoverytime = this->morning_recoverytime_instrument_A;
+	}
+
+	// 中午收盘时间前10秒
+	// 如果A大于B
+	if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->morning_begin_closetime_instrument_A).c_str(), (Utils::getYMDDate() + this->morning_begin_closetime_instrument_B).c_str()))
+	{
+		this->morning_begin_closetime = this->morning_begin_closetime_instrument_B;
+	}
+	else {
+		this->morning_begin_closetime = this->morning_begin_closetime_instrument_A;
+	}
+
+	// 中午收盘
+	// 如果A大于B
+	if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->morning_closetime_instrument_A).c_str(), (Utils::getYMDDate() + this->morning_closetime_instrument_B).c_str()))
+	{
+		this->morning_closetime = this->morning_closetime_instrument_B;
+	}
+	else {
+		this->morning_closetime = this->morning_closetime_instrument_A;
+	}
+
+
+	// 下午开盘时间
+	// 如果A大于B
+	if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->afternoon_opentime_instrument_A).c_str(), (Utils::getYMDDate() + this->afternoon_opentime_instrument_B).c_str()))
+	{
+		this->afternoon_opentime = this->afternoon_opentime_instrument_B;
+	}
+	else {
+		this->afternoon_opentime = this->afternoon_opentime_instrument_A;
+	}
+
+	// 下午收盘时间前10秒
+	// 如果A大于B
+	if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->afternoon_begin_closetime_instrument_A).c_str(), (Utils::getYMDDate() + this->afternoon_begin_closetime_instrument_B).c_str()))
+	{
+		this->afternoon_begin_closetime = this->afternoon_begin_closetime_instrument_B;
+	}
+	else {
+		this->afternoon_begin_closetime = this->afternoon_begin_closetime_instrument_A;
+	}
+
+
+	// 下午收盘时间
+	// 如果A大于B
+	if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->afternoon_closetime_instrument_A).c_str(), (Utils::getYMDDate() + this->afternoon_closetime_instrument_B).c_str()))
+	{
+		this->afternoon_closetime = this->afternoon_closetime_instrument_B;
+	}
+	else {
+		this->afternoon_closetime = this->afternoon_closetime_instrument_A;
+	}
+
+	// 夜间开盘时间
+	// 如果A大于B
+	if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->evening_opentime_instrument_A).c_str(), (Utils::getYMDDate() + this->evening_opentime_instrument_B).c_str()))
+	{
+		this->evening_opentime = this->evening_opentime_instrument_B;
+	}
+	else {
+		this->evening_opentime = this->evening_opentime_instrument_A;
+	}
+
+	// 夜间收盘时间前10秒
+	// 如果A大于B
+	if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->evening_begin_closetime_instrument_A).c_str(), (Utils::getYMDDate() + this->evening_begin_closetime_instrument_B).c_str()))
+	{
+		this->evening_begin_closetime = this->evening_begin_closetime_instrument_B;
+	}
+	else {
+		this->evening_begin_closetime = this->evening_begin_closetime_instrument_A;
+	}
+
+	// 夜间收盘时间
+	// 如果A大于B
+	if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->evening_closetime_instrument_A).c_str(), (Utils::getYMDDate() + this->evening_closetime_instrument_B).c_str()))
+	{
+		this->evening_closetime = this->evening_closetime_instrument_B;
+	}
+	else {
+		this->evening_closetime = this->evening_closetime_instrument_A;
+	}
+}
+
 // 报单录入错误回报
 void Strategy::Exec_OnErrRtnOrderInsert() {
 	USER_PRINT("Exec_OnErrRtnOrderInsert()");
@@ -5845,8 +6201,44 @@ string Strategy::getStgInstrumentIdA() {
 	return stg_instrument_id_A;
 }
 
+
+
 void Strategy::setStgInstrumentIdA(string stgInstrumentIdA) {
 	stg_instrument_id_A = stgInstrumentIdA;
+
+	int i = Utils::match_instrumentid(stgInstrumentIdA);
+
+	if (i != 0)
+	{
+		string instrument_id = stg_instrument_id_A.substr(0, i);
+
+		// 读取合约时间配置文件
+		INIReader reader("config/instruments_time.ini");
+
+		if (reader.ParseError() < 0) {
+			Utils::printRedColor("Strategy::setStgInstrumentIdA() 无法打开instruments_time.ini配置文件");
+			this->getStgUser()->getXtsLogger()->info("Strategy::setStgInstrumentIdA() 无法读取instruments_time.ini配置文件");
+		}
+		else {
+			this->morning_opentime_instrument_A = reader.Get(instrument_id, "morning_opentime", "00:00:00");					// 中午开盘时间_instrument_A
+			this->morning_begin_breaktime_instrument_A = reader.Get(instrument_id, "morning_begin_breaktime", "00:00:00");		// 中午休盘时间前10秒_instrument_A
+			this->morning_breaktime_instrument_A = reader.Get(instrument_id, "morning_breaktime", "00:00:00");					// 中午休盘时间_instrument_A
+			this->morning_recoverytime_instrument_A = reader.Get(instrument_id, "morning_recoverytime", "00:00:00");			// 中午休盘恢复时间_instrument_A
+			this->morning_begin_closetime_instrument_A = reader.Get(instrument_id, "morning_begin_closetime", "00:00:00");		// 中午收盘时间前10秒_instrument_A
+			this->morning_closetime_instrument_A = reader.Get(instrument_id, "morning_closetime", "00:00:00");					// 中午收盘_instrument_A
+			this->afternoon_opentime_instrument_A = reader.Get(instrument_id, "afternoon_opentime", "00:00:00");				// 下午开盘时间_instrument_A
+			this->afternoon_begin_closetime_instrument_A = reader.Get(instrument_id, "afternoon_begin_closetime", "00:00:00");	// 下午收盘时间前10秒_instrument_A
+			this->afternoon_closetime_instrument_A = reader.Get(instrument_id, "afternoon_closetime", "00:00:00");				// 下午收盘时间_instrument_A
+			this->evening_opentime_instrument_A = reader.Get(instrument_id, "evening_opentime", "00:00:00");					// 夜间开盘时间_instrument_A
+			this->evening_begin_closetime_instrument_A = reader.Get(instrument_id, "evening_begin_closetime", "00:00:00");		// 夜间收盘时间前10秒_instrument_A
+			this->evening_closetime_instrument_A = reader.Get(instrument_id, "evening_closetime", "00:00:00");					// 夜间收盘时间_instrument_A
+		}
+	}
+	else {
+		Utils::printRedColor("Strategy::setStgInstrumentIdA() 合约校验失败");
+		this->getStgUser()->getXtsLogger()->info("Strategy::setStgInstrumentIdA() 合约校验失败");
+	}
+
 }
 
 string Strategy::getStgInstrumentIdB() {
@@ -5855,6 +6247,42 @@ string Strategy::getStgInstrumentIdB() {
 
 void Strategy::setStgInstrumentIdB(string stgInstrumentIdB) {
 	stg_instrument_id_B = stgInstrumentIdB;
+
+	int i = Utils::match_instrumentid(stgInstrumentIdB);
+
+	if (i != 0)
+	{
+		string instrument_id = stg_instrument_id_B.substr(0, i);
+
+		// 读取合约时间配置文件
+		INIReader reader("config/instruments_time.ini");
+
+		if (reader.ParseError() < 0) {
+			Utils::printRedColor("Strategy::setStgInstrumentIdA() 无法打开instruments_time.ini配置文件");
+			this->getStgUser()->getXtsLogger()->info("Strategy::setStgInstrumentIdA() 无法读取instruments_time.ini配置文件");
+		}
+		else {
+			this->morning_opentime_instrument_B = reader.Get(instrument_id, "morning_opentime", "00:00:00");					// 中午开盘时间_instrument_B
+			this->morning_begin_breaktime_instrument_B = reader.Get(instrument_id, "morning_begin_breaktime", "00:00:00");		// 中午休盘时间前10秒_instrument_B
+			this->morning_breaktime_instrument_B = reader.Get(instrument_id, "morning_breaktime", "00:00:00");					// 中午休盘时间_instrument_B
+			this->morning_recoverytime_instrument_B = reader.Get(instrument_id, "morning_recoverytime", "00:00:00");			// 中午休盘恢复时间_instrument_B
+			this->morning_begin_closetime_instrument_B = reader.Get(instrument_id, "morning_begin_closetime", "00:00:00");		// 中午收盘时间前10秒_instrument_B
+			this->morning_closetime_instrument_B = reader.Get(instrument_id, "morning_closetime", "00:00:00");					// 中午收盘_instrument_B
+			this->afternoon_opentime_instrument_B = reader.Get(instrument_id, "afternoon_opentime", "00:00:00");				// 下午开盘时间_instrument_B
+			this->afternoon_begin_closetime_instrument_B = reader.Get(instrument_id, "afternoon_begin_closetime", "00:00:00");	// 下午收盘时间前10秒_instrument_B
+			this->afternoon_closetime_instrument_B = reader.Get(instrument_id, "afternoon_closetime", "00:00:00");				// 下午收盘时间_instrument_B
+			this->evening_opentime_instrument_B = reader.Get(instrument_id, "evening_opentime", "00:00:00");					// 夜间开盘时间_instrument_B
+			this->evening_begin_closetime_instrument_B = reader.Get(instrument_id, "evening_begin_closetime", "00:00:00");		// 夜间收盘时间前10秒_instrument_B
+			this->evening_closetime_instrument_B = reader.Get(instrument_id, "evening_closetime", "00:00:00");					// 夜间收盘时间_instrument_B
+		}
+
+		
+	}
+	else {
+		Utils::printRedColor("Strategy::setStgInstrumentIdA() 合约校验失败");
+		this->getStgUser()->getXtsLogger()->info("Strategy::setStgInstrumentIdA() 合约校验失败");
+	}
+
 }
 
 bool Strategy::isStgIsActive() {

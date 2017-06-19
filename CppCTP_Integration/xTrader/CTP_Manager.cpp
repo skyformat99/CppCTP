@@ -2835,6 +2835,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								new_stg->setStgStrategyId(object["strategy_id"].GetString());
 								new_stg->setStgInstrumentIdA(object["a_instrument_id"].GetString());
 								new_stg->setStgInstrumentIdB(object["b_instrument_id"].GetString());
+								// 计算策略时间
+								new_stg->StgTimeCal();
+
 								new_stg->setStgTradingDay(ctp_m->getTradingDay());
 								// 最新修改时间
 								new_stg->setStgUpdatePositionDetailRecordTime(Utils::getDate());

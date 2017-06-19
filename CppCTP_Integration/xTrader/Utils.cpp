@@ -12,6 +12,8 @@
 #include <cstring>
 #include <errno.h>
 #include <ctime>
+#include <regex>
+#include <boost/regex.hpp>
 #include "Utils.h"
 #include "Debug.h"
 
@@ -319,4 +321,21 @@ void Utils::printGreenColorWithKV(string key, int value) {
 void Utils::printRedColorWithKV(string key, int value) {
 	//std::cout << "\t\033[31m" << key << " = " << value << "\033[0m" << std::endl;
 	printf("\t" RED "%s = %d" RESET "\n", key.c_str(), value);
+}
+
+int Utils::match_instrumentid(string instrument_id) {
+	/*std::regex e1("^[a-zA-Z]{1}[0-9]{3,4}$");
+	std::regex e2("^[a-zA-Z]{2}[0-9]{3,4}$");*/
+	boost::regex e1("^[a-zA-Z]{1}[0-9]{3,4}$");
+	boost::regex e2("^[a-zA-Z]{2}[0-9]{3,4}$");
+
+	if (boost::regex_match(instrument_id.c_str(), e1)) {
+		return 1;
+	}
+	else if (boost::regex_match(instrument_id.c_str(), e2)) {
+		return 2;
+	}
+	else {
+		return 0;
+	}
 }
