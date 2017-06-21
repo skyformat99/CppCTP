@@ -235,8 +235,6 @@ void timer_handler() {
 	sem_wait((ctp_m->getSem_strategy_handler()));
 	if (ctp_m->getCalTimer()->running()) //定时器在运行中
 	{
-		
-
 		for (itor = ctp_m->getListStrategy()->begin(); itor != ctp_m->getListStrategy()->end(); itor++) {
 			
 			if ((*itor) != NULL) // 策略不为空
