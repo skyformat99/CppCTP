@@ -250,8 +250,11 @@ void timer_handler() {
 					if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + (*itor)->getMorning_begin_breaktime()).c_str()))
 					{
 						//Utils::printGreenColorWithKV("getMorning_begin_breaktime", (ymd_date + (*itor)->getMorning_begin_breaktime()));
-
-						(*itor)->setIsMarketCloseFlag(true);
+						if ((*itor)->getHasMorningBreakTime())
+						{
+							(*itor)->setIsMarketCloseFlag(true);
+						}
+						
 
 						//时间大于中午休盘结束时间
 						if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + (*itor)->getMorning_recoverytime()).c_str()))
@@ -259,7 +262,10 @@ void timer_handler() {
 
 							//Utils::printGreenColorWithKV("getMorning_recoverytime", (ymd_date + (*itor)->getMorning_recoverytime()));
 
-							(*itor)->setIsMarketCloseFlag(false);
+							if ((*itor)->getHasMorningBreakTime())
+							{
+								(*itor)->setIsMarketCloseFlag(true);
+							}
 
 							//时间大于中午收盘
 							if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + (*itor)->getMorning_begin_closetime()).c_str()))
@@ -327,6 +333,8 @@ void timer_handler() {
 														//Utils::printGreenColorWithKV("getAfternoon_closetime", (ymd_date + (*itor)->getAfternoon_closetime()));
 
 														(*itor)->setIsMarketCloseFlag(true);
+														// 结束任务执行false
+														(*itor)->setStgOnOffEndTask(false);
 
 														// 时间大于15:00:02
 														if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + stopsave_time).c_str())) { // 时间大于15:00:00小于15:00:02
@@ -335,6 +343,8 @@ void timer_handler() {
 															//Utils::printGreenColorWithKV("stopsave_time", (ymd_date + stopsave_time));
 
 															(*itor)->setIsMarketCloseFlag(true);
+															// 结束任务执行false
+															(*itor)->setStgOnOffEndTask(false);
 															is_need_save_data_afternoon = true;
 
 															// 时间大于15:00:02
@@ -344,6 +354,8 @@ void timer_handler() {
 																//Utils::printGreenColorWithKV("afternoon_exit_time", (ymd_date + afternoon_exit_time));
 
 																(*itor)->setIsMarketCloseFlag(true);
+																// 结束任务执行false
+																(*itor)->setStgOnOffEndTask(false);
 																is_need_save_data_afternoon = false;
 																is_need_to_exit = true;
 
@@ -414,6 +426,8 @@ void timer_handler() {
 																							//Utils::printGreenColorWithKV("getEvening_closetime", (ymd_date + (*itor)->getEvening_closetime()));
 
 																							(*itor)->setIsMarketCloseFlag(true);
+																							// 结束任务执行false
+																							(*itor)->setStgOnOffEndTask(false);
 
 																							is_need_save_data_afternoon = true;
 																						}
@@ -493,6 +507,8 @@ void timer_handler() {
 											//Utils::printGreenColorWithKV("getEvening_closetime", (ymd_date + (*itor)->getEvening_closetime()));
 
 											(*itor)->setIsMarketCloseFlag(true);
+											// 结束任务执行false
+											(*itor)->setStgOnOffEndTask(false);
 
 											// 时间大于02:44:55
 											if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + night_start_close_time).c_str()))

@@ -375,9 +375,7 @@ public:
 	/// 拷贝结构体CThostFtdcTradeField
 	void CopyTradeDataToNew(USER_CThostFtdcTradeField *dst, CThostFtdcTradeField *src);
 
-
 	void CopyThreadTradeDataToNew(USER_CThostFtdcTradeField *dst, THREAD_CThostFtdcTradeField *src);
-
 
 
 	void CopyNewTradeData(USER_CThostFtdcTradeField *dst, USER_CThostFtdcTradeField *src);
@@ -725,6 +723,9 @@ public:
 	bool getHasNightMarket();
 	void setHasNightMarket(bool has_night_market);
 
+	bool getHasMorningBreakTime();
+	void setHasMorningBreakTime(bool has_morning_break_time);
+
 	bool getEnd_task_afternoon_first();
 
 	void setEnd_task_afternoon_first(bool end_task_afternoon_first);
@@ -897,6 +898,7 @@ private:
 	bool stg_trade_tasking;		// 交易任务进行中
 	bool on_off_end_task;		// 是否允许收盘任务执行
 	bool has_night_market;		// 是否有夜盘
+	bool has_morning_break_time; // 是否有10:15分休息时间
 
 	CThostFtdcInputOrderField *stg_a_order_insert_args;		// a合约报单参数
 	CThostFtdcInputOrderField *stg_b_order_insert_args;		// b合约报单参数

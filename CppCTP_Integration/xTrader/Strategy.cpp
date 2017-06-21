@@ -66,10 +66,7 @@ Strategy::Strategy(bool fake, User *stg_user) {
 	this->stg_position = 0;					//总持仓
 	this->stg_spread_shift = 0;
 	this->stg_stop_loss = 0;
-	this->stg_lots_batch = 0;
 	this->stg_order_algorithm = "01";
-	this->stg_a_order_action_tires_limit = 0;
-	this->stg_b_order_action_tires_limit = 0;
 	this->stg_a_order_action_count = 0;
 	this->stg_b_order_action_count = 0;
 	this->stg_trade_model = "";
@@ -94,6 +91,7 @@ Strategy::Strategy(bool fake, User *stg_user) {
 	this->is_start_end_task_flag = false;		// 默认不执行收盘任务
 	this->is_market_close_flag = false;			// 默认开盘
 	this->has_night_market = true;				// 默认都拥有夜盘
+	this->has_morning_break_time = true;		// 默认都有中午10:15分休盘时间
 
 	this->stg_instrument_A_scale = 1;			// A合约比例乘数
 	this->stg_instrument_B_scale = 1;			// B合约比例乘数
@@ -4962,9 +4960,17 @@ void Strategy::StgTimeCal() {
 	if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->morning_begin_breaktime_instrument_A).c_str(), (Utils::getYMDDate() + this->morning_begin_breaktime_instrument_B).c_str()))
 	{
 		this->morning_begin_breaktime = this->morning_begin_breaktime_instrument_B;
+		if (this->morning_begin_breaktime == "00:00:00")
+		{
+			this->setHasMorningBreakTime(false);
+		}
 	}
 	else {
 		this->morning_begin_breaktime = this->morning_begin_breaktime_instrument_A;
+		if (this->morning_begin_breaktime == "00:00:00")
+		{
+			this->setHasMorningBreakTime(false);
+		}
 	}
 
 	// 中午休盘时间
@@ -4972,9 +4978,17 @@ void Strategy::StgTimeCal() {
 	if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->morning_breaktime_instrument_A).c_str(), (Utils::getYMDDate() + this->morning_breaktime_instrument_B).c_str()))
 	{
 		this->morning_breaktime = this->morning_breaktime_instrument_B;
+		if (this->morning_breaktime == "00:00:00")
+		{
+			this->setHasMorningBreakTime(false);
+		}
 	}
 	else {
 		this->morning_breaktime = this->morning_breaktime_instrument_A;
+		if (this->morning_breaktime == "00:00:00")
+		{
+			this->setHasMorningBreakTime(false);
+		}
 	}
 
 	// 中午休盘恢复时间
@@ -4982,9 +4996,17 @@ void Strategy::StgTimeCal() {
 	if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->morning_recoverytime_instrument_A).c_str(), (Utils::getYMDDate() + this->morning_recoverytime_instrument_B).c_str()))
 	{
 		this->morning_recoverytime = this->morning_recoverytime_instrument_B;
+		if (this->morning_recoverytime == "00:00:00")
+		{
+			this->setHasMorningBreakTime(false);
+		}
 	}
 	else {
 		this->morning_recoverytime = this->morning_recoverytime_instrument_A;
+		if (this->morning_recoverytime == "00:00:00")
+		{
+			this->setHasMorningBreakTime(false);
+		}
 	}
 
 	// 中午收盘时间前10秒
@@ -5044,7 +5066,7 @@ void Strategy::StgTimeCal() {
 	if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->evening_opentime_instrument_A).c_str(), (Utils::getYMDDate() + this->evening_opentime_instrument_B).c_str()))
 	{
 		this->evening_opentime = this->evening_opentime_instrument_B;
-		if (this->evening_opentime == "")
+		if (this->evening_opentime == "00:00:00")
 		{
 			this->setHasNightMarket(false);
 		}
@@ -5054,7 +5076,7 @@ void Strategy::StgTimeCal() {
 	}
 	else {
 		this->evening_opentime = this->evening_opentime_instrument_A;
-		if (this->evening_opentime == "")
+		if (this->evening_opentime == "00:00:00")
 		{
 			this->setHasNightMarket(false);
 		}
@@ -5127,6 +5149,14 @@ bool Strategy::getHasNightMarket() {
 
 void Strategy::setHasNightMarket(bool has_night_market) {
 	this->has_night_market = has_night_market;
+}
+
+bool Strategy::getHasMorningBreakTime() {
+	return this->has_morning_break_time;
+}
+
+void Strategy::setHasMorningBreakTime(bool has_morning_break_time) {
+	this->has_morning_break_time = has_morning_break_time;
 }
 
 
