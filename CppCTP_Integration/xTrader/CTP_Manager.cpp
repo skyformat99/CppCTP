@@ -1177,6 +1177,11 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 			info_object.AddMember("strategy_id", rapidjson::StringRef((*stg_itor)->getStgStrategyId().c_str()), allocator3);
 			info_object.AddMember("position_b_buy", (*stg_itor)->getStgPositionBBuy(), allocator3);
 			info_object.AddMember("lots_batch", (*stg_itor)->getStgLotsBatch(), allocator3);
+
+			info_object.AddMember("instrument_a_scale", (*stg_itor)->getStgInstrumentAScale(), allocator3);
+			info_object.AddMember("instrument_b_scale", (*stg_itor)->getStgInstrumentBScale(), allocator3);
+
+
 			info_object.AddMember("position_a_buy", (*stg_itor)->getStgPositionABuy(), allocator3);
 			info_object.AddMember("sell_open", (*stg_itor)->getStgSellOpen(), allocator3);
 			info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator3);
@@ -2322,6 +2327,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						info_object.AddMember("strategy_id", rapidjson::StringRef((*stg_itor)->getStgStrategyId().c_str()), allocator);
 						info_object.AddMember("position_b_buy", (*stg_itor)->getStgPositionBBuy(), allocator);
 						info_object.AddMember("lots_batch", (*stg_itor)->getStgLotsBatch(), allocator);
+
+						info_object.AddMember("instrument_a_scale", (*stg_itor)->getStgInstrumentAScale(), allocator);
+						info_object.AddMember("instrument_b_scale", (*stg_itor)->getStgInstrumentBScale(), allocator);
+
 						info_object.AddMember("position_a_buy", (*stg_itor)->getStgPositionABuy(), allocator);
 						info_object.AddMember("sell_open", (*stg_itor)->getStgSellOpen(), allocator);
 						info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator);
@@ -2330,6 +2339,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						info_object.AddMember("b_order_action_limit", (*stg_itor)->getStgBOrderActionTiresLimit(), allocator);
 						info_object.AddMember("sell_close", (*stg_itor)->getStgSellClose(), allocator);
 						info_object.AddMember("buy_open", (*stg_itor)->getStgBuyOpen(), allocator);
+						
 
 						/*开关字段*/
 						info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator);
@@ -2654,6 +2664,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								(*stg_itor)->setStgOrderAlgorithm(object["order_algorithm"].GetString());
 								(*stg_itor)->setStgLots(object["lots"].GetInt());
 								(*stg_itor)->setStgLotsBatch(object["lots_batch"].GetInt());
+
+								(*stg_itor)->setStgInstrumentAScale(object["instrument_a_scale"].GetInt());
+								(*stg_itor)->setStgInstrumentBScale(object["instrument_b_scale"].GetInt());
+
 								(*stg_itor)->setStgStopLoss(object["stop_loss"].GetDouble());
 								(*stg_itor)->setStgSpreadShift(object["spread_shift"].GetDouble());
 								(*stg_itor)->setStgALimitPriceShift(object["a_limit_price_shift"].GetInt());
@@ -2686,6 +2700,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								create_info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator);
 								create_info_object.AddMember("lots", (*stg_itor)->getStgLots(), allocator);
 								create_info_object.AddMember("lots_batch", (*stg_itor)->getStgLotsBatch(), allocator);
+
+								create_info_object.AddMember("instrument_a_scale", (*stg_itor)->getStgInstrumentAScale(), allocator);
+								create_info_object.AddMember("instrument_b_scale", (*stg_itor)->getStgInstrumentBScale(), allocator);
+
 								create_info_object.AddMember("stop_loss", (*stg_itor)->getStgStopLoss(), allocator);
 								create_info_object.AddMember("on_off", (*stg_itor)->getOn_Off(), allocator);
 								create_info_object.AddMember("spread_shift", (*stg_itor)->getStgSpreadShift(), allocator);
@@ -2886,6 +2904,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								create_info_object.AddMember("strategy_id", rapidjson::StringRef(new_stg->getStgStrategyId().c_str()), allocator);
 								create_info_object.AddMember("position_b_buy", new_stg->getStgPositionBBuy(), allocator);
 								create_info_object.AddMember("lots_batch", new_stg->getStgLotsBatch(), allocator);
+
+								create_info_object.AddMember("instrument_a_scale", new_stg->getStgInstrumentAScale(), allocator);
+								create_info_object.AddMember("instrument_b_scale", new_stg->getStgInstrumentBScale(), allocator);
+
 								create_info_object.AddMember("position_a_buy", new_stg->getStgPositionABuy(), allocator);
 								create_info_object.AddMember("sell_open", new_stg->getStgSellOpen(), allocator);
 								create_info_object.AddMember("order_algorithm", rapidjson::StringRef(new_stg->getStgOrderAlgorithm().c_str()), allocator);
@@ -5933,6 +5955,14 @@ std::shared_ptr<spdlog::logger> CTP_Manager::getXtsLogger() {
 
 sem_t * CTP_Manager::getSem_strategy_handler() {
 	return &(this->sem_strategy_handler);
+}
+
+bool CTP_Manager::getIsClosingSaved() {
+	return this->isClosingSaved;
+}
+
+void CTP_Manager::setIsClosingSaved(bool isClosingSaved) {
+	this->isClosingSaved = isClosingSaved;
 }
 
 

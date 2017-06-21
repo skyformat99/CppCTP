@@ -39,7 +39,10 @@ Strategy::Strategy(bool fake, User *stg_user) {
 	this->stg_position_b_buy = 0;			//持仓B买
 	this->stg_position_a_buy = 0;			//持仓A买
 	this->stg_position_b_sell = 0;			//持仓B卖
-	this->stg_lots = 0;						//总手
+	this->stg_lots = 1;						//总手
+	this->stg_lots_batch = 1;				//每批下单手数
+	this->stg_a_order_action_tires_limit = 450; //A合约撤单次数限制
+	this->stg_b_order_action_tires_limit = 450;	//B合约撤单次数限制
 	this->stg_position_a_sell_yesterday = 0;//
 	this->stg_position_a_buy_yesterday = 0; //
 	this->stg_position_a_sell_today = 0;	//
@@ -64,7 +67,7 @@ Strategy::Strategy(bool fake, User *stg_user) {
 	this->stg_spread_shift = 0;
 	this->stg_stop_loss = 0;
 	this->stg_lots_batch = 0;
-	this->stg_order_algorithm = "";
+	this->stg_order_algorithm = "01";
 	this->stg_a_order_action_tires_limit = 0;
 	this->stg_b_order_action_tires_limit = 0;
 	this->stg_a_order_action_count = 0;
@@ -88,6 +91,22 @@ Strategy::Strategy(bool fake, User *stg_user) {
 	this->stg_last_saved_time = "";	// 最后一次保存策略时间
 
 	this->stg_user = stg_user;					// 默认用户为空
+	this->is_start_end_task_flag = false;		// 默认不执行收盘任务
+	this->is_market_close_flag = false;			// 默认开盘
+	this->has_night_market = true;				// 默认都拥有夜盘
+
+	this->stg_instrument_A_scale = 1;			// A合约比例乘数
+	this->stg_instrument_B_scale = 1;			// B合约比例乘数
+
+	this->end_task_afternoon_first = true;							// 下午收盘第一次结束任务标志位
+	this->end_task_afternoon_second = true;							// 下午收盘第二次结束任务标志位
+
+	this->end_task_evening_first = true;							// 夜间收盘第一次结束任务标志位
+	this->end_task_evening_second = true;							// 夜间收盘第二次结束任务标志位
+
+	this->end_task_morning_first = true;							// 凌晨收盘第一次结束任务标志位
+	this->end_task_morning_second = true;							// 凌晨收盘第二次结束任务标志位
+
 
 	this->l_instruments = new list<string>();
 
@@ -2062,6 +2081,12 @@ void Strategy::CopyTradeData(CThostFtdcTradeField *dst, CThostFtdcTradeField *sr
 
 void Strategy::CopyThreadTradeData(USER_CThostFtdcTradeField *dst, THREAD_CThostFtdcTradeField *src) {
 
+	string temp(src->OrderRef);
+	int len_order_ref = temp.length();
+	string strategyid = temp.substr(len_order_ref - 2, 2);
+	///策略id
+	strcpy(dst->StrategyID, strategyid.c_str());
+
 	///经纪公司代码
 	strcpy(dst->BrokerID, src->BrokerID);
 
@@ -3254,13 +3279,14 @@ void Strategy::printStrategyInfo(string message) {
 	this->getStgUser()->getXtsLogger()->info("Strategy::printStrategyInfo()");
 	this->getStgUser()->getXtsLogger()->info("\t期货账户:{}", this->stg_user_id);
 	this->getStgUser()->getXtsLogger()->info("\t策略编号:{}", this->stg_strategy_id);
+	this->getStgUser()->getXtsLogger()->info("\t下单算法:{}", this->stg_order_algorithm);
 	this->getStgUser()->getXtsLogger()->info("\t调试信息:{}", message);
 	this->getStgUser()->getXtsLogger()->info("\t系统总开关:{}", this->stg_user->getCTP_Manager()->getOn_Off());
 	this->getStgUser()->getXtsLogger()->info("\t期货账户开关:{}", this->stg_user->getOn_Off());
 	this->getStgUser()->getXtsLogger()->info("\t交易员开关:{}", this->stg_user->GetTrader()->getOn_Off());
 	this->getStgUser()->getXtsLogger()->info("\t策略开关:{}", this->getOn_Off());
 	this->getStgUser()->getXtsLogger()->info("\t是否正在交易:{}", this->stg_trade_tasking);
-	this->getStgUser()->getXtsLogger()->info("\tmorning_opentime = {} morning_begin_breaktime = {} morning_breaktime = {} morning_recoverytime = {} morning_begin_closetime = {} morning_closetime = {} afternoon_opentime = {} afternoon_begin_closetime = {} afternoon_closetime = {} evening_opentime = {} evening_begin_closetime = {} evening_closetime = {}",
+	this->getStgUser()->getXtsLogger()->info("\tmorning_opentime = {} morning_begin_breaktime = {} morning_breaktime = {} morning_recoverytime = {} morning_begin_closetime = {} morning_closetime = {} afternoon_opentime = {} afternoon_begin_closetime = {} afternoon_closetime = {} evening_opentime = {} evening_stop_opentime = {} evening_closetime = {}",
 		this->morning_opentime,
 		this->morning_begin_breaktime,
 		this->morning_breaktime,
@@ -3271,7 +3297,7 @@ void Strategy::printStrategyInfo(string message) {
 		this->afternoon_begin_closetime,
 		this->afternoon_closetime,
 		this->evening_opentime,
-		this->evening_begin_closetime,
+		this->evening_stop_opentime,
 		this->evening_closetime);
 	
 	this->getStgUser()->getXtsLogger()->info("\t下单算法锁:{}", this->stg_select_order_algorithm_flag);
@@ -3644,7 +3670,7 @@ void Strategy::thread_queue_OnRtnDepthMarketData() {
 		}
 
 		//this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnDepthMarketData()");
-		//this->getStgUser()->getXtsLogger()->info("\t期货账号 = {}, 策略id = {}, 合约id = {}, 接收tick时间 = {}", this->getStgUserId(), this->getStgStrategyId(), pDepthMarketData_tmp->InstrumentID, pDepthMarketData_tmp->UpdateTime);
+		//this->getStgUser()->getXtsLogger()->info("\t期货账号 = {}, 策略id = {}, 合约id = {}, 接收tick时间 = {} 买一价 = {} 卖一价 = {}", this->getStgUserId(), this->getStgStrategyId(), pDepthMarketData_tmp->InstrumentID, pDepthMarketData_tmp->UpdateTime, pDepthMarketData_tmp->BidPrice1, pDepthMarketData_tmp->AskPrice1);
 
 		//删除策略调用
 		if (pDepthMarketData_tmp->IsLastElement == true)
@@ -3659,30 +3685,30 @@ void Strategy::thread_queue_OnRtnDepthMarketData() {
 
 			//this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnDepthMarketData() Tick ExchangeID = {}", pDepthMarketData_tmp->ExchangeID);
 
-			// 区分交易所
-			if (!strcmp(pDepthMarketData_tmp->ExchangeID, "INE")) // 能源交易中心
-			{
+			//// 区分交易所
+			//if (!strcmp(pDepthMarketData_tmp->ExchangeID, "INE")) // 能源交易中心
+			//{
 
-			}
-			else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "CFFEX")) // 中金所
-			{
+			//}
+			//else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "CFFEX")) // 中金所
+			//{
 
-			}
-			else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "CZCE")) // 郑商所
-			{
+			//}
+			//else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "CZCE")) // 郑商所
+			//{
 
-			}
-			else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "DCE")) // 大商所
-			{
+			//}
+			//else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "DCE")) // 大商所
+			//{
 
-			}
-			else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "SHFE")) // 上期所
-			{
+			//}
+			//else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "SHFE")) // 上期所
+			//{
 
-			}
-			else {
-				//this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnDepthMarketData() Tick ExchangeID有误!");
-			}
+			//}
+			//else {
+			//	//this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnDepthMarketData() Tick ExchangeID有误!");
+			//}
 
 			//执行tick处理
 			if (!strcmp(pDepthMarketData_tmp->InstrumentID, this->getStgInstrumentIdA().c_str())) {
@@ -3700,15 +3726,13 @@ void Strategy::thread_queue_OnRtnDepthMarketData() {
 			else { /// 如果没有交易任务，那么选择开始新的交易任务
 
 				// 如果休盘期间
-				if (this->stg_user->getCTP_Manager()->getIsMarketClose())
+				if (this->getIsMarketCloseFlag())
 				{
 					//收到最后5秒开始强制处理挂单列表命令
-					if (this->stg_user->getCTP_Manager()->getIsStartEndTask()) {
-						if (this->getStgOnOffEndTask())
-						{
-							this->setStgOnOffEndTask(false);
-							this->finish_pending_order_list();
-						}
+					if (this->getStgOnOffEndTask())
+					{
+						this->setStgOnOffEndTask(false);
+						this->finish_pending_order_list();
 					}
 					// 析构
 					delete pDepthMarketData_tmp;
@@ -4716,12 +4740,7 @@ string Strategy::getEvening_opentime() {
 void Strategy::setEvening_opentime(string evening_opentime) {
 	this->evening_opentime = evening_opentime;
 }
-string Strategy::getEvening_begin_closetime() {
-	return evening_begin_closetime;
-}
-void Strategy::setEvening_begin_closetime(string evening_begin_closetime) {
-	this->evening_begin_closetime = evening_begin_closetime;
-}
+
 string Strategy::getEvening_closetime() {
 	return evening_closetime;
 }
@@ -4788,12 +4807,7 @@ string Strategy::getEvening_opentime_instrument_A() {
 void Strategy::setEvening_opentime_instrument_A(string evening_opentime_instrument_A) {
 	this->evening_opentime_instrument_A = evening_opentime_instrument_A;
 }
-string Strategy::getEvening_begin_closetime_instrument_A() {
-	return evening_begin_closetime_instrument_A;
-}
-void Strategy::setEvening_begin_closetime_instrument_A(string evening_begin_closetime_instrument_A) {
-	this->evening_begin_closetime_instrument_A = evening_begin_closetime_instrument_A;
-}
+
 string Strategy::getEvening_closetime_instrument_A() {
 	return evening_closetime_instrument_A;
 }
@@ -4860,17 +4874,67 @@ string Strategy::getEvening_opentime_instrument_B() {
 void Strategy::setEvening_opentime_instrument_B(string evening_opentime_instrument_B) {
 	this->evening_opentime_instrument_B = evening_opentime_instrument_B;
 }
-string Strategy::getEvening_begin_closetime_instrument_B() {
-	return evening_begin_closetime_instrument_B;
-}
-void Strategy::setEvening_begin_closetime_instrument_B(string evening_begin_closetime_instrument_B) {
-	this->evening_begin_closetime_instrument_B = evening_begin_closetime_instrument_B;
-}
+
 string Strategy::getEvening_closetime_instrument_B() {
 	return evening_closetime_instrument_B;
 }
 void Strategy::setEvening_closetime_instrument_B(string evening_closetime_instrument_B) {
 	this->evening_closetime_instrument_B = evening_closetime_instrument_B;
+}
+
+string Strategy::getEvening_stop_opentime() {
+	return evening_stop_opentime;
+}
+void Strategy::setEvening_stop_opentime(string evening_stop_opentime) {
+	this->evening_stop_opentime = evening_stop_opentime;
+}
+string Strategy::getEvening_first_end_tasktime() {
+	return evening_first_end_tasktime;
+}
+void Strategy::setEvening_first_end_tasktime(string evening_first_end_tasktime) {
+	this->evening_first_end_tasktime = evening_first_end_tasktime;
+}
+string Strategy::getEvening_second_end_tasktime() {
+	return evening_second_end_tasktime;
+}
+void Strategy::setEvening_second_end_tasktime(string evening_second_end_tasktime) {
+	this->evening_second_end_tasktime = evening_second_end_tasktime;
+}
+string Strategy::getEvening_stop_opentime_instrument_A() {
+	return evening_stop_opentime_instrument_A;
+}
+void Strategy::setEvening_stop_opentime_instrument_A(string evening_stop_opentime_instrument_A) {
+	this->evening_stop_opentime_instrument_A = evening_stop_opentime_instrument_A;
+}
+string Strategy::getEvening_first_end_tasktime_instrument_A() {
+	return evening_first_end_tasktime_instrument_A;
+}
+void Strategy::setEvening_first_end_tasktime_instrument_A(string evening_first_end_tasktime_instrument_A) {
+	this->evening_first_end_tasktime_instrument_A = evening_first_end_tasktime_instrument_A;
+}
+string Strategy::getEvening_second_end_tasktime_instrument_A() {
+	return evening_second_end_tasktime_instrument_A;
+}
+void Strategy::setEvening_second_end_tasktime_instrument_A(string evening_second_end_tasktime_instrument_A) {
+	this->evening_second_end_tasktime_instrument_A = evening_second_end_tasktime_instrument_A;
+}
+string Strategy::getEvening_stop_opentime_instrument_B() {
+	return evening_stop_opentime_instrument_B;
+}
+void Strategy::setEvening_stop_opentime_instrument_B(string evening_stop_opentime_instrument_B) {
+	this->evening_stop_opentime_instrument_B = evening_stop_opentime_instrument_B;
+}
+string Strategy::getEvening_first_end_tasktime_instrument_B() {
+	return evening_first_end_tasktime_instrument_B;
+}
+void Strategy::setEvening_first_end_tasktime_instrument_B(string evening_first_end_tasktime_instrument_B) {
+	this->evening_first_end_tasktime_instrument_B = evening_first_end_tasktime_instrument_B;
+}
+string Strategy::getEvening_second_end_tasktime_instrument_B() {
+	return evening_second_end_tasktime_instrument_B;
+}
+void Strategy::setEvening_second_end_tasktime_instrument_B(string evening_second_end_tasktime_instrument_B) {
+	this->evening_second_end_tasktime_instrument_B = evening_second_end_tasktime_instrument_B;
 }
 
 void Strategy::StgTimeCal() {
@@ -4972,19 +5036,51 @@ void Strategy::StgTimeCal() {
 	if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->evening_opentime_instrument_A).c_str(), (Utils::getYMDDate() + this->evening_opentime_instrument_B).c_str()))
 	{
 		this->evening_opentime = this->evening_opentime_instrument_B;
+		if (this->evening_opentime == "")
+		{
+			this->setHasNightMarket(false);
+		}
+		else {
+			this->setHasNightMarket(true);
+		}
 	}
 	else {
 		this->evening_opentime = this->evening_opentime_instrument_A;
+		if (this->evening_opentime == "")
+		{
+			this->setHasNightMarket(false);
+		}
+		else {
+			this->setHasNightMarket(true);
+		}
 	}
 
 	// 夜间收盘时间前10秒
 	// 如果A大于B
-	if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->evening_begin_closetime_instrument_A).c_str(), (Utils::getYMDDate() + this->evening_begin_closetime_instrument_B).c_str()))
+	if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->evening_stop_opentime_instrument_A).c_str(), (Utils::getYMDDate() + this->evening_stop_opentime_instrument_B).c_str()))
 	{
-		this->evening_begin_closetime = this->evening_begin_closetime_instrument_B;
+		this->evening_stop_opentime = this->evening_stop_opentime_instrument_B;
 	}
 	else {
-		this->evening_begin_closetime = this->evening_begin_closetime_instrument_A;
+		this->evening_stop_opentime = this->evening_stop_opentime_instrument_A;
+	}
+
+	// 如果A大于B
+	if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->evening_first_end_tasktime_instrument_A).c_str(), (Utils::getYMDDate() + this->evening_first_end_tasktime_instrument_B).c_str()))
+	{
+		this->evening_first_end_tasktime = this->evening_first_end_tasktime_instrument_B;
+	}
+	else {
+		this->evening_first_end_tasktime = this->evening_first_end_tasktime_instrument_A;
+	}
+
+	// 如果A大于B
+	if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->evening_second_end_tasktime_instrument_A).c_str(), (Utils::getYMDDate() + this->evening_second_end_tasktime_instrument_B).c_str()))
+	{
+		this->evening_second_end_tasktime = this->evening_second_end_tasktime_instrument_B;
+	}
+	else {
+		this->evening_second_end_tasktime = this->evening_second_end_tasktime_instrument_A;
 	}
 
 	// 夜间收盘时间
@@ -4996,6 +5092,82 @@ void Strategy::StgTimeCal() {
 	else {
 		this->evening_closetime = this->evening_closetime_instrument_A;
 	}
+}
+
+// 结束任务标志位
+bool Strategy::getIsStartEndTaskFlag() {
+	return this->is_start_end_task_flag;
+}
+
+void Strategy::setIsStartEndTaskFlag(bool is_start_end_task_flag) {
+	this->is_start_end_task_flag = is_start_end_task_flag;
+}
+
+// 开盘交易标志位
+bool Strategy::getIsMarketCloseFlag() {
+	return this->is_market_close_flag;
+}
+
+void Strategy::setIsMarketCloseFlag(bool is_market_close_flag) {
+	this->is_market_close_flag = is_market_close_flag;
+}
+
+// 是否有夜盘
+bool Strategy::getHasNightMarket() {
+	return this->has_night_market;
+}
+
+void Strategy::setHasNightMarket(bool has_night_market) {
+	this->has_night_market = has_night_market;
+}
+
+
+bool Strategy::getEnd_task_afternoon_first() {
+	return end_task_afternoon_first;
+}
+
+void Strategy::setEnd_task_afternoon_first(bool end_task_afternoon_first) {
+	this->end_task_afternoon_first = end_task_afternoon_first;
+}
+
+bool Strategy::getEnd_task_afternoon_second() {
+	return end_task_afternoon_second;
+}
+
+void Strategy::setEnd_task_afternoon_second(bool end_task_afternoon_second) {
+	this->end_task_afternoon_second = end_task_afternoon_second;
+}
+
+bool Strategy::getEnd_task_evening_first() {
+	return end_task_evening_first;
+}
+
+void Strategy::setEnd_task_evening_first(bool end_task_evening_first) {
+	this->end_task_evening_first = end_task_evening_first;
+}
+
+bool Strategy::getEnd_task_evening_second() {
+	return end_task_evening_second;
+}
+
+void Strategy::setEnd_task_evening_second(bool end_task_evening_second) {
+	this->end_task_evening_second = end_task_evening_second;
+}
+
+bool Strategy::getEnd_task_morning_first() {
+	return end_task_morning_first;
+}
+
+void Strategy::setEnd_task_morning_first(bool end_task_morning_first) {
+	this->end_task_morning_first = end_task_morning_first;
+}
+
+bool Strategy::getEnd_task_morning_second() {
+	return end_task_morning_second;
+}
+
+void Strategy::setEnd_task_morning_second(bool end_task_morning_second) {
+	this->end_task_morning_second = end_task_morning_second;
 }
 
 // 报单录入错误回报
@@ -6230,7 +6402,9 @@ void Strategy::setStgInstrumentIdA(string stgInstrumentIdA) {
 			this->afternoon_begin_closetime_instrument_A = reader.Get(instrument_id, "afternoon_begin_closetime", "00:00:00");	// 下午收盘时间前10秒_instrument_A
 			this->afternoon_closetime_instrument_A = reader.Get(instrument_id, "afternoon_closetime", "00:00:00");				// 下午收盘时间_instrument_A
 			this->evening_opentime_instrument_A = reader.Get(instrument_id, "evening_opentime", "00:00:00");					// 夜间开盘时间_instrument_A
-			this->evening_begin_closetime_instrument_A = reader.Get(instrument_id, "evening_begin_closetime", "00:00:00");		// 夜间收盘时间前10秒_instrument_A
+			this->evening_stop_opentime_instrument_A = reader.Get(instrument_id, "evening_stop_opentime", "00:00:00");
+			this->evening_first_end_tasktime = reader.Get(instrument_id, "evening_first_end_tasktime", "00:00:00");
+			this->evening_second_end_tasktime_instrument_A = reader.Get(instrument_id, "evening_second_end_tasktime", "00:00:00");
 			this->evening_closetime_instrument_A = reader.Get(instrument_id, "evening_closetime", "00:00:00");					// 夜间收盘时间_instrument_A
 		}
 	}
@@ -6272,7 +6446,9 @@ void Strategy::setStgInstrumentIdB(string stgInstrumentIdB) {
 			this->afternoon_begin_closetime_instrument_B = reader.Get(instrument_id, "afternoon_begin_closetime", "00:00:00");	// 下午收盘时间前10秒_instrument_B
 			this->afternoon_closetime_instrument_B = reader.Get(instrument_id, "afternoon_closetime", "00:00:00");				// 下午收盘时间_instrument_B
 			this->evening_opentime_instrument_B = reader.Get(instrument_id, "evening_opentime", "00:00:00");					// 夜间开盘时间_instrument_B
-			this->evening_begin_closetime_instrument_B = reader.Get(instrument_id, "evening_begin_closetime", "00:00:00");		// 夜间收盘时间前10秒_instrument_B
+			this->evening_stop_opentime_instrument_B = reader.Get(instrument_id, "evening_stop_opentime", "00:00:00");
+			this->evening_first_end_tasktime_instrument_B = reader.Get(instrument_id, "evening_first_end_tasktime", "00:00:00");
+			this->evening_second_end_tasktime_instrument_B = reader.Get(instrument_id, "evening_second_end_tasktime", "00:00:00");
 			this->evening_closetime_instrument_B = reader.Get(instrument_id, "evening_closetime", "00:00:00");					// 夜间收盘时间_instrument_B
 		}
 

@@ -235,6 +235,9 @@ public:
 
 	sem_t *getSem_strategy_handler();
 
+	bool getIsClosingSaved();
+	void setIsClosingSaved(bool isClosingSaved);
+
 private:
 	//Login *login;
 	list<string> *l_instrument;

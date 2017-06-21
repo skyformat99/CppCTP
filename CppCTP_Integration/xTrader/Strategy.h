@@ -584,10 +584,6 @@ public:
 
 	void setEvening_opentime(string evening_opentime);
 
-	string getEvening_begin_closetime();
-
-	void setEvening_begin_closetime(string evening_begin_closetime);
-
 	string getEvening_closetime();
 
 	void setEvening_closetime(string evening_closetime);
@@ -631,10 +627,6 @@ public:
 	string getEvening_opentime_instrument_A();
 
 	void setEvening_opentime_instrument_A(string evening_opentime_instrument_A);
-
-	string getEvening_begin_closetime_instrument_A();
-
-	void setEvening_begin_closetime_instrument_A(string evening_begin_closetime_instrument_A);
 
 	string getEvening_closetime_instrument_A();
 
@@ -680,15 +672,82 @@ public:
 
 	void setEvening_opentime_instrument_B(string evening_opentime_instrument_B);
 
-	string getEvening_begin_closetime_instrument_B();
-
-	void setEvening_begin_closetime_instrument_B(string evening_begin_closetime_instrument_B);
-
 	string getEvening_closetime_instrument_B();
 
 	void setEvening_closetime_instrument_B(string evening_closetime_instrument_B);
 
+	string getEvening_stop_opentime();
+
+	void setEvening_stop_opentime(string evening_stop_opentime);
+
+	string getEvening_first_end_tasktime();
+
+	void setEvening_first_end_tasktime(string evening_first_end_tasktime);
+
+	string getEvening_second_end_tasktime();
+
+	void setEvening_second_end_tasktime(string evening_second_end_tasktime);
+
+	string getEvening_stop_opentime_instrument_A();
+
+	void setEvening_stop_opentime_instrument_A(string evening_stop_opentime_instrument_A);
+
+	string getEvening_first_end_tasktime_instrument_A();
+
+	void setEvening_first_end_tasktime_instrument_A(string evening_first_end_tasktime_instrument_A);
+
+	string getEvening_second_end_tasktime_instrument_A();
+
+	void setEvening_second_end_tasktime_instrument_A(string evening_second_end_tasktime_instrument_A);
+
+	string getEvening_stop_opentime_instrument_B();
+
+	void setEvening_stop_opentime_instrument_B(string evening_stop_opentime_instrument_B);
+
+	string getEvening_first_end_tasktime_instrument_B();
+
+	void setEvening_first_end_tasktime_instrument_B(string evening_first_end_tasktime_instrument_B);
+
+	string getEvening_second_end_tasktime_instrument_B();
+
+	void setEvening_second_end_tasktime_instrument_B(string evening_second_end_tasktime_instrument_B);
+
 	void StgTimeCal();
+
+	// 结束任务标志位
+	bool getIsStartEndTaskFlag();
+	void setIsStartEndTaskFlag(bool is_start_end_task_flag);
+	// 开盘交易标志位
+	bool getIsMarketCloseFlag();
+	void setIsMarketCloseFlag(bool is_market_close_flag);
+
+	// 是否有夜盘
+	bool getHasNightMarket();
+	void setHasNightMarket(bool has_night_market);
+
+	bool getEnd_task_afternoon_first();
+
+	void setEnd_task_afternoon_first(bool end_task_afternoon_first);
+
+	bool getEnd_task_afternoon_second();
+
+	void setEnd_task_afternoon_second(bool end_task_afternoon_second);
+
+	bool getEnd_task_evening_first();
+
+	void setEnd_task_evening_first(bool end_task_evening_first);
+
+	bool getEnd_task_evening_second();
+
+	void setEnd_task_evening_second(bool end_task_evening_second);
+
+	bool getEnd_task_morning_first();
+
+	void setEnd_task_morning_first(bool end_task_morning_first);
+
+	bool getEnd_task_morning_second();
+
+	void setEnd_task_morning_second(bool end_task_morning_second);
 
 private:
 	Trader *trader;
@@ -770,6 +829,15 @@ private:
 	int stg_spread_short_volume;							// 市场空头价差盘口挂单量：min(A合约买一量 - B合约买一量)
 	double stg_spread;										// 市场最新价价差
 
+	bool end_task_afternoon_first;							// 下午收盘第一次结束任务标志位
+	bool end_task_afternoon_second;							// 下午收盘第二次结束任务标志位
+
+	bool end_task_evening_first;							// 夜间收盘第一次结束任务标志位
+	bool end_task_evening_second;							// 夜间收盘第二次结束任务标志位
+
+	bool end_task_morning_first;							// 凌晨收盘第一次结束任务标志位
+	bool end_task_morning_second;							// 凌晨收盘第二次结束任务标志位
+
 	string morning_opentime;								// 中午开盘时间
 	string morning_begin_breaktime;							// 中午休盘时间前10秒
 	string morning_breaktime;								// 中午休盘时间
@@ -780,7 +848,9 @@ private:
 	string afternoon_begin_closetime;						// 下午收盘时间前10秒
 	string afternoon_closetime;								// 下午收盘时间
 	string evening_opentime;								// 夜间开盘时间
-	string evening_begin_closetime;							// 夜间收盘时间前10秒
+	string evening_stop_opentime;							// 夜间收盘前10秒不允许发新单
+	string evening_first_end_tasktime;						// 夜间收盘前5秒
+	string evening_second_end_tasktime;						// 夜间收盘前3秒
 	string evening_closetime;								// 夜间收盘时间
 
 	string morning_opentime_instrument_A;								// 中午开盘时间_instrument_A
@@ -793,7 +863,9 @@ private:
 	string afternoon_begin_closetime_instrument_A;						// 下午收盘时间前10秒_instrument_A
 	string afternoon_closetime_instrument_A;							// 下午收盘时间_instrument_A
 	string evening_opentime_instrument_A;								// 夜间开盘时间_instrument_A
-	string evening_begin_closetime_instrument_A;						// 夜间收盘时间前10秒_instrument_A
+	string evening_stop_opentime_instrument_A;							// 夜间收盘前10秒不允许发新单_instrument_A
+	string evening_first_end_tasktime_instrument_A;						// 夜间收盘前5秒_instrument_A
+	string evening_second_end_tasktime_instrument_A;					// 夜间收盘前3秒_instrument_A
 	string evening_closetime_instrument_A;								// 夜间收盘时间_instrument_A
 
 	string morning_opentime_instrument_B;								// 中午开盘时间_instrument_B
@@ -806,8 +878,13 @@ private:
 	string afternoon_begin_closetime_instrument_B;						// 下午收盘时间前10秒_instrument_B
 	string afternoon_closetime_instrument_B;							// 下午收盘时间_instrument_B
 	string evening_opentime_instrument_B;								// 夜间开盘时间_instrument_B
-	string evening_begin_closetime_instrument_B;						// 夜间收盘时间前10秒_instrument_B
+	string evening_stop_opentime_instrument_B;							// 夜间收盘前10秒不允许发新单_instrument_B
+	string evening_first_end_tasktime_instrument_B;						// 夜间收盘前5秒_instrument_B
+	string evening_second_end_tasktime_instrument_B;					// 夜间收盘前3秒_instrument_B
 	string evening_closetime_instrument_B;								// 夜间收盘时间_instrument_B
+
+	bool is_start_end_task_flag;		// 结束任务标志位
+	bool is_market_close_flag;			// 开盘交易标志位
 
 	string stg_order_ref_last;	// 最后一次实际使用的报单引用
 	string stg_order_ref_a;		// A合约报单引用
@@ -818,7 +895,9 @@ private:
 	int stg_b_limit_price_shift; // B合约报单偏移
 
 	bool stg_trade_tasking;		// 交易任务进行中
-	bool on_off_end_task;		//是否允许收盘任务执行
+	bool on_off_end_task;		// 是否允许收盘任务执行
+	bool has_night_market;		// 是否有夜盘
+
 	CThostFtdcInputOrderField *stg_a_order_insert_args;		// a合约报单参数
 	CThostFtdcInputOrderField *stg_b_order_insert_args;		// b合约报单参数
 	list<CThostFtdcOrderField *> *stg_list_order_pending;	// 挂单列表，报单、成交、撤单回报
