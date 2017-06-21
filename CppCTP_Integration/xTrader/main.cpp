@@ -368,7 +368,7 @@ void timer_handler() {
 																	is_need_save_data_afternoon = false;
 
 																	// 有夜盘的继续维护标志位
-																	if ((*itor)->getHasNightMarket())
+																	if ((*itor)->getHasNightMarket() && (!(*itor)->getHasMidnightMarket()))
 																	{
 																		(*itor)->setIsMarketCloseFlag(true);
 
@@ -451,7 +451,7 @@ void timer_handler() {
 				}
 				else {
 					// 如果有夜盘
-					if ((*itor)->getHasNightMarket())
+					if ((*itor)->getHasNightMarket() && (*itor)->getHasMidnightMarket())
 					{
 						// 时间大于00:00:00
 						if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + night_day_time).c_str()))
@@ -667,7 +667,7 @@ int main(int argc, char *argv[]) {
 	tHello.setSingleShot(false);
 	//tHello.setInterval(Timer::Interval(1000 * 60 * 10));
 	tHello.setInterval(Timer::Interval(1000));
-	tHello.start(true);
+	
 
 	// 程序入口，初始化资源
 	if (!ctp_m->init(init_flag)) {
@@ -675,6 +675,8 @@ int main(int argc, char *argv[]) {
 		spdlog::drop_all();
 		exit(1);
 	}
+
+	tHello.start(true);
 
 	/*while (true)
 	{

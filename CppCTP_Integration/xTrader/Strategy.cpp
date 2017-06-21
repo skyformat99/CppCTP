@@ -92,6 +92,7 @@ Strategy::Strategy(bool fake, User *stg_user) {
 	this->is_market_close_flag = false;			// 默认开盘
 	this->has_night_market = true;				// 默认都拥有夜盘
 	this->has_morning_break_time = true;		// 默认都有中午10:15分休盘时间
+	this->has_midnight_market = false;			// 默认没有半夜交易市场
 
 	this->stg_instrument_A_scale = 1;			// A合约比例乘数
 	this->stg_instrument_B_scale = 1;			// B合约比例乘数
@@ -5122,6 +5123,19 @@ void Strategy::StgTimeCal() {
 	else {
 		this->evening_closetime = this->evening_closetime_instrument_A;
 	}
+
+	// 如果有夜盘
+	if (this->getHasNightMarket())
+	{
+		// 如果夜盘开盘时间大于收盘时间,说明是凌晨收盘，设置凌晨收盘标志位
+		if (Utils::compareTradingDaySeconds((Utils::getYMDDate() + this->evening_opentime).c_str(), (Utils::getYMDDate() + this->evening_closetime).c_str()))
+		{
+			this->setHasMidnightMarket(true);
+		}
+		else {
+			this->setHasMidnightMarket(false);
+		}
+	}
 }
 
 // 结束任务标志位
@@ -5157,6 +5171,14 @@ bool Strategy::getHasMorningBreakTime() {
 
 void Strategy::setHasMorningBreakTime(bool has_morning_break_time) {
 	this->has_morning_break_time = has_morning_break_time;
+}
+
+bool Strategy::getHasMidnightMarket() {
+	return this->has_midnight_market;
+}
+
+void Strategy::setHasMidnightMarket(bool has_midnight_market) {
+	this->has_midnight_market = has_midnight_market;
 }
 
 
@@ -5888,18 +5910,6 @@ void Strategy::update_position_detail(USER_CThostFtdcTradeField *pTrade) {
 
 		for (itor = this->stg_list_position_detail_from_trade->begin(); itor != this->stg_list_position_detail_from_trade->end();) {
 
-			USER_PRINT((*itor)->TradeDate);
-			USER_PRINT(pTrade->TradeDate);
-
-			USER_PRINT((*itor)->InstrumentID);
-			USER_PRINT(pTrade->InstrumentID);
-
-			USER_PRINT((*itor)->HedgeFlag);
-			USER_PRINT(pTrade->HedgeFlag);
-
-			USER_PRINT((*itor)->Volume);
-			USER_PRINT(pTrade->Volume);
-
 			if ((!strcmp((*itor)->TradingDay, pTrade->TradingDay)) &&
 				(!strcmp((*itor)->InstrumentID, pTrade->InstrumentID)) &&
 				((*itor)->HedgeFlag == pTrade->HedgeFlag) &&
@@ -6441,7 +6451,7 @@ void Strategy::setStgInstrumentIdA(string stgInstrumentIdA) {
 			this->afternoon_closetime_instrument_A = reader.Get(instrument_id, "afternoon_closetime", "00:00:00");				// 下午收盘时间_instrument_A
 			this->evening_opentime_instrument_A = reader.Get(instrument_id, "evening_opentime", "00:00:00");					// 夜间开盘时间_instrument_A
 			this->evening_stop_opentime_instrument_A = reader.Get(instrument_id, "evening_stop_opentime", "00:00:00");
-			this->evening_first_end_tasktime = reader.Get(instrument_id, "evening_first_end_tasktime", "00:00:00");
+			this->evening_first_end_tasktime_instrument_A = reader.Get(instrument_id, "evening_first_end_tasktime", "00:00:00");
 			this->evening_second_end_tasktime_instrument_A = reader.Get(instrument_id, "evening_second_end_tasktime", "00:00:00");
 			this->evening_closetime_instrument_A = reader.Get(instrument_id, "evening_closetime", "00:00:00");					// 夜间收盘时间_instrument_A
 		}
