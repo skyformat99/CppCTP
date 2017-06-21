@@ -1178,8 +1178,8 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 			info_object.AddMember("position_b_buy", (*stg_itor)->getStgPositionBBuy(), allocator3);
 			info_object.AddMember("lots_batch", (*stg_itor)->getStgLotsBatch(), allocator3);
 
-			Utils::printGreenColorWithKV("(*stg_itor)->getStgInstrumentAScale() = ", (*stg_itor)->getStgInstrumentAScale());
-			Utils::printGreenColorWithKV("(*stg_itor)->getStgInstrumentBScale() = ", (*stg_itor)->getStgInstrumentBScale());
+			//Utils::printGreenColorWithKV("(*stg_itor)->getStgInstrumentAScale() = ", (*stg_itor)->getStgInstrumentAScale());
+			//Utils::printGreenColorWithKV("(*stg_itor)->getStgInstrumentBScale() = ", (*stg_itor)->getStgInstrumentBScale());
 
 			info_object.AddMember("instrument_a_scale", (*stg_itor)->getStgInstrumentAScale(), allocator3);
 			info_object.AddMember("instrument_b_scale", (*stg_itor)->getStgInstrumentBScale(), allocator3);
@@ -1270,7 +1270,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 			build_doc3.Accept(writer3);
 			//rsp_msg = const_cast<char *>(buffer.GetString());
 			//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-			std::cout << "\t服务端响应数据 = " << buffer3.GetString() << std::endl;
+			//std::cout << "\t服务端响应数据 = " << buffer3.GetString() << std::endl;
 
 			if (write_msg(fd, const_cast<char *>(buffer3.GetString()), strlen(buffer3.GetString())) < 0) {
 				printf("\t客户端已断开!!!\n");

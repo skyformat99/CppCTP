@@ -3292,6 +3292,8 @@ void Strategy::printStrategyInfo(string message) {
 	this->getStgUser()->getXtsLogger()->info("\t交易员开关:{}", this->stg_user->GetTrader()->getOn_Off());
 	this->getStgUser()->getXtsLogger()->info("\t策略开关:{}", this->getOn_Off());
 	this->getStgUser()->getXtsLogger()->info("\t是否正在交易:{}", this->stg_trade_tasking);
+	this->getStgUser()->getXtsLogger()->info("\tA比例系数:{}", this->stg_instrument_A_scale);
+	this->getStgUser()->getXtsLogger()->info("\tB比例系数:{}", this->stg_instrument_B_scale);
 	this->getStgUser()->getXtsLogger()->info("\tmorning_opentime = {} morning_begin_breaktime = {} morning_breaktime = {} morning_recoverytime = {} morning_begin_closetime = {} morning_closetime = {} afternoon_opentime = {} afternoon_begin_closetime = {} afternoon_closetime = {} evening_opentime = {} evening_stop_opentime = {} evening_closetime = {}",
 		this->morning_opentime,
 		this->morning_begin_breaktime,
