@@ -5047,6 +5047,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						info_object.AddMember("strategy_id", rapidjson::StringRef((*stg_itor)->getStgStrategyId().c_str()), allocator);
 						info_object.AddMember("position_b_buy", (*stg_itor)->getStgPositionBBuy(), allocator);
 						info_object.AddMember("lots_batch", (*stg_itor)->getStgLotsBatch(), allocator);
+
+						info_object.AddMember("instrument_a_scale", (*stg_itor)->getStgInstrumentAScale(), allocator);
+						info_object.AddMember("instrument_b_scale", (*stg_itor)->getStgInstrumentBScale(), allocator);
+
 						info_object.AddMember("position_a_buy", (*stg_itor)->getStgPositionABuy(), allocator);
 						info_object.AddMember("sell_open", (*stg_itor)->getStgSellOpen(), allocator);
 						info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator);
