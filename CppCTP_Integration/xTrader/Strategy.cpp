@@ -1669,6 +1669,8 @@ void Strategy::CopyThreadTradeDataToNew(USER_CThostFtdcTradeField *dst, THREAD_C
 	///交易日
 	strcpy(dst->TradingDay, src->TradingDay);
 
+	strcpy(dst->TradingDayRecord, src->TradingDay);
+
 	///记录交易日期时间
 	strcpy(dst->TradingDayRecord, src->TradingDay);
 
@@ -2078,14 +2080,7 @@ void Strategy::CopyTradeData(CThostFtdcTradeField *dst, CThostFtdcTradeField *sr
 	dst->TradeSource = src->TradeSource;
 }
 
-void Strategy::CopyThreadTradeData(USER_CThostFtdcTradeField *dst, THREAD_CThostFtdcTradeField *src) {
-
-	string temp(src->OrderRef);
-	int len_order_ref = temp.length();
-	string strategyid = temp.substr(len_order_ref - 2, 2);
-	///策略id
-	strcpy(dst->StrategyID, strategyid.c_str());
-
+void Strategy::CopyThreadTradeData(THREAD_CThostFtdcTradeField *dst, CThostFtdcTradeField *src, bool isLastElement) {
 	///经纪公司代码
 	strcpy(dst->BrokerID, src->BrokerID);
 
@@ -2167,107 +2162,7 @@ void Strategy::CopyThreadTradeData(USER_CThostFtdcTradeField *dst, THREAD_CThost
 	///交易日
 	strcpy(dst->TradingDay, src->TradingDay);
 
-	///结算编号
-	dst->SettlementID = src->SettlementID;
-
-	///经纪公司报单编号
-	dst->BrokerOrderSeq = src->BrokerOrderSeq;
-
-	///成交来源
-	dst->TradeSource = src->TradeSource;
-
-	
-
-}
-
-void Strategy::CopyTradeData(THREAD_CThostFtdcTradeField *dst, CThostFtdcTradeField *src, bool isLastElement) {
-
-	string temp(src->OrderRef);
-	int len_order_ref = temp.length();
-	string strategyid = temp.substr(len_order_ref - 2, 2);
-	///策略id
-	strcpy(dst->StrategyID, strategyid.c_str());
-
-	///经纪公司代码
-	strcpy(dst->BrokerID, src->BrokerID);
-
-	///投资者代码
-	strcpy(dst->InvestorID, src->InvestorID);
-
-	///合约代码
-	strcpy(dst->InstrumentID, src->InstrumentID);
-
-	///报单引用
-	strcpy(dst->OrderRef, src->OrderRef);
-
-	///用户代码
-	strcpy(dst->UserID, src->UserID);
-
-	///交易所代码
-	strcpy(dst->ExchangeID, src->ExchangeID);
-
-	///成交编号
-	strcpy(dst->TradeID, src->TradeID);
-
-	///买卖方向
-	dst->Direction = src->Direction;
-
-	///报单编号
-	strcpy(dst->OrderSysID, src->OrderSysID);
-
-	///会员代码
-	strcpy(dst->ParticipantID, src->ParticipantID);
-
-	///客户代码
-	strcpy(dst->ClientID, src->ClientID);
-
-	///交易角色
-	dst->TradingRole = src->TradingRole;
-
-	///合约在交易所的代码
-	strcpy(dst->ExchangeInstID, src->ExchangeInstID);
-
-	///开平标志
-	dst->OffsetFlag = src->OffsetFlag;
-
-	///投机套保标志
-	dst->HedgeFlag = src->HedgeFlag;
-
-	///价格
-	dst->Price = src->Price;
-
-	///数量
-	dst->Volume = src->Volume;
-
-	///成交时期
-	strcpy(dst->TradeDate, src->TradeDate);
-
-	///成交时间
-	strcpy(dst->TradeTime, src->TradeTime);
-
-	///成交类型
-	dst->TradeType = src->TradeType;
-
-	///成交价来源
-	dst->PriceSource = src->PriceSource;
-
-	///交易所交易员代码
-	strcpy(dst->TraderID, src->TraderID);
-
-	///本地报单编号
-	strcpy(dst->OrderLocalID, src->OrderLocalID);
-
-	///结算会员编号
-	strcpy(dst->ClearingPartID, src->ClearingPartID);
-
-	///业务单元
-	strcpy(dst->BusinessUnit, src->BusinessUnit);
-
-	///序号
-	dst->SequenceNo = src->SequenceNo;
-
-	///交易日
-	strcpy(dst->TradingDay, src->TradingDay);
+	strcpy(dst->TradingDayRecord, src->TradingDay);
 
 	///结算编号
 	dst->SettlementID = src->SettlementID;
@@ -2279,6 +2174,100 @@ void Strategy::CopyTradeData(THREAD_CThostFtdcTradeField *dst, CThostFtdcTradeFi
 	dst->TradeSource = src->TradeSource;
 
 	dst->IsLastElement = isLastElement;
+}
+
+void Strategy::CopyTradeData(CThostFtdcTradeField *dst, THREAD_CThostFtdcTradeField *src) {
+
+	///经纪公司代码
+	strcpy(dst->BrokerID, src->BrokerID);
+
+	///投资者代码
+	strcpy(dst->InvestorID, src->InvestorID);
+
+	///合约代码
+	strcpy(dst->InstrumentID, src->InstrumentID);
+
+	///报单引用
+	strcpy(dst->OrderRef, src->OrderRef);
+
+	///用户代码
+	strcpy(dst->UserID, src->UserID);
+
+	///交易所代码
+	strcpy(dst->ExchangeID, src->ExchangeID);
+
+	///成交编号
+	strcpy(dst->TradeID, src->TradeID);
+
+	///买卖方向
+	dst->Direction = src->Direction;
+
+	///报单编号
+	strcpy(dst->OrderSysID, src->OrderSysID);
+
+	///会员代码
+	strcpy(dst->ParticipantID, src->ParticipantID);
+
+	///客户代码
+	strcpy(dst->ClientID, src->ClientID);
+
+	///交易角色
+	dst->TradingRole = src->TradingRole;
+
+	///合约在交易所的代码
+	strcpy(dst->ExchangeInstID, src->ExchangeInstID);
+
+	///开平标志
+	dst->OffsetFlag = src->OffsetFlag;
+
+	///投机套保标志
+	dst->HedgeFlag = src->HedgeFlag;
+
+	///价格
+	dst->Price = src->Price;
+
+	///数量
+	dst->Volume = src->Volume;
+
+	///成交时期
+	strcpy(dst->TradeDate, src->TradeDate);
+
+	///成交时间
+	strcpy(dst->TradeTime, src->TradeTime);
+
+	///成交类型
+	dst->TradeType = src->TradeType;
+
+	///成交价来源
+	dst->PriceSource = src->PriceSource;
+
+	///交易所交易员代码
+	strcpy(dst->TraderID, src->TraderID);
+
+	///本地报单编号
+	strcpy(dst->OrderLocalID, src->OrderLocalID);
+
+	///结算会员编号
+	strcpy(dst->ClearingPartID, src->ClearingPartID);
+
+	///业务单元
+	strcpy(dst->BusinessUnit, src->BusinessUnit);
+
+	///序号
+	dst->SequenceNo = src->SequenceNo;
+
+	///交易日
+	strcpy(dst->TradingDay, src->TradingDay);
+
+	///结算编号
+	dst->SettlementID = src->SettlementID;
+
+	///经纪公司报单编号
+	dst->BrokerOrderSeq = src->BrokerOrderSeq;
+
+	///成交来源
+	dst->TradeSource = src->TradeSource;
+
 }
 
 /// 收盘保存数据
@@ -4567,8 +4556,7 @@ void Strategy::thread_queue_OnRtnOrder() {
 // 成交回报
 void Strategy::ExEc_OnRtnTrade(CThostFtdcTradeField *pTrade) {
 	THREAD_CThostFtdcTradeField *pTrade_tmp = new THREAD_CThostFtdcTradeField();
-
-	this->CopyTradeData(pTrade_tmp, pTrade);
+	this->CopyThreadTradeData(pTrade_tmp, pTrade);
 	this->queue_OnRtnTrade.enqueue(pTrade_tmp);
 	//this->getStgUser()->getXtsLogger()->info("Strategy::ExEc_OnRtnTrade() queue_OnRtnTrade.enqueue()");
 }
@@ -4647,7 +4635,7 @@ void Strategy::thread_queue_OnRtnTrade() {
 			}
 
 			USER_CThostFtdcTradeField new_trade;
-			this->CopyThreadTradeData(&new_trade, pTrade);
+			this->CopyThreadTradeDataToNew(&new_trade, pTrade);
 			this->update_position_detail(&new_trade);
 
 			delete pTrade;

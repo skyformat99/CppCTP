@@ -368,15 +368,14 @@ public:
 	/// 拷贝结构体CThostFtdcTradeField
 	void CopyTradeData(CThostFtdcTradeField *dst, CThostFtdcTradeField *src);
 
-	void CopyThreadTradeData(USER_CThostFtdcTradeField *dst, THREAD_CThostFtdcTradeField *src);
+	void CopyThreadTradeData(THREAD_CThostFtdcTradeField *dst, CThostFtdcTradeField *src, bool isLastElement = false);
 
-	void CopyTradeData(THREAD_CThostFtdcTradeField *dst, CThostFtdcTradeField *src, bool isLastElement = false);
+	void CopyTradeData(CThostFtdcTradeField *dst, THREAD_CThostFtdcTradeField *src);
 
 	/// 拷贝结构体CThostFtdcTradeField
 	void CopyTradeDataToNew(USER_CThostFtdcTradeField *dst, CThostFtdcTradeField *src);
 
 	void CopyThreadTradeDataToNew(USER_CThostFtdcTradeField *dst, THREAD_CThostFtdcTradeField *src);
-
 
 	void CopyNewTradeData(USER_CThostFtdcTradeField *dst, USER_CThostFtdcTradeField *src);
 

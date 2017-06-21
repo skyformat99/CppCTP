@@ -368,7 +368,7 @@ void timer_handler() {
 																	is_need_save_data_afternoon = false;
 
 																	// 有夜盘的继续维护标志位
-																	if ((*itor)->getHasNightMarket() && (!(*itor)->getHasMidnightMarket()))
+																	if ((*itor)->getHasNightMarket())
 																	{
 																		(*itor)->setIsMarketCloseFlag(true);
 
@@ -379,29 +379,43 @@ void timer_handler() {
 
 																			(*itor)->setIsMarketCloseFlag(false);
 
+
+
 																			// 时间大于夜间停止新任务时间(提前10s)
 																			if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + (*itor)->getEvening_stop_opentime()).c_str())) {
 
 																				//Utils::printGreenColorWithKV("getEvening_stop_opentime", (ymd_date + (*itor)->getEvening_stop_opentime()));
 
-																				// 停止新任务
-																				(*itor)->setIsMarketCloseFlag(true);
+																				if (!(*itor)->getHasMidnightMarket())
+																				{
+																					// 停止新任务
+																					(*itor)->setIsMarketCloseFlag(true);
+																				}
+
+																				
 
 																				// 时间大于夜间第一次结束任务(提前5s)
 																				if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + (*itor)->getEvening_first_end_tasktime()).c_str())) {
 
 																					//Utils::printGreenColorWithKV("getEvening_first_end_tasktime", (ymd_date + (*itor)->getEvening_first_end_tasktime()));
 
-																					// 停止新任务
-																					(*itor)->setIsMarketCloseFlag(true);
 
-
-																					if ((*itor)->getEnd_task_evening_first())
+																					if (!(*itor)->getHasMidnightMarket())
 																					{
-																						(*itor)->setEnd_task_evening_first(false);
-																						// 结束任务执行1
-																						(*itor)->setStgOnOffEndTask(true);
+																						// 停止新任务
+																						(*itor)->setIsMarketCloseFlag(true);
+
+
+																						if ((*itor)->getEnd_task_evening_first())
+																						{
+																							(*itor)->setEnd_task_evening_first(false);
+																							// 结束任务执行1
+																							(*itor)->setStgOnOffEndTask(true);
+																						}
 																					}
+
+
+																					
 
 																					
 
@@ -410,26 +424,37 @@ void timer_handler() {
 
 																						//Utils::printGreenColorWithKV("getEvening_second_end_tasktime", (ymd_date + (*itor)->getEvening_second_end_tasktime()));
 
-																						// 停止新任务
-																						(*itor)->setIsMarketCloseFlag(true);
-
-																						if ((*itor)->getEnd_task_evening_second())
+																						if (!(*itor)->getHasMidnightMarket())
 																						{
-																							(*itor)->setEnd_task_evening_second(false);
-																							// 结束任务执行2
-																							(*itor)->setStgOnOffEndTask(true);
+																							// 停止新任务
+																							(*itor)->setIsMarketCloseFlag(true);
+
+																							if ((*itor)->getEnd_task_evening_second())
+																							{
+																								(*itor)->setEnd_task_evening_second(false);
+																								// 结束任务执行2
+																								(*itor)->setStgOnOffEndTask(true);
+																							}
 																						}
+
+																						
 
 																						// 时间大于夜间收盘时间
 																						if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + (*itor)->getEvening_closetime()).c_str())) { // 时间大于20:59:55
 
 																							//Utils::printGreenColorWithKV("getEvening_closetime", (ymd_date + (*itor)->getEvening_closetime()));
 
-																							(*itor)->setIsMarketCloseFlag(true);
-																							// 结束任务执行false
-																							(*itor)->setStgOnOffEndTask(false);
 
-																							is_need_save_data_afternoon = true;
+																							if (!(*itor)->getHasMidnightMarket())
+																							{
+																								(*itor)->setIsMarketCloseFlag(true);
+																								// 结束任务执行false
+																								(*itor)->setStgOnOffEndTask(false);
+
+																								is_need_save_data_afternoon = true;
+																							}
+
+																							
 																						}
 																					}
 																				}
