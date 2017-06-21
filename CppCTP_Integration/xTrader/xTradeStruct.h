@@ -389,6 +389,10 @@ struct THREAD_CThostFtdcTradeField
 	TThostFtdcInstrumentIDType	InstrumentID;
 	///报单引用
 	TThostFtdcOrderRefType	OrderRef;
+
+	///策略编号
+	char StrategyID[3];
+
 	///用户代码
 	TThostFtdcUserIDType	UserID;
 	///交易所代码

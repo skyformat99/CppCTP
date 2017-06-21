@@ -2183,6 +2183,12 @@ void Strategy::CopyThreadTradeData(USER_CThostFtdcTradeField *dst, THREAD_CThost
 
 void Strategy::CopyTradeData(THREAD_CThostFtdcTradeField *dst, CThostFtdcTradeField *src, bool isLastElement) {
 
+	string temp(src->OrderRef);
+	int len_order_ref = temp.length();
+	string strategyid = temp.substr(len_order_ref - 2, 2);
+	///策略id
+	strcpy(dst->StrategyID, strategyid.c_str());
+
 	///经纪公司代码
 	strcpy(dst->BrokerID, src->BrokerID);
 
