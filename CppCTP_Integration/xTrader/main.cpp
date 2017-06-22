@@ -131,7 +131,7 @@ void out_addr(struct sockaddr_in *clientaddr) {
 
 /*输出服务器端时间*/
 void do_service(int fd) {
-	printf("main.cpp do_service()");
+	//printf("main.cpp do_service()");
 	/*和客户端进行读写操作(双向通信)*/
 	char buff[MAX_BUFFER_SIZE];
 	while (1)

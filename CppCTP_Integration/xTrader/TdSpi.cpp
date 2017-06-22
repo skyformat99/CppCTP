@@ -210,9 +210,7 @@ void TdSpi::Login(User *user) {
 
 ///登录请求响应
 void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
-                           CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
-	USER_PRINT("TdSpi::OnRspUserLogin");
-	USER_PRINT(bIsLast);
+                           CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	std::cout << "TdSpi::OnRspUserLogin()" << std::endl;
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		//sem_post(&login_sem);
@@ -283,23 +281,19 @@ void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 
 //查询交易结算确认
 void TdSpi::QrySettlementInfoConfirm(User *user) {
-	USER_PRINT("TdSpi::QrySettlementInfoConfirm")
 
-	CThostFtdcQrySettlementInfoConfirmField *qrySettlementField = new CThostFtdcQrySettlementInfoConfirmField();
+	CThostFtdcQrySettlementInfoConfirmField qrySettlementField;
 
-	strcpy(qrySettlementField->BrokerID, user->getBrokerID().c_str());
-	strcpy(qrySettlementField->InvestorID, user->getUserID().c_str());
+	strcpy(qrySettlementField.BrokerID, user->getBrokerID().c_str());
+	strcpy(qrySettlementField.InvestorID, user->getUserID().c_str());
 
 	sleep(1);
-	this->tdapi->ReqQrySettlementInfoConfirm(qrySettlementField, user->getRequestID());
+	this->tdapi->ReqQrySettlementInfoConfirm(&qrySettlementField, user->getRequestID());
 
 	/*int ret = this->controlTimeOut(&sem_ReqQrySettlementInfoConfirm);
 	if (ret == -1) {
 	USER_PRINT("TdSpi::QrySettlementInfoConfirm TimeOut!")
 	}*/
-
-	delete qrySettlementField;
-	qrySettlementField = NULL;
 }
 
 
@@ -310,10 +304,8 @@ void TdSpi::OnRspQrySettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *
 		if (this->current_user->getRequestID() == nRequestID) {
 			//sem_post(&sem_ReqQrySettlementInfoConfirm);
 			if ((!pSettlementInfoConfirm)) { //如果未确认过，pSettlementInfoConfirm为空
-				USER_PRINT("pSettlementInfoConfirm is null");
-				USER_PRINT(this->isConfirmSettlement);
 				if (this->isConfirmSettlement) {
-					USER_PRINT("Already Confirm!");
+					Utils::printGreenColor("TdSpi::OnRspQrySettlementInfoConfirm() 结算信息为空,但今天已经确认过结算!");
 					std::cout << "\t|==确认结算信息==|" << endl;
 					std::cout << "\t|经纪公司" << this->current_user->getBrokerID() << "|" << endl;
 					std::cout << "\t|结算客户" << this->current_user->getUserID() << "|" << endl;
@@ -325,7 +317,7 @@ void TdSpi::OnRspQrySettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *
 					this->QrySettlementInfo(this->current_user);
 				}
 			} else {
-				USER_PRINT("今天已经确认结算!");
+				Utils::printGreenColor("TdSpi::OnRspQrySettlementInfoConfirm() 结算信息不为空,今天已经确认过结算!");
 				std::cout << "\t|==确认结算信息==|" << endl;
 				std::cout << "\t|经纪公司代码" << pSettlementInfoConfirm->BrokerID << "|" << endl;
 				std::cout << "\t|投资者代码" << pSettlementInfoConfirm->InvestorID << "|" << endl;
@@ -342,22 +334,19 @@ void TdSpi::OnRspQrySettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *
 
 //查询结算信息
 void TdSpi::QrySettlementInfo(User *user) {
+	CThostFtdcQrySettlementInfoField pQrySettlementInfo;
 
-	CThostFtdcQrySettlementInfoField *pQrySettlementInfo = new CThostFtdcQrySettlementInfoField();
-	strcpy(pQrySettlementInfo->BrokerID, user->getBrokerID().c_str());
-	strcpy(pQrySettlementInfo->InvestorID, user->getUserID().c_str());
-	strcpy(pQrySettlementInfo->TradingDay, "");
+	strcpy(pQrySettlementInfo.BrokerID, user->getBrokerID().c_str());
+	strcpy(pQrySettlementInfo.InvestorID, user->getUserID().c_str());
 
+	strcpy(pQrySettlementInfo.TradingDay, "");
 	sleep(1);
-	this->tdapi->ReqQrySettlementInfo(pQrySettlementInfo, user->getRequestID());
+	this->tdapi->ReqQrySettlementInfo(&pQrySettlementInfo, user->getRequestID());
 
 	/*int ret = this->controlTimeOut(&sem_ReqQrySettlementInfo);
 	if (ret == -1) {
 		USER_PRINT("TdSpi::QrySettlementInfo TimeOut!")
 	}*/
-
-	delete pQrySettlementInfo;
-	pQrySettlementInfo = NULL;
 }
 
 //请求查询投资者结算结果响应
@@ -394,21 +383,18 @@ void TdSpi::OnRspQrySettlementInfo(CThostFtdcSettlementInfoField *pSettlementInf
 //确认结算结果
 void TdSpi::ConfirmSettlementInfo(User *user) {
 
-	CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm = new CThostFtdcSettlementInfoConfirmField();
-	strcpy(pSettlementInfoConfirm->BrokerID, user->getBrokerID().c_str());
-	strcpy(pSettlementInfoConfirm->InvestorID, user->getUserID().c_str());
-	strcpy(pSettlementInfoConfirm->ConfirmDate, this->tdapi->GetTradingDay());
+	CThostFtdcSettlementInfoConfirmField pSettlementInfoConfirm;
+	strcpy(pSettlementInfoConfirm.BrokerID, user->getBrokerID().c_str());
+	strcpy(pSettlementInfoConfirm.InvestorID, user->getUserID().c_str());
+	strcpy(pSettlementInfoConfirm.ConfirmDate, this->tdapi->GetTradingDay());
 
 	sleep(1);
-	this->tdapi->ReqSettlementInfoConfirm(pSettlementInfoConfirm, user->getRequestID());
+	this->tdapi->ReqSettlementInfoConfirm(&pSettlementInfoConfirm, user->getRequestID());
 
 	/*int ret = this->controlTimeOut(&sem_ReqSettlementInfoConfirm);
 	if (ret == -1) {
 		USER_PRINT("TdSpi::ConfirmSettlementInfo")
 	}*/
-
-	delete pSettlementInfoConfirm;
-	pSettlementInfoConfirm = NULL;
 }
 
 //投资者结算结果确认响应
@@ -432,11 +418,9 @@ void TdSpi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSe
 				string today = this->tdapi->GetTradingDay();
 				string confirm_date = pSettlementInfoConfirm->ConfirmDate;
 				if (today == confirm_date) {
-					USER_PRINT("today_date == confirm_date");
 					this->setIsConfirmSettlement(true);
 				}
 				else {
-					USER_PRINT("today_date != confirm_date");
 					this->setIsConfirmSettlement(false);
 					this->current_user->setIsConfirmSettlement(false);
 				}

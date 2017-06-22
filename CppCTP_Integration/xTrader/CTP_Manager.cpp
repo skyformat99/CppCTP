@@ -2658,7 +2658,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						for (stg_itor = ctp_m->getListStrategy()->begin(); stg_itor != ctp_m->getListStrategy()->end(); stg_itor++) {
 							
 							if (((*stg_itor)->getStgUserId() == q_user_id) && ((*stg_itor)->getStgStrategyId() == q_strategy_id)) {
-								Utils::printGreenColor("找到即将修改的Strategy");
+								//Utils::printGreenColor("找到即将修改的Strategy");
 								ctp_m->getXtsLogger()->info("找到即将修改的Strategy");
 								/* PyQt更新参数如下 */
 								(*stg_itor)->setStgUserId(object["user_id"].GetString());
@@ -2688,7 +2688,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								(*stg_itor)->setStgSellCloseOnOff(object["sell_close_on_off"].GetInt());
 								(*stg_itor)->setStgBuyOpenOnOff(object["buy_open_on_off"].GetInt());
 
-								Utils::printGreenColor("Strategy修改完成!");
+								//Utils::printGreenColor("Strategy修改完成!");
 								ctp_m->getXtsLogger()->info("Strategy修改完成!");
 
 								ctp_m->getDBManager()->UpdateStrategy((*stg_itor));
@@ -3662,7 +3662,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							for (stg_itor = ctp_m->getListStrategy()->begin(); stg_itor != ctp_m->getListStrategy()->end(); stg_itor++) {
 								if (((*stg_itor)->getStgUserId() == q_user_id) && ((*stg_itor)->getStgStrategyId() == q_strategy_id)) {
 									//std::cout << "\t找到即将修改的Strategy" << std::endl;
-									Utils::printGreenColor("找到即将修改的Strategy");
+									//Utils::printGreenColor("找到即将修改的Strategy");
 									ctp_m->getXtsLogger()->info("找到即将修改的Strategy");
 									isFindStrategy = true;
 									USER_PRINT("判断修改持仓...");
