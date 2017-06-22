@@ -67,6 +67,7 @@ string night_day_time = "00:00:00";							// 凌晨12点
 string night_start_close_time = "02:44:55";					// 夜盘准备收盘,停止新的交易任务
 string night_close_time = "02:45:00";						// 夜盘收盘时间
 string night_stop_save_time = "02:45:02";					// 夜盘存储数据时间
+string start_day_time = "06:00:00";					// 夜盘存储数据时间
 
 /* ctrl + c 信号处理 */
 void sig_handler(int signo) {
@@ -563,6 +564,13 @@ void timer_handler() {
 														// 停止新任务
 														(*itor)->setIsMarketCloseFlag(true);
 														is_need_to_exit = true;
+
+														if (Utils::compareTradingDaySeconds(nowtime.c_str(), (ymd_date + start_day_time).c_str())){
+															is_need_save_data_afternoon = false;
+															// 停止新任务
+															(*itor)->setIsMarketCloseFlag(true);
+															is_need_to_exit = false;
+														}
 													}
 												}
 											}
