@@ -265,7 +265,7 @@ void timer_handler() {
 
 							if ((*itor)->getHasMorningBreakTime())
 							{
-								(*itor)->setIsMarketCloseFlag(true);
+								(*itor)->setIsMarketCloseFlag(false);
 							}
 
 							//时间大于中午收盘
