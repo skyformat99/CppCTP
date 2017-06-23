@@ -3052,8 +3052,6 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//std::cout << "收到要删除的策略ID = " << s_StrategyID << std::endl;
 				ctp_m->getXtsLogger()->info("\t收到要删除的策略ID = {}", s_StrategyID);
 
-				
-
 				/*1:进行策略的删除,更新到数据库*/
 				list<Strategy *>::iterator stg_itor;
 				for (stg_itor = ctp_m->getListStrategy()->begin(); stg_itor != ctp_m->getListStrategy()->end();) {
