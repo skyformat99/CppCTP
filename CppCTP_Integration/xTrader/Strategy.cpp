@@ -2916,31 +2916,63 @@ void Strategy::update_task_status() {
 	// 当有其他地方调用挂单列表,阻塞,信号量P操作
 	sem_wait(&(this->sem_list_order_pending));
 
-	if ((this->stg_position_a_buy_today == this->stg_position_b_sell_today)
-		&& (this->stg_position_a_buy_yesterday == this->stg_position_b_sell_yesterday)
-		&& (this->stg_position_a_sell_today == this->stg_position_b_buy_today)
-		&& (this->stg_position_a_sell_yesterday == this->stg_position_b_buy_yesterday)
-		&& (this->stg_list_order_pending->size() == 0)) {
-		/*this->printStrategyInfo("更新交易状态");
-		this->printStrategyInfoPosition();*/
-		//this->stg_trade_tasking = false;
-		this->setStgTradeTasking(false);
-	}
-	else
+	if (this->getStgOrderAlgorithm() == ALGORITHM_ONE)
 	{
-		//this->printStrategyInfo("Strategy::update_task_status() 更新交易状态");
-		/*std::cout << "stg_position_a_buy_today = " << stg_position_a_buy_today << std::endl;
-		std::cout << "stg_position_b_sell_today = " << stg_position_b_sell_today << std::endl;
-		std::cout << "stg_position_a_buy_yesterday = " << stg_position_a_buy_yesterday << std::endl;
-		std::cout << "stg_position_b_sell_yesterday = " << stg_position_b_sell_yesterday << std::endl;
-		std::cout << "stg_position_a_sell_today = " << stg_position_a_sell_today << std::endl;
-		std::cout << "stg_position_b_buy_today = " << stg_position_b_buy_today << std::endl;
-		std::cout << "stg_position_a_sell_yesterday = " << stg_position_a_sell_yesterday << std::endl;
-		std::cout << "stg_position_b_buy_yesterday = " << stg_position_b_buy_yesterday << std::endl;
-		std::cout << "this->stg_list_order_pending->size() = " << this->stg_list_order_pending->size() << std::endl;*/
+		if ((this->stg_position_a_buy_today == this->stg_position_b_sell_today)
+			&& (this->stg_position_a_buy_yesterday == this->stg_position_b_sell_yesterday)
+			&& (this->stg_position_a_sell_today == this->stg_position_b_buy_today)
+			&& (this->stg_position_a_sell_yesterday == this->stg_position_b_buy_yesterday)
+			&& (this->stg_list_order_pending->size() == 0)) {
+			/*this->printStrategyInfo("更新交易状态");
+			this->printStrategyInfoPosition();*/
+			//this->stg_trade_tasking = false;
+			this->setStgTradeTasking(false);
+		}
+		else
+		{
+			//this->printStrategyInfo("Strategy::update_task_status() 更新交易状态");
+			/*std::cout << "stg_position_a_buy_today = " << stg_position_a_buy_today << std::endl;
+			std::cout << "stg_position_b_sell_today = " << stg_position_b_sell_today << std::endl;
+			std::cout << "stg_position_a_buy_yesterday = " << stg_position_a_buy_yesterday << std::endl;
+			std::cout << "stg_position_b_sell_yesterday = " << stg_position_b_sell_yesterday << std::endl;
+			std::cout << "stg_position_a_sell_today = " << stg_position_a_sell_today << std::endl;
+			std::cout << "stg_position_b_buy_today = " << stg_position_b_buy_today << std::endl;
+			std::cout << "stg_position_a_sell_yesterday = " << stg_position_a_sell_yesterday << std::endl;
+			std::cout << "stg_position_b_buy_yesterday = " << stg_position_b_buy_yesterday << std::endl;
+			std::cout << "this->stg_list_order_pending->size() = " << this->stg_list_order_pending->size() << std::endl;*/
 
-		this->setStgTradeTasking(true);
+			this->setStgTradeTasking(true);
+		}
 	}
+	else if (this->getStgOrderAlgorithm() == ALGORITHM_TWO)
+	{
+		if (((this->stg_position_a_buy_today * this->stg_instrument_A_scale) == (this->stg_position_b_sell_today * this->stg_instrument_B_scale))
+			&& ((this->stg_position_a_buy_yesterday * this->stg_instrument_A_scale) == (this->stg_position_b_sell_yesterday * this->stg_instrument_B_scale))
+			&& ((this->stg_position_a_sell_today * this->stg_instrument_A_scale) == (this->stg_position_b_buy_today * this->stg_instrument_B_scale))
+			&& ((this->stg_position_a_sell_yesterday * this->stg_instrument_A_scale) == (this->stg_position_b_buy_yesterday * this->stg_instrument_B_scale))
+			&& (this->stg_list_order_pending->size() == 0)) {
+			/*this->printStrategyInfo("更新交易状态");
+			this->printStrategyInfoPosition();*/
+			//this->stg_trade_tasking = false;
+			this->setStgTradeTasking(false);
+		}
+		else
+		{
+			//this->printStrategyInfo("Strategy::update_task_status() 更新交易状态");
+			/*std::cout << "stg_position_a_buy_today = " << stg_position_a_buy_today << std::endl;
+			std::cout << "stg_position_b_sell_today = " << stg_position_b_sell_today << std::endl;
+			std::cout << "stg_position_a_buy_yesterday = " << stg_position_a_buy_yesterday << std::endl;
+			std::cout << "stg_position_b_sell_yesterday = " << stg_position_b_sell_yesterday << std::endl;
+			std::cout << "stg_position_a_sell_today = " << stg_position_a_sell_today << std::endl;
+			std::cout << "stg_position_b_buy_today = " << stg_position_b_buy_today << std::endl;
+			std::cout << "stg_position_a_sell_yesterday = " << stg_position_a_sell_yesterday << std::endl;
+			std::cout << "stg_position_b_buy_yesterday = " << stg_position_b_buy_yesterday << std::endl;
+			std::cout << "this->stg_list_order_pending->size() = " << this->stg_list_order_pending->size() << std::endl;*/
+			this->setStgTradeTasking(true);
+		}
+	}
+
+	
 
 	// 释放信号量,信号量V操作
 	sem_post(&(this->sem_list_order_pending));
@@ -3504,6 +3536,8 @@ void Strategy::finish_pending_order_list() {
 	std::cout << "\t挂单列表长度:" << this->stg_list_order_pending->size() << std::endl;
 	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
 	std::cout << "\t策略编号:" << this->stg_strategy_id << std::endl;
+
+	this->getStgUser()->getXtsLogger()->info("Strategy::finish_pending_order_list() 挂单列表长度 = {} 期货账户 = {} 策略编号 = {}", this->stg_list_order_pending->size(), this->stg_user_id, this->stg_strategy_id);
 	
 	// 遍历挂单列表,如果是A合约,立马撤单,如果是B合约,超价发单
 	list<CThostFtdcOrderField *>::iterator itor;
@@ -3750,6 +3784,9 @@ void Strategy::thread_queue_OnRtnDepthMarketData() {
 						std::cout << "\tA合约撤单次数:" << this->getStgAOrderActionCount() << ", A合约撤单限制:" << this->getStgAOrderActionTiresLimit() << std::endl;
 						std::cout << "\tB合约撤单次数:" << this->getStgBOrderActionCount() << ", B合约撤单限制:" << this->getStgBOrderActionTiresLimit() << std::endl;
 						Utils::printRedColor("已停止新的任务!");
+
+						this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnDepthMarketData() 撤单次数已超过限制! 期货账户 = {} 策略编号 = {} A合约撤单次数 = {} B合约撤单次数 = {}", this->stg_user_id, this->stg_strategy_id, this->getStgAOrderActionTiresLimit(), this->getStgBOrderActionTiresLimit())
+
 						// 析构
 						delete pDepthMarketData_tmp;
 						pDepthMarketData_tmp = NULL;
@@ -4367,9 +4404,9 @@ void Strategy::Order_Algorithm_Two() {
 
 	/// 价差卖平
 	if ((this->sell_close_on_off) &&
-		((this->stg_position_a_sell) == (this->stg_position_b_buy)) &&
+		((this->stg_position_a_sell * this->stg_instrument_A_scale) == (this->stg_position_b_buy * this->stg_instrument_B_scale)) &&
 		(this->stg_position_a_buy > 0) &&
-		(this->stg_spread_long >= (this->stg_sell_close + this->stg_spread_shift * this->stg_a_price_tick)) &&
+		((this->stg_spread_long) >= (this->stg_sell_close + this->stg_spread_shift * this->stg_a_price_tick)) &&
 		(!this->stg_select_order_algorithm_flag)) {
 
 		this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_Two() 价差卖平", true); // 开启下单锁
@@ -4412,7 +4449,11 @@ void Strategy::Order_Algorithm_Two() {
 
 			//std::cout << "this->stg_spread_long_volume = " << this->stg_spread_long_volume << std::endl;
 			//std::cout << "this->stg_position_a_buy_yesterday = " << this->stg_position_a_buy_yesterday << std::endl;
+			
 			order_volume = this->getMinNum(this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, this->stg_position_a_buy_yesterday);
+			
+			order_volume = order_volume - order_volume % this->stg_instrument_A_scale;
+
 			//std::cout << "order_volume = " << order_volume << std::endl;
 			this->stg_a_order_insert_args->CombOffsetFlag[0] = '4'; /// 平昨
 			this->stg_b_order_insert_args->CombOffsetFlag[0] = '4'; /// 平昨
@@ -4422,10 +4463,14 @@ void Strategy::Order_Algorithm_Two() {
 			//std::cout << "this->stg_lots_batch = " << this->stg_lots_batch << std::endl;
 			//std::cout << "this->stg_position_a_buy_today = " << this->stg_position_a_buy_today << std::endl;
 			order_volume = this->getMinNum(this->stg_spread_short_volume, this->stg_lots_batch * this->stg_instrument_A_scale, this->stg_position_a_buy_today);
+			
+			order_volume = order_volume - order_volume % this->stg_instrument_A_scale;
+			
 			//std::cout << "order_volume = " << order_volume << std::endl;
 			this->stg_a_order_insert_args->CombOffsetFlag[0] = '3'; /// 平今
 			this->stg_b_order_insert_args->CombOffsetFlag[0] = '3'; /// 平今
 		}
+
 		if ((order_volume <= 0)) {
 			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 策略编号 = {} 发单手数错误值 = {}", this->stg_strategy_id, order_volume);
 			this->setStgTradeTasking(false);
@@ -4488,7 +4533,7 @@ void Strategy::Order_Algorithm_Two() {
 	}
 	/// 价差买平
 	else if ((this->buy_close_on_off) &&
-		(this->stg_position_a_sell == this->stg_position_b_buy) &&
+		((this->stg_position_a_sell * this->stg_instrument_A_scale) == (this->stg_position_b_buy * this->stg_instrument_B_scale)) &&
 		(this->stg_position_a_sell > 0) &&
 		(this->stg_spread_short <= (this->stg_buy_close - this->stg_spread_shift * this->stg_a_price_tick)) &&
 		(!this->stg_select_order_algorithm_flag)) {
@@ -4541,6 +4586,9 @@ void Strategy::Order_Algorithm_Two() {
 			//std::cout << "this->stg_lots_batch = " << this->stg_lots_batch << std::endl;
 			//std::cout << "this->stg_position_a_sell_yesterday = " << this->stg_position_a_sell_yesterday << std::endl;
 			order_volume = this->getMinNum(this->stg_spread_short_volume, this->stg_lots_batch * this->stg_instrument_A_scale, this->stg_position_a_sell_yesterday);
+			
+			order_volume = order_volume - order_volume % this->stg_instrument_A_scale;
+
 			//std::cout << "order_volume = " << order_volume << std::endl;
 			this->stg_a_order_insert_args->CombOffsetFlag[0] = '4'; /// 平昨
 			this->stg_b_order_insert_args->CombOffsetFlag[0] = '4'; /// 平昨
@@ -4550,6 +4598,9 @@ void Strategy::Order_Algorithm_Two() {
 			//std::cout << "this->stg_lots_batch = " << this->stg_lots_batch << std::endl;
 			//std::cout << "this->stg_position_a_sell_today = " << this->stg_position_a_sell_today << std::endl;
 			order_volume = this->getMinNum(this->stg_spread_short_volume, this->stg_lots_batch * this->stg_instrument_A_scale, this->stg_position_a_sell_today);
+			
+			order_volume = order_volume - order_volume % this->stg_instrument_A_scale;
+
 			//std::cout << "order_volume = " << order_volume << std::endl;
 			this->stg_a_order_insert_args->CombOffsetFlag[0] = '3'; /// 平今
 			this->stg_b_order_insert_args->CombOffsetFlag[0] = '3'; /// 平今
@@ -4614,7 +4665,7 @@ void Strategy::Order_Algorithm_Two() {
 
 	/// 价差卖开
 	else if ((this->sell_open_on_off) &&
-		((this->stg_position_a_buy + this->stg_position_a_sell + this->stg_pending_a_open) < this->stg_lots) &&
+		((this->stg_position_a_buy + this->stg_position_a_sell + this->stg_pending_a_open) < (this->stg_lots * this->stg_instrument_A_scale)) &&
 		(this->stg_spread_long >= (this->stg_sell_open + this->stg_spread_shift * this->stg_a_price_tick)) &&
 		(!this->stg_select_order_algorithm_flag)) {
 
@@ -4650,6 +4701,7 @@ void Strategy::Order_Algorithm_Two() {
 		int order_volume = this->getMinNum(this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, this->stg_lots - (this->stg_position_a_buy + this->stg_position_b_buy));
 		//std::cout << "order_volume = " << order_volume << std::endl;
 
+		order_volume = order_volume - order_volume % this->stg_instrument_A_scale;
 
 		if (order_volume <= 0) {
 			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 策略编号 = {} 发单手数错误值 = {}", this->stg_strategy_id, order_volume);
@@ -4714,7 +4766,7 @@ void Strategy::Order_Algorithm_Two() {
 
 	/// 价差买开
 	else if ((this->buy_open_on_off) &&
-		((this->stg_position_a_buy + this->stg_position_a_sell + this->stg_pending_a_open) < this->stg_lots) &&
+		((this->stg_position_a_buy + this->stg_position_a_sell + this->stg_pending_a_open) < (this->stg_lots * this->stg_instrument_A_scale)) &&
 		((this->stg_spread_short <= (this->stg_buy_open - this->stg_spread_shift * this->stg_a_price_tick))) &&
 		(!this->stg_select_order_algorithm_flag)) {
 
@@ -4742,6 +4794,7 @@ void Strategy::Order_Algorithm_Two() {
 		int order_volume = this->getMinNum(this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, this->stg_lots - (this->stg_position_a_buy + this->stg_position_b_buy));
 		//std::cout << "order_volume = " << order_volume << std::endl;
 
+		order_volume = order_volume - order_volume % this->stg_instrument_A_scale;
 
 		if (order_volume <= 0) {
 			//std::cout << "发单手数错误值 = " << order_volume << endl;
@@ -4802,7 +4855,7 @@ void Strategy::Order_Algorithm_Two() {
 		this->Exec_OrderInsert(this->stg_a_order_insert_args);
 	}
 }
-//下单算法3
+/// 下单算法3
 void Strategy::Order_Algorithm_Three() {
 
 }
@@ -4988,6 +5041,34 @@ void Strategy::thread_queue_OnRtnOrder() {
 
 				//this->stg_user->getUserTradeSPI()->OrderInsert(this->stg_user, this->stg_b_order_insert_args);
 				this->Exec_OrderInsert(this->stg_b_order_insert_args);
+			}
+			/// A撤单回报，如果成交量不是整数倍,就主动平掉；如果是整数倍,不用处理
+			else if ((!strcmp(pOrder->InstrumentID, this->stg_instrument_id_A.c_str())) && (pOrder->OrderStatus == '5') && (strlen(pOrder->OrderSysID) != 0)) {
+				
+				/// 只针对跨品种下单算法进行撤单处理
+				if (this->getStgOrderAlgorithm() == ALGORITHM_TWO)
+				{
+					// 报单引用
+					/*this->stg_order_ref_b = this->Generate_Order_Ref();
+					this->stg_order_ref_last = this->stg_order_ref_b;
+					strcpy(this->stg_b_order_insert_args->OrderRef, this->stg_order_ref_b.c_str());*/
+
+					if (pOrder->Direction == '0') {
+						this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->AskPrice1;
+					}
+					else if (pOrder->Direction == '1') {
+						this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->BidPrice1;
+					}
+
+					// 平掉非scale整数倍的量
+					this->stg_a_order_insert_args->VolumeTotalOriginal = (pOrder->VolumeTotalOriginal - pOrder->VolumeTotal) % this->stg_instrument_A_scale;
+					this->stg_a_order_insert_args->Direction = pOrder->Direction;
+					this->stg_a_order_insert_args->CombOffsetFlag[0] = pOrder->CombOffsetFlag[0];
+					this->stg_a_order_insert_args->CombHedgeFlag[0] = pOrder->CombHedgeFlag[0];
+
+					//this->stg_user->getUserTradeSPI()->OrderInsert(this->stg_user, this->stg_b_order_insert_args);
+					this->Exec_OrderInsert(this->stg_a_order_insert_args);
+				}
 			}
 			/// B成交回报
 			else if ((!strcmp(pOrder->InstrumentID, this->stg_instrument_id_B.c_str())) && (pOrder->OrderStatus == '0' || pOrder->OrderStatus == '1') && (strlen(pOrder->OrderSysID) != 0)) { // 全部成交或者部分成交
@@ -5706,11 +5787,12 @@ void Strategy::Exec_OnErrRtnOrderAction() {
 
 // 行情回调,执行交易任务
 void Strategy::Exec_OnTickComing(THREAD_CThostFtdcDepthMarketDataField *pDepthMarketData) {
-	USER_PRINT("Exec_OnTickComing()");
+	
 	//std::cout << "行情回调" << std::endl;
 	/*this->printStrategyInfo("行情回调打印挂单列表");
 	std::cout << "行情挂单列表长度 = " << this->stg_list_order_pending->size() << std::endl;*/
 	list<CThostFtdcOrderField *>::iterator Itor;
+
 
 	// 当有其他地方调用挂单列表,阻塞,信号量P操作
 	sem_wait(&(this->sem_list_order_pending));
