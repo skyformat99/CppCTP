@@ -43,6 +43,9 @@ Strategy::Strategy(bool fake, User *stg_user) {
 	this->stg_lots_batch = 1;				//每批下单手数
 	this->stg_a_order_action_tires_limit = 450; //A合约撤单次数限制
 	this->stg_b_order_action_tires_limit = 450;	//B合约撤单次数限制
+
+	this->stg_b_order_already_send_batch = 0;	//B合约已发份数默认为0
+
 	this->stg_position_a_sell_yesterday = 0;//
 	this->stg_position_a_buy_yesterday = 0; //
 	this->stg_position_a_sell_today = 0;	//
@@ -2926,6 +2929,8 @@ void Strategy::update_task_status() {
 			/*this->printStrategyInfo("更新交易状态");
 			this->printStrategyInfoPosition();*/
 			//this->stg_trade_tasking = false;
+			// 结束任务后B已发份数置为0
+			this->stg_b_order_already_send_batch = 0;
 			this->setStgTradeTasking(false);
 		}
 		else
@@ -2946,14 +2951,14 @@ void Strategy::update_task_status() {
 	}
 	else if (this->getStgOrderAlgorithm() == ALGORITHM_TWO)
 	{
-		if (((this->stg_position_a_buy_today * this->stg_instrument_A_scale) == (this->stg_position_b_sell_today * this->stg_instrument_B_scale))
-			&& ((this->stg_position_a_buy_yesterday * this->stg_instrument_A_scale) == (this->stg_position_b_sell_yesterday * this->stg_instrument_B_scale))
-			&& ((this->stg_position_a_sell_today * this->stg_instrument_A_scale) == (this->stg_position_b_buy_today * this->stg_instrument_B_scale))
-			&& ((this->stg_position_a_sell_yesterday * this->stg_instrument_A_scale) == (this->stg_position_b_buy_yesterday * this->stg_instrument_B_scale))
+		if (((this->stg_position_a_buy / this->stg_instrument_A_scale) == (this->stg_position_b_sell / this->stg_instrument_B_scale))
+			&& ((this->stg_position_a_sell / this->stg_instrument_A_scale) == (this->stg_position_b_buy / this->stg_instrument_B_scale))
 			&& (this->stg_list_order_pending->size() == 0)) {
 			/*this->printStrategyInfo("更新交易状态");
 			this->printStrategyInfoPosition();*/
 			//this->stg_trade_tasking = false;
+			// 结束任务后B已发份数置为0
+			this->stg_b_order_already_send_batch = 0;
 			this->setStgTradeTasking(false);
 		}
 		else
@@ -5153,6 +5158,7 @@ void Strategy::thread_queue_OnRtnOrder() {
 				// 当有其他地方调用挂单列表,阻塞,信号量P操作
 				sem_wait(&(this->sem_list_order_pending));
 
+#if 0
 				if (this->stg_list_order_pending->size() == 0) { // 无挂单
 					//this->stg_b_order_insert_args->VolumeTotalOriginal = pOrder->VolumeTraded;
 
@@ -5189,6 +5195,20 @@ void Strategy::thread_queue_OnRtnOrder() {
 						if (pOrder->VolumeTraded % this->stg_instrument_A_scale == 0)
 						{
 							this->stg_b_order_insert_args->VolumeTotalOriginal = (pOrder->VolumeTraded / this->stg_instrument_A_scale) * this->stg_instrument_B_scale;
+						}
+					}
+				}
+#endif
+				// 成交量为a_scale的整数倍
+				if (pOrder->VolumeTraded > 0)
+				{
+					int times = pOrder->VolumeTraded / this->stg_instrument_A_scale;
+					if (times > 0)
+					{
+						this->stg_b_order_insert_args->VolumeTotalOriginal = (times - this->stg_b_order_already_send_batch) * this->stg_instrument_B_scale;
+						if (this->stg_b_order_insert_args->VolumeTotalOriginal > 0)
+						{
+							this->stg_b_order_already_send_batch = times;
 						}
 					}
 				}

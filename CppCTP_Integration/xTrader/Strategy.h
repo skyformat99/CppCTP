@@ -769,6 +769,8 @@ private:
 	string stg_strategy_id;		// 策略id
 	string stg_instrument_id_A;	// 合约A
 	string stg_instrument_id_B;	// 合约B
+	
+	int stg_b_order_already_send_batch;	// B合约已经发出去的数量
 
 	double stg_buy_open;				// 触发买开（开多单）
 	double stg_sell_close;				// 触发卖平（平多单）
