@@ -293,13 +293,14 @@ public:
 	void Generate_Order_Ref(CThostFtdcInputOrderField *insert_order);
 
 	/// 执行任务函数
+	void Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order);   // 报单平仓自动调整
 	void Exec_OrderInsert(CThostFtdcInputOrderField *insert_order);			// 报单
-	void Exec_OnRspOrderInsert();		// 报单录入请求
-	void Exec_OnRspOrderAction();		// 报单操作请求响应
-	void Exec_OnRtnOrder(CThostFtdcOrderField *pOrder);				// 报单回报
-	void ExEc_OnRtnTrade(CThostFtdcTradeField *pTrade);				// 成交回报
-	void Exec_OnErrRtnOrderInsert();	// 报单录入错误回报
-	void Exec_OnErrRtnOrderAction();	// 报单操作错误回报
+	void Exec_OnRspOrderInsert();											// 报单录入请求
+	void Exec_OnRspOrderAction();											// 报单操作请求响应
+	void Exec_OnRtnOrder(CThostFtdcOrderField *pOrder);						// 报单回报
+	void ExEc_OnRtnTrade(CThostFtdcTradeField *pTrade);						// 成交回报
+	void Exec_OnErrRtnOrderInsert();										// 报单录入错误回报
+	void Exec_OnErrRtnOrderAction();										// 报单操作错误回报
 	void Exec_OnTickComing(THREAD_CThostFtdcDepthMarketDataField *pDepthMarketData);			// 行情回调,执行交易任务
 
 	/// 更新挂单list

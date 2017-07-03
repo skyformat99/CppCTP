@@ -4879,6 +4879,123 @@ void Strategy::Generate_Order_Ref(CThostFtdcInputOrderField *insert_order) {
 
 }
 
+// 报单平仓自动调整
+void Strategy::Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order) {
+	/************************************************************************/
+	/* 如果是开仓:
+				不做任何转换
+	   如果是平昨:
+				判断发单数量，如果大于TS策略维护的昨持仓量,那么将报单分两次发送(一次平昨,一次平今)
+				如果小于TS策略维护的做持仓量,那么就直接发送*/
+	/************************************************************************/
+
+	if (insert_order->CombOffsetFlag[0] == '4') // 只针对平昨进行转换
+	{
+		if (!strcmp(insert_order->InstrumentID, this->stg_instrument_id_A.c_str()))
+		{
+			if (insert_order->Direction == '0') // 方向为买平昨
+			{
+				// 判断发单数量与策略维护的数量
+				int remain = insert_order->VolumeTotalOriginal - this->stg_position_a_buy_yesterday;
+				// 如果小于等于0，那么无需转换
+				if (remain <= 0)
+				{
+					this->Exec_OrderInsert(insert_order);
+				}
+				// 如果大于0，自动分为平昨，平今两条发单指令发送
+				else if (remain > 0)
+				{
+					// 第一条指令(平昨部分)
+					insert_order->VolumeTotalOriginal = this->stg_position_a_buy_yesterday;
+					insert_order->CombOffsetFlag[0] = '4';
+					this->Exec_OrderInsert(insert_order);
+
+					// 第二条指令(平今部分)
+					insert_order->VolumeTotalOriginal = remain;
+					insert_order->CombOffsetFlag[0] = '3';
+					this->Exec_OrderInsert(insert_order);
+				}
+			}
+			else if (insert_order->Direction == '1') // 方向为卖平昨
+			{
+				// 判断发单数量与策略维护的数量
+				int remain = insert_order->VolumeTotalOriginal - this->stg_position_a_sell_yesterday;
+				// 如果小于等于0，那么无需转换
+				if (remain <= 0)
+				{
+					this->Exec_OrderInsert(insert_order);
+				}
+				// 如果大于0，自动分为平昨，平今两条发单指令发送
+				else if (remain > 0)
+				{
+					// 第一条指令(平昨部分)
+					insert_order->VolumeTotalOriginal = this->stg_position_a_sell_yesterday;
+					insert_order->CombOffsetFlag[0] = '4';
+					this->Exec_OrderInsert(insert_order);
+
+					// 第二条指令(平今部分)
+					insert_order->VolumeTotalOriginal = remain;
+					insert_order->CombOffsetFlag[0] = '3';
+					this->Exec_OrderInsert(insert_order);
+				}
+			}
+		}
+		else if (!strcmp(insert_order->InstrumentID, this->stg_instrument_id_B.c_str()))
+		{
+			if (insert_order->Direction == '0') // 方向为买平昨
+			{
+				// 判断发单数量与策略维护的数量
+				int remain = insert_order->VolumeTotalOriginal - this->stg_position_b_buy_yesterday;
+				// 如果小于等于0，那么无需转换
+				if (remain <= 0)
+				{
+					this->Exec_OrderInsert(insert_order);
+				}
+				// 如果大于0，自动分为平昨，平今两条发单指令发送
+				else if (remain > 0)
+				{
+					// 第一条指令(平昨部分)
+					insert_order->VolumeTotalOriginal = this->stg_position_b_buy_yesterday;
+					insert_order->CombOffsetFlag[0] = '4';
+					this->Exec_OrderInsert(insert_order);
+
+					// 第二条指令(平今部分)
+					insert_order->VolumeTotalOriginal = remain;
+					insert_order->CombOffsetFlag[0] = '3';
+					this->Exec_OrderInsert(insert_order);
+				}
+			}
+			else if (insert_order->Direction == '1') // 方向为卖平昨
+			{
+				// 判断发单数量与策略维护的数量
+				int remain = insert_order->VolumeTotalOriginal - this->stg_position_b_sell_yesterday;
+				// 如果小于等于0，那么无需转换
+				if (remain <= 0)
+				{
+					this->Exec_OrderInsert(insert_order);
+				}
+				// 如果大于0，自动分为平昨，平今两条发单指令发送
+				else if (remain > 0)
+				{
+					// 第一条指令(平昨部分)
+					insert_order->VolumeTotalOriginal = this->stg_position_b_sell_yesterday;
+					insert_order->CombOffsetFlag[0] = '4';
+					this->Exec_OrderInsert(insert_order);
+
+					// 第二条指令(平今部分)
+					insert_order->VolumeTotalOriginal = remain;
+					insert_order->CombOffsetFlag[0] = '3';
+					this->Exec_OrderInsert(insert_order);
+				}
+			}
+		}
+		else {
+			Utils::printRedColor("Strategy::Exec_OrderCloseConvert() 发单合约ID为空!");
+			this->stg_user->getXtsLogger()->info("Strategy::Exec_OrderCloseConvert() 发单合约ID为空!");
+		}
+	}
+}
+
 
 // 报单
 void Strategy::Exec_OrderInsert(CThostFtdcInputOrderField *insert_order) {
@@ -4894,7 +5011,16 @@ void Strategy::Exec_OrderInsert(CThostFtdcInputOrderField *insert_order) {
 	// 当有其他地方调用报单插入,阻塞,信号量P操作
 	sem_wait(&(this->sem_order_insert));
 
-	this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
+	// 针对平昨特殊处理
+	if (insert_order->CombOffsetFlag[0] == '4')
+	{
+		// 平昨仓转换
+		this->Exec_OrderCloseConvert(insert_order);
+	}
+	else {
+		// 发单
+		this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
+	}
 
 	// 释放信号量,信号量V操作
 	sem_post(&(this->sem_order_insert));
@@ -5060,14 +5186,54 @@ void Strategy::thread_queue_OnRtnOrder() {
 						this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->BidPrice1;
 					}
 
-					// 平掉非scale整数倍的量
+					// 反方向操作 非scale整数倍的量(已开仓的就平掉,已平仓的再开回来)
 					this->stg_a_order_insert_args->VolumeTotalOriginal = (pOrder->VolumeTotalOriginal - pOrder->VolumeTotal) % this->stg_instrument_A_scale;
-					this->stg_a_order_insert_args->Direction = pOrder->Direction;
-					this->stg_a_order_insert_args->CombOffsetFlag[0] = pOrder->CombOffsetFlag[0];
-					this->stg_a_order_insert_args->CombHedgeFlag[0] = pOrder->CombHedgeFlag[0];
+					
+					if (this->stg_a_order_insert_args->VolumeTotalOriginal > 0)
+					{
+						// 先前为买->变为卖，先前为卖->变为买
+						if (pOrder->Direction == '0')
+						{
+							this->stg_a_order_insert_args->Direction = '1';
+						}
+						else if (pOrder->Direction == '1')
+						{
+							this->stg_a_order_insert_args->Direction = '0';
+						}
 
-					//this->stg_user->getUserTradeSPI()->OrderInsert(this->stg_user, this->stg_b_order_insert_args);
-					this->Exec_OrderInsert(this->stg_a_order_insert_args);
+						// 开平仓标志位逆转
+						if (pOrder->CombOffsetFlag[0] == '0') // 开仓
+						{
+							// 所有的开仓逆转为 平昨 , 平昨 单经过特殊函数自动转换 平今、平昨
+							pOrder->CombOffsetFlag[0] == '4';
+						}
+						else if (pOrder->CombOffsetFlag[0] == '1') // 平仓
+						{
+							// 平仓单转为 开仓 单
+							pOrder->CombOffsetFlag[0] == '0';
+						}
+						else if (pOrder->CombOffsetFlag[0] == '3') // 平今
+						{
+							// 平仓单转为 开仓 单
+							pOrder->CombOffsetFlag[0] == '0';
+						}
+						else if (pOrder->CombOffsetFlag[0] == '4') // 平昨
+						{
+							// 平仓单转为 开仓 单
+							pOrder->CombOffsetFlag[0] == '0';
+						}
+
+						// 投机套保标志位
+						this->stg_a_order_insert_args->CombHedgeFlag[0] = pOrder->CombHedgeFlag[0];
+
+						//this->stg_user->getUserTradeSPI()->OrderInsert(this->stg_user, this->stg_b_order_insert_args);
+						this->Exec_OrderInsert(this->stg_a_order_insert_args);
+					}
+					else {
+						this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnOrder() A撤单反转操作数量为0");
+					}
+
+					
 				}
 			}
 			/// B成交回报
