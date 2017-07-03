@@ -3854,8 +3854,8 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 	}
 
 	// 如果有撇腿, 关闭下单锁
-	if (!((this->stg_position_a_sell == this->stg_position_b_buy) && 
-		(this->stg_position_a_buy == this->stg_position_b_sell))) {
+	if (!(((this->stg_position_a_sell * this->stg_instrument_B_scale) == (this->stg_position_b_buy * this->stg_instrument_A_scale)) &&
+		((this->stg_position_a_buy * this->stg_instrument_B_scale) == (this->stg_position_b_sell * this->stg_instrument_A_scale)))) {
 		
 		this->setStgSelectOrderAlgorithmFlag("Strategy::Select_Order_Algorithm() 有撇腿", false); 
 		
@@ -4446,25 +4446,28 @@ void Strategy::Order_Algorithm_Two() {
 		/// 优先平昨仓
 		/// 报单手数：盘口挂单量、每份发单手数、持仓量
 		if (this->stg_position_a_buy_yesterday > 0) {
-
-			//std::cout << "this->stg_spread_long_volume = " << this->stg_spread_long_volume << std::endl;
-			//std::cout << "this->stg_position_a_buy_yesterday = " << this->stg_position_a_buy_yesterday << std::endl;
 			
 			order_volume = this->getMinNum(this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, this->stg_position_a_buy_yesterday);
-			
+
+			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 有昨仓 策略编号 = {} 数量1 = {} 数量2 = {} 数量3 = {} order_volume最小值 = {}", this->stg_strategy_id, this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, this->stg_position_a_buy_yesterday, order_volume);
+
 			order_volume = order_volume - order_volume % this->stg_instrument_A_scale;
+
+			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 有昨仓 策略编号 = {} scale倍数order_volume = {}", this->stg_strategy_id, order_volume);
 
 			//std::cout << "order_volume = " << order_volume << std::endl;
 			this->stg_a_order_insert_args->CombOffsetFlag[0] = '4'; /// 平昨
 			this->stg_b_order_insert_args->CombOffsetFlag[0] = '4'; /// 平昨
 		}
 		else if ((this->stg_position_a_buy_yesterday == 0) && (this->stg_position_a_buy_today > 0)) {
-			//std::cout << "this->stg_spread_short_volume = " << this->stg_spread_short_volume << std::endl;
-			//std::cout << "this->stg_lots_batch = " << this->stg_lots_batch << std::endl;
-			//std::cout << "this->stg_position_a_buy_today = " << this->stg_position_a_buy_today << std::endl;
-			order_volume = this->getMinNum(this->stg_spread_short_volume, this->stg_lots_batch * this->stg_instrument_A_scale, this->stg_position_a_buy_today);
-			
+
+			order_volume = this->getMinNum(this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, this->stg_position_a_buy_today);
+
+			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 无昨仓 策略编号 = {} 数量1 = {} 数量2 = {} 数量3 = {} order_volume最小值 = {}", this->stg_strategy_id, this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, this->stg_position_a_buy_today, order_volume);
+
 			order_volume = order_volume - order_volume % this->stg_instrument_A_scale;
+
+			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 无昨仓 策略编号 = {} scale倍数order_volume = {}", this->stg_strategy_id, order_volume);
 			
 			//std::cout << "order_volume = " << order_volume << std::endl;
 			this->stg_a_order_insert_args->CombOffsetFlag[0] = '3'; /// 平今
@@ -4585,9 +4588,15 @@ void Strategy::Order_Algorithm_Two() {
 			//std::cout << "this->stg_spread_short_volume = " << this->stg_spread_short_volume << std::endl;
 			//std::cout << "this->stg_lots_batch = " << this->stg_lots_batch << std::endl;
 			//std::cout << "this->stg_position_a_sell_yesterday = " << this->stg_position_a_sell_yesterday << std::endl;
+
 			order_volume = this->getMinNum(this->stg_spread_short_volume, this->stg_lots_batch * this->stg_instrument_A_scale, this->stg_position_a_sell_yesterday);
+
+			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 有昨仓 策略编号 = {} 数量1 = {} 数量2 = {} 数量3 = {} order_volume最小值 = {}", this->stg_strategy_id, this->stg_spread_short_volume, this->stg_lots_batch * this->stg_instrument_A_scale, stg_position_a_sell_yesterday, order_volume);
+
 			
 			order_volume = order_volume - order_volume % this->stg_instrument_A_scale;
+
+			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 有昨仓 策略编号 = {} scale倍数order_volume = {}", this->stg_strategy_id, order_volume);
 
 			//std::cout << "order_volume = " << order_volume << std::endl;
 			this->stg_a_order_insert_args->CombOffsetFlag[0] = '4'; /// 平昨
@@ -4599,7 +4608,12 @@ void Strategy::Order_Algorithm_Two() {
 			//std::cout << "this->stg_position_a_sell_today = " << this->stg_position_a_sell_today << std::endl;
 			order_volume = this->getMinNum(this->stg_spread_short_volume, this->stg_lots_batch * this->stg_instrument_A_scale, this->stg_position_a_sell_today);
 			
+			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 无昨仓 策略编号 = {} 数量1 = {} 数量2 = {} 数量3 = {} order_volume最小值 = {}", this->stg_strategy_id, this->stg_spread_short_volume, this->stg_lots_batch * this->stg_instrument_A_scale, stg_position_a_sell_today, order_volume);
+
 			order_volume = order_volume - order_volume % this->stg_instrument_A_scale;
+
+			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 无昨仓 策略编号 = {} scale倍数order_volume = {}", this->stg_strategy_id, order_volume);
+
 
 			//std::cout << "order_volume = " << order_volume << std::endl;
 			this->stg_a_order_insert_args->CombOffsetFlag[0] = '3'; /// 平今
@@ -4701,7 +4715,11 @@ void Strategy::Order_Algorithm_Two() {
 		int order_volume = this->getMinNum(this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, (this->stg_lots * this->stg_instrument_A_scale) - (this->stg_position_a_buy + this->stg_position_b_buy));
 		//std::cout << "order_volume = " << order_volume << std::endl;
 
+		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 策略编号 = {} 数量1 = {} 数量2 = {} 数量3 = {} order_volume最小值 = {}", this->stg_strategy_id, this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, (this->stg_lots * this->stg_instrument_A_scale) - (this->stg_position_a_buy + this->stg_position_b_buy), order_volume);
+
 		order_volume = order_volume - order_volume % this->stg_instrument_A_scale;
+
+		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 策略编号 = {} scale倍数order_volume = {}", this->stg_strategy_id, order_volume);
 
 		if (order_volume <= 0) {
 			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 策略编号 = {} 发单手数错误值 = {}", this->stg_strategy_id, order_volume);
@@ -4794,7 +4812,12 @@ void Strategy::Order_Algorithm_Two() {
 		int order_volume = this->getMinNum(this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, (this->stg_lots * this->stg_instrument_A_scale) - (this->stg_position_a_buy + this->stg_position_b_buy));
 		//std::cout << "order_volume = " << order_volume << std::endl;
 
+		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 策略编号 = {} 数量1 = {} 数量2 = {} 数量3 = {} order_volume最小值 = {}", this->stg_strategy_id, this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, (this->stg_lots * this->stg_instrument_A_scale) - (this->stg_position_a_buy + this->stg_position_b_buy), order_volume);
+
 		order_volume = order_volume - order_volume % this->stg_instrument_A_scale;
+
+		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 策略编号 = {} scale倍数order_volume = {}", this->stg_strategy_id, order_volume);
+
 
 		if (order_volume <= 0) {
 			//std::cout << "发单手数错误值 = " << order_volume << endl;
@@ -5131,8 +5154,13 @@ void Strategy::thread_queue_OnRtnOrder() {
 				sem_wait(&(this->sem_list_order_pending));
 
 				if (this->stg_list_order_pending->size() == 0) { // 无挂单
-					//std::cout << "A无挂单" << std::endl;
-					this->stg_b_order_insert_args->VolumeTotalOriginal = pOrder->VolumeTraded;
+					//this->stg_b_order_insert_args->VolumeTotalOriginal = pOrder->VolumeTraded;
+
+					// 无挂单情况下 当A成交的数量为scale的整数倍,B才可以发单
+					if (pOrder->VolumeTraded % this->stg_instrument_A_scale == 0)
+					{
+						this->stg_b_order_insert_args->VolumeTotalOriginal = (pOrder->VolumeTraded / this->stg_instrument_A_scale) * this->stg_instrument_B_scale;
+					}
 				}
 				else { // 有挂单
 					//std::cout << "A有挂单" << std::endl;
@@ -5140,11 +5168,16 @@ void Strategy::thread_queue_OnRtnOrder() {
 					list<CThostFtdcOrderField *>::iterator Itor;
 					for (Itor = this->stg_list_order_pending->begin(); Itor != this->stg_list_order_pending->end(); Itor++) {
 						if (!strcmp((*Itor)->OrderRef, pOrder->OrderRef)) { // 报单引用相等
-							/*std::cout << "挂单列表找到A合约" << std::endl;
-							std::cout << "pOrder->VolumeTraded = " << pOrder->VolumeTraded << endl;
-							std::cout << "(*Itor)->VolumeTraded = " << (*Itor)->VolumeTraded << endl;*/
+							
+							//this->stg_b_order_insert_args->VolumeTotalOriginal = pOrder->VolumeTraded - (*Itor)->VolumeTraded; // B发单量等于本次回报A的成交量
 
-							this->stg_b_order_insert_args->VolumeTotalOriginal = pOrder->VolumeTraded - (*Itor)->VolumeTraded; // B发单量等于本次回报A的成交量
+
+							// 有挂单情况下 当A成交的数量为scale的整数倍,B才可以发单
+							if ((pOrder->VolumeTraded - (*Itor)->VolumeTraded) % this->stg_instrument_A_scale == 0)
+							{
+								this->stg_b_order_insert_args->VolumeTotalOriginal = ((pOrder->VolumeTraded - (*Itor)->VolumeTraded) / this->stg_instrument_A_scale) * this->stg_instrument_B_scale;
+							}
+
 							b_fined = true;
 							break;
 						}
@@ -5152,7 +5185,11 @@ void Strategy::thread_queue_OnRtnOrder() {
 					if (!b_fined) { // 无挂单，但是属于分批成交, 第一批
 						//std::cout << "无挂单，但是属于分批成交, 第一批" << std::endl;
 						//std::cout << "pOrder->VolumeTraded = " << pOrder->VolumeTraded << endl;
-						this->stg_b_order_insert_args->VolumeTotalOriginal = pOrder->VolumeTraded;
+						//this->stg_b_order_insert_args->VolumeTotalOriginal = pOrder->VolumeTraded;
+						if (pOrder->VolumeTraded % this->stg_instrument_A_scale == 0)
+						{
+							this->stg_b_order_insert_args->VolumeTotalOriginal = (pOrder->VolumeTraded / this->stg_instrument_A_scale) * this->stg_instrument_B_scale;
+						}
 					}
 				}
 
