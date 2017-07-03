@@ -3858,14 +3858,82 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 		sem_post(&(this->sem_list_order_pending));
 	}
 
+	//// 如果有撇腿, 关闭下单锁
+	//if (!(((this->stg_position_a_sell * this->stg_instrument_B_scale) == (this->stg_position_b_buy * this->stg_instrument_A_scale)) &&
+	//	((this->stg_position_a_buy * this->stg_instrument_B_scale) == (this->stg_position_b_sell * this->stg_instrument_A_scale)))) {
+	//	
+	//	this->setStgSelectOrderAlgorithmFlag("Strategy::Select_Order_Algorithm() 有撇腿", false); 
+	//	
+	//	return;
+	//}
+
 	// 如果有撇腿, 关闭下单锁
-	if (!(((this->stg_position_a_sell * this->stg_instrument_B_scale) == (this->stg_position_b_buy * this->stg_instrument_A_scale)) &&
-		((this->stg_position_a_buy * this->stg_instrument_B_scale) == (this->stg_position_b_sell * this->stg_instrument_A_scale)))) {
-		
-		this->setStgSelectOrderAlgorithmFlag("Strategy::Select_Order_Algorithm() 有撇腿", false); 
-		
-		return;
+	if (this->getStgOrderAlgorithm() == ALGORITHM_ONE)
+	{
+		if ((this->stg_position_a_buy_today == this->stg_position_b_sell_today)
+			&& (this->stg_position_a_buy_yesterday == this->stg_position_b_sell_yesterday)
+			&& (this->stg_position_a_sell_today == this->stg_position_b_buy_today)
+			&& (this->stg_position_a_sell_yesterday == this->stg_position_b_buy_yesterday)
+			&& (this->stg_list_order_pending->size() == 0)) {
+			/*this->printStrategyInfo("更新交易状态");
+			this->printStrategyInfoPosition();*/
+			//this->stg_trade_tasking = false;
+			// 结束任务后B已发份数置为0
+			//this->stg_b_order_already_send_batch = 0;
+			//this->setStgTradeTasking(false);
+
+			this->setStgSelectOrderAlgorithmFlag("Strategy::Select_Order_Algorithm() ALGORITHM_ONE 有撇腿", false);
+
+			return;
+		}
+		else
+		{
+			//this->printStrategyInfo("Strategy::update_task_status() 更新交易状态");
+			/*std::cout << "stg_position_a_buy_today = " << stg_position_a_buy_today << std::endl;
+			std::cout << "stg_position_b_sell_today = " << stg_position_b_sell_today << std::endl;
+			std::cout << "stg_position_a_buy_yesterday = " << stg_position_a_buy_yesterday << std::endl;
+			std::cout << "stg_position_b_sell_yesterday = " << stg_position_b_sell_yesterday << std::endl;
+			std::cout << "stg_position_a_sell_today = " << stg_position_a_sell_today << std::endl;
+			std::cout << "stg_position_b_buy_today = " << stg_position_b_buy_today << std::endl;
+			std::cout << "stg_position_a_sell_yesterday = " << stg_position_a_sell_yesterday << std::endl;
+			std::cout << "stg_position_b_buy_yesterday = " << stg_position_b_buy_yesterday << std::endl;
+			std::cout << "this->stg_list_order_pending->size() = " << this->stg_list_order_pending->size() << std::endl;*/
+
+			//this->setStgTradeTasking(true);
+		}
 	}
+	else if (this->getStgOrderAlgorithm() == ALGORITHM_TWO)
+	{
+		if (((this->stg_position_a_buy / this->stg_instrument_A_scale) == (this->stg_position_b_sell / this->stg_instrument_B_scale))
+			&& ((this->stg_position_a_sell / this->stg_instrument_A_scale) == (this->stg_position_b_buy / this->stg_instrument_B_scale))
+			&& (this->stg_list_order_pending->size() == 0)) {
+			/*this->printStrategyInfo("更新交易状态");
+			this->printStrategyInfoPosition();*/
+			//this->stg_trade_tasking = false;
+			// 结束任务后B已发份数置为0
+			//this->stg_b_order_already_send_batch = 0;
+			//this->setStgTradeTasking(false);
+
+			this->setStgSelectOrderAlgorithmFlag("Strategy::Select_Order_Algorithm() ALGORITHM_TWO 有撇腿", false);
+
+			return;
+		}
+		else
+		{
+			//this->printStrategyInfo("Strategy::update_task_status() 更新交易状态");
+			/*std::cout << "stg_position_a_buy_today = " << stg_position_a_buy_today << std::endl;
+			std::cout << "stg_position_b_sell_today = " << stg_position_b_sell_today << std::endl;
+			std::cout << "stg_position_a_buy_yesterday = " << stg_position_a_buy_yesterday << std::endl;
+			std::cout << "stg_position_b_sell_yesterday = " << stg_position_b_sell_yesterday << std::endl;
+			std::cout << "stg_position_a_sell_today = " << stg_position_a_sell_today << std::endl;
+			std::cout << "stg_position_b_buy_today = " << stg_position_b_buy_today << std::endl;
+			std::cout << "stg_position_a_sell_yesterday = " << stg_position_a_sell_yesterday << std::endl;
+			std::cout << "stg_position_b_buy_yesterday = " << stg_position_b_buy_yesterday << std::endl;
+			std::cout << "this->stg_list_order_pending->size() = " << this->stg_list_order_pending->size() << std::endl;*/
+			//this->setStgTradeTasking(true);
+		}
+	}
+
 
 	if (stg_order_algorithm == ALGORITHM_ONE) { // 下单算法1
 		this->Order_Algorithm_One();
