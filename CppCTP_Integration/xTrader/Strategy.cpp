@@ -3882,9 +3882,7 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 			//this->stg_b_order_already_send_batch = 0;
 			//this->setStgTradeTasking(false);
 
-			this->setStgSelectOrderAlgorithmFlag("Strategy::Select_Order_Algorithm() ALGORITHM_ONE 有撇腿", false);
-
-			return;
+			
 		}
 		else
 		{
@@ -3900,6 +3898,9 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 			std::cout << "this->stg_list_order_pending->size() = " << this->stg_list_order_pending->size() << std::endl;*/
 
 			//this->setStgTradeTasking(true);
+			this->setStgSelectOrderAlgorithmFlag("Strategy::Select_Order_Algorithm() ALGORITHM_ONE 有撇腿", false);
+
+			return;
 		}
 	}
 	else if (this->getStgOrderAlgorithm() == ALGORITHM_TWO)
@@ -3914,9 +3915,7 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 			//this->stg_b_order_already_send_batch = 0;
 			//this->setStgTradeTasking(false);
 
-			this->setStgSelectOrderAlgorithmFlag("Strategy::Select_Order_Algorithm() ALGORITHM_TWO 有撇腿", false);
-
-			return;
+			
 		}
 		else
 		{
@@ -3931,17 +3930,20 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 			std::cout << "stg_position_b_buy_yesterday = " << stg_position_b_buy_yesterday << std::endl;
 			std::cout << "this->stg_list_order_pending->size() = " << this->stg_list_order_pending->size() << std::endl;*/
 			//this->setStgTradeTasking(true);
+			this->setStgSelectOrderAlgorithmFlag("Strategy::Select_Order_Algorithm() ALGORITHM_TWO 有撇腿", false);
+
+			return;
 		}
 	}
 
 
-	if (stg_order_algorithm == ALGORITHM_ONE) { // 下单算法1
+	if (this->stg_order_algorithm == ALGORITHM_ONE) { // 下单算法1
 		this->Order_Algorithm_One();
 	}
-	else if (stg_order_algorithm == ALGORITHM_TWO) { // 下单算法2
+	else if (this->stg_order_algorithm == ALGORITHM_TWO) { // 下单算法2
 		this->Order_Algorithm_Two();
 	}
-	else if (stg_order_algorithm == ALGORITHM_THREE) { // 下单算法3
+	else if (this->stg_order_algorithm == ALGORITHM_THREE) { // 下单算法3
 		this->Order_Algorithm_Three();
 	}
 	else {
