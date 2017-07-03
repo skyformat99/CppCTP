@@ -3785,7 +3785,7 @@ void Strategy::thread_queue_OnRtnDepthMarketData() {
 						std::cout << "\tB合约撤单次数:" << this->getStgBOrderActionCount() << ", B合约撤单限制:" << this->getStgBOrderActionTiresLimit() << std::endl;
 						Utils::printRedColor("已停止新的任务!");
 
-						this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnDepthMarketData() 撤单次数已超过限制! 期货账户 = {} 策略编号 = {} A合约撤单次数 = {} B合约撤单次数 = {}", this->stg_user_id, this->stg_strategy_id, this->getStgAOrderActionTiresLimit(), this->getStgBOrderActionTiresLimit())
+						this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnDepthMarketData() 撤单次数已超过限制! 期货账户 = {} 策略编号 = {} A合约撤单次数 = {} B合约撤单次数 = {}", this->stg_user_id, this->stg_strategy_id, this->getStgAOrderActionTiresLimit(), this->getStgBOrderActionTiresLimit());
 
 						// 析构
 						delete pDepthMarketData_tmp;
@@ -4404,7 +4404,7 @@ void Strategy::Order_Algorithm_Two() {
 
 	/// 价差卖平
 	if ((this->sell_close_on_off) &&
-		((this->stg_position_a_sell * this->stg_instrument_A_scale) == (this->stg_position_b_buy * this->stg_instrument_B_scale)) &&
+		((this->stg_position_a_sell * this->stg_instrument_B_scale) == (this->stg_position_b_buy * this->stg_instrument_A_scale)) &&
 		(this->stg_position_a_buy > 0) &&
 		((this->stg_spread_long) >= (this->stg_sell_close + this->stg_spread_shift * this->stg_a_price_tick)) &&
 		(!this->stg_select_order_algorithm_flag)) {
@@ -4533,7 +4533,7 @@ void Strategy::Order_Algorithm_Two() {
 	}
 	/// 价差买平
 	else if ((this->buy_close_on_off) &&
-		((this->stg_position_a_sell * this->stg_instrument_A_scale) == (this->stg_position_b_buy * this->stg_instrument_B_scale)) &&
+		((this->stg_position_a_sell * this->stg_instrument_B_scale) == (this->stg_position_b_buy * this->stg_instrument_A_scale)) &&
 		(this->stg_position_a_sell > 0) &&
 		(this->stg_spread_short <= (this->stg_buy_close - this->stg_spread_shift * this->stg_a_price_tick)) &&
 		(!this->stg_select_order_algorithm_flag)) {
@@ -4698,7 +4698,7 @@ void Strategy::Order_Algorithm_Two() {
 		std::cout << "this->stg_position_a_buy = " << this->stg_position_a_buy << std::endl;
 		std::cout << "this->stg_position_b_buy = " << this->stg_position_b_buy << std::endl;*/
 		/// 报单手数：盘口挂单量,每份发单手数,剩余可开仓手数中取最小值
-		int order_volume = this->getMinNum(this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, this->stg_lots - (this->stg_position_a_buy + this->stg_position_b_buy));
+		int order_volume = this->getMinNum(this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, (this->stg_lots * this->stg_instrument_A_scale) - (this->stg_position_a_buy + this->stg_position_b_buy));
 		//std::cout << "order_volume = " << order_volume << std::endl;
 
 		order_volume = order_volume - order_volume % this->stg_instrument_A_scale;
@@ -4791,7 +4791,7 @@ void Strategy::Order_Algorithm_Two() {
 		std::cout << "this->stg_position_b_buy = " << this->stg_position_b_buy << std::endl;*/
 
 		/// 报单手数：盘口挂单量,每份发单手数,剩余可开仓手数中取最小值
-		int order_volume = this->getMinNum(this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, this->stg_lots - (this->stg_position_a_buy + this->stg_position_b_buy));
+		int order_volume = this->getMinNum(this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, (this->stg_lots * this->stg_instrument_A_scale) - (this->stg_position_a_buy + this->stg_position_b_buy));
 		//std::cout << "order_volume = " << order_volume << std::endl;
 
 		order_volume = order_volume - order_volume % this->stg_instrument_A_scale;
@@ -4805,8 +4805,6 @@ void Strategy::Order_Algorithm_Two() {
 		else {
 			//std::cout << "发单手数 = " << order_volume << endl;
 		}
-
-
 
 		// A合约报单参数,全部确定
 		// 报单引用
