@@ -759,7 +759,8 @@ void DBManager::getAllFutureAccount(list<User *> *l_user) {
 int DBManager::CheckStrategyExist(string strategy_id, string user_id, string trading_day) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
-	std::cout << "DBManager::CheckStrategyExist()" << std::endl;
+	//std::cout << "DBManager::CheckStrategyExist()" << std::endl;
+	this->getXtsDBLogger()->info("DBManager::CheckStrategyExist()");
 	int count_number = 0;
 	int flag = 0;
 
@@ -776,7 +777,8 @@ int DBManager::CheckStrategyExist(string strategy_id, string user_id, string tra
 int DBManager::CreateStrategy(Strategy *stg) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
-	std::cout << "DBManager::CreateStrategy()" << std::endl;
+	//std::cout << "DBManager::CreateStrategy()" << std::endl;
+	this->getXtsDBLogger()->info("DBManager::CreateStrategy()");
 	int count_number = 0;
 	int flag = 0;
 

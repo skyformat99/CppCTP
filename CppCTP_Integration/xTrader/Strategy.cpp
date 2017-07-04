@@ -4718,10 +4718,10 @@ void Strategy::Order_Algorithm_Two() {
 		std::cout << "this->stg_position_a_buy = " << this->stg_position_a_buy << std::endl;
 		std::cout << "this->stg_position_b_buy = " << this->stg_position_b_buy << std::endl;*/
 		/// 报单手数：盘口挂单量,每份发单手数,剩余可开仓手数中取最小值
-		int order_volume = this->getMinNum(this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, (this->stg_lots * this->stg_instrument_A_scale) - (this->stg_position_a_buy + this->stg_position_b_buy));
+		int order_volume = this->getMinNum(this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, (this->stg_lots * this->stg_instrument_A_scale) - (this->stg_position_a_buy + this->stg_position_a_sell));
 		//std::cout << "order_volume = " << order_volume << std::endl;
 
-		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 策略编号 = {} 数量1 = {} 数量2 = {} 数量3 = {} order_volume最小值 = {}", this->stg_strategy_id, this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, (this->stg_lots * this->stg_instrument_A_scale) - (this->stg_position_a_buy + this->stg_position_b_buy), order_volume);
+		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 策略编号 = {} 数量1 = {} 数量2 = {} 数量3 = {} order_volume最小值 = {}", this->stg_strategy_id, this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, (this->stg_lots * this->stg_instrument_A_scale) - (this->stg_position_a_buy + this->stg_position_a_sell), order_volume);
 
 		order_volume = order_volume - order_volume % this->stg_instrument_A_scale;
 
@@ -4815,10 +4815,10 @@ void Strategy::Order_Algorithm_Two() {
 		std::cout << "this->stg_position_b_buy = " << this->stg_position_b_buy << std::endl;*/
 
 		/// 报单手数：盘口挂单量,每份发单手数,剩余可开仓手数中取最小值
-		int order_volume = this->getMinNum(this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, (this->stg_lots * this->stg_instrument_A_scale) - (this->stg_position_a_buy + this->stg_position_b_buy));
+		int order_volume = this->getMinNum(this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, (this->stg_lots * this->stg_instrument_A_scale) - (this->stg_position_a_buy + this->stg_position_a_sell));
 		//std::cout << "order_volume = " << order_volume << std::endl;
 
-		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 策略编号 = {} 数量1 = {} 数量2 = {} 数量3 = {} order_volume最小值 = {}", this->stg_strategy_id, this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, (this->stg_lots * this->stg_instrument_A_scale) - (this->stg_position_a_buy + this->stg_position_b_buy), order_volume);
+		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 策略编号 = {} 数量1 = {} 数量2 = {} 数量3 = {} order_volume最小值 = {}", this->stg_strategy_id, this->stg_spread_long_volume, this->stg_lots_batch * this->stg_instrument_A_scale, (this->stg_lots * this->stg_instrument_A_scale) - (this->stg_position_a_buy + this->stg_position_a_sell), order_volume);
 
 		order_volume = order_volume - order_volume % this->stg_instrument_A_scale;
 
@@ -6257,6 +6257,26 @@ void Strategy::remove_pending_order_list(CThostFtdcOrderField *pOrder) {
 
 /// 撤单错误回报删除pending_order_list中的元素
 void Strategy::remove_pending_order_list(CThostFtdcOrderActionField *pOrderAction) {
+	list<CThostFtdcOrderField *>::iterator itor;
+	// 当有其他地方调用挂单列表,阻塞,信号量P操作
+	sem_wait(&(this->sem_list_order_pending));
+
+	for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
+		if (!strcmp((*itor)->OrderRef, pOrderAction->OrderRef)) {
+			delete (*itor);
+			itor = this->stg_list_order_pending->erase(itor); //移除
+			//break;
+		}
+		else {
+			itor++;
+		}
+	}
+
+	// 释放信号量,信号量V操作
+	sem_post(&(this->sem_list_order_pending));
+}
+
+void Strategy::remove_pending_order_list(CThostFtdcInputOrderActionField *pOrderAction) {
 	list<CThostFtdcOrderField *>::iterator itor;
 	// 当有其他地方调用挂单列表,阻塞,信号量P操作
 	sem_wait(&(this->sem_list_order_pending));
@@ -7745,6 +7765,7 @@ void Strategy::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder) {
 	//}
 	//std::cout << "Strategy::OnRspOrderInsert()" << std::endl;
 	this->getStgUser()->getXtsLogger()->info("Strategy::OnRspOrderInsert()");
+	this->remove_pending_order_list(pInputOrder);
 	this->Exec_OnRspOrderInsert();
 }
 
@@ -7757,6 +7778,7 @@ void Strategy::OrderAction(string ExchangeID, string OrderRef, string OrderSysID
 void Strategy::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction) {
 	USER_PRINT("Strategy::OnRspOrderAction");
 	this->getStgUser()->getXtsLogger()->info("Strategy::OnRspOrderAction()");
+	this->remove_pending_order_list(pInputOrderAction);
 }
 
 //撤单错误

@@ -314,6 +314,8 @@ public:
 	
 	/// 撤单错误回报删除pending_order_list中的元素
 	void remove_pending_order_list(CThostFtdcOrderActionField *pOrderAction);
+
+	void remove_pending_order_list(CThostFtdcInputOrderActionField *pOrderAction);
 	
 	/// 错误回报返回的元素要从挂单列表里移除
 	void remove_pending_order_list(CThostFtdcInputOrderField *pOrder);
