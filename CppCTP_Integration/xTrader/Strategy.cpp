@@ -4915,61 +4915,46 @@ void Strategy::Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order) {
 				判断发单数量，如果大于TS策略维护的昨持仓量,那么将报单分两次发送(一次平昨,一次平今)
 				如果小于TS策略维护的做持仓量,那么就直接发送*/
 	/************************************************************************/
+	int open_num, close_today_num, close_yesterday_num;
+	open_num = close_today_num = close_yesterday_num = 0;
 
-	if (insert_order->CombOffsetFlag[0] == '4') // 只针对平昨进行转换
+	if (insert_order->CombOffsetFlag[0] == '0') // 开仓
 	{
+		open_num = insert_order->VolumeTotalOriginal;
+	}
+	else if (insert_order->CombOffsetFlag[0] == '3') // 平今
+	{
+		close_today_num = insert_order->VolumeTotalOriginal;
+	}
+	else if ((insert_order->CombOffsetFlag[0] == '4') || (insert_order->CombOffsetFlag[0] == '1')) // 平仓或者平昨
+	{
+		// 如果是A合约
 		if (!strcmp(insert_order->InstrumentID, this->stg_instrument_id_A.c_str()))
 		{
 			if (insert_order->Direction == '0') // 方向为买平昨
 			{
-				// 判断发单数量与策略维护的数量
-				int remain = insert_order->VolumeTotalOriginal - this->stg_position_a_sell_yesterday;
-				// 如果小于等于0，那么无需转换
-				if (remain <= 0)
+				// 如果发单数量小于昨卖持仓量
+				if ((insert_order->VolumeTotalOriginal - this->stg_position_a_sell_yesterday) <= 0)
 				{
-					// 发单
-					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
+					close_today_num = 0;
+					close_yesterday_num = insert_order->VolumeTotalOriginal;
 				}
-				// 如果大于0，自动分为平昨，平今两条发单指令发送
-				else if (remain > 0)
-				{
-					// 第一条指令(平昨部分)
-					insert_order->VolumeTotalOriginal = this->stg_position_a_sell_yesterday;
-					insert_order->CombOffsetFlag[0] = '4';
-					// 发单
-					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
-
-					// 第二条指令(平今部分)
-					insert_order->VolumeTotalOriginal = remain;
-					insert_order->CombOffsetFlag[0] = '3';
-					// 发单
-					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
+				else {
+					close_yesterday_num = this->stg_position_a_sell_yesterday;
+					close_today_num = insert_order->VolumeTotalOriginal - this->stg_position_a_sell_yesterday;
 				}
 			}
 			else if (insert_order->Direction == '1') // 方向为卖平昨
 			{
-				// 判断发单数量与策略维护的数量
-				int remain = insert_order->VolumeTotalOriginal - this->stg_position_a_buy_yesterday;
-				// 如果小于等于0，那么无需转换
-				if (remain <= 0)
+				// 如果发单数量小于昨买持仓量
+				if ((insert_order->VolumeTotalOriginal - this->stg_position_a_buy_yesterday) <= 0)
 				{
-					// 发单
-					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
+					close_today_num = 0;
+					close_yesterday_num = insert_order->VolumeTotalOriginal;
 				}
-				// 如果大于0，自动分为平昨，平今两条发单指令发送
-				else if (remain > 0)
-				{
-					// 第一条指令(平昨部分)
-					insert_order->VolumeTotalOriginal = this->stg_position_a_buy_yesterday;
-					insert_order->CombOffsetFlag[0] = '4';
-					// 发单
-					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
-
-					// 第二条指令(平今部分)
-					insert_order->VolumeTotalOriginal = remain;
-					insert_order->CombOffsetFlag[0] = '3';
-					// 发单
-					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
+				else {
+					close_yesterday_num = this->stg_position_a_buy_yesterday;
+					close_today_num = insert_order->VolumeTotalOriginal - this->stg_position_a_buy_yesterday;
 				}
 			}
 		}
@@ -4977,54 +4962,28 @@ void Strategy::Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order) {
 		{
 			if (insert_order->Direction == '0') // 方向为买平昨
 			{
-				// 判断发单数量与策略维护的数量
-				int remain = insert_order->VolumeTotalOriginal - this->stg_position_b_sell_yesterday;
-				// 如果小于等于0，那么无需转换
-				if (remain <= 0)
+				// 如果发单数量小于昨卖持仓量
+				if ((insert_order->VolumeTotalOriginal - this->stg_position_b_sell_yesterday) <= 0)
 				{
-					// 发单
-					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
+					close_today_num = 0;
+					close_yesterday_num = insert_order->VolumeTotalOriginal;
 				}
-				// 如果大于0，自动分为平昨，平今两条发单指令发送
-				else if (remain > 0)
-				{
-					// 第一条指令(平昨部分)
-					insert_order->VolumeTotalOriginal = this->stg_position_b_sell_yesterday;
-					insert_order->CombOffsetFlag[0] = '4';
-					// 发单
-					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
-
-					// 第二条指令(平今部分)
-					insert_order->VolumeTotalOriginal = remain;
-					insert_order->CombOffsetFlag[0] = '3';
-					// 发单
-					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
+				else {
+					close_yesterday_num = this->stg_position_b_sell_yesterday;
+					close_today_num = insert_order->VolumeTotalOriginal - this->stg_position_b_sell_yesterday;
 				}
 			}
 			else if (insert_order->Direction == '1') // 方向为卖平昨
 			{
-				// 判断发单数量与策略维护的数量
-				int remain = insert_order->VolumeTotalOriginal - this->stg_position_b_buy_yesterday;
-				// 如果小于等于0，那么无需转换
-				if (remain <= 0)
+				// 如果发单数量小于昨买持仓量
+				if ((insert_order->VolumeTotalOriginal - this->stg_position_b_buy_yesterday) <= 0)
 				{
-					// 发单
-					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
+					close_today_num = 0;
+					close_yesterday_num = insert_order->VolumeTotalOriginal;
 				}
-				// 如果大于0，自动分为平昨，平今两条发单指令发送
-				else if (remain > 0)
-				{
-					// 第一条指令(平昨部分)
-					insert_order->VolumeTotalOriginal = this->stg_position_b_buy_yesterday;
-					insert_order->CombOffsetFlag[0] = '4';
-					// 发单
-					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
-
-					// 第二条指令(平今部分)
-					insert_order->VolumeTotalOriginal = remain;
-					insert_order->CombOffsetFlag[0] = '3';
-					// 发单
-					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
+				else {
+					close_yesterday_num = this->stg_position_b_buy_yesterday;
+					close_today_num = insert_order->VolumeTotalOriginal - this->stg_position_b_buy_yesterday;
 				}
 			}
 		}
@@ -5033,10 +4992,28 @@ void Strategy::Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order) {
 			this->stg_user->getXtsLogger()->info("Strategy::Exec_OrderCloseConvert() 发单合约ID为空!");
 		}
 	}
-	else {
-		// 发单
+
+	this->getStgUser()->getXtsLogger()->info("Strategy::Exec_OrderCloseConvert() 开仓 = {} 平今 = {} 平昨 = {}", open_num, close_today_num, close_yesterday_num);
+
+	if (open_num > 0)
+	{
 		this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
 	}
+	
+	if (close_yesterday_num > 0)
+	{
+		insert_order->VolumeTotalOriginal = close_yesterday_num;
+		insert_order->CombOffsetFlag[0] = '4';
+		this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
+	}
+
+	if (close_today_num > 0)
+	{
+		insert_order->VolumeTotalOriginal = close_today_num;
+		insert_order->CombOffsetFlag[0] = '3';
+		this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
+	}
+
 }
 
 
