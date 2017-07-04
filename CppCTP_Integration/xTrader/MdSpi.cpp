@@ -324,6 +324,7 @@ void MdSpi::UnSubMarket(list<string> *l_instrument) {
 void MdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (pSpecificInstrument) {
+			Utils::printGreenColorWithKV("MdSpi::OnRspSubMarketData() 订阅行情合约代码", pSpecificInstrument->InstrumentID);
 			this->ctp_m->getXtsLogger()->info("MdSpi::OnRspSubMarketData() 订阅行情合约代码 = {}", pSpecificInstrument->InstrumentID);
 		}
 	}
@@ -422,8 +423,8 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
 	//	!strcmp(this->last_tick_data->UpdateTime, pDepthMarketData->UpdateTime) &&
 	//	(this->last_tick_data->UpdateMillisec == pDepthMarketData->UpdateMillisec)) {
 	//	std::cout << "MdSpi::OnRtnDepthMarketData() 重复tick推送" << std::endl;
-	//	cout << "\t交易日:" << pDepthMarketData->TradingDay
-	//		<< ", 合约代码:" << pDepthMarketData->InstrumentID
+		//cout << "\t交易日:" << pDepthMarketData->TradingDay
+			//<< ", 合约代码:" << pDepthMarketData->InstrumentID
 	//		<< ", 最新价:" << pDepthMarketData->LastPrice
 	//		<< ", 持仓量:" << pDepthMarketData->OpenInterest
 	//		//<< ", 上次结算价:" << pDepthMarketData->PreSettlementPrice 
@@ -439,7 +440,7 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
 	//		//<< ", 今收盘价:" << pDepthMarketData->ClosePrice
 	//		//<< ", 当日均价:" << pDepthMarketData->AveragePrice
 	//		//<< ", 本次结算价格:" << pDepthMarketData->SettlementPrice
-	//		<< ", 成交金额:" << pDepthMarketData->Turnover << endl;
+			//<< ", 成交金额:" << pDepthMarketData->Turnover << endl;
 	//	return;
 	//}
 	//else {
@@ -460,7 +461,7 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
 	for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
 		USER_PRINT(((*itor)));
 		//std::cout << "\tcount = " << count++ << std::endl;
-		//std::cout << "ExchangeID = " << pDepthMarketData->ExchangeID << std::endl;
+		//std::cout << "UserID = " << (*itor)->getStgUserId() << ", StrategyID = " << (*itor)->getStgStrategyId() << std::endl;
 		(*itor)->OnRtnDepthMarketData(pDepthMarketData);
 	}
 

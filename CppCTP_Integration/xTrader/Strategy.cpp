@@ -3692,6 +3692,7 @@ void Strategy::thread_queue_OnRtnDepthMarketData() {
 
 		if (this->queue_OnRtnDepthMarketData_on_off == false)
 		{
+			sem_post(&(this->sem_thread_queue_OnRtnDepthMarketData));
 			break;
 		}
 		else {
@@ -3717,33 +3718,6 @@ void Strategy::thread_queue_OnRtnDepthMarketData() {
 			continue;
 		}
 		else {
-
-			//this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnDepthMarketData() Tick ExchangeID = {}", pDepthMarketData_tmp->ExchangeID);
-
-			//// 区分交易所
-			//if (!strcmp(pDepthMarketData_tmp->ExchangeID, "INE")) // 能源交易中心
-			//{
-
-			//}
-			//else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "CFFEX")) // 中金所
-			//{
-
-			//}
-			//else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "CZCE")) // 郑商所
-			//{
-
-			//}
-			//else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "DCE")) // 大商所
-			//{
-
-			//}
-			//else if (!strcmp(pDepthMarketData_tmp->ExchangeID, "SHFE")) // 上期所
-			//{
-
-			//}
-			//else {
-			//	//this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnDepthMarketData() Tick ExchangeID有误!");
-			//}
 
 			//执行tick处理
 			if (!strcmp(pDepthMarketData_tmp->InstrumentID, this->getStgInstrumentIdA().c_str())) {
@@ -3870,34 +3844,17 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 	// 如果有撇腿, 关闭下单锁
 	if (this->getStgOrderAlgorithm() == ALGORITHM_ONE)
 	{
-		if ((this->stg_position_a_buy_today == this->stg_position_b_sell_today)
+		if (!((this->stg_position_a_buy_today == this->stg_position_b_sell_today)
 			&& (this->stg_position_a_buy_yesterday == this->stg_position_b_sell_yesterday)
 			&& (this->stg_position_a_sell_today == this->stg_position_b_buy_today)
 			&& (this->stg_position_a_sell_yesterday == this->stg_position_b_buy_yesterday)
-			&& (this->stg_list_order_pending->size() == 0)) {
+			&& (this->stg_list_order_pending->size() == 0))) {
 			/*this->printStrategyInfo("更新交易状态");
 			this->printStrategyInfoPosition();*/
 			//this->stg_trade_tasking = false;
 			// 结束任务后B已发份数置为0
 			//this->stg_b_order_already_send_batch = 0;
 			//this->setStgTradeTasking(false);
-
-			
-		}
-		else
-		{
-			//this->printStrategyInfo("Strategy::update_task_status() 更新交易状态");
-			/*std::cout << "stg_position_a_buy_today = " << stg_position_a_buy_today << std::endl;
-			std::cout << "stg_position_b_sell_today = " << stg_position_b_sell_today << std::endl;
-			std::cout << "stg_position_a_buy_yesterday = " << stg_position_a_buy_yesterday << std::endl;
-			std::cout << "stg_position_b_sell_yesterday = " << stg_position_b_sell_yesterday << std::endl;
-			std::cout << "stg_position_a_sell_today = " << stg_position_a_sell_today << std::endl;
-			std::cout << "stg_position_b_buy_today = " << stg_position_b_buy_today << std::endl;
-			std::cout << "stg_position_a_sell_yesterday = " << stg_position_a_sell_yesterday << std::endl;
-			std::cout << "stg_position_b_buy_yesterday = " << stg_position_b_buy_yesterday << std::endl;
-			std::cout << "this->stg_list_order_pending->size() = " << this->stg_list_order_pending->size() << std::endl;*/
-
-			//this->setStgTradeTasking(true);
 			this->setStgSelectOrderAlgorithmFlag("Strategy::Select_Order_Algorithm() ALGORITHM_ONE 有撇腿", false);
 
 			return;
@@ -3905,31 +3862,15 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 	}
 	else if (this->getStgOrderAlgorithm() == ALGORITHM_TWO)
 	{
-		if (((this->stg_position_a_buy / this->stg_instrument_A_scale) == (this->stg_position_b_sell / this->stg_instrument_B_scale))
+		if (!(((this->stg_position_a_buy / this->stg_instrument_A_scale) == (this->stg_position_b_sell / this->stg_instrument_B_scale))
 			&& ((this->stg_position_a_sell / this->stg_instrument_A_scale) == (this->stg_position_b_buy / this->stg_instrument_B_scale))
-			&& (this->stg_list_order_pending->size() == 0)) {
+			&& (this->stg_list_order_pending->size() == 0))) {
 			/*this->printStrategyInfo("更新交易状态");
 			this->printStrategyInfoPosition();*/
 			//this->stg_trade_tasking = false;
 			// 结束任务后B已发份数置为0
 			//this->stg_b_order_already_send_batch = 0;
 			//this->setStgTradeTasking(false);
-
-			
-		}
-		else
-		{
-			//this->printStrategyInfo("Strategy::update_task_status() 更新交易状态");
-			/*std::cout << "stg_position_a_buy_today = " << stg_position_a_buy_today << std::endl;
-			std::cout << "stg_position_b_sell_today = " << stg_position_b_sell_today << std::endl;
-			std::cout << "stg_position_a_buy_yesterday = " << stg_position_a_buy_yesterday << std::endl;
-			std::cout << "stg_position_b_sell_yesterday = " << stg_position_b_sell_yesterday << std::endl;
-			std::cout << "stg_position_a_sell_today = " << stg_position_a_sell_today << std::endl;
-			std::cout << "stg_position_b_buy_today = " << stg_position_b_buy_today << std::endl;
-			std::cout << "stg_position_a_sell_yesterday = " << stg_position_a_sell_yesterday << std::endl;
-			std::cout << "stg_position_b_buy_yesterday = " << stg_position_b_buy_yesterday << std::endl;
-			std::cout << "this->stg_list_order_pending->size() = " << this->stg_list_order_pending->size() << std::endl;*/
-			//this->setStgTradeTasking(true);
 			this->setStgSelectOrderAlgorithmFlag("Strategy::Select_Order_Algorithm() ALGORITHM_TWO 有撇腿", false);
 
 			return;
@@ -3948,6 +3889,8 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 	}
 	else {
 		//this->getStgUser()->getXtsLogger()->info("Strategy::Select_Order_Algorithm() 不存在的下单算法 user_id = {} strategy_id = {}", this->getStgUserId(), this->getStgStrategyId());
+		this->getStgUser()->getXtsLogger()->info("Strategy::Select_Order_Algorithm() 下单算法不在系统范围内! user_id = {} strategy_id = {}", this->getStgUserId(), this->getStgStrategyId());
+		return;
 	}
 	
 }
