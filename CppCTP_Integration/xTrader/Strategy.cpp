@@ -3312,13 +3312,10 @@ void Strategy::printStrategyInfo(string message) {
 	this->getStgUser()->getXtsLogger()->info("\t策略编号:{}", this->stg_strategy_id);
 	this->getStgUser()->getXtsLogger()->info("\t下单算法:{}", this->stg_order_algorithm);
 	this->getStgUser()->getXtsLogger()->info("\t调试信息:{}", message);
-	this->getStgUser()->getXtsLogger()->info("\t系统总开关:{}", this->stg_user->getCTP_Manager()->getOn_Off());
-	this->getStgUser()->getXtsLogger()->info("\t期货账户开关:{}", this->stg_user->getOn_Off());
-	this->getStgUser()->getXtsLogger()->info("\t交易员开关:{}", this->stg_user->GetTrader()->getOn_Off());
-	this->getStgUser()->getXtsLogger()->info("\t策略开关:{}", this->getOn_Off());
-	this->getStgUser()->getXtsLogger()->info("\t是否正在交易:{}", this->stg_trade_tasking);
-	this->getStgUser()->getXtsLogger()->info("\tA比例系数:{}", this->stg_instrument_A_scale);
-	this->getStgUser()->getXtsLogger()->info("\tB比例系数:{}", this->stg_instrument_B_scale);
+	this->getStgUser()->getXtsLogger()->info("\t系统总开关:{} 期货账户开关:{} 交易员开关:{} 策略开关:{}", this->stg_user->getCTP_Manager()->getOn_Off(), this->stg_user->getOn_Off(), this->stg_user->GetTrader()->getOn_Off(), this->getOn_Off());
+	this->getStgUser()->getXtsLogger()->info("\tA比例系数:{} B比例系数:{}", this->stg_instrument_A_scale, this->stg_instrument_B_scale);
+	this->getStgUser()->getXtsLogger()->info("\tA报单偏移:{} B报单偏移:{}", this->stg_a_limit_price_shift, this->stg_b_limit_price_shift);
+	this->getStgUser()->getXtsLogger()->info("\tA撤单等待:{} B撤单等待:{}", this->stg_a_wait_price_tick, this->stg_b_wait_price_tick);
 	this->getStgUser()->getXtsLogger()->info("\tmorning_opentime = {} morning_begin_breaktime = {} morning_breaktime = {} morning_recoverytime = {} morning_begin_closetime = {} morning_closetime = {} afternoon_opentime = {} afternoon_begin_closetime = {} afternoon_closetime = {} evening_opentime = {} evening_stop_opentime = {} evening_closetime = {}",
 		this->morning_opentime,
 		this->morning_begin_breaktime,
@@ -3333,7 +3330,7 @@ void Strategy::printStrategyInfo(string message) {
 		this->evening_stop_opentime,
 		this->evening_closetime);
 	
-	this->getStgUser()->getXtsLogger()->info("\t下单算法锁:{}", this->stg_select_order_algorithm_flag);
+	this->getStgUser()->getXtsLogger()->info("\t是否正在交易:{} 下单算法锁:{}", this->stg_trade_tasking, this->stg_select_order_algorithm_flag);
 	this->getStgUser()->getXtsLogger()->info("\tA合约撤单次数:{}, A合约撤单限制:{}", this->getStgAOrderActionCount(), this->getStgAOrderActionTiresLimit());
 	this->getStgUser()->getXtsLogger()->info("\tB合约撤单次数:{}, B合约撤单限制:{}", this->getStgBOrderActionCount(), this->getStgBOrderActionTiresLimit());
 	this->getStgUser()->getXtsLogger()->info("\t市场多头价差:{}, 市场空头价差:{}", this->stg_spread_long, this->stg_spread_short);
@@ -3737,6 +3734,8 @@ void Strategy::thread_queue_OnRtnDepthMarketData() {
 				// 如果休盘期间
 				if (this->getIsMarketCloseFlag())
 				{
+					this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnDepthMarketData() 该策略已休盘 期货账户 = {} 策略编号 = {}", this->stg_user_id, this->stg_strategy_id);
+
 					//收到最后5秒开始强制处理挂单列表命令
 					if (this->getStgOnOffEndTask())
 					{
@@ -3856,7 +3855,6 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 			//this->stg_b_order_already_send_batch = 0;
 			//this->setStgTradeTasking(false);
 			this->setStgSelectOrderAlgorithmFlag("Strategy::Select_Order_Algorithm() ALGORITHM_ONE 有撇腿", false);
-
 			return;
 		}
 	}
@@ -3872,7 +3870,6 @@ void Strategy::Select_Order_Algorithm(string stg_order_algorithm) {
 			//this->stg_b_order_already_send_batch = 0;
 			//this->setStgTradeTasking(false);
 			this->setStgSelectOrderAlgorithmFlag("Strategy::Select_Order_Algorithm() ALGORITHM_TWO 有撇腿", false);
-
 			return;
 		}
 	}
@@ -3997,7 +3994,7 @@ void Strategy::Order_Algorithm_One() {
 			//std::cout << "this->stg_spread_short_volume = " << this->stg_spread_short_volume << std::endl;
 			//std::cout << "this->stg_lots_batch = " << this->stg_lots_batch << std::endl;
 			//std::cout << "this->stg_position_a_buy_today = " << this->stg_position_a_buy_today << std::endl;
-			order_volume = this->getMinNum(this->stg_spread_short_volume, this->stg_lots_batch, this->stg_position_a_buy_today);
+			order_volume = this->getMinNum(this->stg_spread_long_volume, this->stg_lots_batch, this->stg_position_a_buy_today);
 			//std::cout << "order_volume = " << order_volume << std::endl;
 			this->stg_a_order_insert_args->CombOffsetFlag[0] = '3'; /// 平今
 			this->stg_b_order_insert_args->CombOffsetFlag[0] = '3'; /// 平今
@@ -4407,7 +4404,7 @@ void Strategy::Order_Algorithm_Two() {
 	{
 		//this->printStrategyInfo("策略跳过异常行情");
 		//this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_Two()_1", false);
-		//this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 策略跳过异常行情");
+		this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 策略跳过异常行情");
 		/*this->getStgUser()->getXtsLogger()->info("\t策略跳过异常行情");*/
 		return;
 	}
