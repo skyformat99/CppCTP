@@ -4915,38 +4915,12 @@ void Strategy::Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order) {
 				判断发单数量，如果大于TS策略维护的昨持仓量,那么将报单分两次发送(一次平昨,一次平今)
 				如果小于TS策略维护的做持仓量,那么就直接发送*/
 	/************************************************************************/
-	
+
 	if (insert_order->CombOffsetFlag[0] == '4') // 只针对平昨进行转换
 	{
 		if (!strcmp(insert_order->InstrumentID, this->stg_instrument_id_A.c_str()))
 		{
 			if (insert_order->Direction == '0') // 方向为买平昨
-			{
-				// 判断发单数量与策略维护的数量
-				int remain = insert_order->VolumeTotalOriginal - this->stg_position_a_buy_yesterday;
-				// 如果小于等于0，那么无需转换
-				if (remain <= 0)
-				{
-					// 发单
-					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
-				}
-				// 如果大于0，自动分为平昨，平今两条发单指令发送
-				else if (remain > 0)
-				{
-					// 第一条指令(平昨部分)
-					insert_order->VolumeTotalOriginal = this->stg_position_a_buy_yesterday;
-					insert_order->CombOffsetFlag[0] = '4';
-					// 发单
-					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
-
-					// 第二条指令(平今部分)
-					insert_order->VolumeTotalOriginal = remain;
-					insert_order->CombOffsetFlag[0] = '3';
-					// 发单
-					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
-				}
-			}
-			else if (insert_order->Direction == '1') // 方向为卖平昨
 			{
 				// 判断发单数量与策略维护的数量
 				int remain = insert_order->VolumeTotalOriginal - this->stg_position_a_sell_yesterday;
@@ -4972,13 +4946,10 @@ void Strategy::Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order) {
 					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
 				}
 			}
-		}
-		else if (!strcmp(insert_order->InstrumentID, this->stg_instrument_id_B.c_str()))
-		{
-			if (insert_order->Direction == '0') // 方向为买平昨
+			else if (insert_order->Direction == '1') // 方向为卖平昨
 			{
 				// 判断发单数量与策略维护的数量
-				int remain = insert_order->VolumeTotalOriginal - this->stg_position_b_buy_yesterday;
+				int remain = insert_order->VolumeTotalOriginal - this->stg_position_a_buy_yesterday;
 				// 如果小于等于0，那么无需转换
 				if (remain <= 0)
 				{
@@ -4989,7 +4960,7 @@ void Strategy::Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order) {
 				else if (remain > 0)
 				{
 					// 第一条指令(平昨部分)
-					insert_order->VolumeTotalOriginal = this->stg_position_b_buy_yesterday;
+					insert_order->VolumeTotalOriginal = this->stg_position_a_buy_yesterday;
 					insert_order->CombOffsetFlag[0] = '4';
 					// 发单
 					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
@@ -5001,7 +4972,10 @@ void Strategy::Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order) {
 					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
 				}
 			}
-			else if (insert_order->Direction == '1') // 方向为卖平昨
+		}
+		else if (!strcmp(insert_order->InstrumentID, this->stg_instrument_id_B.c_str()))
+		{
+			if (insert_order->Direction == '0') // 方向为买平昨
 			{
 				// 判断发单数量与策略维护的数量
 				int remain = insert_order->VolumeTotalOriginal - this->stg_position_b_sell_yesterday;
@@ -5016,6 +4990,32 @@ void Strategy::Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order) {
 				{
 					// 第一条指令(平昨部分)
 					insert_order->VolumeTotalOriginal = this->stg_position_b_sell_yesterday;
+					insert_order->CombOffsetFlag[0] = '4';
+					// 发单
+					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
+
+					// 第二条指令(平今部分)
+					insert_order->VolumeTotalOriginal = remain;
+					insert_order->CombOffsetFlag[0] = '3';
+					// 发单
+					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
+				}
+			}
+			else if (insert_order->Direction == '1') // 方向为卖平昨
+			{
+				// 判断发单数量与策略维护的数量
+				int remain = insert_order->VolumeTotalOriginal - this->stg_position_b_buy_yesterday;
+				// 如果小于等于0，那么无需转换
+				if (remain <= 0)
+				{
+					// 发单
+					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
+				}
+				// 如果大于0，自动分为平昨，平今两条发单指令发送
+				else if (remain > 0)
+				{
+					// 第一条指令(平昨部分)
+					insert_order->VolumeTotalOriginal = this->stg_position_b_buy_yesterday;
 					insert_order->CombOffsetFlag[0] = '4';
 					// 发单
 					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
