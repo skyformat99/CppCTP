@@ -2891,10 +2891,6 @@ int Strategy::getStgSellCloseOnOff() {
 
 /// 更新交易状态
 void Strategy::update_task_status() {
-	//std::cout << "Strategy::update_task_status()" << std::endl;
-	//update_status_mtx.lock();
-	USER_PRINT("Strategy::update_task_status");
-	USER_PRINT(this->stg_trade_tasking);
 
 	/*std::cout << "Strategy::update_task_status() A今买 = " << stg_position_a_buy_today << std::endl;
 	std::cout << "Strategy::update_task_status() B今卖 = " << stg_position_b_sell_today << std::endl;
@@ -2932,6 +2928,7 @@ void Strategy::update_task_status() {
 			// 结束任务后B已发份数置为0
 			this->stg_b_order_already_send_batch = 0;
 			this->setStgTradeTasking(false);
+			this->setStgSelectOrderAlgorithmFlag("Strategy::update_task_status() ALGORITHM_ONE", false);
 		}
 		else
 		{
@@ -2960,6 +2957,7 @@ void Strategy::update_task_status() {
 			// 结束任务后B已发份数置为0
 			this->stg_b_order_already_send_batch = 0;
 			this->setStgTradeTasking(false);
+			this->setStgSelectOrderAlgorithmFlag("Strategy::update_task_status() ALGORITHM_TWO", false);
 		}
 		else
 		{
@@ -2977,15 +2975,8 @@ void Strategy::update_task_status() {
 		}
 	}
 
-	
-
 	// 释放信号量,信号量V操作
 	sem_post(&(this->sem_list_order_pending));
-	//std::cout << "After update this.trade_tasking = " << this->stg_trade_tasking << endl;
-	//std::cout << "\t挂单列表长度 = " << this->stg_list_order_pending->size() << std::endl;
-	//std::cout << "\t任务执行状态 = " << this->stg_trade_tasking << std::endl;
-	//update_status_mtx.unlock();
-	USER_PRINT(this->stg_trade_tasking);
 
 	/************************************************************************/
 	/* 任务执行中的时候，tick可以解锁                                                                     */
@@ -2993,10 +2984,6 @@ void Strategy::update_task_status() {
 	if (this->stg_trade_tasking) {
 		this->setStgSelectOrderAlgorithmFlag("Strategy::update_task_status()", false);
 	}
-	else {
-		this->getStgSelectOrderAlgorithmFlag();
-	}
-
 }
 
 /// 更新tick锁
@@ -3777,7 +3764,7 @@ void Strategy::thread_queue_OnRtnDepthMarketData() {
 
 				// 如果选择下单算法锁释放,那么开始新的下单
 				if (!stg_select_order_algorithm_flag) {
-					// 选择下单算法锁
+					// 选择下单算法
 					this->Select_Order_Algorithm(this->getStgOrderAlgorithm());
 				}
 				else {
@@ -4924,7 +4911,7 @@ void Strategy::Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order) {
 				判断发单数量，如果大于TS策略维护的昨持仓量,那么将报单分两次发送(一次平昨,一次平今)
 				如果小于TS策略维护的做持仓量,那么就直接发送*/
 	/************************************************************************/
-
+	
 	if (insert_order->CombOffsetFlag[0] == '4') // 只针对平昨进行转换
 	{
 		if (!strcmp(insert_order->InstrumentID, this->stg_instrument_id_A.c_str()))
@@ -4936,7 +4923,8 @@ void Strategy::Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order) {
 				// 如果小于等于0，那么无需转换
 				if (remain <= 0)
 				{
-					this->Exec_OrderInsert(insert_order);
+					// 发单
+					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
 				}
 				// 如果大于0，自动分为平昨，平今两条发单指令发送
 				else if (remain > 0)
@@ -4944,12 +4932,14 @@ void Strategy::Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order) {
 					// 第一条指令(平昨部分)
 					insert_order->VolumeTotalOriginal = this->stg_position_a_buy_yesterday;
 					insert_order->CombOffsetFlag[0] = '4';
-					this->Exec_OrderInsert(insert_order);
+					// 发单
+					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
 
 					// 第二条指令(平今部分)
 					insert_order->VolumeTotalOriginal = remain;
 					insert_order->CombOffsetFlag[0] = '3';
-					this->Exec_OrderInsert(insert_order);
+					// 发单
+					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
 				}
 			}
 			else if (insert_order->Direction == '1') // 方向为卖平昨
@@ -4959,7 +4949,8 @@ void Strategy::Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order) {
 				// 如果小于等于0，那么无需转换
 				if (remain <= 0)
 				{
-					this->Exec_OrderInsert(insert_order);
+					// 发单
+					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
 				}
 				// 如果大于0，自动分为平昨，平今两条发单指令发送
 				else if (remain > 0)
@@ -4967,12 +4958,14 @@ void Strategy::Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order) {
 					// 第一条指令(平昨部分)
 					insert_order->VolumeTotalOriginal = this->stg_position_a_sell_yesterday;
 					insert_order->CombOffsetFlag[0] = '4';
-					this->Exec_OrderInsert(insert_order);
+					// 发单
+					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
 
 					// 第二条指令(平今部分)
 					insert_order->VolumeTotalOriginal = remain;
 					insert_order->CombOffsetFlag[0] = '3';
-					this->Exec_OrderInsert(insert_order);
+					// 发单
+					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
 				}
 			}
 		}
@@ -4985,7 +4978,8 @@ void Strategy::Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order) {
 				// 如果小于等于0，那么无需转换
 				if (remain <= 0)
 				{
-					this->Exec_OrderInsert(insert_order);
+					// 发单
+					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
 				}
 				// 如果大于0，自动分为平昨，平今两条发单指令发送
 				else if (remain > 0)
@@ -4993,12 +4987,14 @@ void Strategy::Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order) {
 					// 第一条指令(平昨部分)
 					insert_order->VolumeTotalOriginal = this->stg_position_b_buy_yesterday;
 					insert_order->CombOffsetFlag[0] = '4';
-					this->Exec_OrderInsert(insert_order);
+					// 发单
+					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
 
 					// 第二条指令(平今部分)
 					insert_order->VolumeTotalOriginal = remain;
 					insert_order->CombOffsetFlag[0] = '3';
-					this->Exec_OrderInsert(insert_order);
+					// 发单
+					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
 				}
 			}
 			else if (insert_order->Direction == '1') // 方向为卖平昨
@@ -5008,7 +5004,8 @@ void Strategy::Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order) {
 				// 如果小于等于0，那么无需转换
 				if (remain <= 0)
 				{
-					this->Exec_OrderInsert(insert_order);
+					// 发单
+					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
 				}
 				// 如果大于0，自动分为平昨，平今两条发单指令发送
 				else if (remain > 0)
@@ -5016,12 +5013,14 @@ void Strategy::Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order) {
 					// 第一条指令(平昨部分)
 					insert_order->VolumeTotalOriginal = this->stg_position_b_sell_yesterday;
 					insert_order->CombOffsetFlag[0] = '4';
-					this->Exec_OrderInsert(insert_order);
+					// 发单
+					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
 
 					// 第二条指令(平今部分)
 					insert_order->VolumeTotalOriginal = remain;
 					insert_order->CombOffsetFlag[0] = '3';
-					this->Exec_OrderInsert(insert_order);
+					// 发单
+					this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
 				}
 			}
 		}
@@ -5029,6 +5028,10 @@ void Strategy::Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order) {
 			Utils::printRedColor("Strategy::Exec_OrderCloseConvert() 发单合约ID为空!");
 			this->stg_user->getXtsLogger()->info("Strategy::Exec_OrderCloseConvert() 发单合约ID为空!");
 		}
+	}
+	else {
+		// 发单
+		this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
 	}
 }
 
@@ -5044,19 +5047,13 @@ void Strategy::Exec_OrderInsert(CThostFtdcInputOrderField *insert_order) {
 	", CombOffsetFlag = " << insert_order->CombOffsetFlag[0] <<
 	", CombHedgeFlag = " << insert_order->CombHedgeFlag[0] << std::endl;*/
 
+	this->getStgUser()->getXtsLogger()->info("Strategy::Exec_OrderInsert()");
+
 	// 当有其他地方调用报单插入,阻塞,信号量P操作
 	sem_wait(&(this->sem_order_insert));
 
-	// 针对平昨特殊处理
-	if (insert_order->CombOffsetFlag[0] == '4')
-	{
-		// 平昨仓转换
-		this->Exec_OrderCloseConvert(insert_order);
-	}
-	else {
-		// 发单
-		this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
-	}
+	// 发单前经过平昨仓转换
+	this->Exec_OrderCloseConvert(insert_order);
 
 	// 释放信号量,信号量V操作
 	sem_post(&(this->sem_order_insert));
@@ -5095,6 +5092,7 @@ void Strategy::thread_queue_OnRtnOrder() {
 
 		if (this->queue_OnRtnOrder_on_off == false)
 		{
+			sem_post(&(this->sem_thread_queue_OnRtnOrder));
 			break;
 		}
 		else {
@@ -5166,7 +5164,7 @@ void Strategy::thread_queue_OnRtnOrder() {
 			if ((!strcmp(pOrder->InstrumentID, this->stg_instrument_id_A.c_str())) && ((pOrder->OrderStatus == '0') || (pOrder->OrderStatus == '1')) && (strlen(pOrder->OrderSysID) != 0)) { //只有全部成交或者部分成交还在队列中
 
 				// 当有其他地方调用挂单列表,阻塞,信号量P操作
-				sem_wait(&(this->sem_list_order_pending));
+				//sem_wait(&(this->sem_list_order_pending));
 
 #if 0
 				if (this->stg_list_order_pending->size() == 0) { // 无挂单
@@ -5224,7 +5222,7 @@ void Strategy::thread_queue_OnRtnOrder() {
 				}
 
 				// 释放信号量,信号量V操作
-				sem_post(&(this->sem_list_order_pending));
+				//sem_post(&(this->sem_list_order_pending));
 
 				/*this->stg_order_ref_b = this->Generate_Order_Ref();
 				this->stg_order_ref_last = this->stg_order_ref_b;
@@ -5386,6 +5384,7 @@ void Strategy::thread_queue_OnRtnTrade() {
 
 		if (this->queue_OnRtnTrade_on_off == false)
 		{
+			sem_post(&(this->sem_thread_queue_OnRtnTrade));
 			break;
 		}
 		else {
@@ -6357,10 +6356,7 @@ void Strategy::update_position(CThostFtdcOrderField *pOrder) {
 
 /// 更新持仓量(UserOrder)
 void Strategy::update_position(USER_CThostFtdcOrderField *pOrder) {
-	USER_PRINT("Strategy::update_position");
-	USER_PRINT(pOrder->InstrumentID);
-	USER_PRINT(this->stg_instrument_id_A);
-	USER_PRINT(this->stg_instrument_id_B);
+	
 	//this->printStrategyInfo("Strategy::update_position() 输出VolumeTradedBatch");
 	// A成交
 	if (!strcmp(pOrder->InstrumentID, this->stg_instrument_id_A.c_str())) {
@@ -6402,9 +6398,7 @@ void Strategy::update_position(USER_CThostFtdcOrderField *pOrder) {
 	// B成交
 	else if (!strcmp(pOrder->InstrumentID, this->stg_instrument_id_B.c_str()))
 	{
-		USER_PRINT(pOrder->CombOffsetFlag[0]);
-		USER_PRINT(pOrder->Direction);
-		USER_PRINT(pOrder->VolumeTradedBatch);
+		
 		if (pOrder->CombOffsetFlag[0] == '0') { // B开仓成交回报
 			if (pOrder->Direction == '0') // B买开仓
 			{
@@ -6760,6 +6754,7 @@ void Strategy::update_position_detail(USER_CThostFtdcTradeField *pTrade) {
 
 /// 更新持仓明细(Order)
 void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
+	
 	//std::cout << "Strategy::update_position_detail() order" << std::endl;
 	/************************************************************************/
 	/* """
@@ -6781,10 +6776,14 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 	<< ", pOrder->VolumeTradedBatch = " << pOrder->VolumeTradedBatch << std::endl;*/
 
 	if (pOrder->VolumeTradedBatch == 0) {
+		this->getStgUser()->getXtsLogger()->info("Strategy::update_position_detail() 本次成交量为0返回 期货账户 = {} 策略编号 = {}", this->getStgUserId(), this->getStgStrategyId());
+
 		return;
 	}
 	
 	if (pOrder->CombOffsetFlag[0] == '0') { // 开仓
+
+		this->getStgUser()->getXtsLogger()->info("Strategy::update_position_detail() 开仓 期货账户 = {} 策略编号 = {}", this->getStgUserId(), this->getStgStrategyId());
 
 		USER_CThostFtdcOrderField *new_order = new USER_CThostFtdcOrderField();
 		memset(new_order, 0, sizeof(USER_CThostFtdcOrderField));
@@ -6797,6 +6796,8 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 		sem_post(&(this->sem_list_position_detail_order));
 	} 
 	else if (pOrder->CombOffsetFlag[0] == '3') { // 平今
+		this->getStgUser()->getXtsLogger()->info("Strategy::update_position_detail() 平今 期货账户 = {} 策略编号 = {}", this->getStgUserId(), this->getStgStrategyId());
+
 		list<USER_CThostFtdcOrderField *>::iterator itor;
 
 		// 当有其他地方调用持仓明细,阻塞,信号量P操作
@@ -6836,6 +6837,8 @@ void Strategy::update_position_detail(USER_CThostFtdcOrderField *pOrder) {
 	}
 	else if (pOrder->CombOffsetFlag[0] == '4') // 平昨
 	{
+		this->getStgUser()->getXtsLogger()->info("Strategy::update_position_detail() 平昨 期货账户 = {} 策略编号 = {}", this->getStgUserId(), this->getStgStrategyId());
+
 		list<USER_CThostFtdcOrderField *>::iterator itor;
 
 		// 当有其他地方调用持仓明细,阻塞,信号量P操作
@@ -7589,7 +7592,7 @@ void Strategy::setStgTradeTasking(bool stgTradeTasking) {
 	std::cout << "\t策略编号 = " << this->getStgStrategyId() << std::endl;
 	std::cout << "\t选择下单算法锁 = " << this->stg_select_order_algorithm_flag << std::endl;
 	std::cout << "\t策略执行标志位 = " << this->stg_trade_tasking << std::endl;*/
-	this->getStgUser()->getXtsLogger()->info("Strategy::setStgTradeTasking() 期货账号 = {} 策略编号 = {} 选择下单算法锁 = {} 交易执行锁 = {}", this->getStgUserId(), this->getStgStrategyId(), this->stg_select_order_algorithm_flag, this->stg_trade_tasking);
+	this->getStgUser()->getXtsLogger()->info("Strategy::setStgTradeTasking() 期货账号 = {} 策略编号 = {} 下单算法 = {} 选择下单算法锁 = {} 交易执行锁 = {}", this->getStgUserId(), this->getStgStrategyId(), this->getStgOrderAlgorithm() ,this->stg_select_order_algorithm_flag, this->stg_trade_tasking);
 }
 
 void Strategy::setStgTradeTaskingRecovery() {
@@ -7648,7 +7651,7 @@ string Strategy::getStgTradingDay() {
 
 void Strategy::setStgSelectOrderAlgorithmFlag(string msg, bool stg_select_order_algorithm_flag) {
 	this->stg_select_order_algorithm_flag = stg_select_order_algorithm_flag;
-	this->getStgUser()->getXtsLogger()->info("Strategy::setStgSelectOrderAlgorithmFlag() 期货账号 = {} 策略编号 = {} 调用者 = {} 选择下单算法锁 = {} 交易执行锁 = {}", this->getStgUserId(), this->getStgStrategyId(), msg, this->stg_select_order_algorithm_flag, this->stg_trade_tasking);
+	this->getStgUser()->getXtsLogger()->info("Strategy::setStgSelectOrderAlgorithmFlag() 期货账号 = {} 策略编号 = {} 调用者 = {} 下单算法 = {} 选择下单算法锁 = {} 交易执行锁 = {}", this->getStgUserId(), this->getStgStrategyId(), msg, this->getStgOrderAlgorithm(), this->stg_select_order_algorithm_flag, this->stg_trade_tasking);
 	/*this->getStgUser()->getXtsLogger()->info("\t期货账号 = {}", this->getStgUserId());
 	this->getStgUser()->getXtsLogger()->info("\t策略编号 = {}", this->getStgStrategyId());
 	this->getStgUser()->getXtsLogger()->info("\t调用者 = {}", msg);
@@ -7663,7 +7666,7 @@ bool Strategy::getStgSelectOrderAlgorithmFlag() {
 	this->getStgUser()->getXtsLogger()->info("\t策略编号 = {}", this->getStgStrategyId());
 	this->getStgUser()->getXtsLogger()->info("\t选择下单算法锁 = {}", this->stg_select_order_algorithm_flag);
 	this->getStgUser()->getXtsLogger()->info("\t交易执行锁 = {}", this->stg_trade_tasking);*/
-	this->getStgUser()->getXtsLogger()->info("Strategy::getStgSelectOrderAlgorithmFlag() 期货账号 = {} 策略编号 = {} 选择下单算法锁 = {} 交易执行锁 = {}", this->getStgUserId(), this->getStgStrategyId(), this->stg_select_order_algorithm_flag, this->stg_trade_tasking);
+	this->getStgUser()->getXtsLogger()->info("Strategy::getStgSelectOrderAlgorithmFlag() 期货账号 = {} 策略编号 = {} 下单算法 = {} 选择下单算法锁 = {} 交易执行锁 = {}", this->getStgUserId(), this->getStgStrategyId(), this->getStgOrderAlgorithm() ,this->stg_select_order_algorithm_flag, this->stg_trade_tasking);
 
 
 	return this->stg_select_order_algorithm_flag;

@@ -423,8 +423,6 @@ public:
 	void setStgSellCloseOnOff(int sell_close_on_off);			//卖平-开关
 	int getStgSellCloseOnOff();
 
-	
-
 	/// 交易模型
 	void setStgTradeModel(string stg_trade_model);
 
