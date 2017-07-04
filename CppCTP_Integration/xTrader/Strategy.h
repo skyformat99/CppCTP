@@ -306,6 +306,18 @@ public:
 	/// 更新挂单list
 	void update_pending_order_list(CThostFtdcOrderField *pOrder);
 
+	/// 向pending_order_list中增加元素
+	void add_update_pending_order_list(CThostFtdcOrderField *pOrder);
+
+	/// 报单错误回报删除pending_order_list中的元素
+	void remove_pending_order_list(CThostFtdcOrderField *pOrder); 
+	
+	/// 撤单错误回报删除pending_order_list中的元素
+	void remove_pending_order_list(CThostFtdcOrderActionField *pOrderAction);
+	
+	/// 错误回报返回的元素要从挂单列表里移除
+	void remove_pending_order_list(CThostFtdcInputOrderField *pOrder);
+
 	/// 更新持仓量(Order)
 	//void update_position(CThostFtdcOrderField *pOrder);
 

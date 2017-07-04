@@ -6123,118 +6123,51 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 	if (strlen(pOrder->OrderSysID) != 0) { // 如果报单编号不为空，为交易所返回
 		if (pOrder->OrderStatus == '0') { // 全部成交
 			this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list() 期货账户 = {} 策略编号 = {} pOrder->OrderStatus = '0' 全部成交", this->stg_user_id, this->stg_strategy_id);
-			list<CThostFtdcOrderField *>::iterator itor;
-			// 当有其他地方调用挂单列表,阻塞,信号量P操作
-			sem_wait(&(this->sem_list_order_pending));
-
-			for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
-				if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
-					delete (*itor);
-					itor = this->stg_list_order_pending->erase(itor); //移除
-					//break;
-				}
-				else {
-					itor++;
-				}
-			}
-
-			// 释放信号量,信号量V操作
-			sem_post(&(this->sem_list_order_pending));
+			
+			this->remove_pending_order_list(pOrder);
 		}
 		else if (pOrder->OrderStatus == '1') { // 部分成交还在队列中
 			this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list() 期货账户 = {} 策略编号 = {} pOrder->OrderStatus = '1' 部分成交还在队列中", this->stg_user_id, this->stg_strategy_id);
 
-			list<CThostFtdcOrderField *>::iterator itor;
-
-			// 当有其他地方调用挂单列表,阻塞,信号量P操作
-			sem_wait(&(this->sem_list_order_pending));
-
-			for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end(); itor++) {
-				if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
-					this->CopyOrderData(*itor, pOrder);
-					//break;
-				}
-			}
-
-			// 释放信号量,信号量V操作
-			sem_post(&(this->sem_list_order_pending));
+			this->add_update_pending_order_list(pOrder);
 
 		}
 		else if (pOrder->OrderStatus == '2') { ///部分成交不在队列中
 			this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list() 期货账户 = {} 策略编号 = {} pOrder->OrderStatus = '2' 部分成交不在队列中", this->stg_user_id, this->stg_strategy_id);
-
+			
+			this->add_update_pending_order_list(pOrder);
 		}
 		else if (pOrder->OrderStatus == '3') { // 未成交还在队列中
 			this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list() 期货账户 = {} 策略编号 = {} pOrder->OrderStatus = '3' 未成交还在队列中", this->stg_user_id, this->stg_strategy_id);
-
-			bool isExists = false;
-			// 判断挂单列表是否存在
-			list<CThostFtdcOrderField *>::iterator itor;
-
-			// 当有其他地方调用挂单列表,阻塞,信号量P操作
-			sem_wait(&(this->sem_list_order_pending));
-
-			for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end(); itor++) {
-				if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
-					// 存在置flag标志位
-					isExists = true;
-					this->CopyOrderData(*itor, pOrder);
-					//break;
-				}
-			}
-
-			// 如果不存在直接加入
-			if (!isExists) {
-				// 深复制对象
-				CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
-				memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
-				this->CopyOrderData(pOrder_tmp, pOrder);
-
-				this->stg_list_order_pending->push_back(pOrder_tmp);
-			}
-
-			// 释放信号量,信号量V操作
-			sem_post(&(this->sem_list_order_pending));
+			
+			this->add_update_pending_order_list(pOrder);
 		}
 		else if (pOrder->OrderStatus == '4') //未成交不在队列中
 		{
 			this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list() 期货账户 = {} 策略编号 = {} pOrder->OrderStatus = '4' 未成交不在队列中", this->stg_user_id, this->stg_strategy_id);
-
+			
+			this->add_update_pending_order_list(pOrder);
 		}
 		else if (pOrder->OrderStatus == '5') { // 撤单
 			this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list() 期货账户 = {} 策略编号 = {} pOrder->OrderStatus = '5' 撤单", this->stg_user_id, this->stg_strategy_id);
 
-			list<CThostFtdcOrderField *>::iterator itor;
-
-			// 当有其他地方调用挂单列表,阻塞,信号量P操作
-			sem_wait(&(this->sem_list_order_pending));
-
-			for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
-				if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
-					delete (*itor);
-					itor = this->stg_list_order_pending->erase(itor); //移除
-					//break;
-				}
-				else {
-					itor++;
-				}
-			}
-
-			// 释放信号量,信号量V操作
-			sem_post(&(this->sem_list_order_pending));
+			this->remove_pending_order_list(pOrder);
 
 		}
 		else if (pOrder->OrderStatus == 'a') { // 未知
 			this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list() 期货账户 = {} 策略编号 = {} pOrder->OrderStatus = 'a' 未知", this->stg_user_id, this->stg_strategy_id);
-
+			
+			this->add_update_pending_order_list(pOrder);
 		}
 		else if (pOrder->OrderStatus == 'b') { // 尚未触发
 			this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list() 期货账户 = {} 策略编号 = {} pOrder->OrderStatus = 'b' 尚未触发", this->stg_user_id, this->stg_strategy_id);
-
+			
+			this->add_update_pending_order_list(pOrder);
 		}
 		else if (pOrder->OrderStatus == 'c') { // 已触发
 			this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list() 期货账户 = {} 策略编号 = {} pOrder->OrderStatus = 'c' 已触发发", this->stg_user_id, this->stg_strategy_id);
-
+			
+			this->add_update_pending_order_list(pOrder);
 		}
 
 		// 遍历挂单列表，找出A合约开仓未成交的量
@@ -6264,8 +6197,104 @@ void Strategy::update_pending_order_list(CThostFtdcOrderField *pOrder) {
 		/* 2：报单发往交易所未收到回报                                                                     */
 		/************************************************************************/
 		this->getStgUser()->getXtsLogger()->info("Strategy::update_pending_order_list() 期货账户 = {} 策略编号 = {} 报单编号长度为0,CTP直接返回的错误或者还未发到交易所", this->stg_user_id, this->stg_strategy_id);
-
+		
+		this->add_update_pending_order_list(pOrder);
 	}
+}
+
+/// 向pending_order_list中增加元素
+void Strategy::add_update_pending_order_list(CThostFtdcOrderField *pOrder) {
+	bool isExists = false;
+	// 判断挂单列表是否存在
+	list<CThostFtdcOrderField *>::iterator itor;
+
+	// 当有其他地方调用挂单列表,阻塞,信号量P操作
+	sem_wait(&(this->sem_list_order_pending));
+
+	for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end(); itor++) {
+		if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
+			// 存在置flag标志位
+			isExists = true;
+			this->CopyOrderData(*itor, pOrder);
+			//break;
+		}
+	}
+
+	// 如果不存在直接加入
+	if (!isExists) {
+		// 深复制对象
+		CThostFtdcOrderField *pOrder_tmp = new CThostFtdcOrderField();
+		memset(pOrder_tmp, 0x00, sizeof(CThostFtdcOrderField));
+		this->CopyOrderData(pOrder_tmp, pOrder);
+
+		this->stg_list_order_pending->push_back(pOrder_tmp);
+	}
+
+	// 释放信号量,信号量V操作
+	sem_post(&(this->sem_list_order_pending));
+}
+
+/// 删除pending_order_list中的元素
+void Strategy::remove_pending_order_list(CThostFtdcOrderField *pOrder) {
+	list<CThostFtdcOrderField *>::iterator itor;
+	// 当有其他地方调用挂单列表,阻塞,信号量P操作
+	sem_wait(&(this->sem_list_order_pending));
+
+	for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
+		if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
+			delete (*itor);
+			itor = this->stg_list_order_pending->erase(itor); //移除
+			//break;
+		}
+		else {
+			itor++;
+		}
+	}
+
+	// 释放信号量,信号量V操作
+	sem_post(&(this->sem_list_order_pending));
+}
+
+/// 撤单错误回报删除pending_order_list中的元素
+void Strategy::remove_pending_order_list(CThostFtdcOrderActionField *pOrderAction) {
+	list<CThostFtdcOrderField *>::iterator itor;
+	// 当有其他地方调用挂单列表,阻塞,信号量P操作
+	sem_wait(&(this->sem_list_order_pending));
+
+	for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
+		if (!strcmp((*itor)->OrderRef, pOrderAction->OrderRef)) {
+			delete (*itor);
+			itor = this->stg_list_order_pending->erase(itor); //移除
+			//break;
+		}
+		else {
+			itor++;
+		}
+	}
+
+	// 释放信号量,信号量V操作
+	sem_post(&(this->sem_list_order_pending));
+}
+
+/// 错误回报返回的元素要从挂单列表里移除
+void Strategy::remove_pending_order_list(CThostFtdcInputOrderField *pOrder) {
+	list<CThostFtdcOrderField *>::iterator itor;
+	// 当有其他地方调用挂单列表,阻塞,信号量P操作
+	sem_wait(&(this->sem_list_order_pending));
+
+	for (itor = this->stg_list_order_pending->begin(); itor != this->stg_list_order_pending->end();) {
+		if (!strcmp((*itor)->OrderRef, pOrder->OrderRef)) {
+			delete (*itor);
+			itor = this->stg_list_order_pending->erase(itor); //移除
+			//break;
+		}
+		else {
+			itor++;
+		}
+	}
+
+	// 释放信号量,信号量V操作
+	sem_post(&(this->sem_list_order_pending));
 }
 
 #if 0
@@ -7702,6 +7731,8 @@ void Strategy::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pOrder) {
 	//	return;
 	//}
 
+	this->remove_pending_order_list(pOrder);
+
 	this->Exec_OnErrRtnOrderInsert();
 }
 
@@ -7732,6 +7763,7 @@ void Strategy::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderActi
 void Strategy::OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction) {
 	USER_PRINT("Strategy::OnErrRtnOrderAction");
 	this->getStgUser()->getXtsLogger()->info("Strategy::OnErrRtnOrderAction()");
+	this->remove_pending_order_list(pOrderAction);
 	this->Exec_OnErrRtnOrderAction();
 }
 
