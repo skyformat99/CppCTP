@@ -2927,8 +2927,9 @@ void Strategy::update_task_status() {
 			//this->stg_trade_tasking = false;
 			// 结束任务后B已发份数置为0
 			this->stg_b_order_already_send_batch = 0;
-			this->setStgSelectOrderAlgorithmFlag("Strategy::update_task_status() ALGORITHM_ONE", false);
+			
 			this->setStgTradeTasking(false);
+			this->setStgSelectOrderAlgorithmFlag("Strategy::update_task_status() ALGORITHM_ONE", false);
 			
 		}
 		else
@@ -2957,8 +2958,9 @@ void Strategy::update_task_status() {
 			//this->stg_trade_tasking = false;
 			// 结束任务后B已发份数置为0
 			this->stg_b_order_already_send_batch = 0;
-			this->setStgSelectOrderAlgorithmFlag("Strategy::update_task_status() ALGORITHM_TWO", false);
+			
 			this->setStgTradeTasking(false);
+			this->setStgSelectOrderAlgorithmFlag("Strategy::update_task_status() ALGORITHM_TWO", false);
 			
 		}
 		else

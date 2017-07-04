@@ -3058,19 +3058,19 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 					if (((*stg_itor)->getStgUserId() == s_UserID) && ((*stg_itor)->getStgStrategyId() == s_StrategyID)) {
 						//std::cout << "\t找到即将删除的Strategy" << std::endl;
-						Utils::printGreenColor("找到即将删除的Strategy");
+						//Utils::printGreenColor("找到即将删除的Strategy");
 						ctp_m->getXtsLogger()->info("找到即将删除的Strategy");
 						int flag = ctp_m->getDBManager()->DeleteStrategy((*stg_itor));
 						int flag_1 = ctp_m->getDBManager()->DeleteStrategyYesterday((*stg_itor));
 
 						if (flag) {
-							Utils::printRedColor("Strategy数据库删除失败!");
+							//Utils::printRedColor("Strategy数据库删除失败!");
 							ctp_m->getXtsLogger()->info("Strategy数据库删除失败!");
 							build_doc.AddMember("MsgResult", 1, allocator);
 							build_doc.AddMember("MsgErrorReason", "未找到删除的策略!", allocator);
 						}
 						else {
-							Utils::printGreenColor("Strategy数据库删除成功!");
+							//Utils::printGreenColor("Strategy数据库删除成功!");
 							ctp_m->getXtsLogger()->info("Strategy数据库删除成功!");
 							build_doc.AddMember("MsgResult", 0, allocator);
 							build_doc.AddMember("MsgErrorReason", "", allocator);
