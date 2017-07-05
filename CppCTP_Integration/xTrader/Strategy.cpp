@@ -3993,6 +3993,7 @@ void Strategy::Order_Algorithm_One() {
 		if ((order_volume <= 0)) {
 			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One() 发单手数错误值 = {}", order_volume);
 			this->setStgTradeTasking(false);
+			this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One() ALGORITHM_ONE 价差卖平", false);
 			return;
 		} else {
 			//std::cout << "发单手数 = " << order_volume << endl;
@@ -4120,6 +4121,7 @@ void Strategy::Order_Algorithm_One() {
 		if ((order_volume <= 0)) {
 			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One() 发单手数错误值 = {}", order_volume);
 			this->setStgTradeTasking(false);
+			this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One() ALGORITHM_ONE 价差买平", false);
 			return;
 		} else {
 			//std::cout << "发单手数 = " << order_volume << endl;
@@ -4216,6 +4218,7 @@ void Strategy::Order_Algorithm_One() {
 		if (order_volume <= 0) {
 			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One() 发单手数错误值 = {}", order_volume);
 			this->setStgTradeTasking(false);
+			this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One() ALGORITHM_ONE 价差卖开", false);
 			return;
 		} else {
 			//std::cout << "发单手数 = " << order_volume << endl;
@@ -4308,6 +4311,7 @@ void Strategy::Order_Algorithm_One() {
 			//std::cout << "发单手数错误值 = " << order_volume << endl;
 			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_One() 发单手数错误值 = {}", order_volume);
 			this->setStgTradeTasking(false);
+			this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_One() ALGORITHM_ONE 价差买开", false);
 			return;
 		} else {
 			//std::cout << "发单手数 = " << order_volume << endl;
@@ -4483,6 +4487,7 @@ void Strategy::Order_Algorithm_Two() {
 		if ((order_volume <= 0)) {
 			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 策略编号 = {} 发单手数错误值 = {}", this->stg_strategy_id, order_volume);
 			this->setStgTradeTasking(false);
+			this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_Two() ALGORITHM_TWO 价差卖平", false);
 			return;
 		}
 		else {
@@ -4628,6 +4633,7 @@ void Strategy::Order_Algorithm_Two() {
 		if ((order_volume <= 0)) {
 			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 策略编号 = {} 发单手数错误值 = {}", this->stg_strategy_id, order_volume);
 			this->setStgTradeTasking(false);
+			this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_Two() ALGORITHM_TWO 价差买平", false);
 			return;
 		}
 		else {
@@ -4730,6 +4736,7 @@ void Strategy::Order_Algorithm_Two() {
 		if (order_volume <= 0) {
 			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 策略编号 = {} 发单手数错误值 = {}", this->stg_strategy_id, order_volume);
 			this->setStgTradeTasking(false);
+			this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_Two() ALGORITHM_TWO 价差卖开", false);
 			return;
 		}
 		else {
@@ -4829,6 +4836,7 @@ void Strategy::Order_Algorithm_Two() {
 			//std::cout << "发单手数错误值 = " << order_volume << endl;
 			this->getStgUser()->getXtsLogger()->info("Strategy::Order_Algorithm_Two() 策略编号 = {} 发单手数错误值 = {}", this->stg_strategy_id, order_volume);
 			this->setStgTradeTasking(false);
+			this->setStgSelectOrderAlgorithmFlag("Strategy::Order_Algorithm_Two() ALGORITHM_TWO 价差买开", false);
 			return;
 		}
 		else {
@@ -5218,31 +5226,29 @@ void Strategy::thread_queue_OnRtnOrder() {
 				/// 只针对跨品种下单算法进行撤单处理
 				if (this->getStgOrderAlgorithm() == ALGORITHM_TWO)
 				{
+
 					// 报单引用
 					/*this->stg_order_ref_b = this->Generate_Order_Ref();
 					this->stg_order_ref_last = this->stg_order_ref_b;
 					strcpy(this->stg_b_order_insert_args->OrderRef, this->stg_order_ref_b.c_str());*/
 
-					if (pOrder->Direction == '0') {
-						this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->AskPrice1;
-					}
-					else if (pOrder->Direction == '1') {
-						this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->BidPrice1;
-					}
-
 					// 反方向操作 非scale整数倍的量(已开仓的就平掉,已平仓的再开回来)
 					this->stg_a_order_insert_args->VolumeTotalOriginal = (pOrder->VolumeTotalOriginal - pOrder->VolumeTotal) % this->stg_instrument_A_scale;
 					
+					this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnOrder() pOrder->VolumeTotalOriginal = {} pOrder->VolumeTotal = {} A撤单反转操作数量 = {}", pOrder->VolumeTotalOriginal, pOrder->VolumeTotal, this->stg_a_order_insert_args->VolumeTotalOriginal);
+
 					if (this->stg_a_order_insert_args->VolumeTotalOriginal > 0)
 					{
 						// 先前为买->变为卖，先前为卖->变为买
 						if (pOrder->Direction == '0')
 						{
 							this->stg_a_order_insert_args->Direction = '1';
+							this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->BidPrice1;
 						}
 						else if (pOrder->Direction == '1')
 						{
 							this->stg_a_order_insert_args->Direction = '0';
+							this->stg_a_order_insert_args->LimitPrice = this->stg_instrument_A_tick->AskPrice1;
 						}
 
 						// 开平仓标志位逆转
@@ -5276,7 +5282,6 @@ void Strategy::thread_queue_OnRtnOrder() {
 					else {
 						this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnOrder() A撤单反转操作数量为0");
 					}
-
 					
 				}
 			}

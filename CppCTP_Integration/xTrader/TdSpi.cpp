@@ -163,7 +163,6 @@ void TdSpi::OnFrontDisconnected(int nReason) {
 		this->ctp_m->sendTradeOffLineMessage(this->current_user->getUserID(), 1);
 		this->current_user->getXtsLogger()->info("TdSpi::OnFrontDisconnected() 断线原因 = {}", nReason);
 		this->current_user->getXtsLogger()->flush();
-		
 	}
 }
 
@@ -1997,8 +1996,6 @@ void TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
 	//user->DB_OrderInsert(user->GetOrderConn(), pInputOrder);
 
 	string orderref = string(pInputOrder->OrderRef);
-	USER_PRINT(pInputOrder->OrderRef);
-	USER_PRINT(orderref);
 	// 更新报单引用基准
 	user->DB_UpdateOrderRef(orderref.substr(0, 10));
 }
