@@ -4383,17 +4383,44 @@ void Strategy::Order_Algorithm_Two() {
 		this->stg_spread_long = this->stg_instrument_A_tick->BidPrice1 * this->stg_instrument_A_scale -
 			this->stg_instrument_B_tick->AskPrice1 * this->stg_instrument_B_scale;
 
-		//市场多头价差挂单量
-		this->stg_spread_long_volume = std::min(this->stg_instrument_A_tick->BidVolume1,
-			this->stg_instrument_B_tick->AskVolume1);
+		int A_BidVolume1_Batch = this->stg_instrument_A_tick->BidVolume1 / this->stg_instrument_A_scale;
+		int B_AskVolume1_Batch = this->stg_instrument_B_tick->AskVolume1 / this->stg_instrument_B_scale;
+
+		if (A_BidVolume1_Batch >= B_AskVolume1_Batch)
+		{
+			//市场多头价差挂单量
+			this->stg_spread_long_volume = this->stg_instrument_A_tick->BidVolume1;
+		}
+		else {
+			//市场多头价差挂单量
+			this->stg_spread_long_volume = this->stg_instrument_B_tick->AskVolume1;
+		}
+
+		////市场多头价差挂单量
+		//this->stg_spread_long_volume = std::min(this->stg_instrument_A_tick->BidVolume1,
+		//	this->stg_instrument_B_tick->AskVolume1);
 
 		// 市场空头价差
 		this->stg_spread_short = this->stg_instrument_A_tick->AskPrice1 * this->stg_instrument_A_scale -
 			this->stg_instrument_B_tick->BidPrice1 * this->stg_instrument_B_scale;
 
-		// 市场空头价差挂单量
-		this->stg_spread_short_volume = std::min(this->stg_instrument_A_tick->AskVolume1,
-			this->stg_instrument_B_tick->BidVolume1);
+
+		int A_AskVolume1_Batch = this->stg_instrument_A_tick->AskVolume1 / this->stg_instrument_A_scale;
+		int B_BidVolume1_Batch = this->stg_instrument_B_tick->BidVolume1 / this->stg_instrument_B_scale;
+
+		if (A_AskVolume1_Batch >= B_BidVolume1_Batch)
+		{
+			//市场空头价差挂单量
+			this->stg_spread_short_volume = this->stg_instrument_A_tick->AskVolume1;
+		}
+		else {
+			//市场空头价差挂单量
+			this->stg_spread_short_volume = this->stg_instrument_B_tick->BidVolume1;
+		}
+
+		//// 市场空头价差挂单量
+		//this->stg_spread_short_volume = std::min(this->stg_instrument_A_tick->AskVolume1,
+		//	this->stg_instrument_B_tick->BidVolume1);
 	}
 	else
 	{
@@ -5280,7 +5307,7 @@ void Strategy::thread_queue_OnRtnOrder() {
 						this->Exec_OrderInsert(this->stg_a_order_insert_args);
 					}
 					else {
-						this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnOrder() A撤单反转操作数量为0");
+						this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnOrder() A撤单反转操作数量 = {}", 0);
 					}
 					
 				}
