@@ -16,6 +16,8 @@
 #include "PositionDetail.h"
 #include "xTradeStruct.h"
 #include "Timer.h"
+#include "safequeue.h"
+#include "command/ApiCommand.h"
 #include <spdlog/spdlog.h>
 using namespace spdlog;
 using spdlog::logger;
@@ -280,5 +282,8 @@ private:
 	std::shared_ptr<spdlog::logger> xts_logger;
 
 	sem_t sem_strategy_handler;			// 信号量,用来保证同一时间只能一个线程操作策略
+
+	// 命令队列
+	SafeQueue<ApiCommand *> queue_Command;
 };
 #endif

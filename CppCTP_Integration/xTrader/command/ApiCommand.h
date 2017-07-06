@@ -4,6 +4,8 @@
 
 #include "../TdSpi.h"
 
+class TdSpi;
+
 class ApiCommand {
 public:
 	virtual ~ApiCommand();
