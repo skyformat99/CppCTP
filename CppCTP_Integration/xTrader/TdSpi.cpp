@@ -170,7 +170,7 @@ void TdSpi::OnFrontDisconnected(int nReason) {
 }
 
 //登录
-void TdSpi::Login(User *user) {
+int TdSpi::Login(User *user) {
 	USER_PRINT("TdSpi::Login");
 	this->current_user = user;
 
@@ -187,7 +187,7 @@ void TdSpi::Login(User *user) {
 	strcpy(loginField->UserID, user->getUserID().c_str());
 	strcpy(loginField->Password, user->getPassword().c_str());
 
-	this->tdapi->ReqUserLogin(loginField, user->getRequestID());
+	int rsp_num = this->tdapi->ReqUserLogin(loginField, user->getRequestID());
 
 	/*int ret = this->controlTimeOut(&login_sem);
 
@@ -208,6 +208,8 @@ void TdSpi::Login(User *user) {
 
 	delete loginField;
 	loginField = NULL;
+
+	return rsp_num;
 }
 
 ///登录请求响应
@@ -1851,7 +1853,7 @@ void TdSpi::OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *
 }
 
 //下单
-void TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
+int TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
 
 	int request_error = 0;
 
@@ -2001,6 +2003,8 @@ void TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
 	string orderref = string(pInputOrder->OrderRef);
 	// 更新报单引用基准
 	user->DB_UpdateOrderRef(orderref.substr(0, 10));
+
+	return request_error;
 }
 
 ///报单录入请求响应
@@ -2432,7 +2436,7 @@ void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFt
 }
 
 //撤单
-void TdSpi::OrderAction(char *ExchangeID, char *OrderRef, char *OrderSysID) {
+int TdSpi::OrderAction(char *ExchangeID, char *OrderRef, char *OrderSysID) {
 
 	int request_error = 0;
 
@@ -2466,6 +2470,7 @@ void TdSpi::OrderAction(char *ExchangeID, char *OrderRef, char *OrderSysID) {
 		Utils::printRedColor("TdSpi::OrderInsert() 每秒发送请求数超过许可数");
 	}
 
+	return request_error;
 	//this->current_user->DB_OrderAction(this->current_user->getCTP_Manager()->getDBManager()->getConn(), &pOrderAction);
 }
 

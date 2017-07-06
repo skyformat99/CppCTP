@@ -295,6 +295,7 @@ public:
 	/// 执行任务函数
 	void Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order);   // 报单平仓自动调整
 	void Exec_OrderInsert(CThostFtdcInputOrderField *insert_order);			// 报单
+	void Exec_OrderAction(CThostFtdcOrderField *action_order);				// 撤单
 	void Exec_OnRspOrderInsert();											// 报单录入请求
 	void Exec_OnRspOrderAction();											// 报单操作请求响应
 	void Exec_OnRtnOrder(CThostFtdcOrderField *pOrder);						// 报单回报

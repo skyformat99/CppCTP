@@ -3540,13 +3540,15 @@ void Strategy::finish_pending_order_list() {
 		// A合约
 		if (!strcmp((*itor)->InstrumentID, this->stg_instrument_id_A.c_str())) {
 			/// A合约撤单
-			this->stg_user->getUserTradeSPI()->OrderAction((*itor)->ExchangeID, (*itor)->OrderRef, (*itor)->OrderSysID);
+			//this->stg_user->getUserTradeSPI()->OrderAction((*itor)->ExchangeID, (*itor)->OrderRef, (*itor)->OrderSysID);
+			this->Exec_OrderAction((*itor));
 		}
 		// B合约
 		else if (!strcmp((*itor)->InstrumentID, this->stg_instrument_id_B.c_str()))
 		{
 			// 1:先撤单
-			this->stg_user->getUserTradeSPI()->OrderAction((*itor)->ExchangeID, (*itor)->OrderRef, (*itor)->OrderSysID);
+			//this->stg_user->getUserTradeSPI()->OrderAction((*itor)->ExchangeID, (*itor)->OrderRef, (*itor)->OrderSysID);
+			this->Exec_OrderAction((*itor));
 			
 			// 2:再超价发单
 			// B合约报单参数
@@ -5067,6 +5069,12 @@ void Strategy::Exec_OrderInsert(CThostFtdcInputOrderField *insert_order) {
 	sem_post(&(this->sem_order_insert));
 }
 
+void Strategy::Exec_OrderAction(CThostFtdcOrderField *action_order) {
+	this->getStgUser()->getXtsLogger()->info("Strategy::Exec_OrderAction()");
+	this->stg_user->getUserTradeSPI()->OrderAction(action_order->ExchangeID, action_order->OrderRef, action_order->OrderSysID);
+
+}
+
 // 报单录入请求
 void Strategy::Exec_OnRspOrderInsert() {
 	this->getStgUser()->getXtsLogger()->info("Strategy::Exec_OnRspOrderInsert()");
@@ -6056,7 +6064,8 @@ void Strategy::Exec_OnTickComing(THREAD_CThostFtdcDepthMarketDataField *pDepthMa
 					if (pDepthMarketData->BidPrice1 > ((*Itor)->LimitPrice + (this->stg_a_wait_price_tick * this->stg_a_price_tick))) {
 						//std::cout << "A合约通过最新tick判断A合约买挂单符合撤单条件" << endl;
 						/// A合约撤单
-						this->stg_user->getUserTradeSPI()->OrderAction((*Itor)->ExchangeID, (*Itor)->OrderRef, (*Itor)->OrderSysID);
+						//this->stg_user->getUserTradeSPI()->OrderAction((*Itor)->ExchangeID, (*Itor)->OrderRef, (*Itor)->OrderSysID);
+						this->Exec_OrderAction((*Itor));
 					}
 				}
 				else if ((*Itor)->Direction == '1') {
@@ -6069,7 +6078,8 @@ void Strategy::Exec_OnTickComing(THREAD_CThostFtdcDepthMarketDataField *pDepthMa
 					if (pDepthMarketData->AskPrice1 < ((*Itor)->LimitPrice - (this->stg_a_wait_price_tick * this->stg_a_price_tick))) {
 						//std::cout << "Strategy::Exec_OnTickComing A挂单方向为卖，撤单" << std::endl;
 						/// A合约撤单
-						this->stg_user->getUserTradeSPI()->OrderAction((*Itor)->ExchangeID, (*Itor)->OrderRef, (*Itor)->OrderSysID);
+						//this->stg_user->getUserTradeSPI()->OrderAction((*Itor)->ExchangeID, (*Itor)->OrderRef, (*Itor)->OrderSysID);
+						this->Exec_OrderAction((*Itor));
 					}
 				}
 			}
@@ -6090,7 +6100,8 @@ void Strategy::Exec_OnTickComing(THREAD_CThostFtdcDepthMarketDataField *pDepthMa
 						std::cout << "B_Tick 符合撤单:this->stg_instrument_B_tick_last->BidPrice1 = " << this->stg_instrument_B_tick_last->BidPrice1 << std::endl;
 						std::cout << "B_Tick 符合撤单:this->stg_b_wait_price_tick = " << this->stg_b_wait_price_tick << std::endl;
 						std::cout << "B_Tick 符合撤单:this->stg_b_price_tick = " << this->stg_b_price_tick << std::endl;*/
-						this->stg_user->getUserTradeSPI()->OrderAction((*Itor)->ExchangeID, (*Itor)->OrderRef, (*Itor)->OrderSysID);
+						//this->stg_user->getUserTradeSPI()->OrderAction((*Itor)->ExchangeID, (*Itor)->OrderRef, (*Itor)->OrderSysID);
+						this->Exec_OrderAction((*Itor));
 					}
 				}
 				/// A挂单的买卖方向为卖
@@ -6107,7 +6118,8 @@ void Strategy::Exec_OnTickComing(THREAD_CThostFtdcDepthMarketDataField *pDepthMa
 						std::cout << "B_Tick 符合撤单:this->stg_instrument_B_tick_last->AskPrice1 = " << this->stg_instrument_B_tick_last->AskPrice1 << std::endl;
 						std::cout << "B_Tick 符合撤单:this->stg_b_wait_price_tick = " << this->stg_b_wait_price_tick << std::endl;
 						std::cout << "B_Tick 符合撤单:this->stg_b_price_tick = " << this->stg_b_price_tick << std::endl;*/
-						this->stg_user->getUserTradeSPI()->OrderAction((*Itor)->ExchangeID, (*Itor)->OrderRef, (*Itor)->OrderSysID);
+						//this->stg_user->getUserTradeSPI()->OrderAction((*Itor)->ExchangeID, (*Itor)->OrderRef, (*Itor)->OrderSysID);
+						this->Exec_OrderAction((*Itor));
 					}
 				}
 			}
@@ -6123,7 +6135,8 @@ void Strategy::Exec_OnTickComing(THREAD_CThostFtdcDepthMarketDataField *pDepthMa
 					if (pDepthMarketData->BidPrice1 >= ((*Itor)->LimitPrice + this->stg_b_wait_price_tick * this->stg_b_price_tick)) {
 						USER_PRINT("通过B最新tick判断B合约买挂单符合撤单条件");
 						//this->printStrategyInfo("通过B最新tick判断B合约买挂单符合撤单条件");
-						this->stg_user->getUserTradeSPI()->OrderAction((*Itor)->ExchangeID, (*Itor)->OrderRef, (*Itor)->OrderSysID);
+						//this->stg_user->getUserTradeSPI()->OrderAction((*Itor)->ExchangeID, (*Itor)->OrderRef, (*Itor)->OrderSysID);
+						this->Exec_OrderAction((*Itor));
 					}
 				}
 				/// B挂单的买卖方向为卖
@@ -6132,7 +6145,8 @@ void Strategy::Exec_OnTickComing(THREAD_CThostFtdcDepthMarketDataField *pDepthMa
 					if (pDepthMarketData->AskPrice1 <= ((*Itor)->LimitPrice - this->stg_b_wait_price_tick * this->stg_b_price_tick)) {
 						USER_PRINT("通过B最新tick判断B合约卖挂单符合撤单条件");
 						//this->printStrategyInfo("通过B最新tick判断B合约卖挂单符合撤单条件");
-						this->stg_user->getUserTradeSPI()->OrderAction((*Itor)->ExchangeID, (*Itor)->OrderRef, (*Itor)->OrderSysID);
+						//this->stg_user->getUserTradeSPI()->OrderAction((*Itor)->ExchangeID, (*Itor)->OrderRef, (*Itor)->OrderSysID);
+						this->Exec_OrderAction((*Itor));
 					}
 				}
 			}

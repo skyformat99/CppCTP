@@ -128,10 +128,7 @@ User * CTP_Manager::CreateAccount(User *user, list<Strategy *> *l_strategys) {
 		std::cout << "\tBrokerID = " << user->getBrokerID() << endl;
 		std::cout << "\t期货密码 = " << user->getPassword() << endl;*/
 
-		this->getXtsLogger()->info("CTP_Manager::CreateAccount()");
-		this->getXtsLogger()->info("\t期货账户 = {}", user->getUserID());
-		this->getXtsLogger()->info("\tBrokerID = {}", user->getBrokerID());
-		this->getXtsLogger()->info("\t期货密码 = {}", user->getPassword());
+		this->getXtsLogger()->info("CTP_Manager::CreateAccount() 期货账户 = {} BrokerID = {} 期货密码 = {}", user->getUserID(), user->getBrokerID(), user->getPassword());
 
 		user->getUserTradeSPI()->Connect(user, this->system_init_flag); // 连接
 		sleep(1);
@@ -174,7 +171,7 @@ MdSpi * CTP_Manager::CreateMd(string md_frontAddress, string md_broker, string m
 		mdspi->setListStrategy(l_strategys); // 初始化策略给到位
 		mdspi->setCtpManager(this);
 	}
-	USER_PRINT(const_cast<char *>(conn_md_frontAddress.c_str()));
+	
 	mdspi->Connect(const_cast<char *>(conn_md_frontAddress.c_str())); // 连接
 	sleep(1);
 	mdspi->Login(const_cast<char *>(md_broker.c_str()), const_cast<char *>(md_user.c_str()), const_cast<char *>(md_pass.c_str())); // 登陆
