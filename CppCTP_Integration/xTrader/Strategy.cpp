@@ -3303,11 +3303,11 @@ void Strategy::printStrategyInfo(string message) {
 	this->getStgUser()->getXtsLogger()->info("\t策略编号:{}", this->stg_strategy_id);
 	this->getStgUser()->getXtsLogger()->info("\t下单算法:{}", this->stg_order_algorithm);
 	this->getStgUser()->getXtsLogger()->info("\t调试信息:{}", message);
-	this->getStgUser()->getXtsLogger()->info("\t系统总开关:{} 期货账户开关:{} 交易员开关:{} 策略开关:{}", this->stg_user->getCTP_Manager()->getOn_Off(), this->stg_user->getOn_Off(), this->stg_user->GetTrader()->getOn_Off(), this->getOn_Off());
+	this->getStgUser()->getXtsLogger()->info("\t系统总开关:{} 期货账户开关:{} 交易员开关:{} 策略开关:{} 账户断线状态:{}", this->stg_user->getCTP_Manager()->getOn_Off(), this->stg_user->getOn_Off(), this->stg_user->GetTrader()->getOn_Off(), this->getOn_Off(), this->getStgUser()->getIsEverLostConnection());
 	this->getStgUser()->getXtsLogger()->info("\tA比例系数:{} B比例系数:{}", this->stg_instrument_A_scale, this->stg_instrument_B_scale);
 	this->getStgUser()->getXtsLogger()->info("\tA报单偏移:{} B报单偏移:{}", this->stg_a_limit_price_shift, this->stg_b_limit_price_shift);
 	this->getStgUser()->getXtsLogger()->info("\tA撤单等待:{} B撤单等待:{}", this->stg_a_wait_price_tick, this->stg_b_wait_price_tick);
-	this->getStgUser()->getXtsLogger()->info("\tmorning_opentime = {} morning_begin_breaktime = {} morning_breaktime = {} morning_recoverytime = {} morning_begin_closetime = {} morning_closetime = {} afternoon_opentime = {} afternoon_begin_closetime = {} afternoon_closetime = {} evening_opentime = {} evening_stop_opentime = {} evening_closetime = {}",
+	this->getStgUser()->getXtsLogger()->info("\t早上开盘时间 = {} 中午准备休息时间 = {} 中午休息时间 = {} 中午恢复时间 = {} 中午准备休盘时间 = {} 中午休盘时间 = {} 下午开盘时间 = {} 下午准备收盘时间 = {} 下午收盘时间 = {} 夜盘开盘时间 = {} 夜盘准备收盘时间 = {} 夜盘收盘时间 = {}",
 		this->morning_opentime,
 		this->morning_begin_breaktime,
 		this->morning_breaktime,
@@ -3322,8 +3322,7 @@ void Strategy::printStrategyInfo(string message) {
 		this->evening_closetime);
 	
 	this->getStgUser()->getXtsLogger()->info("\t是否正在交易:{} 下单算法锁:{}", this->stg_trade_tasking, this->stg_select_order_algorithm_flag);
-	this->getStgUser()->getXtsLogger()->info("\tA合约撤单次数:{}, A合约撤单限制:{}", this->getStgAOrderActionCount(), this->getStgAOrderActionTiresLimit());
-	this->getStgUser()->getXtsLogger()->info("\tB合约撤单次数:{}, B合约撤单限制:{}", this->getStgBOrderActionCount(), this->getStgBOrderActionTiresLimit());
+	this->getStgUser()->getXtsLogger()->info("\tA合约撤单次数:{}, A合约撤单限制:{}, B合约撤单次数:{}, B合约撤单限制:{}", this->getStgAOrderActionCount(), this->getStgAOrderActionTiresLimit(), this->getStgBOrderActionCount(), this->getStgBOrderActionTiresLimit());
 	this->getStgUser()->getXtsLogger()->info("\t市场多头价差:{}, 市场空头价差:{}", this->stg_spread_long, this->stg_spread_short);
 	this->getStgUser()->getXtsLogger()->info("\t交易员卖开价差:{}, 交易员买平价差:{}", this->stg_sell_open, this->stg_buy_close);
 	this->getStgUser()->getXtsLogger()->info("\t市场空头价差:{}, 市场多头价差:{}", this->stg_spread_short, this->stg_spread_long);
@@ -3524,7 +3523,6 @@ void Strategy::createFakeTradePositionDetail(USER_CThostFtdcTradeField *trade, s
 
 //收盘前5秒处理挂单列表
 void Strategy::finish_pending_order_list() {
-	USER_PRINT("Strategy::finish_pending_order_list()");
 	std::cout << "Strategy::finish_pending_order_list()" << std::endl;
 	std::cout << "\t挂单列表长度:" << this->stg_list_order_pending->size() << std::endl;
 	std::cout << "\t期货账户:" << this->stg_user_id << std::endl;
@@ -3725,7 +3723,7 @@ void Strategy::thread_queue_OnRtnDepthMarketData() {
 				// 如果休盘期间
 				if (this->getIsMarketCloseFlag())
 				{
-					this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnDepthMarketData() 该策略已休盘 期货账户 = {} 策略编号 = {}", this->stg_user_id, this->stg_strategy_id);
+					//this->getStgUser()->getXtsLogger()->info("Strategy::thread_queue_OnRtnDepthMarketData() 该策略已休盘 期货账户 = {} 策略编号 = {}", this->stg_user_id, this->stg_strategy_id);
 
 					//收到最后5秒开始强制处理挂单列表命令
 					if (this->getStgOnOffEndTask())
@@ -3921,11 +3919,12 @@ void Strategy::Order_Algorithm_One() {
 		return;
 	}
 
-	/// 策略开关，期货账户开关，交易员开关，系统总开关
+	/// 策略开关，期货账户开关，交易员开关，系统总开关, 断线恢复标志位
 	if (!((this->getOn_Off()) && 
 		(this->stg_user->getOn_Off()) && 
 		(this->stg_user->GetTrader()->getOn_Off()) && 
-		(this->stg_user->getCTP_Manager()->getOn_Off()))) {
+		(this->stg_user->getCTP_Manager()->getOn_Off()) &&
+		(!this->stg_user->getIsEverLostConnection()))) {
 		return;
 	}
 
@@ -4423,11 +4422,12 @@ void Strategy::Order_Algorithm_Two() {
 		return;
 	}
 
-	/// 策略开关，期货账户开关，交易员开关，系统总开关
+	/// 策略开关，期货账户开关，交易员开关，系统总开关, 断线恢复标志位
 	if (!((this->getOn_Off()) &&
 		(this->stg_user->getOn_Off()) &&
 		(this->stg_user->GetTrader()->getOn_Off()) &&
-		(this->stg_user->getCTP_Manager()->getOn_Off()))) {
+		(this->stg_user->getCTP_Manager()->getOn_Off()) &&
+		(!this->stg_user->getIsEverLostConnection()))) {
 		return;
 	}
 
@@ -5125,6 +5125,8 @@ void Strategy::thread_queue_OnRtnOrder() {
 			continue;
 		}
 		else {
+			
+
 			string compare_date = pOrder->InsertDate; //报单日期
 			string compare_time = pOrder->InsertTime; //报单时间
 			// 如果pOrder的时间在修改持仓之前 return
@@ -7743,13 +7745,18 @@ void Strategy::OrderInsert(User *user, char *InstrumentID, char CombOffsetFlag, 
 
 //下单响应
 void Strategy::OnRtnOrder(CThostFtdcOrderField *pOrder) {
-	USER_PRINT("Strategy::OnRtnOrder");
 	//如果已经收盘,不再接收
 	/*if (this->getStgUser()->getCTP_Manager()->getIsMarketCloseDone()) {
 		return;
 	}*/
-	/// 如果合约在撤单维护列表里，那么撤单次数增加1
-	this->stg_user->add_instrument_id_action_counter(pOrder);
+	// 如果合约在撤单维护列表里，那么撤单次数增加1
+
+	// 只有不断线情况下才能统计撤单次数
+	if (!this->getStgUser()->getIsEverLostConnection())
+	{
+		this->stg_user->add_instrument_id_action_counter(pOrder);
+	}
+	
 	this->Exec_OnRtnOrder(pOrder);
 }
 

@@ -42,6 +42,7 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 	this->l_position_detail_from_local_order = new list<USER_INSTRUMENT_POSITION *>();
 	this->l_position_detail_from_local_trade = new list<USER_INSTRUMENT_POSITION *>();
 	this->thread_init_status = false;
+	this->isEverLostConnection = false;	// 初始化网络一切正常
 
 	try {
 		this->xts_user_logger = spdlog::get("xts_async_" + UserID + "_logger");
@@ -93,6 +94,7 @@ User::User(string BrokerID, string UserID, int nRequestID, string stg_order_ref_
 	this->l_position_detail_from_ctp = new list<USER_INSTRUMENT_POSITION *>();
 	this->l_position_detail_from_local_order = new list<USER_INSTRUMENT_POSITION *>();
 	this->l_position_detail_from_local_trade = new list<USER_INSTRUMENT_POSITION *>();
+	this->isEverLostConnection = false;	// 初始化网络一切正常
 
 	try {
 		this->xts_user_logger = spdlog::get("xts_async_" + UserID + "_logger");
@@ -396,8 +398,14 @@ void User::add_instrument_id_action_counter(CThostFtdcOrderField *pOrder) {
 	}
 }
 
+/// 设置报单引用基准
 void User::setStgOrderRefBase(long long stg_order_ref_base) {
 	this->stg_order_ref_base = stg_order_ref_base;
+}
+
+/// 获取报单引用基准
+long long User::getStgOrderRefBase() {
+	return this->stg_order_ref_base;
 }
 
 void User::OrderInsert(CThostFtdcInputOrderField *insert_order, string strategy_id) {
@@ -1903,4 +1911,13 @@ void User::setXtsLogger(std::shared_ptr<spdlog::logger> ptr) {
 }
 std::shared_ptr<spdlog::logger> User::getXtsLogger() {
 	return this->xts_user_logger;
+}
+
+// 网络是否曾经断过
+void User::setIsEverLostConnection(bool isEverLostConnection) {
+	this->isEverLostConnection = isEverLostConnection;
+}
+
+bool User::getIsEverLostConnection() {
+	return this->isEverLostConnection;
 }

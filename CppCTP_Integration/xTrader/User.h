@@ -91,6 +91,11 @@ public:
 
 	/// 报单引用基准
 	void setStgOrderRefBase(long long stg_order_ref_base);
+
+	/// 获取报单引用基准
+	long long getStgOrderRefBase();
+
+	/// 获取报单
 	void OrderInsert(CThostFtdcInputOrderField *insert_order, string strategy_id);
 
 	/// 设置策略内合约最小跳价格
@@ -175,6 +180,10 @@ public:
 	void setXtsLogger(std::shared_ptr<spdlog::logger> ptr);
 	std::shared_ptr<spdlog::logger> getXtsLogger();
 
+	// 网络是否曾经断过
+	void setIsEverLostConnection(bool isEverLostConnection);
+	bool getIsEverLostConnection();
+
 private:
 	int on_off; //开关
 	string BrokerID;
@@ -206,6 +215,7 @@ private:
 	list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_local_order;
 	list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_local_trade;
 	bool thread_init_status;
+	bool isEverLostConnection;
 	std::shared_ptr<spdlog::logger> xts_user_logger;
 	sem_t sem_get_order_ref;					// 信号量,用来保证同一时间只能一处地方操作报单引用
 

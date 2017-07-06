@@ -117,8 +117,8 @@ void TdSpi::Connect(User *user, bool init_flag) {
 	//等待回调
 	std::unique_lock<std::mutex> lck(mtx);
 	while (cv.wait_for(lck, std::chrono::seconds(RSP_TIMEOUT)) == std::cv_status::timeout) {
-		std::cout << "TdSpi::Connect()" << std::endl;
-		std::cout << "\t连接等待超时" << std::endl;
+		Utils::printRedColor("TdSpi::Connect() 连接等待超时");
+		this->current_user->getXtsLogger()->info("TdSpi::Connect() 连接等待超时");
 		user->setIsConnected(false);
 		return;
 	}
@@ -161,6 +161,9 @@ void TdSpi::OnFrontDisconnected(int nReason) {
 	if (this->current_user && this->ctp_m) {
 		Utils::printRedColor("TdSpi::OnFrontDisconnected() 断线!");
 		this->ctp_m->sendTradeOffLineMessage(this->current_user->getUserID(), 1);
+		// 保存最后策略参数,更新运行状态正常收盘
+		this->ctp_m->saveAllStrategyPositionDetail();
+		this->current_user->setIsEverLostConnection(true);
 		this->current_user->getXtsLogger()->info("TdSpi::OnFrontDisconnected() 断线原因 = {}", nReason);
 		this->current_user->getXtsLogger()->flush();
 	}
@@ -2246,6 +2249,18 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 		if (len_order_ref == 12 && result == "1") { // 通过本交易系统发出去的order长度12,首位字符为1
 
 			//this->current_user->DB_OnRtnOrder(this->current_user->getCTP_Manager()->getDBManager()->getConn(), pOrder);
+
+			// 断线重新连接恢复标志位逻辑
+			if (this->current_user->getIsEverLostConnection())
+			{
+				string orderref = string(pOrder->OrderRef);
+				long long cal_num = Utils::strtolonglong(orderref.substr(0, 10));
+				if (cal_num >= this->current_user->getStgOrderRefBase())
+				{
+					this->current_user->getXtsLogger()->info("TdSpi::OnRtnOrder() 断线恢复OrderRef统计 = {} 断线之前OrderRef = {}", cal_num, this->current_user->getStgOrderRefBase());
+					this->current_user->setIsEverLostConnection(false);
+				}
+			}
 
 			//delete[] codeDst;
 			strategyid = temp.substr(len_order_ref - 2, 2);
