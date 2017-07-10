@@ -8,6 +8,7 @@
 #include "Utils.h"
 #include "Debug.h"
 #include "msg.h"
+#include "ApiCommand.h"
 
 #define MSG_SEND_FLAG 1
 using namespace rapidjson;
@@ -46,6 +47,8 @@ CTP_Manager::CTP_Manager() {
 	this->is_market_close = true;
 	this->is_start_end_task = false;
 	this->is_market_close_done = false;
+	// 初始化最后一次发送命令类型为-1
+	this->last_command_type = -1;
 
 
 	// 同一时间只能有一个线程调用生成报单引用(避免带来段错误)
@@ -69,6 +72,10 @@ CTP_Manager::CTP_Manager() {
 	//this->ten_min_flag = false;
 	//this->one_min_flag = false;
 	//this->one_second_flag = false;
+
+	std::thread thread_command(&CTP_Manager::thread_queue_Command, this);
+	thread_command.detach();
+
 }
 
 bool CTP_Manager::ten_min_flag = false;
@@ -218,7 +225,6 @@ void CTP_Manager::UnSubmarketData(MdSpi *mdspi, string instrumentID, list<string
 			this->l_unsubinstrument->push_back(instrumentID);
 			mdspi->UnSubMarket(this->l_unsubinstrument);
 		}
-		
 	}
 }
 
@@ -5695,8 +5701,8 @@ void CTP_Manager::delSocketFD(string user_id, int fd) {
 
 /// 发送行情断线通知
 void CTP_Manager::sendMarketOffLineMessage(int on_off_status) {
-	Utils::printRedColor("CTP_Manager::sendMarketOffLineMessage() 服务端发送发送行情断线通知");
-	this->getXtsLogger()->info("服务端发送发送行情断线通知");
+	Utils::printRedColor("CTP_Manager::sendMarketOffLineMessage() 服务端发送发送行情通知");
+	this->getXtsLogger()->info("服务端发送发送行情通知");
 
 	/************************************************************************/
 	/*发送行情断线通知     msgtype == 18                                                       */
@@ -5749,8 +5755,8 @@ void CTP_Manager::sendMarketOffLineMessage(int on_off_status) {
 
 /// 发送交易断线通知
 void CTP_Manager::sendTradeOffLineMessage(string user_id, int on_off_status) {
-	Utils::printRedColor("CTP_Manager::sendTradeOffLineMessage() 服务端发送发送行情断线通知");
-	this->getXtsLogger()->info("服务端发送发送交易断线通知");
+	Utils::printRedColor("CTP_Manager::sendTradeOffLineMessage() 服务端发送发送交易通知");
+	this->getXtsLogger()->info("服务端发送发送交易通知");
 	/************************************************************************/
 	/*发送交易断线通知     msgtype == 19                                       */
 	/************************************************************************/
@@ -5965,6 +5971,84 @@ bool CTP_Manager::getIsClosingSaved() {
 
 void CTP_Manager::setIsClosingSaved(bool isClosingSaved) {
 	this->isClosingSaved = isClosingSaved;
+}
+
+void CTP_Manager::thread_queue_Command() {
+	while (1)
+	{
+		ApiCommand *command = NULL;
+		command = this->queue_Command.dequeue();
+		if (command == NULL)
+		{
+			continue;
+		}
+
+		// 命令执行结果
+		int result = command->execute();
+
+		this->getXtsLogger()->info("CTP_Manager::thread_queue_Command() result = {}", result);
+
+		if (result == 0) {
+			//result为0意味着发送指令成功
+			
+		}
+		else if (result == -1)
+		{
+			Utils::printRedColor("CTP_Manager::thread_queue_Command() 网络连接失败");
+			this->getXtsLogger()->info("CTP_Manager::thread_queue_Command() 网络连接失败");
+
+			/// 设置断线
+			list<User *>::iterator user_itor;
+			for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
+				// 设置断线
+				(*user_itor)->setIsEverLostConnection(true);
+			}
+
+			// 保存最后策略参数,更新运行状态正常收盘
+			this->saveAllStrategyPositionDetail();
+		}
+		else if (result == -2)
+		{
+			Utils::printRedColor("CTP_Manager::thread_queue_Command() 未处理请求超过许可数");
+			this->getXtsLogger()->info("CTP_Manager::thread_queue_Command() 未处理请求超过许可数");
+		}
+		else if (result == -3)
+		{
+			Utils::printRedColor("CTP_Manager::thread_queue_Command() 每秒发送请求数超过许可数");
+			this->getXtsLogger()->info("CTP_Manager::thread_queue_Command() 每秒发送请求数超过许可数");
+		}
+		
+
+		/************************************************************************/
+		/* 命令类型：
+		0：查询
+		1：交易*/
+		/************************************************************************/
+
+		// 不是初始化状态
+		if (this->last_command_type != -1)
+		{
+			// 上一次是查询类
+			if (this->last_command_type == 0)
+			{
+				if (this->last_command_type != command->getCommandType()) // 说明本次不是查询类
+				{
+
+				}
+				else if (this->last_command_type == command->getCommandType()) // 本次依然是查询类
+				{
+					sleep(1);
+				}
+			}
+		}
+
+		// 更新最后一次命令类型
+		this->last_command_type = command->getCommandType();
+	}
+}
+
+void CTP_Manager::addCommand(ApiCommand *command) {
+	this->queue_Command.enqueue(command);
 }
 
 

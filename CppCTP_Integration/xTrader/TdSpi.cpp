@@ -4,8 +4,6 @@
 #include <thread>
 #include <mutex>              // std::mutex, std::unique_lock
 #include <condition_variable> // std::condition_variable, std::cv_status
-
-
 #include "TdSpi.h"
 #include "Utils.h"
 #include "User.h"
@@ -142,6 +140,13 @@ void TdSpi::OnFrontConnected() {
 	{
 		Utils::printRedColor("TdSpi::OnFrontConnected() 断线重连...");
 		this->current_user->getXtsLogger()->info("TdSpi::OnFrontConnected() 断线重连...");
+
+		// 更新下单锁，任务锁
+		list<Strategy *>::iterator stg_itor;
+		for (stg_itor = this->ctp_m->getListStrategy()->begin(); stg_itor != this->ctp_m->getListStrategy()->end(); stg_itor++) { // 遍历Strategy
+			(*stg_itor)->update_task_status();
+		}
+
 		this->Login(this->current_user);
 	}
 	else { // 第一次登陆系统
@@ -199,7 +204,7 @@ int TdSpi::Login(User *user) {
 	std::unique_lock<std::mutex> lck(mtx);
 	while (cv.wait_for(lck, std::chrono::seconds(RSP_TIMEOUT)) == std::cv_status::timeout) {
 
-		this->current_user->getXtsLogger()->info("TdSpi::Connect() 登陆等待超时");
+		this->current_user->getXtsLogger()->info("TdSpi::Login() 登陆等待超时");
 
 		user->setIsLogged(false);
 
@@ -1853,7 +1858,7 @@ void TdSpi::OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *
 }
 
 //下单
-int TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
+int TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder, Strategy *stg) {
 
 	int request_error = 0;
 
@@ -1976,23 +1981,39 @@ int TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
 
 	request_error = this->tdapi->ReqOrderInsert(pInputOrder, 1);
 
+	this->current_user->getXtsLogger()->info("TdSpi::OrderInsert() request_error = {}", request_error);
+
 	/*-1，表示网络连接失败；
 	-2，表示未处理请求超过许可数；
 	-3，表示每秒发送请求数超过许可数*/
-
-	if (request_error == -1)
+	if (request_error == 0)
+	{
+		// 报单编号不相等,说明有新报单
+		if (strcmp(pInputOrder->OrderRef, user->getCurrentOrderRef().c_str()))
+		{
+			user->setCurrentOrderRef(pInputOrder->OrderRef);
+		}
+		//// 发送成功记录最后一次order_ref
+		//user->setLastOrderRef(pInputOrder->OrderRef);
+		
+	}
+	else if (request_error == -1)
 	{
 		Utils::printRedColor("TdSpi::OrderInsert() 网络连接失败");
-		// 保存最后策略参数,更新运行状态正常收盘
-		this->ctp_m->saveAllStrategyPositionDetail();
+		stg->setStgTradeTasking(false);
+		stg->setStgSelectOrderAlgorithmFlag("TdSpi::OrderInsert() 网络连接失败", false);
+		user->setIsEverLostConnection(true);
+		this->current_user->getXtsLogger()->info("TdSpi::OrderInsert() 网络连接失败");
 	}
 	else if (request_error == -2)
 	{
 		Utils::printRedColor("TdSpi::OrderInsert() 未处理请求超过许可数");
+		this->current_user->getXtsLogger()->info("TdSpi::OrderInsert() 未处理请求超过许可数");
 	}
 	else if (request_error == -3)
 	{
 		Utils::printRedColor("TdSpi::OrderInsert() 每秒发送请求数超过许可数");
+		this->current_user->getXtsLogger()->info("TdSpi::OrderInsert() 每秒发送请求数超过许可数");
 	}
 
 	//this->current_user->DB_OrderInsert(this->current_user->GetOrderConn(), pInputOrder);
@@ -2111,8 +2132,7 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 		//	if (pOrder->SessionID == (*sid_itor)->getSessionID()) {
 		
 
-		this->current_user->getXtsLogger()->info("TdSpi::OnRtnOrder() 合约代码 = {} 报单引用 = {} 用户代码 = {} 交易所代码 = {} 组合开平标志 = {} 报单状态 = {}",
-			pOrder->InstrumentID, pOrder->OrderRef, pOrder->UserID, pOrder->ExchangeID, pOrder->CombOffsetFlag, pOrder->OrderStatus);
+		
 
 		//std::cout << "=================================================================================" << endl;
 		//经纪公司代码
@@ -2254,15 +2274,37 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 
 			//this->current_user->DB_OnRtnOrder(this->current_user->getCTP_Manager()->getDBManager()->getConn(), pOrder);
 
-			// 断线重新连接恢复标志位逻辑
+			this->current_user->getXtsLogger()->info("TdSpi::OnRtnOrder() 合约代码 = {} 报单引用 = {} 用户代码 = {} 交易所代码 = {} 组合开平标志 = {} 报单状态 = {}",
+				pOrder->InstrumentID, pOrder->OrderRef, pOrder->UserID, pOrder->ExchangeID, pOrder->CombOffsetFlag, pOrder->OrderStatus);
+
+			// 断线情况自恢复逻辑
 			if (this->current_user->getIsEverLostConnection())
 			{
-				string orderref = string(pOrder->OrderRef);
-				long long cal_num = Utils::strtolonglong(orderref.substr(0, 10));
-				if (cal_num >= this->current_user->getStgOrderRefBase())
+				this->current_user->getXtsLogger()->info("TdSpi::OnRtnOrder() pOrder->OrderRef = {} LastOrderRef = {}", pOrder->OrderRef, this->current_user->getLastOrderRef());
+				// 对比最后一次order_ref
+				if (!strcmp(pOrder->OrderRef, this->current_user->getLastOrderRef().c_str()))
 				{
-					this->current_user->getXtsLogger()->info("TdSpi::OnRtnOrder() 断线恢复OrderRef统计 = {} 断线之前OrderRef = {}", cal_num, this->current_user->getStgOrderRefBase());
-					this->current_user->setIsEverLostConnection(false);
+					this->current_user->autoIncrementLastOrderRefCalTmp();
+					
+					this->current_user->getXtsLogger()->info("TdSpi::OnRtnOrder() getLastOrderRefCalTmp = {} getLastOrderRefCal = {}", this->current_user->getLastOrderRefCalTmp(), this->current_user->getLastOrderRefCal());
+					
+					if (this->current_user->getLastOrderRefCalTmp() == this->current_user->getLastOrderRefCal())
+					{
+						this->current_user->setIsEverLostConnection(false);
+						// 重新归0
+						this->current_user->resetLastOrderRefCalTmp();
+					}
+				}
+			}
+			else {
+				// 对比最后一次order_ref，不相等归1，并且赋值相等进行计数统计
+				if (!strcmp(pOrder->OrderRef, this->current_user->getLastOrderRef().c_str()))
+				{
+					this->current_user->autoIncrementLastOrderRefCal();
+				}
+				else {
+					this->current_user->setLastOrderRef(pOrder->OrderRef);
+					this->current_user->resetLastOrderRefCal();
 				}
 			}
 

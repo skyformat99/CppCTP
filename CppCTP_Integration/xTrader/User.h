@@ -96,7 +96,7 @@ public:
 	long long getStgOrderRefBase();
 
 	/// 获取报单
-	void OrderInsert(CThostFtdcInputOrderField *insert_order, string strategy_id);
+	void OrderInsert(CThostFtdcInputOrderField *insert_order, Strategy *stg, string strategy_id);
 
 	/// 设置策略内合约最小跳价格
 	void setStgInstrumnetPriceTick();
@@ -184,6 +184,25 @@ public:
 	void setIsEverLostConnection(bool isEverLostConnection);
 	bool getIsEverLostConnection();
 
+	// 上一次orderref
+	string getLastOrderRef();
+	void setLastOrderRef(string last_order_ref);
+
+	// 当前order_ref
+	string getCurrentOrderRef();
+	void setCurrentOrderRef(string current_order_ref);
+
+	// 最后一次orderref统计
+	int getLastOrderRefCal();
+	void setLastOrderRefCal(int last_order_ref_cal);
+	void autoIncrementLastOrderRefCal();
+	void resetLastOrderRefCal();
+
+	int getLastOrderRefCalTmp();
+	void setLastOrderRefCalTmp(int last_order_ref_cal_tmp);
+	void autoIncrementLastOrderRefCalTmp();
+	void resetLastOrderRefCalTmp();
+
 private:
 	int on_off; //开关
 	string BrokerID;
@@ -217,10 +236,16 @@ private:
 	bool thread_init_status;
 	bool isEverLostConnection;
 	std::shared_ptr<spdlog::logger> xts_user_logger;
-	sem_t sem_get_order_ref;					// 信号量,用来保证同一时间只能一处地方操作报单引用
+	sem_t sem_get_order_ref; // 信号量,用来保证同一时间只能一处地方操作报单引用
+	sem_t sem_inc_last_order_ref_cal; // 信号量,用来保证同一时间只能一处累加操作
+	sem_t sem_inc_last_order_ref_cal_tmp; // 信号量,用来保证同一时间只能一处累加操作
 
 	// 阻塞队列
 	moodycamel::BlockingConcurrentQueue<CThostFtdcDepthMarketDataField *> queue_OrderInsert;	// 行情队列
+	string last_order_ref;	// 上一次order_ref
+	string current_order_ref;	// 当前order_ref
+	int last_order_ref_cal;	// 最后一次order_ref接收次数统计
+	int last_order_ref_cal_tmp;	// 最后一次order_ref接收次数统计tmp
 
 };
 

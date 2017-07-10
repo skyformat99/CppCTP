@@ -1,7 +1,7 @@
 #ifndef QUANT_CTP_LOGINCOMMAND_H
 #define QUANT_CTP_LOGINCOMMAND_H
 
-#include "../TdSpi.h"
+#include "TdSpi.h"
 #include "ApiCommand.h"
 
 class LoginCommand : public ApiCommand{

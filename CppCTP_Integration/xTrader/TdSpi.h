@@ -188,7 +188,7 @@ public:
 	void OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
     //下单
-	int OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder);
+	int OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder, Strategy *stg);
 
 	//下单响应
 	void OnRtnOrder(CThostFtdcOrderField *pOrder);

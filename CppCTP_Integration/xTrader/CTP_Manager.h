@@ -17,7 +17,7 @@
 #include "xTradeStruct.h"
 #include "Timer.h"
 #include "safequeue.h"
-#include "command/ApiCommand.h"
+#include "ApiCommand.h"
 #include <spdlog/spdlog.h>
 using namespace spdlog;
 using spdlog::logger;
@@ -27,6 +27,7 @@ using std::map;
 
 class MdSpi;
 class MarketConfig;
+class ApiCommand;
 
 class CTP_Manager {
 
@@ -240,6 +241,10 @@ public:
 	bool getIsClosingSaved();
 	void setIsClosingSaved(bool isClosingSaved);
 
+	void thread_queue_Command();
+
+	void addCommand(ApiCommand *command);
+
 private:
 	//Login *login;
 	list<string> *l_instrument;
@@ -285,5 +290,8 @@ private:
 
 	// 命令队列
 	SafeQueue<ApiCommand *> queue_Command;
+
+	// 记录最后一次发送命令类型
+	int last_command_type;
 };
 #endif

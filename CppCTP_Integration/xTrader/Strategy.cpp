@@ -4,12 +4,20 @@
 #include <mutex>
 #include "Strategy.h"
 #include "Utils.h"
+#include "OrderInsertCommand.h"
+#include "OrderActionCommand.h"
+
+class OrderActionCommand;
+class OrderInsertCommand;
+
 using mongo::BSONArray;
 using mongo::BSONArrayBuilder;
 using mongo::BSONObj;
 using mongo::BSONObjBuilder;
 using mongo::BSONElement;
 using mongo::ConnectException;
+
+
 
 //std::mutex tick_mtx; // locks access to counter
 //std::mutex update_status_mtx; // locks access to counter
@@ -4925,7 +4933,7 @@ void Strategy::Generate_Order_Ref(CThostFtdcInputOrderField *insert_order) {
 	strstream >> number;
 	string order_ref_base = number + this->stg_strategy_id;*/
 
-	//this->stg_user->OrderInsert(insert_order, this->stg_strategy_id); // 更新基准数
+	//this->stg_user->OrderInsert(insert_order, this, this->stg_strategy_id); // 更新基准数
 
 	//stringstream strValue;
 	//strValue << order_ref_base;
@@ -5026,21 +5034,22 @@ void Strategy::Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order) {
 
 	if (open_num > 0)
 	{
-		this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
+		
+		this->stg_user->OrderInsert(insert_order, this, this->stg_strategy_id);
 	}
 	
 	if (close_yesterday_num > 0)
 	{
 		insert_order->VolumeTotalOriginal = close_yesterday_num;
 		insert_order->CombOffsetFlag[0] = '4';
-		this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
+		this->stg_user->OrderInsert(insert_order, this, this->stg_strategy_id);
 	}
 
 	if (close_today_num > 0)
 	{
 		insert_order->VolumeTotalOriginal = close_today_num;
 		insert_order->CombOffsetFlag[0] = '3';
-		this->stg_user->OrderInsert(insert_order, this->stg_strategy_id);
+		this->stg_user->OrderInsert(insert_order, this, this->stg_strategy_id);
 	}
 
 }
@@ -5071,7 +5080,11 @@ void Strategy::Exec_OrderInsert(CThostFtdcInputOrderField *insert_order) {
 
 void Strategy::Exec_OrderAction(CThostFtdcOrderField *action_order) {
 	this->getStgUser()->getXtsLogger()->info("Strategy::Exec_OrderAction()");
-	this->stg_user->getUserTradeSPI()->OrderAction(action_order->ExchangeID, action_order->OrderRef, action_order->OrderSysID);
+
+	OrderActionCommand *command = new OrderActionCommand(this->stg_user->getUserTradeSPI(), action_order, 1);
+	this->getStgUser()->getCTP_Manager()->addCommand(command);
+
+	//this->stg_user->getUserTradeSPI()->OrderAction(action_order->ExchangeID, action_order->OrderRef, action_order->OrderSysID);
 
 }
 
@@ -5101,7 +5114,6 @@ void Strategy::Exec_OnRtnOrder(CThostFtdcOrderField *pOrder) {
 void Strategy::thread_queue_OnRtnOrder() {
 	while (1)
 	{
-
 		sem_wait(&(this->sem_thread_queue_OnRtnOrder));
 
 		THREAD_CThostFtdcOrderField *pOrder = NULL;
@@ -5133,7 +5145,15 @@ void Strategy::thread_queue_OnRtnOrder() {
 			continue;
 		}
 		else {
-			
+
+			// 如果还处于断线期间,不能接收
+			if (this->getStgUser()->getIsEverLostConnection())
+			{
+				delete pOrder;
+				pOrder = NULL;
+				sem_post(&(this->sem_thread_queue_OnRtnOrder));
+				continue;
+			}
 
 			string compare_date = pOrder->InsertDate; //报单日期
 			string compare_time = pOrder->InsertTime; //报单时间
@@ -5423,6 +5443,16 @@ void Strategy::thread_queue_OnRtnTrade() {
 			continue;
 		}
 		else {
+
+			// 如果还处于断线期间,不能接收
+			if (this->getStgUser()->getIsEverLostConnection())
+			{
+				delete pTrade;
+				pTrade = NULL;
+				sem_post(&(this->sem_thread_queue_OnRtnTrade));
+				continue;
+			}
+
 			/*1:更新持仓明细*/
 			string compare_date = pTrade->TradeDate; //报单日期
 			string compare_time = pTrade->TradeTime; //报单时间
