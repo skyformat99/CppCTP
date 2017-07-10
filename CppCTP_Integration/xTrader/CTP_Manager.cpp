@@ -9,6 +9,8 @@
 #include "Debug.h"
 #include "msg.h"
 #include "ApiCommand.h"
+#include "LoginCommand.h"
+#include "QrySettlementInfoConfirmCommand.h"
 
 #define MSG_SEND_FLAG 1
 using namespace rapidjson;
@@ -139,10 +141,19 @@ User * CTP_Manager::CreateAccount(User *user, list<Strategy *> *l_strategys) {
 
 		user->getUserTradeSPI()->Connect(user, this->system_init_flag); // 连接
 		sleep(1);
-		user->getUserTradeSPI()->Login(user); // 登陆
-		sleep(1);
-		user->getUserTradeSPI()->QrySettlementInfoConfirm(user); // 确认交易结算
-		sleep(1);
+
+
+		LoginCommand *command_login = new LoginCommand(user->getUserTradeSPI(), user, 0);
+		this->addCommand(command_login);
+
+		//user->getUserTradeSPI()->Login(user); // 登陆
+		//sleep(1);
+
+		QrySettlementInfoConfirmCommand *command_qrysettlementinfoconfirm = new QrySettlementInfoConfirmCommand(user->getUserTradeSPI(), user, 0);
+		this->addCommand(command_qrysettlementinfoconfirm);
+
+		//user->getUserTradeSPI()->QrySettlementInfoConfirm(user); // 确认交易结算
+		//sleep(1);
 		/// 设置初始化状态完成
 		user->setThread_Init_Status(true);
 

@@ -9,6 +9,7 @@
 #include "User.h"
 #include "Debug.h"
 #include "Session.h"
+#include "LoginCommand.h"
 
 //转码数组
 char codeDst[255];
@@ -147,7 +148,10 @@ void TdSpi::OnFrontConnected() {
 			(*stg_itor)->update_task_status();
 		}
 
-		this->Login(this->current_user);
+		LoginCommand *command_login = new LoginCommand(this, current_user, 0);
+		this->ctp_m->addCommand(command_login);
+
+		//this->Login(this->current_user);
 	}
 	else { // 第一次登陆系统
 		cv.notify_one();
@@ -282,6 +286,8 @@ void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 		//std::cout << "TdSpi::OnRspUserLogin()" << std::endl;
 		this->current_user->getXtsLogger()->info("TdSpi::OnRspUserLogin() 登陆出错!");
 		this->current_user->setIsLoggedError(true);
+		//释放
+		cv.notify_one();
 		return;
 	}
 	//释放
@@ -289,7 +295,7 @@ void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 }
 
 //查询交易结算确认
-void TdSpi::QrySettlementInfoConfirm(User *user) {
+int TdSpi::QrySettlementInfoConfirm(User *user) {
 
 	CThostFtdcQrySettlementInfoConfirmField qrySettlementField;
 
@@ -297,12 +303,13 @@ void TdSpi::QrySettlementInfoConfirm(User *user) {
 	strcpy(qrySettlementField.InvestorID, user->getUserID().c_str());
 
 	sleep(1);
-	this->tdapi->ReqQrySettlementInfoConfirm(&qrySettlementField, user->getRequestID());
+	int request_error = this->tdapi->ReqQrySettlementInfoConfirm(&qrySettlementField, user->getRequestID());
 
 	/*int ret = this->controlTimeOut(&sem_ReqQrySettlementInfoConfirm);
 	if (ret == -1) {
 	USER_PRINT("TdSpi::QrySettlementInfoConfirm TimeOut!")
 	}*/
+	return request_error;
 }
 
 

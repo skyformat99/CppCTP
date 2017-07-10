@@ -402,6 +402,30 @@ PositionDetail.cpp.s:
 	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/PositionDetail.cpp.s
 .PHONY : PositionDetail.cpp.s
 
+QrySettlementInfoConfirmCommand.o: QrySettlementInfoConfirmCommand.cpp.o
+.PHONY : QrySettlementInfoConfirmCommand.o
+
+# target to build an object file
+QrySettlementInfoConfirmCommand.cpp.o:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/QrySettlementInfoConfirmCommand.cpp.o
+.PHONY : QrySettlementInfoConfirmCommand.cpp.o
+
+QrySettlementInfoConfirmCommand.i: QrySettlementInfoConfirmCommand.cpp.i
+.PHONY : QrySettlementInfoConfirmCommand.i
+
+# target to preprocess a source file
+QrySettlementInfoConfirmCommand.cpp.i:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/QrySettlementInfoConfirmCommand.cpp.i
+.PHONY : QrySettlementInfoConfirmCommand.cpp.i
+
+QrySettlementInfoConfirmCommand.s: QrySettlementInfoConfirmCommand.cpp.s
+.PHONY : QrySettlementInfoConfirmCommand.s
+
+# target to generate assembly for a file
+QrySettlementInfoConfirmCommand.cpp.s:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/QrySettlementInfoConfirmCommand.cpp.s
+.PHONY : QrySettlementInfoConfirmCommand.cpp.s
+
 Session.o: Session.cpp.o
 .PHONY : Session.o
 
@@ -663,6 +687,9 @@ help:
 	@echo "... PositionDetail.o"
 	@echo "... PositionDetail.i"
 	@echo "... PositionDetail.s"
+	@echo "... QrySettlementInfoConfirmCommand.o"
+	@echo "... QrySettlementInfoConfirmCommand.i"
+	@echo "... QrySettlementInfoConfirmCommand.s"
 	@echo "... Session.o"
 	@echo "... Session.i"
 	@echo "... Session.s"

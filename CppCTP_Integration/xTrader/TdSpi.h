@@ -83,7 +83,7 @@ public:
 
 
 	//查询结算信息确认
-	void QrySettlementInfoConfirm(User *user);
+	int QrySettlementInfoConfirm(User *user);
 
     //请求查询结算信息确认响应
     void OnRspQrySettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm,
