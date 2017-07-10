@@ -1,60 +1,21 @@
-CppCTP
+CppSgit_API_ypf
 =========
-上期信息技术CTP开发(C++实现)
+飞鼠API开发(期货)
 
 开发环境
 --------
 
     CentOS 6.5, gcc:v4.8.2, cmake:v2.8.12.2, lang:c++, MongoDB v3.2
 
-开发顺序
---------
+简介
+=========
+该版本是在分支CppCTP_API_ypf基础上开发，针对飞鼠API进行开发。
 
-    CppCTP_API -> CppCTP_Integration
-
-## 简单演示
-* CppCTP与客户端交互
-
-![show_demo](https://user-images.githubusercontent.com/3973297/27087027-80820c0e-5086-11e7-9cf6-0a13a6b0f037.gif)
-
-* 客户端策略的增删改查
-
-![strategy_crud](https://user-images.githubusercontent.com/3973297/27087656-2b05649a-5088-11e7-8a14-58dfc80cdd01.gif)
-## 各个目录说明
-* CppCTP_API
-  * 本目录是针对CTP的API库进行的API测试，分为md(市场行情),td(交易),初学者最适宜从API版本学起，学习最基本的API调用
-* CppCTP_Integration
-  * xTrader
-    * 该目录是CppCTP系统源码，支持多账户，多策略交易使用
-  * xTrader_doc
-    * 该目录是CppCTP系统开发中的一些协议文档相关的资料说明
-* CppCTP_SOCKET
-  * 本目录是CTP实现socket通信版本,是C++与Python的socket通信底层代码
-
-## 致谢
-CppCTP中使用了一些第三方开源库，非常感谢开源作者提供优秀的库，下面列举出该系统使用的开源库：
-* log日志库:[spdlog](https://github.com/gabime/spdlog)
-* 多线程安全队列:[concurrentqueue](https://github.com/cameron314/concurrentqueue)
-* C++高性能json解析库:[rapidjson](https://github.com/miloyip/rapidjson)
-* C++ ini文件解析库:[inih](https://github.com/jtilly/inih)
-
-## 相关开发教程
-整个CppCTP的开发周期还是比较漫长的，从接触API文档到后期策略级别上的开发，中间踩过不少坑。
-
-后续我会把CppCTP交易系统的开发环境搭建以及CTP开发教程整理出来。有兴趣可以从main.cpp源码泛读代码。
-
-个人博客地址：http://www.jyguagua.com
+* 注意：master分支维护的是标准CTP开发(基于上期信息技术提供的API开发)
 
 更新日志
-===
+======
 
-### 更新时间:2017.07.10
-* 完成CTP断线保护功能
-* 完成跨品种交易,支持跨品种比例系数设置
-* 增加五家交易所所有品种开盘，休盘时间配置
-* 修改系统命令发送架构,改为队列线程进行命令发送
-* 修复若干bug
-
-### 更新时间:2017.06.13
-* 初步完成多账户多策略交易系统
-* 支持同交易所同品种交易，支持国内四家交易所(上期所,大商所,郑商所,中金所)
+2017.07.10
+-----
+* 新建分支，开发飞鼠API(期货)
