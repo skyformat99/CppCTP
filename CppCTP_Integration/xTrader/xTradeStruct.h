@@ -310,6 +310,8 @@ struct THREAD_CThostFtdcOrderField
 	TThostFtdcSequenceNoType	NotifySequence;
 	///交易日
 	TThostFtdcDateType	TradingDay;
+	///记录保存日期
+	TThostFtdcDateType	TradingDayRecord;
 	///结算编号
 	TThostFtdcSettlementIDType	SettlementID;
 	///报单编号
@@ -389,6 +391,10 @@ struct THREAD_CThostFtdcTradeField
 	TThostFtdcInstrumentIDType	InstrumentID;
 	///报单引用
 	TThostFtdcOrderRefType	OrderRef;
+
+	///策略编号
+	char StrategyID[3];
+
 	///用户代码
 	TThostFtdcUserIDType	UserID;
 	///交易所代码
@@ -435,6 +441,8 @@ struct THREAD_CThostFtdcTradeField
 	TThostFtdcSequenceNoType	SequenceNo;
 	///交易日
 	TThostFtdcDateType	TradingDay;
+	///记录保存日期
+	TThostFtdcDateType	TradingDayRecord;
 	///结算编号
 	TThostFtdcSettlementIDType	SettlementID;
 	///经纪公司报单编号

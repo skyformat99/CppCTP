@@ -63,7 +63,7 @@ public:
 	void OnFrontDisconnected(int nReason);
 
 	//登录
-	void Login(User *user);
+	int Login(User *user);
 
 
     ///登录请求响应
@@ -83,7 +83,7 @@ public:
 
 
 	//查询结算信息确认
-	void QrySettlementInfoConfirm(User *user);
+	int QrySettlementInfoConfirm(User *user);
 
     //请求查询结算信息确认响应
     void OnRspQrySettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm,
@@ -188,7 +188,7 @@ public:
 	void OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
     //下单
-	void OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder);
+	int OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder, Strategy *stg);
 
 	//下单响应
 	void OnRtnOrder(CThostFtdcOrderField *pOrder);
@@ -203,7 +203,7 @@ public:
 	void OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 	//撤单
-	void OrderAction(char *ExchangeID, char *OrderRef, char *OrderSysID);
+	int OrderAction(char *ExchangeID, char *OrderRef, char *OrderSysID);
 
 	//撤单错误响应
 	void OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);

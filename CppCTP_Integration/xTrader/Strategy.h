@@ -9,6 +9,7 @@
 #include "Debug.h"
 #include "DBManager.h"
 #include "xTradeStruct.h"
+#include "INIReader.h"
 //#include "concurrentqueue/blockingconcurrentqueue.h"
 #include "safequeue.h"
 #include <spdlog/spdlog.h>
@@ -217,6 +218,12 @@ public:
 
 	string getStgStrategyId();
 	void setStgStrategyId(string stgStrategyId);
+			
+	int getStgInstrumentAScale();		// A合约比例乘数
+	void setStgInstrumentAScale(int stg_instrument_A_scale);
+
+	int getStgInstrumentBScale();		// B合约比例乘数
+	void setStgInstrumentBScale(int stg_instrument_B_scale);
 
 	bool isStgTradeTasking();
 	void setStgTradeTasking(bool stgTradeTasking);
@@ -286,17 +293,33 @@ public:
 	void Generate_Order_Ref(CThostFtdcInputOrderField *insert_order);
 
 	/// 执行任务函数
+	void Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order);   // 报单平仓自动调整
 	void Exec_OrderInsert(CThostFtdcInputOrderField *insert_order);			// 报单
-	void Exec_OnRspOrderInsert();		// 报单录入请求
-	void Exec_OnRspOrderAction();		// 报单操作请求响应
-	void Exec_OnRtnOrder(CThostFtdcOrderField *pOrder);				// 报单回报
-	void ExEc_OnRtnTrade(CThostFtdcTradeField *pTrade);				// 成交回报
-	void Exec_OnErrRtnOrderInsert();	// 报单录入错误回报
-	void Exec_OnErrRtnOrderAction();	// 报单操作错误回报
+	void Exec_OrderAction(CThostFtdcOrderField *action_order);				// 撤单
+	void Exec_OnRspOrderInsert();											// 报单录入请求
+	void Exec_OnRspOrderAction();											// 报单操作请求响应
+	void Exec_OnRtnOrder(CThostFtdcOrderField *pOrder);						// 报单回报
+	void ExEc_OnRtnTrade(CThostFtdcTradeField *pTrade);						// 成交回报
+	void Exec_OnErrRtnOrderInsert();										// 报单录入错误回报
+	void Exec_OnErrRtnOrderAction();										// 报单操作错误回报
 	void Exec_OnTickComing(THREAD_CThostFtdcDepthMarketDataField *pDepthMarketData);			// 行情回调,执行交易任务
 
 	/// 更新挂单list
 	void update_pending_order_list(CThostFtdcOrderField *pOrder);
+
+	/// 向pending_order_list中增加元素
+	void add_update_pending_order_list(CThostFtdcOrderField *pOrder);
+
+	/// 报单错误回报删除pending_order_list中的元素
+	void remove_pending_order_list(CThostFtdcOrderField *pOrder); 
+	
+	/// 撤单错误回报删除pending_order_list中的元素
+	void remove_pending_order_list(CThostFtdcOrderActionField *pOrderAction);
+
+	void remove_pending_order_list(CThostFtdcInputOrderActionField *pOrderAction);
+	
+	/// 错误回报返回的元素要从挂单列表里移除
+	void remove_pending_order_list(CThostFtdcInputOrderField *pOrder);
 
 	/// 更新持仓量(Order)
 	//void update_position(CThostFtdcOrderField *pOrder);
@@ -361,17 +384,14 @@ public:
 	/// 拷贝结构体CThostFtdcTradeField
 	void CopyTradeData(CThostFtdcTradeField *dst, CThostFtdcTradeField *src);
 
-	void CopyThreadTradeData(USER_CThostFtdcTradeField *dst, THREAD_CThostFtdcTradeField *src);
+	void CopyThreadTradeData(THREAD_CThostFtdcTradeField *dst, CThostFtdcTradeField *src, bool isLastElement = false);
 
-	void CopyTradeData(THREAD_CThostFtdcTradeField *dst, CThostFtdcTradeField *src, bool isLastElement = false);
+	void CopyTradeData(CThostFtdcTradeField *dst, THREAD_CThostFtdcTradeField *src);
 
 	/// 拷贝结构体CThostFtdcTradeField
 	void CopyTradeDataToNew(USER_CThostFtdcTradeField *dst, CThostFtdcTradeField *src);
 
-
 	void CopyThreadTradeDataToNew(USER_CThostFtdcTradeField *dst, THREAD_CThostFtdcTradeField *src);
-
-
 
 	void CopyNewTradeData(USER_CThostFtdcTradeField *dst, USER_CThostFtdcTradeField *src);
 
@@ -417,8 +437,6 @@ public:
 
 	void setStgSellCloseOnOff(int sell_close_on_off);			//卖平-开关
 	int getStgSellCloseOnOff();
-
-	
 
 	/// 交易模型
 	void setStgTradeModel(string stg_trade_model);
@@ -537,6 +555,217 @@ public:
 	void setQueue_OnRtnTrade_on_off(bool queue_OnRtnTrade_on_off);
 	bool getQueue_OnRtnTrade_on_off();
 
+	string getMorning_opentime();
+
+	void setMorning_opentime(string morning_opentime);
+
+	string getMorning_begin_breaktime();
+
+	void setMorning_begin_breaktime(string morning_begin_breaktime);
+
+	string getMorning_breaktime();
+
+	void setMorning_breaktime(string morning_breaktime);
+
+	string getMorning_recoverytime();
+
+	void setMorning_recoverytime(string morning_recoverytime);
+
+	string getMorning_begin_closetime();
+
+	void setMorning_begin_closetime(string morning_begin_closetime);
+
+	string getMorning_closetime();
+
+	void setMorning_closetime(string morning_closetime);
+
+	string getAfternoon_opentime();
+
+	void setAfternoon_opentime(string afternoon_opentime);
+
+	string getAfternoon_begin_closetime();
+
+	void setAfternoon_begin_closetime(string afternoon_begin_closetime);
+
+	string getAfternoon_closetime();
+
+	void setAfternoon_closetime(string afternoon_closetime);
+
+	string getEvening_opentime();
+
+	void setEvening_opentime(string evening_opentime);
+
+	string getEvening_closetime();
+
+	void setEvening_closetime(string evening_closetime);
+
+	string getMorning_opentime_instrument_A();
+
+	void setMorning_opentime_instrument_A(string morning_opentime_instrument_A);
+
+	string getMorning_begin_breaktime_instrument_A();
+
+	void setMorning_begin_breaktime_instrument_A(string morning_begin_breaktime_instrument_A);
+
+	string getMorning_breaktime_instrument_A();
+
+	void setMorning_breaktime_instrument_A(string morning_breaktime_instrument_A);
+
+	string getMorning_recoverytime_instrument_A();
+
+	void setMorning_recoverytime_instrument_A(string morning_recoverytime_instrument_A);
+
+	string getMorning_begin_closetime_instrument_A();
+
+	void setMorning_begin_closetime_instrument_A(string morning_begin_closetime_instrument_A);
+
+	string getMorning_closetime_instrument_A();
+
+	void setMorning_closetime_instrument_A(string morning_closetime_instrument_A);
+
+	string getAfternoon_opentime_instrument_A();
+
+	void setAfternoon_opentime_instrument_A(string afternoon_opentime_instrument_A);
+
+	string getAfternoon_begin_closetime_instrument_A();
+
+	void setAfternoon_begin_closetime_instrument_A(string afternoon_begin_closetime_instrument_A);
+
+	string getAfternoon_closetime_instrument_A();
+
+	void setAfternoon_closetime_instrument_A(string afternoon_closetime_instrument_A);
+
+	string getEvening_opentime_instrument_A();
+
+	void setEvening_opentime_instrument_A(string evening_opentime_instrument_A);
+
+	string getEvening_closetime_instrument_A();
+
+	void setEvening_closetime_instrument_A(string evening_closetime_instrument_A);
+
+	string getMorning_opentime_instrument_B();
+
+	void setMorning_opentime_instrument_B(string morning_opentime_instrument_B);
+
+	string getMorning_begin_breaktime_instrument_B();
+
+	void setMorning_begin_breaktime_instrument_B(string morning_begin_breaktime_instrument_B);
+
+	string getMorning_breaktime_instrument_B();
+
+	void setMorning_breaktime_instrument_B(string morning_breaktime_instrument_B);
+
+	string getMorning_recoverytime_instrument_B();
+
+	void setMorning_recoverytime_instrument_B(string morning_recoverytime_instrument_B);
+
+	string getMorning_begin_closetime_instrument_B();
+
+	void setMorning_begin_closetime_instrument_B(string morning_begin_closetime_instrument_B);
+
+	string getMorning_closetime_instrument_B();
+
+	void setMorning_closetime_instrument_B(string morning_closetime_instrument_B);
+
+	string getAfternoon_opentime_instrument_B();
+
+	void setAfternoon_opentime_instrument_B(string afternoon_opentime_instrument_B);
+
+	string getAfternoon_begin_closetime_instrument_B();
+
+	void setAfternoon_begin_closetime_instrument_B(string afternoon_begin_closetime_instrument_B);
+
+	string getAfternoon_closetime_instrument_B();
+
+	void setAfternoon_closetime_instrument_B(string afternoon_closetime_instrument_B);
+
+	string getEvening_opentime_instrument_B();
+
+	void setEvening_opentime_instrument_B(string evening_opentime_instrument_B);
+
+	string getEvening_closetime_instrument_B();
+
+	void setEvening_closetime_instrument_B(string evening_closetime_instrument_B);
+
+	string getEvening_stop_opentime();
+
+	void setEvening_stop_opentime(string evening_stop_opentime);
+
+	string getEvening_first_end_tasktime();
+
+	void setEvening_first_end_tasktime(string evening_first_end_tasktime);
+
+	string getEvening_second_end_tasktime();
+
+	void setEvening_second_end_tasktime(string evening_second_end_tasktime);
+
+	string getEvening_stop_opentime_instrument_A();
+
+	void setEvening_stop_opentime_instrument_A(string evening_stop_opentime_instrument_A);
+
+	string getEvening_first_end_tasktime_instrument_A();
+
+	void setEvening_first_end_tasktime_instrument_A(string evening_first_end_tasktime_instrument_A);
+
+	string getEvening_second_end_tasktime_instrument_A();
+
+	void setEvening_second_end_tasktime_instrument_A(string evening_second_end_tasktime_instrument_A);
+
+	string getEvening_stop_opentime_instrument_B();
+
+	void setEvening_stop_opentime_instrument_B(string evening_stop_opentime_instrument_B);
+
+	string getEvening_first_end_tasktime_instrument_B();
+
+	void setEvening_first_end_tasktime_instrument_B(string evening_first_end_tasktime_instrument_B);
+
+	string getEvening_second_end_tasktime_instrument_B();
+
+	void setEvening_second_end_tasktime_instrument_B(string evening_second_end_tasktime_instrument_B);
+
+	void StgTimeCal();
+
+	// 结束任务标志位
+	bool getIsStartEndTaskFlag();
+	void setIsStartEndTaskFlag(bool is_start_end_task_flag);
+	// 开盘交易标志位
+	bool getIsMarketCloseFlag();
+	void setIsMarketCloseFlag(bool is_market_close_flag);
+
+	// 是否有夜盘
+	bool getHasNightMarket();
+	void setHasNightMarket(bool has_night_market);
+
+	bool getHasMorningBreakTime();
+	void setHasMorningBreakTime(bool has_morning_break_time);
+
+	bool getHasMidnightMarket();
+	void setHasMidnightMarket(bool has_midnight_market);
+
+	bool getEnd_task_afternoon_first();
+
+	void setEnd_task_afternoon_first(bool end_task_afternoon_first);
+
+	bool getEnd_task_afternoon_second();
+
+	void setEnd_task_afternoon_second(bool end_task_afternoon_second);
+
+	bool getEnd_task_evening_first();
+
+	void setEnd_task_evening_first(bool end_task_evening_first);
+
+	bool getEnd_task_evening_second();
+
+	void setEnd_task_evening_second(bool end_task_evening_second);
+
+	bool getEnd_task_morning_first();
+
+	void setEnd_task_morning_first(bool end_task_morning_first);
+
+	bool getEnd_task_morning_second();
+
+	void setEnd_task_morning_second(bool end_task_morning_second);
+
 private:
 	Trader *trader;
 	User *user;
@@ -553,6 +782,8 @@ private:
 	string stg_strategy_id;		// 策略id
 	string stg_instrument_id_A;	// 合约A
 	string stg_instrument_id_B;	// 合约B
+	
+	int stg_b_order_already_send_batch;	// B合约已经发出去的数量
 
 	double stg_buy_open;				// 触发买开（开多单）
 	double stg_sell_close;				// 触发卖平（平多单）
@@ -586,6 +817,9 @@ private:
 	string stg_update_position_detail_record_time; // 策略持仓明细修改记录时间
 	string stg_last_saved_time;			// 策略最后一次保存的时间
 
+	int stg_instrument_A_scale;			// A合约比例乘数
+	int stg_instrument_B_scale;			// B合约比例乘数
+
 	int stg_position_a_buy_today;		// A合约买持仓今仓
 	int stg_position_a_buy_yesterday;	// A合约买持仓昨仓
 	int stg_position_a_buy;				// A合约买持仓总仓位
@@ -614,6 +848,63 @@ private:
 	int stg_spread_short_volume;							// 市场空头价差盘口挂单量：min(A合约买一量 - B合约买一量)
 	double stg_spread;										// 市场最新价价差
 
+	bool end_task_afternoon_first;							// 下午收盘第一次结束任务标志位
+	bool end_task_afternoon_second;							// 下午收盘第二次结束任务标志位
+
+	bool end_task_evening_first;							// 夜间收盘第一次结束任务标志位
+	bool end_task_evening_second;							// 夜间收盘第二次结束任务标志位
+
+	bool end_task_morning_first;							// 凌晨收盘第一次结束任务标志位
+	bool end_task_morning_second;							// 凌晨收盘第二次结束任务标志位
+
+	string morning_opentime;								// 中午开盘时间
+	string morning_begin_breaktime;							// 中午休盘时间前10秒
+	string morning_breaktime;								// 中午休盘时间
+	string morning_recoverytime;							// 中午休盘恢复时间
+	string morning_begin_closetime;							// 中午收盘时间前10秒
+	string morning_closetime;								// 中午收盘
+	string afternoon_opentime;								// 下午开盘时间
+	string afternoon_begin_closetime;						// 下午收盘时间前10秒
+	string afternoon_closetime;								// 下午收盘时间
+	string evening_opentime;								// 夜间开盘时间
+	string evening_stop_opentime;							// 夜间收盘前10秒不允许发新单
+	string evening_first_end_tasktime;						// 夜间收盘前5秒
+	string evening_second_end_tasktime;						// 夜间收盘前3秒
+	string evening_closetime;								// 夜间收盘时间
+
+	string morning_opentime_instrument_A;								// 中午开盘时间_instrument_A
+	string morning_begin_breaktime_instrument_A;						// 中午休盘时间前10秒_instrument_A
+	string morning_breaktime_instrument_A;								// 中午休盘时间_instrument_A
+	string morning_recoverytime_instrument_A;							// 中午休盘恢复时间_instrument_A
+	string morning_begin_closetime_instrument_A;						// 中午收盘时间前10秒_instrument_A
+	string morning_closetime_instrument_A;								// 中午收盘_instrument_A
+	string afternoon_opentime_instrument_A;								// 下午开盘时间_instrument_A
+	string afternoon_begin_closetime_instrument_A;						// 下午收盘时间前10秒_instrument_A
+	string afternoon_closetime_instrument_A;							// 下午收盘时间_instrument_A
+	string evening_opentime_instrument_A;								// 夜间开盘时间_instrument_A
+	string evening_stop_opentime_instrument_A;							// 夜间收盘前10秒不允许发新单_instrument_A
+	string evening_first_end_tasktime_instrument_A;						// 夜间收盘前5秒_instrument_A
+	string evening_second_end_tasktime_instrument_A;					// 夜间收盘前3秒_instrument_A
+	string evening_closetime_instrument_A;								// 夜间收盘时间_instrument_A
+
+	string morning_opentime_instrument_B;								// 中午开盘时间_instrument_B
+	string morning_begin_breaktime_instrument_B;						// 中午休盘时间前10秒_instrument_B
+	string morning_breaktime_instrument_B;								// 中午休盘时间_instrument_B
+	string morning_recoverytime_instrument_B;							// 中午休盘恢复时间_instrument_B
+	string morning_begin_closetime_instrument_B;						// 中午收盘时间前10秒_instrument_B
+	string morning_closetime_instrument_B;								// 中午收盘_instrument_B
+	string afternoon_opentime_instrument_B;								// 下午开盘时间_instrument_B
+	string afternoon_begin_closetime_instrument_B;						// 下午收盘时间前10秒_instrument_B
+	string afternoon_closetime_instrument_B;							// 下午收盘时间_instrument_B
+	string evening_opentime_instrument_B;								// 夜间开盘时间_instrument_B
+	string evening_stop_opentime_instrument_B;							// 夜间收盘前10秒不允许发新单_instrument_B
+	string evening_first_end_tasktime_instrument_B;						// 夜间收盘前5秒_instrument_B
+	string evening_second_end_tasktime_instrument_B;					// 夜间收盘前3秒_instrument_B
+	string evening_closetime_instrument_B;								// 夜间收盘时间_instrument_B
+
+	bool is_start_end_task_flag;		// 结束任务标志位
+	bool is_market_close_flag;			// 开盘交易标志位
+
 	string stg_order_ref_last;	// 最后一次实际使用的报单引用
 	string stg_order_ref_a;		// A合约报单引用
 	string stg_order_ref_b;		// B合约报单引用
@@ -622,8 +913,12 @@ private:
 	int stg_a_limit_price_shift; // A合约报单偏移
 	int stg_b_limit_price_shift; // B合约报单偏移
 
-	bool stg_trade_tasking;		// 交易任务进行中
-	bool on_off_end_task;		//是否允许收盘任务执行
+	bool stg_trade_tasking;			// 交易任务进行中
+	bool on_off_end_task;			// 是否允许收盘任务执行
+	bool has_night_market;			// 是否有夜盘
+	bool has_morning_break_time;	// 是否有10:15分休息时间
+	bool has_midnight_market;		// 是否有过00:00:00的交易
+
 	CThostFtdcInputOrderField *stg_a_order_insert_args;		// a合约报单参数
 	CThostFtdcInputOrderField *stg_b_order_insert_args;		// b合约报单参数
 	list<CThostFtdcOrderField *> *stg_list_order_pending;	// 挂单列表，报单、成交、撤单回报

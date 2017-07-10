@@ -759,7 +759,8 @@ void DBManager::getAllFutureAccount(list<User *> *l_user) {
 int DBManager::CheckStrategyExist(string strategy_id, string user_id, string trading_day) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
-	std::cout << "DBManager::CheckStrategyExist()" << std::endl;
+	//std::cout << "DBManager::CheckStrategyExist()" << std::endl;
+	this->getXtsDBLogger()->info("DBManager::CheckStrategyExist()");
 	int count_number = 0;
 	int flag = 0;
 
@@ -776,7 +777,8 @@ int DBManager::CheckStrategyExist(string strategy_id, string user_id, string tra
 int DBManager::CreateStrategy(Strategy *stg) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
-	std::cout << "DBManager::CreateStrategy()" << std::endl;
+	//std::cout << "DBManager::CreateStrategy()" << std::endl;
+	this->getXtsDBLogger()->info("DBManager::CreateStrategy()");
 	int count_number = 0;
 	int flag = 0;
 
@@ -804,6 +806,10 @@ int DBManager::CreateStrategy(Strategy *stg) {
 		b.append("strategy_id", stg->getStgStrategyId());
 		b.append("position_b_buy", stg->getStgPositionBBuy());
 		b.append("lots_batch", stg->getStgLotsBatch());
+
+		b.append("instrument_a_scale", stg->getStgInstrumentAScale());
+		b.append("instrument_b_scale", stg->getStgInstrumentBScale());
+
 		b.append("position_a_buy", stg->getStgPositionABuy());
 		b.append("sell_open", stg->getStgSellOpen());
 		b.append("order_algorithm", stg->getStgOrderAlgorithm());
@@ -971,6 +977,10 @@ void DBManager::UpdateStrategy(Strategy *stg) {
 			<< "strategy_id" << stg->getStgStrategyId()
 			<< "position_b_buy" << stg->getStgPositionBBuy()
 			<< "lots_batch" << stg->getStgLotsBatch()
+
+			<< "instrument_a_scale" << stg->getStgInstrumentAScale()
+			<< "instrument_b_scale" << stg->getStgInstrumentBScale()
+
 			<< "position_a_buy" << stg->getStgPositionABuy()
 			<< "sell_open" << stg->getStgSellOpen()
 			<< "order_algorithm" << stg->getStgOrderAlgorithm()
@@ -1110,6 +1120,9 @@ void DBManager::getAllStrategy(list<Strategy *> *l_strategys, string traderid, s
 		stg->setStgIsActive(p.getField("is_active").Bool());
 		stg->setStgLots(p.getIntField("lots"));
 		stg->setStgLotsBatch(p.getIntField("lots_batch"));
+
+		stg->setStgInstrumentAScale(p.getIntField("instrument_a_scale"));
+		stg->setStgInstrumentBScale(p.getIntField("instrument_b_scale"));
 
 		stg->setStgOnlyClose(p.getIntField("only_close"));
 		stg->setOn_Off(p.getIntField("strategy_on_off"));
@@ -1278,6 +1291,9 @@ void DBManager::getAllStrategyByActiveUser(bool fake, list<Strategy *> *l_strate
 			stg->setStgLots(p.getIntField("lots"));
 			stg->setStgLotsBatch(p.getIntField("lots_batch"));
 
+			stg->setStgInstrumentAScale(p.getIntField("instrument_a_scale"));
+			stg->setStgInstrumentBScale(p.getIntField("instrument_b_scale"));
+
 			stg->setStgOnlyClose(p.getIntField("only_close"));
 			stg->setOn_Off(p.getIntField("strategy_on_off"));
 			stg->setStgSellOpenOnOff(p.getIntField("sell_open_on_off"));
@@ -1345,6 +1361,10 @@ void DBManager::getAllStrategyByActiveUser(bool fake, list<Strategy *> *l_strate
 			if (elements.size() > 1) {
 				stg->setStgInstrumentIdA(elements[0].String());
 				stg->setStgInstrumentIdB(elements[1].String());
+
+				// 计算策略时间
+				stg->StgTimeCal();
+
 				stg->addInstrumentToList(stg->getStgInstrumentIdA());
 				stg->addInstrumentToList(stg->getStgInstrumentIdB());
 				//cout << "stg->setStgInstrumentIdA(elements[0]) = " << stg->getStgInstrumentIdA() << ", ";
@@ -1400,6 +1420,10 @@ int DBManager::CreateStrategyYesterday(Strategy *stg) {
 		b.append("strategy_id", stg->getStgStrategyId());
 		b.append("position_b_buy", stg->getStgPositionBBuy());
 		b.append("lots_batch", stg->getStgLotsBatch());
+
+		b.append("instrument_a_scale", stg->getStgInstrumentAScale());
+		b.append("instrument_b_scale", stg->getStgInstrumentBScale());
+
 		b.append("position_a_buy", stg->getStgPositionABuy());
 		b.append("sell_open", stg->getStgSellOpen());
 		b.append("order_algorithm", stg->getStgOrderAlgorithm());
@@ -1506,6 +1530,10 @@ void DBManager::UpdateStrategyYesterday(Strategy *stg) {
 			<< "strategy_id" << stg->getStgStrategyId()
 			<< "position_b_buy" << stg->getStgPositionBBuy()
 			<< "lots_batch" << stg->getStgLotsBatch()
+
+			<< "instrument_a_scale" << stg->getStgInstrumentAScale()
+			<< "instrument_b_scale" << stg->getStgInstrumentBScale()
+
 			<< "position_a_buy" << stg->getStgPositionABuy()
 			<< "sell_open" << stg->getStgSellOpen()
 			<< "order_algorithm" << stg->getStgOrderAlgorithm()
@@ -1639,6 +1667,9 @@ void DBManager::getAllStrategyYesterday(list<Strategy *> *l_strategys, string tr
 		stg->setStgIsActive(p.getField("is_active").Bool());
 		stg->setStgLots(p.getIntField("lots"));
 		stg->setStgLotsBatch(p.getIntField("lots_batch"));
+
+		stg->setStgInstrumentAScale(p.getIntField("instrument_a_scale"));
+		stg->setStgInstrumentBScale(p.getIntField("instrument_b_scale"));
 
 		stg->setStgOnlyClose(p.getIntField("only_close"));
 		stg->setOn_Off(p.getIntField("strategy_on_off"));
@@ -1811,6 +1842,10 @@ void DBManager::getAllStrategyYesterdayByTraderIdAndUserIdAndStrategyId(list<Str
 		stg->setStgIsActive(p.getField("is_active").Bool());
 		stg->setStgLots(p.getIntField("lots"));
 		stg->setStgLotsBatch(p.getIntField("lots_batch"));
+
+		stg->setStgInstrumentAScale(p.getIntField("instrument_a_scale"));
+		stg->setStgInstrumentBScale(p.getIntField("instrument_b_scale"));
+
 		stg->setStgOnlyClose(p.getIntField("only_close"));
 
 
@@ -1967,6 +2002,9 @@ void DBManager::getAllStrategyYesterdayByActiveUser(list<Strategy *> *l_strategy
 			stg->setStgLots(p.getIntField("lots"));
 			stg->setStgLotsBatch(p.getIntField("lots_batch"));
 
+			stg->setStgInstrumentAScale(p.getIntField("instrument_a_scale"));
+			stg->setStgInstrumentBScale(p.getIntField("instrument_b_scale"));
+
 			stg->setStgOnlyClose(p.getIntField("only_close"));
 			stg->setOn_Off(p.getIntField("strategy_on_off"));
 			stg->setStgSellOpenOnOff(p.getIntField("sell_open_on_off"));
@@ -2031,6 +2069,10 @@ void DBManager::getAllStrategyYesterdayByActiveUser(list<Strategy *> *l_strategy
 			if (elements.size() > 1) {
 				stg->setStgInstrumentIdA(elements[0].String());
 				stg->setStgInstrumentIdB(elements[1].String());
+
+				// 计算策略时间
+				stg->StgTimeCal();
+
 				stg->addInstrumentToList(stg->getStgInstrumentIdA());
 				stg->addInstrumentToList(stg->getStgInstrumentIdB());
 				//cout << "stg->setStgInstrumentIdA(elements[0]) = " << stg->getStgInstrumentIdA() << ", ";

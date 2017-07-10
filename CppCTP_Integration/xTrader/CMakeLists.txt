@@ -13,6 +13,7 @@
     #source files(can add source files manually)
     #set(SOURCE_FILES main.cpp ThostFtdcMdApi.h ThostFtdcTraderApi.h ThostFtdcUserApiDataType.h ThostFtdcUserApiStruct.h MdSpi.cpp MdSpi.h TdSpi.cpp TdSpi.h CTP_Manager.cpp CTP_Manager.h Login.h Order.cpp Order.h User.cpp User.h Utils.cpp Utils.h DBManager.h DBManager.cpp Trader.h Trader.cpp FutureAccount.h FutureAccount.cpp Strategy.h Strategy.cpp Algorithm.h Algorithm.cpp)
 
+
 	#source directory(add source files automatically)
 	aux_source_directory(. SOURCE_FILES)
 	#set exe folder

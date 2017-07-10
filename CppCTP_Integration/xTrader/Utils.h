@@ -30,6 +30,7 @@ public:
 	static void printRedColorWithKV(string key, string value);
 	static void printGreenColorWithKV(string key, int value);
 	static void printRedColorWithKV(string key, int value);
+	static int match_instrumentid(string instrument_id);
 };
 
 #endif

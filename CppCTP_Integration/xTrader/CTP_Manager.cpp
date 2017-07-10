@@ -8,6 +8,9 @@
 #include "Utils.h"
 #include "Debug.h"
 #include "msg.h"
+#include "ApiCommand.h"
+#include "LoginCommand.h"
+#include "QrySettlementInfoConfirmCommand.h"
 
 #define MSG_SEND_FLAG 1
 using namespace rapidjson;
@@ -46,6 +49,8 @@ CTP_Manager::CTP_Manager() {
 	this->is_market_close = true;
 	this->is_start_end_task = false;
 	this->is_market_close_done = false;
+	// 初始化最后一次发送命令类型为-1
+	this->last_command_type = -1;
 
 
 	// 同一时间只能有一个线程调用生成报单引用(避免带来段错误)
@@ -69,6 +74,10 @@ CTP_Manager::CTP_Manager() {
 	//this->ten_min_flag = false;
 	//this->one_min_flag = false;
 	//this->one_second_flag = false;
+
+	std::thread thread_command(&CTP_Manager::thread_queue_Command, this);
+	thread_command.detach();
+
 }
 
 bool CTP_Manager::ten_min_flag = false;
@@ -128,17 +137,23 @@ User * CTP_Manager::CreateAccount(User *user, list<Strategy *> *l_strategys) {
 		std::cout << "\tBrokerID = " << user->getBrokerID() << endl;
 		std::cout << "\t期货密码 = " << user->getPassword() << endl;*/
 
-		this->getXtsLogger()->info("CTP_Manager::CreateAccount()");
-		this->getXtsLogger()->info("\t期货账户 = {}", user->getUserID());
-		this->getXtsLogger()->info("\tBrokerID = {}", user->getBrokerID());
-		this->getXtsLogger()->info("\t期货密码 = {}", user->getPassword());
+		this->getXtsLogger()->info("CTP_Manager::CreateAccount() 期货账户 = {} BrokerID = {} 期货密码 = {}", user->getUserID(), user->getBrokerID(), user->getPassword());
 
 		user->getUserTradeSPI()->Connect(user, this->system_init_flag); // 连接
 		sleep(1);
-		user->getUserTradeSPI()->Login(user); // 登陆
-		sleep(1);
-		user->getUserTradeSPI()->QrySettlementInfoConfirm(user); // 确认交易结算
-		sleep(1);
+
+
+		LoginCommand *command_login = new LoginCommand(user->getUserTradeSPI(), user, 0);
+		this->addCommand(command_login);
+
+		//user->getUserTradeSPI()->Login(user); // 登陆
+		//sleep(1);
+
+		QrySettlementInfoConfirmCommand *command_qrysettlementinfoconfirm = new QrySettlementInfoConfirmCommand(user->getUserTradeSPI(), user, 0);
+		this->addCommand(command_qrysettlementinfoconfirm);
+
+		//user->getUserTradeSPI()->QrySettlementInfoConfirm(user); // 确认交易结算
+		//sleep(1);
 		/// 设置初始化状态完成
 		user->setThread_Init_Status(true);
 
@@ -174,7 +189,7 @@ MdSpi * CTP_Manager::CreateMd(string md_frontAddress, string md_broker, string m
 		mdspi->setListStrategy(l_strategys); // 初始化策略给到位
 		mdspi->setCtpManager(this);
 	}
-	USER_PRINT(const_cast<char *>(conn_md_frontAddress.c_str()));
+	
 	mdspi->Connect(const_cast<char *>(conn_md_frontAddress.c_str())); // 连接
 	sleep(1);
 	mdspi->Login(const_cast<char *>(md_broker.c_str()), const_cast<char *>(md_user.c_str()), const_cast<char *>(md_pass.c_str())); // 登陆
@@ -221,7 +236,6 @@ void CTP_Manager::UnSubmarketData(MdSpi *mdspi, string instrumentID, list<string
 			this->l_unsubinstrument->push_back(instrumentID);
 			mdspi->UnSubMarket(this->l_unsubinstrument);
 		}
-		
 	}
 }
 
@@ -1177,6 +1191,14 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 			info_object.AddMember("strategy_id", rapidjson::StringRef((*stg_itor)->getStgStrategyId().c_str()), allocator3);
 			info_object.AddMember("position_b_buy", (*stg_itor)->getStgPositionBBuy(), allocator3);
 			info_object.AddMember("lots_batch", (*stg_itor)->getStgLotsBatch(), allocator3);
+
+			//Utils::printGreenColorWithKV("(*stg_itor)->getStgInstrumentAScale() = ", (*stg_itor)->getStgInstrumentAScale());
+			//Utils::printGreenColorWithKV("(*stg_itor)->getStgInstrumentBScale() = ", (*stg_itor)->getStgInstrumentBScale());
+
+			info_object.AddMember("instrument_a_scale", (*stg_itor)->getStgInstrumentAScale(), allocator3);
+			info_object.AddMember("instrument_b_scale", (*stg_itor)->getStgInstrumentBScale(), allocator3);
+
+
 			info_object.AddMember("position_a_buy", (*stg_itor)->getStgPositionABuy(), allocator3);
 			info_object.AddMember("sell_open", (*stg_itor)->getStgSellOpen(), allocator3);
 			info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator3);
@@ -1301,7 +1323,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 		build_doc3.Accept(writer3);
 		//rsp_msg = const_cast<char *>(buffer.GetString());
 		//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-		//std::cout << "\t服务端响应数据 = " << buffer3.GetString() << std::endl;
+		std::cout << "\t服务端响应数据 = " << buffer3.GetString() << std::endl;
 
 		if (write_msg(fd, const_cast<char *>(buffer3.GetString()), strlen(buffer3.GetString())) < 0) {
 			printf("\t客户端已断开!!!\n");
@@ -2053,6 +2075,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 1, buffer.GetString());
+
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t客户端已断开!!!\n");
 						//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -2097,6 +2121,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 1, buffer.GetString());
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t客户端已断开!!!\n");
@@ -2188,6 +2214,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+						ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 2, buffer.GetString());
+
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
 							//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -2229,6 +2257,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 2, buffer.GetString());
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -2314,6 +2344,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						info_object.AddMember("strategy_id", rapidjson::StringRef((*stg_itor)->getStgStrategyId().c_str()), allocator);
 						info_object.AddMember("position_b_buy", (*stg_itor)->getStgPositionBBuy(), allocator);
 						info_object.AddMember("lots_batch", (*stg_itor)->getStgLotsBatch(), allocator);
+
+						info_object.AddMember("instrument_a_scale", (*stg_itor)->getStgInstrumentAScale(), allocator);
+						info_object.AddMember("instrument_b_scale", (*stg_itor)->getStgInstrumentBScale(), allocator);
+
 						info_object.AddMember("position_a_buy", (*stg_itor)->getStgPositionABuy(), allocator);
 						info_object.AddMember("sell_open", (*stg_itor)->getStgSellOpen(), allocator);
 						info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator);
@@ -2322,6 +2356,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						info_object.AddMember("b_order_action_limit", (*stg_itor)->getStgBOrderActionTiresLimit(), allocator);
 						info_object.AddMember("sell_close", (*stg_itor)->getStgSellClose(), allocator);
 						info_object.AddMember("buy_open", (*stg_itor)->getStgBuyOpen(), allocator);
+						
 
 						/*开关字段*/
 						info_object.AddMember("only_close", (*stg_itor)->isStgOnlyClose(), allocator);
@@ -2400,6 +2435,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+						ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 3, buffer.GetString());
+
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
 							//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -2440,6 +2477,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 3, buffer.GetString());
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -2524,6 +2563,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+						ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 4, buffer.GetString());
+
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
 							//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -2563,6 +2604,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 4, buffer.GetString());
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -2629,7 +2672,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						for (stg_itor = ctp_m->getListStrategy()->begin(); stg_itor != ctp_m->getListStrategy()->end(); stg_itor++) {
 							
 							if (((*stg_itor)->getStgUserId() == q_user_id) && ((*stg_itor)->getStgStrategyId() == q_strategy_id)) {
-								Utils::printGreenColor("找到即将修改的Strategy");
+								//Utils::printGreenColor("找到即将修改的Strategy");
 								ctp_m->getXtsLogger()->info("找到即将修改的Strategy");
 								/* PyQt更新参数如下 */
 								(*stg_itor)->setStgUserId(object["user_id"].GetString());
@@ -2638,6 +2681,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								(*stg_itor)->setStgOrderAlgorithm(object["order_algorithm"].GetString());
 								(*stg_itor)->setStgLots(object["lots"].GetInt());
 								(*stg_itor)->setStgLotsBatch(object["lots_batch"].GetInt());
+
+								(*stg_itor)->setStgInstrumentAScale(object["instrument_a_scale"].GetInt());
+								(*stg_itor)->setStgInstrumentBScale(object["instrument_b_scale"].GetInt());
+
 								(*stg_itor)->setStgStopLoss(object["stop_loss"].GetDouble());
 								(*stg_itor)->setStgSpreadShift(object["spread_shift"].GetDouble());
 								(*stg_itor)->setStgALimitPriceShift(object["a_limit_price_shift"].GetInt());
@@ -2655,7 +2702,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								(*stg_itor)->setStgSellCloseOnOff(object["sell_close_on_off"].GetInt());
 								(*stg_itor)->setStgBuyOpenOnOff(object["buy_open_on_off"].GetInt());
 
-								Utils::printGreenColor("Strategy修改完成!");
+								//Utils::printGreenColor("Strategy修改完成!");
 								ctp_m->getXtsLogger()->info("Strategy修改完成!");
 
 								ctp_m->getDBManager()->UpdateStrategy((*stg_itor));
@@ -2670,6 +2717,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								create_info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator);
 								create_info_object.AddMember("lots", (*stg_itor)->getStgLots(), allocator);
 								create_info_object.AddMember("lots_batch", (*stg_itor)->getStgLotsBatch(), allocator);
+
+								create_info_object.AddMember("instrument_a_scale", (*stg_itor)->getStgInstrumentAScale(), allocator);
+								create_info_object.AddMember("instrument_b_scale", (*stg_itor)->getStgInstrumentBScale(), allocator);
+
 								create_info_object.AddMember("stop_loss", (*stg_itor)->getStgStopLoss(), allocator);
 								create_info_object.AddMember("on_off", (*stg_itor)->getOn_Off(), allocator);
 								create_info_object.AddMember("spread_shift", (*stg_itor)->getStgSpreadShift(), allocator);
@@ -2725,6 +2776,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+
+				ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 5, buffer.GetString());
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -2816,6 +2870,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								new_stg->setStgStrategyId(object["strategy_id"].GetString());
 								new_stg->setStgInstrumentIdA(object["a_instrument_id"].GetString());
 								new_stg->setStgInstrumentIdB(object["b_instrument_id"].GetString());
+								// 计算策略时间
+								new_stg->StgTimeCal();
+
 								new_stg->setStgTradingDay(ctp_m->getTradingDay());
 								// 最新修改时间
 								new_stg->setStgUpdatePositionDetailRecordTime(Utils::getDate());
@@ -2864,6 +2921,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 								create_info_object.AddMember("strategy_id", rapidjson::StringRef(new_stg->getStgStrategyId().c_str()), allocator);
 								create_info_object.AddMember("position_b_buy", new_stg->getStgPositionBBuy(), allocator);
 								create_info_object.AddMember("lots_batch", new_stg->getStgLotsBatch(), allocator);
+
+								create_info_object.AddMember("instrument_a_scale", new_stg->getStgInstrumentAScale(), allocator);
+								create_info_object.AddMember("instrument_b_scale", new_stg->getStgInstrumentBScale(), allocator);
+
 								create_info_object.AddMember("position_a_buy", new_stg->getStgPositionABuy(), allocator);
 								create_info_object.AddMember("sell_open", new_stg->getStgSellOpen(), allocator);
 								create_info_object.AddMember("order_algorithm", rapidjson::StringRef(new_stg->getStgOrderAlgorithm().c_str()), allocator);
@@ -2949,6 +3010,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+
+				ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 6, buffer.GetString());
+
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
 					//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -3002,27 +3066,25 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//std::cout << "收到要删除的策略ID = " << s_StrategyID << std::endl;
 				ctp_m->getXtsLogger()->info("\t收到要删除的策略ID = {}", s_StrategyID);
 
-				
-
 				/*1:进行策略的删除,更新到数据库*/
 				list<Strategy *>::iterator stg_itor;
 				for (stg_itor = ctp_m->getListStrategy()->begin(); stg_itor != ctp_m->getListStrategy()->end();) {
 
 					if (((*stg_itor)->getStgUserId() == s_UserID) && ((*stg_itor)->getStgStrategyId() == s_StrategyID)) {
 						//std::cout << "\t找到即将删除的Strategy" << std::endl;
-						Utils::printGreenColor("找到即将删除的Strategy");
+						//Utils::printGreenColor("找到即将删除的Strategy");
 						ctp_m->getXtsLogger()->info("找到即将删除的Strategy");
 						int flag = ctp_m->getDBManager()->DeleteStrategy((*stg_itor));
 						int flag_1 = ctp_m->getDBManager()->DeleteStrategyYesterday((*stg_itor));
 
 						if (flag) {
-							Utils::printRedColor("Strategy数据库删除失败!");
+							//Utils::printRedColor("Strategy数据库删除失败!");
 							ctp_m->getXtsLogger()->info("Strategy数据库删除失败!");
 							build_doc.AddMember("MsgResult", 1, allocator);
 							build_doc.AddMember("MsgErrorReason", "未找到删除的策略!", allocator);
 						}
 						else {
-							Utils::printGreenColor("Strategy数据库删除成功!");
+							//Utils::printGreenColor("Strategy数据库删除成功!");
 							ctp_m->getXtsLogger()->info("Strategy数据库删除成功!");
 							build_doc.AddMember("MsgResult", 0, allocator);
 							build_doc.AddMember("MsgErrorReason", "", allocator);
@@ -3080,7 +3142,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.Accept(writer);
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
-				std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+				ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 7, buffer.GetString());
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -3152,6 +3215,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+				ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 8, buffer.GetString());
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -3227,6 +3292,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+				ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 9, buffer.GetString());
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -3366,6 +3433,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+
+						ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 10, buffer.GetString());
+
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
 							//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -3406,6 +3476,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 10, buffer.GetString());
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -3483,6 +3555,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+						ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 11, buffer.GetString());
+
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
 							//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -3521,6 +3595,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 11, buffer.GetString());
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -3598,7 +3674,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 							for (stg_itor = ctp_m->getListStrategy()->begin(); stg_itor != ctp_m->getListStrategy()->end(); stg_itor++) {
 								if (((*stg_itor)->getStgUserId() == q_user_id) && ((*stg_itor)->getStgStrategyId() == q_strategy_id)) {
 									//std::cout << "\t找到即将修改的Strategy" << std::endl;
-									Utils::printGreenColor("找到即将修改的Strategy");
+									//Utils::printGreenColor("找到即将修改的Strategy");
 									ctp_m->getXtsLogger()->info("找到即将修改的Strategy");
 									isFindStrategy = true;
 									USER_PRINT("判断修改持仓...");
@@ -3978,6 +4054,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+				ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 12, buffer.GetString());
+
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
 					//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -4077,6 +4155,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+				
+				ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 13, buffer.GetString());
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -4166,6 +4246,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+				ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 14, buffer.GetString());
+
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -4279,6 +4362,9 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+						ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 15, buffer.GetString());
+
+
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
 							//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -4322,6 +4408,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 15, buffer.GetString());
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -4507,6 +4595,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+						ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 17, buffer.GetString());
+
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
 							//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -4548,6 +4638,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 17, buffer.GetString());
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -4674,6 +4766,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+						ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 20, buffer.GetString());
+
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
 							//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -4716,6 +4810,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 20, buffer.GetString());
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -4827,6 +4923,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+						ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 21, buffer.GetString());
+
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
 							//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -4869,6 +4967,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 					//rsp_msg = const_cast<char *>(buffer.GetString());
 					//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 					//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+					ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 21, buffer.GetString());
 
 					if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 						printf("\t先前客户端已断开!!!\n");
@@ -4959,6 +5059,10 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						info_object.AddMember("strategy_id", rapidjson::StringRef((*stg_itor)->getStgStrategyId().c_str()), allocator);
 						info_object.AddMember("position_b_buy", (*stg_itor)->getStgPositionBBuy(), allocator);
 						info_object.AddMember("lots_batch", (*stg_itor)->getStgLotsBatch(), allocator);
+
+						info_object.AddMember("instrument_a_scale", (*stg_itor)->getStgInstrumentAScale(), allocator);
+						info_object.AddMember("instrument_b_scale", (*stg_itor)->getStgInstrumentBScale(), allocator);
+
 						info_object.AddMember("position_a_buy", (*stg_itor)->getStgPositionABuy(), allocator);
 						info_object.AddMember("sell_open", (*stg_itor)->getStgSellOpen(), allocator);
 						info_object.AddMember("order_algorithm", rapidjson::StringRef((*stg_itor)->getStgOrderAlgorithm().c_str()), allocator);
@@ -5039,6 +5143,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 						//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
 
+						ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 22, buffer.GetString());
+
 						if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 							printf("\t先前客户端已断开!!!\n");
 							//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
@@ -5060,8 +5166,58 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 
 			}
+			else if (msgtype == 23) { // 心跳包处理
+				//std::cout << "\t请求查询策略信息..." << std::endl;
+				ctp_m->getXtsLogger()->info("\t心跳包处理...");
+
+#if 0
+				rapidjson::Value &MsgSendFlag = doc["MsgSendFlag"];
+				rapidjson::Value &TraderID = doc["TraderID"];
+				rapidjson::Value &MsgRef = doc["MsgRef"];
+				rapidjson::Value &MsgSrc = doc["MsgSrc"];
+
+				string s_TraderID = TraderID.GetString();
+				int i_MsgRef = MsgRef.GetInt();
+				int i_MsgSendFlag = MsgSendFlag.GetInt();
+				int i_MsgSrc = MsgSrc.GetInt();
+
+				/*std::cout << "\t收到交易员ID = " << s_TraderID << std::endl;
+				std::cout << "\t收到期货账户ID = " << s_UserID << std::endl;*/
+				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
+
+				//list<Strategy *> l_strategys;
+				//ctp_m->getDBManager()->getAllStrategy(&l_strategys, s_TraderID, s_UserID);
+				//ctp_m->getDBManager()->getAllStrategyByActiveUser(&l_strategys, ctp_m->getL_User(), s_TraderID);
+
+				/*构建StrategyInfo的Json*/
+				build_doc.SetObject();
+				rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
+				build_doc.AddMember("MsgRef", server_msg_ref++, allocator);
+				build_doc.AddMember("MsgSendFlag", MSG_SEND_FLAG, allocator);
+				build_doc.AddMember("MsgType", 23, allocator);
+				build_doc.AddMember("TraderID", rapidjson::StringRef(s_TraderID.c_str()), allocator);
+				build_doc.AddMember("MsgResult", 0, allocator);
+				build_doc.AddMember("MsgErrorReason", "", allocator);
+				build_doc.AddMember("MsgSrc", 0, allocator);
+				build_doc.AddMember("IsLast", 1, allocator);
+
+				build_doc.Accept(writer);
+
+				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
+					printf("\t先前客户端已断开!!!\n");
+					//printf("errorno = %d, 先前客户端已断开!!!\n", errno);
+					if (errno == EPIPE) {
+						std::cout << "\tEPIPE信号" << std::endl;
+						//break;
+					}
+
+					perror("\tprotocal error\n");
+				}
+
+#endif
+			}
 			else {
-				std::cout << "请求类型错误!" << endl;
+				Utils::printRedColor("请求类型错误!");
 				/*构建StrategyInfo的Json*/
 				build_doc.SetObject();
 				rapidjson::Document::AllocatorType& allocator = build_doc.GetAllocator();
@@ -5076,11 +5232,12 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				build_doc.AddMember("MsgSrc", 0, allocator);
 				build_doc.AddMember("IsLast", 1, allocator);
 
-
 				build_doc.Accept(writer);
 				//rsp_msg = const_cast<char *>(buffer.GetString());
 				//std::cout << "yyyyyyyyyyyyyyyyyyyyyyy" << std::endl;
 				//std::cout << "\t服务端响应数据 = " << buffer.GetString() << std::endl;
+
+				ctp_m->getXtsLogger()->info("msgtype = {} 服务端响应数据 = {}", 99, buffer.GetString());
 
 				if (write_msg(fd, const_cast<char *>(buffer.GetString()), strlen(buffer.GetString())) < 0) {
 					printf("\t先前客户端已断开!!!\n");
@@ -5555,8 +5712,8 @@ void CTP_Manager::delSocketFD(string user_id, int fd) {
 
 /// 发送行情断线通知
 void CTP_Manager::sendMarketOffLineMessage(int on_off_status) {
-	Utils::printRedColor("CTP_Manager::sendMarketOffLineMessage() 服务端发送发送行情断线通知");
-	this->getXtsLogger()->info("服务端发送发送行情断线通知");
+	Utils::printRedColor("CTP_Manager::sendMarketOffLineMessage() 服务端发送发送行情通知");
+	this->getXtsLogger()->info("服务端发送发送行情通知");
 
 	/************************************************************************/
 	/*发送行情断线通知     msgtype == 18                                                       */
@@ -5609,8 +5766,8 @@ void CTP_Manager::sendMarketOffLineMessage(int on_off_status) {
 
 /// 发送交易断线通知
 void CTP_Manager::sendTradeOffLineMessage(string user_id, int on_off_status) {
-	Utils::printRedColor("CTP_Manager::sendTradeOffLineMessage() 服务端发送发送行情断线通知");
-	this->getXtsLogger()->info("服务端发送发送交易断线通知");
+	Utils::printRedColor("CTP_Manager::sendTradeOffLineMessage() 服务端发送发送交易通知");
+	this->getXtsLogger()->info("服务端发送发送交易通知");
 	/************************************************************************/
 	/*发送交易断线通知     msgtype == 19                                       */
 	/************************************************************************/
@@ -5819,6 +5976,92 @@ sem_t * CTP_Manager::getSem_strategy_handler() {
 	return &(this->sem_strategy_handler);
 }
 
+bool CTP_Manager::getIsClosingSaved() {
+	return this->isClosingSaved;
+}
+
+void CTP_Manager::setIsClosingSaved(bool isClosingSaved) {
+	this->isClosingSaved = isClosingSaved;
+}
+
+void CTP_Manager::thread_queue_Command() {
+	while (1)
+	{
+		ApiCommand *command = NULL;
+		command = this->queue_Command.dequeue();
+		if (command == NULL)
+		{
+			continue;
+		}
+
+		// 命令执行结果
+		int result = command->execute();
+
+		this->getXtsLogger()->info("CTP_Manager::thread_queue_Command() result = {}", result);
+
+		if (result == 0) {
+			//result为0意味着发送指令成功
+			
+		}
+		else if (result == -1)
+		{
+			Utils::printRedColor("CTP_Manager::thread_queue_Command() 网络连接失败");
+			this->getXtsLogger()->info("CTP_Manager::thread_queue_Command() 网络连接失败");
+
+			/// 设置断线
+			list<User *>::iterator user_itor;
+			for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
+				// 设置断线
+				(*user_itor)->setIsEverLostConnection(true);
+			}
+
+			// 保存最后策略参数,更新运行状态正常收盘
+			this->saveAllStrategyPositionDetail();
+		}
+		else if (result == -2)
+		{
+			Utils::printRedColor("CTP_Manager::thread_queue_Command() 未处理请求超过许可数");
+			this->getXtsLogger()->info("CTP_Manager::thread_queue_Command() 未处理请求超过许可数");
+		}
+		else if (result == -3)
+		{
+			Utils::printRedColor("CTP_Manager::thread_queue_Command() 每秒发送请求数超过许可数");
+			this->getXtsLogger()->info("CTP_Manager::thread_queue_Command() 每秒发送请求数超过许可数");
+		}
+		
+
+		/************************************************************************/
+		/* 命令类型：
+		0：查询
+		1：交易*/
+		/************************************************************************/
+
+		// 不是初始化状态
+		if (this->last_command_type != -1)
+		{
+			// 上一次是查询类
+			if (this->last_command_type == 0)
+			{
+				if (this->last_command_type != command->getCommandType()) // 说明本次不是查询类
+				{
+
+				}
+				else if (this->last_command_type == command->getCommandType()) // 本次依然是查询类
+				{
+					sleep(1);
+				}
+			}
+		}
+
+		// 更新最后一次命令类型
+		this->last_command_type = command->getCommandType();
+	}
+}
+
+void CTP_Manager::addCommand(ApiCommand *command) {
+	this->queue_Command.enqueue(command);
+}
+
 
 ///// 初始化昨仓明细
 //bool CTP_Manager::initYesterdayPositionDetail() {
@@ -5996,7 +6239,7 @@ bool CTP_Manager::init(bool is_online) {
 
 	/// 查询昨仓策略
 	//this->dbm->getAllStrategyYesterday(this->l_strategys_yesterday);
-	this->dbm->getAllStrategyYesterdayByActiveUser(this->l_strategys_yesterday, this->l_user);
+	//this->dbm->getAllStrategyYesterdayByActiveUser(this->l_strategys_yesterday, this->l_user);
 	
 	//std::cout << "\t初始化策略完成..." << std::endl;
 	this->getXtsLogger()->info("\t初始化策略完成...");

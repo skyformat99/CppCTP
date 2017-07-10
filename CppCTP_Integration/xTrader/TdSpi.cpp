@@ -4,13 +4,12 @@
 #include <thread>
 #include <mutex>              // std::mutex, std::unique_lock
 #include <condition_variable> // std::condition_variable, std::cv_status
-
-
 #include "TdSpi.h"
 #include "Utils.h"
 #include "User.h"
 #include "Debug.h"
 #include "Session.h"
+#include "LoginCommand.h"
 
 //转码数组
 char codeDst[255];
@@ -117,8 +116,8 @@ void TdSpi::Connect(User *user, bool init_flag) {
 	//等待回调
 	std::unique_lock<std::mutex> lck(mtx);
 	while (cv.wait_for(lck, std::chrono::seconds(RSP_TIMEOUT)) == std::cv_status::timeout) {
-		std::cout << "TdSpi::Connect()" << std::endl;
-		std::cout << "\t连接等待超时" << std::endl;
+		Utils::printRedColor("TdSpi::Connect() 连接等待超时");
+		this->current_user->getXtsLogger()->info("TdSpi::Connect() 连接等待超时");
 		user->setIsConnected(false);
 		return;
 	}
@@ -142,7 +141,17 @@ void TdSpi::OnFrontConnected() {
 	{
 		Utils::printRedColor("TdSpi::OnFrontConnected() 断线重连...");
 		this->current_user->getXtsLogger()->info("TdSpi::OnFrontConnected() 断线重连...");
-		this->Login(this->current_user);
+
+		// 更新下单锁，任务锁
+		list<Strategy *>::iterator stg_itor;
+		for (stg_itor = this->ctp_m->getListStrategy()->begin(); stg_itor != this->ctp_m->getListStrategy()->end(); stg_itor++) { // 遍历Strategy
+			(*stg_itor)->update_task_status();
+		}
+
+		LoginCommand *command_login = new LoginCommand(this, current_user, 0);
+		this->ctp_m->addCommand(command_login);
+
+		//this->Login(this->current_user);
 	}
 	else { // 第一次登陆系统
 		cv.notify_one();
@@ -161,14 +170,16 @@ void TdSpi::OnFrontDisconnected(int nReason) {
 	if (this->current_user && this->ctp_m) {
 		Utils::printRedColor("TdSpi::OnFrontDisconnected() 断线!");
 		this->ctp_m->sendTradeOffLineMessage(this->current_user->getUserID(), 1);
+		// 保存最后策略参数,更新运行状态正常收盘
+		this->ctp_m->saveAllStrategyPositionDetail();
+		this->current_user->setIsEverLostConnection(true);
 		this->current_user->getXtsLogger()->info("TdSpi::OnFrontDisconnected() 断线原因 = {}", nReason);
 		this->current_user->getXtsLogger()->flush();
-		
 	}
 }
 
 //登录
-void TdSpi::Login(User *user) {
+int TdSpi::Login(User *user) {
 	USER_PRINT("TdSpi::Login");
 	this->current_user = user;
 
@@ -185,7 +196,7 @@ void TdSpi::Login(User *user) {
 	strcpy(loginField->UserID, user->getUserID().c_str());
 	strcpy(loginField->Password, user->getPassword().c_str());
 
-	this->tdapi->ReqUserLogin(loginField, user->getRequestID());
+	int rsp_num = this->tdapi->ReqUserLogin(loginField, user->getRequestID());
 
 	/*int ret = this->controlTimeOut(&login_sem);
 
@@ -197,7 +208,7 @@ void TdSpi::Login(User *user) {
 	std::unique_lock<std::mutex> lck(mtx);
 	while (cv.wait_for(lck, std::chrono::seconds(RSP_TIMEOUT)) == std::cv_status::timeout) {
 
-		this->current_user->getXtsLogger()->info("TdSpi::Connect() 登陆等待超时");
+		this->current_user->getXtsLogger()->info("TdSpi::Login() 登陆等待超时");
 
 		user->setIsLogged(false);
 
@@ -206,13 +217,13 @@ void TdSpi::Login(User *user) {
 
 	delete loginField;
 	loginField = NULL;
+
+	return rsp_num;
 }
 
 ///登录请求响应
 void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
-                           CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
-	USER_PRINT("TdSpi::OnRspUserLogin");
-	USER_PRINT(bIsLast);
+                           CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	std::cout << "TdSpi::OnRspUserLogin()" << std::endl;
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		//sem_post(&login_sem);
@@ -275,6 +286,8 @@ void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 		//std::cout << "TdSpi::OnRspUserLogin()" << std::endl;
 		this->current_user->getXtsLogger()->info("TdSpi::OnRspUserLogin() 登陆出错!");
 		this->current_user->setIsLoggedError(true);
+		//释放
+		cv.notify_one();
 		return;
 	}
 	//释放
@@ -282,24 +295,21 @@ void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 }
 
 //查询交易结算确认
-void TdSpi::QrySettlementInfoConfirm(User *user) {
-	USER_PRINT("TdSpi::QrySettlementInfoConfirm")
+int TdSpi::QrySettlementInfoConfirm(User *user) {
 
-	CThostFtdcQrySettlementInfoConfirmField *qrySettlementField = new CThostFtdcQrySettlementInfoConfirmField();
+	CThostFtdcQrySettlementInfoConfirmField qrySettlementField;
 
-	strcpy(qrySettlementField->BrokerID, user->getBrokerID().c_str());
-	strcpy(qrySettlementField->InvestorID, user->getUserID().c_str());
+	strcpy(qrySettlementField.BrokerID, user->getBrokerID().c_str());
+	strcpy(qrySettlementField.InvestorID, user->getUserID().c_str());
 
 	sleep(1);
-	this->tdapi->ReqQrySettlementInfoConfirm(qrySettlementField, user->getRequestID());
+	int request_error = this->tdapi->ReqQrySettlementInfoConfirm(&qrySettlementField, user->getRequestID());
 
 	/*int ret = this->controlTimeOut(&sem_ReqQrySettlementInfoConfirm);
 	if (ret == -1) {
 	USER_PRINT("TdSpi::QrySettlementInfoConfirm TimeOut!")
 	}*/
-
-	delete qrySettlementField;
-	qrySettlementField = NULL;
+	return request_error;
 }
 
 
@@ -310,10 +320,8 @@ void TdSpi::OnRspQrySettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *
 		if (this->current_user->getRequestID() == nRequestID) {
 			//sem_post(&sem_ReqQrySettlementInfoConfirm);
 			if ((!pSettlementInfoConfirm)) { //如果未确认过，pSettlementInfoConfirm为空
-				USER_PRINT("pSettlementInfoConfirm is null");
-				USER_PRINT(this->isConfirmSettlement);
 				if (this->isConfirmSettlement) {
-					USER_PRINT("Already Confirm!");
+					Utils::printGreenColor("TdSpi::OnRspQrySettlementInfoConfirm() 结算信息为空,但今天已经确认过结算!");
 					std::cout << "\t|==确认结算信息==|" << endl;
 					std::cout << "\t|经纪公司" << this->current_user->getBrokerID() << "|" << endl;
 					std::cout << "\t|结算客户" << this->current_user->getUserID() << "|" << endl;
@@ -325,7 +333,7 @@ void TdSpi::OnRspQrySettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *
 					this->QrySettlementInfo(this->current_user);
 				}
 			} else {
-				USER_PRINT("今天已经确认结算!");
+				Utils::printGreenColor("TdSpi::OnRspQrySettlementInfoConfirm() 结算信息不为空,今天已经确认过结算!");
 				std::cout << "\t|==确认结算信息==|" << endl;
 				std::cout << "\t|经纪公司代码" << pSettlementInfoConfirm->BrokerID << "|" << endl;
 				std::cout << "\t|投资者代码" << pSettlementInfoConfirm->InvestorID << "|" << endl;
@@ -342,22 +350,19 @@ void TdSpi::OnRspQrySettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *
 
 //查询结算信息
 void TdSpi::QrySettlementInfo(User *user) {
+	CThostFtdcQrySettlementInfoField pQrySettlementInfo;
 
-	CThostFtdcQrySettlementInfoField *pQrySettlementInfo = new CThostFtdcQrySettlementInfoField();
-	strcpy(pQrySettlementInfo->BrokerID, user->getBrokerID().c_str());
-	strcpy(pQrySettlementInfo->InvestorID, user->getUserID().c_str());
-	strcpy(pQrySettlementInfo->TradingDay, "");
+	strcpy(pQrySettlementInfo.BrokerID, user->getBrokerID().c_str());
+	strcpy(pQrySettlementInfo.InvestorID, user->getUserID().c_str());
 
+	strcpy(pQrySettlementInfo.TradingDay, "");
 	sleep(1);
-	this->tdapi->ReqQrySettlementInfo(pQrySettlementInfo, user->getRequestID());
+	this->tdapi->ReqQrySettlementInfo(&pQrySettlementInfo, user->getRequestID());
 
 	/*int ret = this->controlTimeOut(&sem_ReqQrySettlementInfo);
 	if (ret == -1) {
 		USER_PRINT("TdSpi::QrySettlementInfo TimeOut!")
 	}*/
-
-	delete pQrySettlementInfo;
-	pQrySettlementInfo = NULL;
 }
 
 //请求查询投资者结算结果响应
@@ -394,21 +399,18 @@ void TdSpi::OnRspQrySettlementInfo(CThostFtdcSettlementInfoField *pSettlementInf
 //确认结算结果
 void TdSpi::ConfirmSettlementInfo(User *user) {
 
-	CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm = new CThostFtdcSettlementInfoConfirmField();
-	strcpy(pSettlementInfoConfirm->BrokerID, user->getBrokerID().c_str());
-	strcpy(pSettlementInfoConfirm->InvestorID, user->getUserID().c_str());
-	strcpy(pSettlementInfoConfirm->ConfirmDate, this->tdapi->GetTradingDay());
+	CThostFtdcSettlementInfoConfirmField pSettlementInfoConfirm;
+	strcpy(pSettlementInfoConfirm.BrokerID, user->getBrokerID().c_str());
+	strcpy(pSettlementInfoConfirm.InvestorID, user->getUserID().c_str());
+	strcpy(pSettlementInfoConfirm.ConfirmDate, this->tdapi->GetTradingDay());
 
 	sleep(1);
-	this->tdapi->ReqSettlementInfoConfirm(pSettlementInfoConfirm, user->getRequestID());
+	this->tdapi->ReqSettlementInfoConfirm(&pSettlementInfoConfirm, user->getRequestID());
 
 	/*int ret = this->controlTimeOut(&sem_ReqSettlementInfoConfirm);
 	if (ret == -1) {
 		USER_PRINT("TdSpi::ConfirmSettlementInfo")
 	}*/
-
-	delete pSettlementInfoConfirm;
-	pSettlementInfoConfirm = NULL;
 }
 
 //投资者结算结果确认响应
@@ -432,11 +434,9 @@ void TdSpi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSe
 				string today = this->tdapi->GetTradingDay();
 				string confirm_date = pSettlementInfoConfirm->ConfirmDate;
 				if (today == confirm_date) {
-					USER_PRINT("today_date == confirm_date");
 					this->setIsConfirmSettlement(true);
 				}
 				else {
-					USER_PRINT("today_date != confirm_date");
 					this->setIsConfirmSettlement(false);
 					this->current_user->setIsConfirmSettlement(false);
 				}
@@ -793,7 +793,7 @@ void TdSpi::CopyInstrumentInfo(CThostFtdcInstrumentField *dst, CThostFtdcInstrum
 }
 
 ///合约交易状态通知
-void TdSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus) {
+ void TdSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus) {
 	//USER_PRINT("TdSpi::OnRtnInstrumentStatus");
 	if (pInstrumentStatus) {
 		/*///交易所代码
@@ -813,7 +813,7 @@ void TdSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentSt
 		///进入本状态原因
 		std::cout << "进入本状态原因 = " << pInstrumentStatus->EnterReason << endl;*/
 
-		this->current_user->getXtsLogger()->info("|交易所代码 = {} 合约在交易所的代码 = {} 结算组代码 = {} 合约代码 = {} 合约交易状态 = {} 交易阶段编号 = {} 进入本状态时间 = {} 进入本状态原因 = {}", 
+		this->current_user->getXtsLogger()->info("TdSpi::OnRtnInstrumentStatus() 交易所代码 = {} 合约在交易所的代码 = {} 结算组代码 = {} 合约代码 = {} 合约交易状态 = {} 交易阶段编号 = {} 进入本状态时间 = {} 进入本状态原因 = {}", 
 			pInstrumentStatus->ExchangeID, pInstrumentStatus->ExchangeInstID, pInstrumentStatus->SettlementGroupID, pInstrumentStatus->InstrumentID, 
 			pInstrumentStatus->InstrumentStatus, pInstrumentStatus->TradingSegmentSN, pInstrumentStatus->EnterTime, pInstrumentStatus->EnterReason);
 
@@ -1865,7 +1865,7 @@ void TdSpi::OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *
 }
 
 //下单
-void TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
+int TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder, Strategy *stg) {
 
 	int request_error = 0;
 
@@ -1988,23 +1988,39 @@ void TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
 
 	request_error = this->tdapi->ReqOrderInsert(pInputOrder, 1);
 
+	this->current_user->getXtsLogger()->info("TdSpi::OrderInsert() request_error = {}", request_error);
+
 	/*-1，表示网络连接失败；
 	-2，表示未处理请求超过许可数；
 	-3，表示每秒发送请求数超过许可数*/
-
-	if (request_error == -1)
+	if (request_error == 0)
+	{
+		// 报单编号不相等,说明有新报单
+		if (strcmp(pInputOrder->OrderRef, user->getCurrentOrderRef().c_str()))
+		{
+			user->setCurrentOrderRef(pInputOrder->OrderRef);
+		}
+		//// 发送成功记录最后一次order_ref
+		//user->setLastOrderRef(pInputOrder->OrderRef);
+		
+	}
+	else if (request_error == -1)
 	{
 		Utils::printRedColor("TdSpi::OrderInsert() 网络连接失败");
-		// 保存最后策略参数,更新运行状态正常收盘
-		this->ctp_m->saveAllStrategyPositionDetail();
+		stg->setStgTradeTasking(false);
+		stg->setStgSelectOrderAlgorithmFlag("TdSpi::OrderInsert() 网络连接失败", false);
+		user->setIsEverLostConnection(true);
+		this->current_user->getXtsLogger()->info("TdSpi::OrderInsert() 网络连接失败");
 	}
 	else if (request_error == -2)
 	{
 		Utils::printRedColor("TdSpi::OrderInsert() 未处理请求超过许可数");
+		this->current_user->getXtsLogger()->info("TdSpi::OrderInsert() 未处理请求超过许可数");
 	}
 	else if (request_error == -3)
 	{
 		Utils::printRedColor("TdSpi::OrderInsert() 每秒发送请求数超过许可数");
+		this->current_user->getXtsLogger()->info("TdSpi::OrderInsert() 每秒发送请求数超过许可数");
 	}
 
 	//this->current_user->DB_OrderInsert(this->current_user->GetOrderConn(), pInputOrder);
@@ -2013,10 +2029,10 @@ void TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder) {
 	//user->DB_OrderInsert(user->GetOrderConn(), pInputOrder);
 
 	string orderref = string(pInputOrder->OrderRef);
-	USER_PRINT(pInputOrder->OrderRef);
-	USER_PRINT(orderref);
 	// 更新报单引用基准
 	user->DB_UpdateOrderRef(orderref.substr(0, 10));
+
+	return request_error;
 }
 
 ///报单录入请求响应
@@ -2122,6 +2138,9 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 		//	USER_PRINT((*sid_itor)->getSessionID());
 		//	if (pOrder->SessionID == (*sid_itor)->getSessionID()) {
 		
+
+		
+
 		//std::cout << "=================================================================================" << endl;
 		//经纪公司代码
 		//std::cout << "\t*经纪公司代码:" << pOrder->BrokerID << ", ";
@@ -2262,6 +2281,40 @@ void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
 
 			//this->current_user->DB_OnRtnOrder(this->current_user->getCTP_Manager()->getDBManager()->getConn(), pOrder);
 
+			this->current_user->getXtsLogger()->info("TdSpi::OnRtnOrder() 合约代码 = {} 报单引用 = {} 用户代码 = {} 交易所代码 = {} 组合开平标志 = {} 报单状态 = {}",
+				pOrder->InstrumentID, pOrder->OrderRef, pOrder->UserID, pOrder->ExchangeID, pOrder->CombOffsetFlag, pOrder->OrderStatus);
+
+			// 断线情况自恢复逻辑
+			if (this->current_user->getIsEverLostConnection())
+			{
+				this->current_user->getXtsLogger()->info("TdSpi::OnRtnOrder() pOrder->OrderRef = {} LastOrderRef = {}", pOrder->OrderRef, this->current_user->getLastOrderRef());
+				// 对比最后一次order_ref
+				if (!strcmp(pOrder->OrderRef, this->current_user->getLastOrderRef().c_str()))
+				{
+					this->current_user->autoIncrementLastOrderRefCalTmp();
+					
+					this->current_user->getXtsLogger()->info("TdSpi::OnRtnOrder() getLastOrderRefCalTmp = {} getLastOrderRefCal = {}", this->current_user->getLastOrderRefCalTmp(), this->current_user->getLastOrderRefCal());
+					
+					if (this->current_user->getLastOrderRefCalTmp() == this->current_user->getLastOrderRefCal())
+					{
+						this->current_user->setIsEverLostConnection(false);
+						// 重新归0
+						this->current_user->resetLastOrderRefCalTmp();
+					}
+				}
+			}
+			else {
+				// 对比最后一次order_ref，不相等归1，并且赋值相等进行计数统计
+				if (!strcmp(pOrder->OrderRef, this->current_user->getLastOrderRef().c_str()))
+				{
+					this->current_user->autoIncrementLastOrderRefCal();
+				}
+				else {
+					this->current_user->setLastOrderRef(pOrder->OrderRef);
+					this->current_user->resetLastOrderRefCal();
+				}
+			}
+
 			//delete[] codeDst;
 			strategyid = temp.substr(len_order_ref - 2, 2);
 			//std::cout << "\t回报策略编号 = " << strategyid << std::endl;
@@ -2292,6 +2345,11 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 	USER_PRINT("TdSpi::OnRtnTrade");
 	//std::cout << "TdSpi::OnRtnTrade()" << std::endl;
 	if (pTrade) {
+
+		this->current_user->getXtsLogger()->info("TdSpi::OnRtnTrade() 合约代码 = {} 报单引用 = {} 用户代码 = {} 交易所代码 = {} 报单编号 = {} 开平标志 = {}",
+			pTrade->InstrumentID, pTrade->OrderRef, pTrade->UserID, pTrade->ExchangeID, pTrade->OrderSysID, pTrade->OffsetFlag);
+
+
 		//std::cout << "===========================TdSpi::OnRtnTrade()===================================" << std::endl;
 		/////经纪公司代码
 		//cout << "\t*经纪公司代码:" << pTrade->BrokerID << ", ";
@@ -2427,7 +2485,7 @@ void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFt
 }
 
 //撤单
-void TdSpi::OrderAction(char *ExchangeID, char *OrderRef, char *OrderSysID) {
+int TdSpi::OrderAction(char *ExchangeID, char *OrderRef, char *OrderSysID) {
 
 	int request_error = 0;
 
@@ -2461,6 +2519,7 @@ void TdSpi::OrderAction(char *ExchangeID, char *OrderRef, char *OrderSysID) {
 		Utils::printRedColor("TdSpi::OrderInsert() 每秒发送请求数超过许可数");
 	}
 
+	return request_error;
 	//this->current_user->DB_OrderAction(this->current_user->getCTP_Manager()->getDBManager()->getConn(), &pOrderAction);
 }
 

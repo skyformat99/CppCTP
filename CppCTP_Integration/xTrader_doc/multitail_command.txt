@@ -1,0 +1,14 @@
+multitail -ci green xts_log_ctpmanager.txt_2017-05-24_08-42 -ci yellow -I xts_log_user_058176.txt_2017-05-24_08-42 -ci cyan  -I xts_log_user_083850.txt_2017-05-24_08-42 -ci white -I xts_log_user_083851.txt_2017-05-24_08-42 
+
+multitail -ci green xts_log_ctpmanager.txt_2017-05-24_08-42 -ci yellow -I xts_log_user_058176.txt_2017-05-24_08-42 -ci cyan  -I xts_log_user_083850.txt_2017-05-24_08-42 -ci white -I xts_log_user_083851.txt_2017-05-24_08-42 
+
+multitail -ci green xts_log_ctpmanager.txt_2017-05-24_12-56 -ci red -I xts_log_db.txt_2017-05-24_12-56 -ci cyan -I xts_log_user_083850.txt_2017-05-24_12-56 -ci white -I xts_log_user_083851.txt_2017-05-24_12-56 -ci yellow -I xts_log_user_058176.txt_2017-05-24_12-56 -ci magenta -I xts_log_user_091919.txt_2017-05-24_12-56 
+
+black
+blue
+green
+yellow
+cyan
+white
+magenta
+red

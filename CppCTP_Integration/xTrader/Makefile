@@ -138,6 +138,30 @@ Algorithm.cpp.s:
 	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Algorithm.cpp.s
 .PHONY : Algorithm.cpp.s
 
+ApiCommand.o: ApiCommand.cpp.o
+.PHONY : ApiCommand.o
+
+# target to build an object file
+ApiCommand.cpp.o:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/ApiCommand.cpp.o
+.PHONY : ApiCommand.cpp.o
+
+ApiCommand.i: ApiCommand.cpp.i
+.PHONY : ApiCommand.i
+
+# target to preprocess a source file
+ApiCommand.cpp.i:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/ApiCommand.cpp.i
+.PHONY : ApiCommand.cpp.i
+
+ApiCommand.s: ApiCommand.cpp.s
+.PHONY : ApiCommand.s
+
+# target to generate assembly for a file
+ApiCommand.cpp.s:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/ApiCommand.cpp.s
+.PHONY : ApiCommand.cpp.s
+
 CTP_Manager.o: CTP_Manager.cpp.o
 .PHONY : CTP_Manager.o
 
@@ -209,6 +233,30 @@ FutureAccount.s: FutureAccount.cpp.s
 FutureAccount.cpp.s:
 	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/FutureAccount.cpp.s
 .PHONY : FutureAccount.cpp.s
+
+LoginCommand.o: LoginCommand.cpp.o
+.PHONY : LoginCommand.o
+
+# target to build an object file
+LoginCommand.cpp.o:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/LoginCommand.cpp.o
+.PHONY : LoginCommand.cpp.o
+
+LoginCommand.i: LoginCommand.cpp.i
+.PHONY : LoginCommand.i
+
+# target to preprocess a source file
+LoginCommand.cpp.i:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/LoginCommand.cpp.i
+.PHONY : LoginCommand.cpp.i
+
+LoginCommand.s: LoginCommand.cpp.s
+.PHONY : LoginCommand.s
+
+# target to generate assembly for a file
+LoginCommand.cpp.s:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/LoginCommand.cpp.s
+.PHONY : LoginCommand.cpp.s
 
 MarketConfig.o: MarketConfig.cpp.o
 .PHONY : MarketConfig.o
@@ -282,6 +330,54 @@ Order.cpp.s:
 	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/Order.cpp.s
 .PHONY : Order.cpp.s
 
+OrderActionCommand.o: OrderActionCommand.cpp.o
+.PHONY : OrderActionCommand.o
+
+# target to build an object file
+OrderActionCommand.cpp.o:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/OrderActionCommand.cpp.o
+.PHONY : OrderActionCommand.cpp.o
+
+OrderActionCommand.i: OrderActionCommand.cpp.i
+.PHONY : OrderActionCommand.i
+
+# target to preprocess a source file
+OrderActionCommand.cpp.i:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/OrderActionCommand.cpp.i
+.PHONY : OrderActionCommand.cpp.i
+
+OrderActionCommand.s: OrderActionCommand.cpp.s
+.PHONY : OrderActionCommand.s
+
+# target to generate assembly for a file
+OrderActionCommand.cpp.s:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/OrderActionCommand.cpp.s
+.PHONY : OrderActionCommand.cpp.s
+
+OrderInsertCommand.o: OrderInsertCommand.cpp.o
+.PHONY : OrderInsertCommand.o
+
+# target to build an object file
+OrderInsertCommand.cpp.o:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/OrderInsertCommand.cpp.o
+.PHONY : OrderInsertCommand.cpp.o
+
+OrderInsertCommand.i: OrderInsertCommand.cpp.i
+.PHONY : OrderInsertCommand.i
+
+# target to preprocess a source file
+OrderInsertCommand.cpp.i:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/OrderInsertCommand.cpp.i
+.PHONY : OrderInsertCommand.cpp.i
+
+OrderInsertCommand.s: OrderInsertCommand.cpp.s
+.PHONY : OrderInsertCommand.s
+
+# target to generate assembly for a file
+OrderInsertCommand.cpp.s:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/OrderInsertCommand.cpp.s
+.PHONY : OrderInsertCommand.cpp.s
+
 PositionDetail.o: PositionDetail.cpp.o
 .PHONY : PositionDetail.o
 
@@ -305,6 +401,30 @@ PositionDetail.s: PositionDetail.cpp.s
 PositionDetail.cpp.s:
 	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/PositionDetail.cpp.s
 .PHONY : PositionDetail.cpp.s
+
+QrySettlementInfoConfirmCommand.o: QrySettlementInfoConfirmCommand.cpp.o
+.PHONY : QrySettlementInfoConfirmCommand.o
+
+# target to build an object file
+QrySettlementInfoConfirmCommand.cpp.o:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/QrySettlementInfoConfirmCommand.cpp.o
+.PHONY : QrySettlementInfoConfirmCommand.cpp.o
+
+QrySettlementInfoConfirmCommand.i: QrySettlementInfoConfirmCommand.cpp.i
+.PHONY : QrySettlementInfoConfirmCommand.i
+
+# target to preprocess a source file
+QrySettlementInfoConfirmCommand.cpp.i:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/QrySettlementInfoConfirmCommand.cpp.i
+.PHONY : QrySettlementInfoConfirmCommand.cpp.i
+
+QrySettlementInfoConfirmCommand.s: QrySettlementInfoConfirmCommand.cpp.s
+.PHONY : QrySettlementInfoConfirmCommand.s
+
+# target to generate assembly for a file
+QrySettlementInfoConfirmCommand.cpp.s:
+	$(MAKE) -f CMakeFiles/quant_ctp_XTrader.dir/build.make CMakeFiles/quant_ctp_XTrader.dir/QrySettlementInfoConfirmCommand.cpp.s
+.PHONY : QrySettlementInfoConfirmCommand.cpp.s
 
 Session.o: Session.cpp.o
 .PHONY : Session.o
@@ -534,6 +654,9 @@ help:
 	@echo "... Algorithm.o"
 	@echo "... Algorithm.i"
 	@echo "... Algorithm.s"
+	@echo "... ApiCommand.o"
+	@echo "... ApiCommand.i"
+	@echo "... ApiCommand.s"
 	@echo "... CTP_Manager.o"
 	@echo "... CTP_Manager.i"
 	@echo "... CTP_Manager.s"
@@ -543,6 +666,9 @@ help:
 	@echo "... FutureAccount.o"
 	@echo "... FutureAccount.i"
 	@echo "... FutureAccount.s"
+	@echo "... LoginCommand.o"
+	@echo "... LoginCommand.i"
+	@echo "... LoginCommand.s"
 	@echo "... MarketConfig.o"
 	@echo "... MarketConfig.i"
 	@echo "... MarketConfig.s"
@@ -552,9 +678,18 @@ help:
 	@echo "... Order.o"
 	@echo "... Order.i"
 	@echo "... Order.s"
+	@echo "... OrderActionCommand.o"
+	@echo "... OrderActionCommand.i"
+	@echo "... OrderActionCommand.s"
+	@echo "... OrderInsertCommand.o"
+	@echo "... OrderInsertCommand.i"
+	@echo "... OrderInsertCommand.s"
 	@echo "... PositionDetail.o"
 	@echo "... PositionDetail.i"
 	@echo "... PositionDetail.s"
+	@echo "... QrySettlementInfoConfirmCommand.o"
+	@echo "... QrySettlementInfoConfirmCommand.i"
+	@echo "... QrySettlementInfoConfirmCommand.s"
 	@echo "... Session.o"
 	@echo "... Session.i"
 	@echo "... Session.s"

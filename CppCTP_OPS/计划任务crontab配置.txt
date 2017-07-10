@@ -1,0 +1,2 @@
+40 08,20 * * 1-5 sh /var/xTrade/auto_start.sh
+45 02,15 * * 1-5 sh /var/xTrade/auto_stop.sh

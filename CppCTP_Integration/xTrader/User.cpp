@@ -3,6 +3,11 @@
 #include "DBManager.h"
 #include "Debug.h"
 #include "Utils.h"
+#include "OrderInsertCommand.h"
+#include "OrderActionCommand.h"
+
+class OrderActionCommand;
+class OrderInsertCommand;
 
 /// Order相关的集合
 #define DB_ORDERINSERT_COLLECTION         "CTP.orderinsert"
@@ -42,6 +47,12 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 	this->l_position_detail_from_local_order = new list<USER_INSTRUMENT_POSITION *>();
 	this->l_position_detail_from_local_trade = new list<USER_INSTRUMENT_POSITION *>();
 	this->thread_init_status = false;
+	this->isEverLostConnection = false;	// 初始化网络一切正常
+
+	this->last_order_ref = "";	// 最后一次order_ref
+	this->current_order_ref = ""; // 当前order_ref
+	this->last_order_ref_cal = 0;	// 最后一次order_ref接收次数统计
+	this->last_order_ref_cal_tmp = 0;	// 最后一次order_ref接收次数统计
 
 	try {
 		this->xts_user_logger = spdlog::get("xts_async_" + UserID + "_logger");
@@ -64,6 +75,20 @@ User::User(string frontAddress, string BrokerID, string UserID, string Password,
 	// 同一时间只能有一个线程调用持仓明细(避免带来空指针错误)
 	if (sem_init(&(this->sem_get_order_ref), 0, 1) != 0) {
 		this->xts_user_logger->info("User::User() sem_get_order_ref init failed!");
+		this->xts_user_logger->flush();
+		exit(1);
+	}
+
+	// 同一时间只能有一个线程累加操作
+	if (sem_init(&(this->sem_inc_last_order_ref_cal), 0, 1) != 0) {
+		this->xts_user_logger->info("User::User() sem_inc_last_order_ref_cal init failed!");
+		this->xts_user_logger->flush();
+		exit(1);
+	}
+
+	// 同一时间只能有一个线程累加操作
+	if (sem_init(&(this->sem_inc_last_order_ref_cal_tmp), 0, 1) != 0) {
+		this->xts_user_logger->info("User::User() sem_inc_last_order_ref_cal_tmp init failed!");
 		this->xts_user_logger->flush();
 		exit(1);
 	}
@@ -93,6 +118,11 @@ User::User(string BrokerID, string UserID, int nRequestID, string stg_order_ref_
 	this->l_position_detail_from_ctp = new list<USER_INSTRUMENT_POSITION *>();
 	this->l_position_detail_from_local_order = new list<USER_INSTRUMENT_POSITION *>();
 	this->l_position_detail_from_local_trade = new list<USER_INSTRUMENT_POSITION *>();
+	this->isEverLostConnection = false;	// 初始化网络一切正常
+	this->last_order_ref = "";	// 最后一次order_ref
+	this->current_order_ref = ""; // 当前order_ref
+	this->last_order_ref_cal = 0;	// 最后一次order_ref接收次数统计
+	this->last_order_ref_cal_tmp = 0;	// 最后一次order_ref接收次数统计
 
 	try {
 		this->xts_user_logger = spdlog::get("xts_async_" + UserID + "_logger");
@@ -115,6 +145,20 @@ User::User(string BrokerID, string UserID, int nRequestID, string stg_order_ref_
 	// 同一时间只能有一个线程调用持仓明细(避免带来空指针错误)
 	if (sem_init(&(this->sem_get_order_ref), 0, 1) != 0) {
 		this->xts_user_logger->info("User::User() sem_get_order_ref init failed!");
+		this->xts_user_logger->flush();
+		exit(1);
+	}
+
+	// 同一时间只能有一个线程累加操作
+	if (sem_init(&(this->sem_inc_last_order_ref_cal), 0, 1) != 0) {
+		this->xts_user_logger->info("User::User() sem_inc_last_order_ref_cal init failed!");
+		this->xts_user_logger->flush();
+		exit(1);
+	}
+
+	// 同一时间只能有一个线程累加操作
+	if (sem_init(&(this->sem_inc_last_order_ref_cal_tmp), 0, 1) != 0) {
+		this->xts_user_logger->info("User::User() sem_inc_last_order_ref_cal_tmp init failed!");
 		this->xts_user_logger->flush();
 		exit(1);
 	}
@@ -396,11 +440,17 @@ void User::add_instrument_id_action_counter(CThostFtdcOrderField *pOrder) {
 	}
 }
 
+/// 设置报单引用基准
 void User::setStgOrderRefBase(long long stg_order_ref_base) {
 	this->stg_order_ref_base = stg_order_ref_base;
 }
 
-void User::OrderInsert(CThostFtdcInputOrderField *insert_order, string strategy_id) {
+/// 获取报单引用基准
+long long User::getStgOrderRefBase() {
+	return this->stg_order_ref_base;
+}
+
+void User::OrderInsert(CThostFtdcInputOrderField *insert_order, Strategy *stg, string strategy_id) {
 
 	// 当有其他地方调用操作报单引用,阻塞,信号量P操作
 	sem_wait(&(this->sem_get_order_ref));
@@ -413,7 +463,11 @@ void User::OrderInsert(CThostFtdcInputOrderField *insert_order, string strategy_
 		insert_order->OrderRef, insert_order->InstrumentID, insert_order->LimitPrice, insert_order->VolumeTotalOriginal, insert_order->Direction,
 		insert_order->CombOffsetFlag[0], insert_order->CombHedgeFlag[0]);
 
-	this->getUserTradeSPI()->OrderInsert(this, insert_order);
+	//this->getUserTradeSPI()->OrderInsert(this, insert_order);
+
+	OrderInsertCommand *command = new OrderInsertCommand(this->getUserTradeSPI(), this, insert_order, stg, 1);
+	
+	this->getCTP_Manager()->addCommand(command);
 
 	// 释放信号量,信号量V操作
 	sem_post(&(this->sem_get_order_ref));
@@ -816,10 +870,7 @@ void User::DB_OrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderF
 
 // 更新报单引用
 void User::DB_UpdateOrderRef(string order_ref_base) {
-	USER_PRINT("User::DB_UpdateOrderRef!");
 	int len_order_ref_base = order_ref_base.length();
-	USER_PRINT(order_ref_base);
-	USER_PRINT(len_order_ref_base);
 	this->getCTP_Manager()->getDBManager()->UpdateFutureAccountOrderRef(this, order_ref_base);
 }
 
@@ -1906,4 +1957,70 @@ void User::setXtsLogger(std::shared_ptr<spdlog::logger> ptr) {
 }
 std::shared_ptr<spdlog::logger> User::getXtsLogger() {
 	return this->xts_user_logger;
+}
+
+// 网络是否曾经断过
+void User::setIsEverLostConnection(bool isEverLostConnection) {
+	this->isEverLostConnection = isEverLostConnection;
+}
+
+bool User::getIsEverLostConnection() {
+	return this->isEverLostConnection;
+}
+
+// 最后一次orderref
+string User::getLastOrderRef() {
+	return this->last_order_ref;
+}
+
+void User::setLastOrderRef(string last_order_ref) {
+	this->last_order_ref = last_order_ref;
+}
+
+string User::getCurrentOrderRef() {
+	return this->current_order_ref;
+}
+void User::setCurrentOrderRef(string current_order_ref) {
+	this->current_order_ref = current_order_ref;
+}
+
+// 最后一次orderref统计
+int User::getLastOrderRefCal() {
+	return this->last_order_ref_cal;
+}
+
+void User::setLastOrderRefCal(int last_order_ref_cal) {
+	this->last_order_ref_cal = last_order_ref_cal;
+}
+
+void User::autoIncrementLastOrderRefCal() {
+	sem_wait(&(this->sem_inc_last_order_ref_cal));
+	this->last_order_ref_cal = this->last_order_ref_cal + 1;
+	this->getXtsLogger()->info("User::autoIncrementLastOrderRefCal() this->last_order_ref_cal = {}", this->last_order_ref_cal);
+	sem_post(&(this->sem_inc_last_order_ref_cal));
+}
+void User::resetLastOrderRefCal() {
+	sem_wait(&(this->sem_inc_last_order_ref_cal));
+	this->last_order_ref_cal = 1;
+	sem_post(&(this->sem_inc_last_order_ref_cal));
+}
+
+int User::getLastOrderRefCalTmp() {
+	return this->last_order_ref_cal_tmp;
+}
+
+void User::setLastOrderRefCalTmp(int last_order_ref_cal_tmp) {
+	this->last_order_ref_cal_tmp = last_order_ref_cal_tmp;
+}
+
+void User::autoIncrementLastOrderRefCalTmp() {
+	sem_wait(&(this->sem_inc_last_order_ref_cal_tmp));
+	this->last_order_ref_cal_tmp = this->last_order_ref_cal_tmp + 1;
+	sem_post(&(this->sem_inc_last_order_ref_cal_tmp));
+}
+
+void User::resetLastOrderRefCalTmp() {
+	sem_wait(&(this->sem_inc_last_order_ref_cal_tmp));
+	this->last_order_ref_cal_tmp = 0;
+	sem_post(&(this->sem_inc_last_order_ref_cal_tmp));
 }
