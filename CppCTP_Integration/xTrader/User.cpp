@@ -456,7 +456,7 @@ void User::add_instrument_id_action_counter(CSgitFtdcInputOrderActionField *pInp
 		/*std::cout << "\t撤单列表里不存在该合约 = " << pInputOrderAction->InstrumentID << std::endl;
 		std::cout << "\t添加 " << pInputOrderAction->InstrumentID << " 合约到列表中..." << std::endl;*/
 
-		this->getXtsLogger()->info("User::add_instrument_id_action_counter() 撤单列表里不存在该合约 = {} 添加 {} 合约到列表中", pInputOrderAction->InstrumentID, pOrder->InstrumentID);
+		this->getXtsLogger()->info("User::add_instrument_id_action_counter() 撤单列表里不存在该合约 = {} 添加 {} 合约到列表中", pInputOrderAction->InstrumentID, pInputOrderAction->InstrumentID);
 
 		//this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0));
 		this->init_instrument_id_action_counter(string(pInputOrderAction->InstrumentID));

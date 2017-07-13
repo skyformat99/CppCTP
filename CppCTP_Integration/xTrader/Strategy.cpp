@@ -5097,16 +5097,7 @@ void Strategy::Exec_OnRspOrderInsert() {
 // 报单操作请求响应
 void Strategy::Exec_OnRspOrderAction(CSgitFtdcInputOrderActionField *pInputOrderAction) {
 	this->getStgUser()->getXtsLogger()->info("Strategy::Exec_OnRspOrderAction()");
-
-	// 更新挂单列表
-	this->update_pending_order_list(pInputOrderAction);
-
-	// 更新持仓明细(不处理)
-
-	// 更新持仓量(不处理)
-
-	// 更新标志位(不处理)
-
+	
 	// A撤单,B撤单处理
 	/// A撤单回报，如果成交量不是整数倍,就主动平掉；如果是整数倍,不用处理
 	if ((!strcmp(pInputOrderAction->InstrumentID, this->stg_instrument_id_A.c_str())) && (strlen(pInputOrderAction->OrderSysID) != 0)) {
@@ -5114,7 +5105,6 @@ void Strategy::Exec_OnRspOrderAction(CSgitFtdcInputOrderActionField *pInputOrder
 		/// 只针对跨品种下单算法进行撤单处理
 		if (this->getStgOrderAlgorithm() == ALGORITHM_TWO)
 		{
-
 			// 遍历挂单列表，找到对应报单
 			list<CSgitFtdcOrderField *>::iterator cal_itor;
 
@@ -5203,6 +5193,17 @@ void Strategy::Exec_OnRspOrderAction(CSgitFtdcInputOrderActionField *pInputOrder
 			}
 		}
 	}
+
+	// 更新挂单列表
+	this->update_pending_order_list(pInputOrderAction);
+
+	// 更新持仓明细(不处理)
+
+	// 更新持仓量(不处理)
+
+	// 更新标志位(不处理)
+
+
 }
 
 // 报单回报
@@ -6269,7 +6270,7 @@ void Strategy::update_pending_order_list(USER_CSgitFtdcTradeField *pTrade) {
 				else if (pTrade->Volume < ((*cal_itor)->VolumeTotalOriginal - (*cal_itor)->VolumeTraded)) // 部分成交
 				{
 					// 更新已成交的量
-					(*cal_itor)->VolumeTraded = (*cal_itor)->VolumeTotalOriginal - pTrade->Volume;
+					(*cal_itor)->VolumeTraded += pTrade->Volume;
 					cal_itor++;
 				}
 				else if (pTrade->Volume >((*cal_itor)->VolumeTotalOriginal - (*cal_itor)->VolumeTraded)) // 出错了
@@ -6326,16 +6327,6 @@ void Strategy::update_pending_order_list(CSgitFtdcInputOrderActionField *pInputO
 			cal_itor++;
 		}
 
-	}
-
-	// 求出当前策略A开仓挂单量
-	this->stg_pending_a_open = 0;
-
-	for (cal_itor = this->stg_list_order_pending->begin(); cal_itor != this->stg_list_order_pending->end(); cal_itor++) {
-		// 对比InstrumentID
-		if (!strcmp((*cal_itor)->InstrumentID, this->stg_instrument_id_A.c_str()) && ((*cal_itor)->CombOffsetFlag[0] == '0')) { // 查找A合约开仓
-			this->stg_pending_a_open += (*cal_itor)->VolumeTotalOriginal - (*cal_itor)->VolumeTraded;
-		}
 	}
 
 	// 释放信号量,信号量V操作
