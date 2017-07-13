@@ -11,9 +11,6 @@
 
 using namespace std;
 
-const string BROKER_ID = "9999";
-const string USER_ID = "058176";
-const string PASS = "669822";
 struct timespec outtime = {3, 0};
 std::condition_variable md_cv;
 std::mutex md_mtx;
@@ -21,8 +18,8 @@ std::mutex md_mtx;
 #define MD_RSP_TIMEOUT	5
 
 //初始化构造函数
-MdSpi::MdSpi(CThostFtdcMdApi *mdapi) {
-	this->last_tick_data = new CThostFtdcDepthMarketDataField();
+MdSpi::MdSpi(CSgitFtdcMdApi *mdapi) {
+	this->last_tick_data = new CSgitFtdcDepthMarketDataField();
 	/*sem_init(&connect_sem, 0, 0);
 	sem_init(&login_sem, 0, 0);
 	sem_init(&logout_sem, 0, 0);
@@ -73,17 +70,18 @@ void MdSpi::timeraddMS(struct timeval *now_time, int ms) {
 
 //连接
 void MdSpi::Connect(char *frontAddress) {
-	USER_PRINT("MdSpi::Connect")
+	// 行情订阅模式
+	this->mdapi->SubscribeMarketTopic(Sgit_TERT_QUICK);
+	// 前置地址
 	this->mdapi->RegisterFront(frontAddress); //24H
-	//sleep(1);
-	this->mdapi->Init();
+	// 开启log
+	this->mdapi->Init(true);
 	//int ret = this->controlTimeOut(&connect_sem);
 
 	//等待回调
 	std::unique_lock<std::mutex> md_lck(md_mtx);
 	while (md_cv.wait_for(md_lck, std::chrono::seconds(MD_RSP_TIMEOUT)) == std::cv_status::timeout) {
-		std::cout << "MdSpi::Connect()" << std::endl;
-		std::cout << "\t行情连接等待超时" << std::endl;
+		std::cout << "MdSpi::Connect() 行情连接等待超时" << std::endl;
 		return;
 	}
 }
@@ -143,7 +141,7 @@ void MdSpi::Login(char *BrokerID, char *UserID, char *Password) {
 	this->BrokerID = BrokerID;
 	this->UserID = UserID;
 	this->Password = Password;
-	loginField = new CThostFtdcReqUserLoginField();
+	loginField = new CSgitFtdcReqUserLoginField();
 	strcpy(loginField->BrokerID, BrokerID);
 	strcpy(loginField->UserID, UserID);
 	strcpy(loginField->Password, Password);
@@ -167,7 +165,7 @@ void MdSpi::Login(char *BrokerID, char *UserID, char *Password) {
 }
 
 //响应登录
-void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo,
+void MdSpi::OnRspUserLogin(CSgitFtdcRspUserLoginField *pRspUserLogin, CSgitFtdcRspInfoField *pRspInfo,
                            int nRequestID, bool bIsLast) {
 	USER_PRINT("MdSpi::OnRspUserLogin");
 	USER_PRINT(bIsLast);
@@ -198,11 +196,13 @@ void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtd
 		///中金所时间
 		cout << "中金所时间" << pRspUserLogin->FFEXTime << ", ";
 		///能源中心时间
-		cout << "能源中心时间" << pRspUserLogin->INETime << ", ";
+		//cout << "能源中心时间" << pRspUserLogin->INETime << ", ";
 		this->isLogged = true;
 		string s_trading_day = this->mdapi->GetTradingDay();
 		this->ctp_m->getXtsLogger()->info("MdSpi::OnRspUserLogin() TradingDay = {}", s_trading_day);
-		this->ctp_m->setTradingDay(s_trading_day);
+		
+		//this->ctp_m->setTradingDay(s_trading_day);
+		this->ctp_m->setTradingDay("20170712");
 		this->ctp_m->setMdLogin(true);
 		/*sem_post(&login_sem);
 		if (this->isFirstTimeLogged == false) {
@@ -225,7 +225,7 @@ void MdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtd
 }
 
 //返回数据是否报错
-bool MdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo) {
+bool MdSpi::IsErrorRspInfo(CSgitFtdcRspInfoField *pRspInfo) {
 	// 如果ErrorID != 0, 说明收到了错误的响应
 	bool bResult = ((pRspInfo) && (pRspInfo->ErrorID != 0));
 	if (bResult)
@@ -236,7 +236,7 @@ bool MdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo) {
 //登出
 void MdSpi::Logout(char *BrokerID, char *UserID) {
 	USER_PRINT("MdSpi::Logout")
-	logoutField = new CThostFtdcUserLogoutField();
+	logoutField = new CSgitFtdcUserLogoutField();
 	strcpy(logoutField->BrokerID, BrokerID);
 	strcpy(logoutField->UserID, UserID);
 	this->mdapi->ReqUserLogout(logoutField, this->loginRequestID);
@@ -247,7 +247,7 @@ void MdSpi::Logout(char *BrokerID, char *UserID) {
 }
 
 //响应登出
-void MdSpi::OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout, CThostFtdcRspInfoField *pRspInfo,
+void MdSpi::OnRspUserLogout(CSgitFtdcUserLogoutField *pUserLogout, CSgitFtdcRspInfoField *pRspInfo,
                             int nRequestID, bool bIsLast) {
 	USER_PRINT("MdSpi::OnRspUserLogout")
 	if (bIsLast && !(this->IsErrorRspInfo(pRspInfo))) {
@@ -264,7 +264,19 @@ void MdSpi::SubMarketData(char *ppInstrumentID[], int nCount) {
 		USER_PRINT("SubMarketData");
 		this->ppInstrumentID = ppInstrumentID;
 		this->nCount = nCount;
-		this->mdapi->SubscribeMarketData(ppInstrumentID, nCount);
+		
+		//this->mdapi->SubscribeMarketData(ppInstrumentID, nCount);
+
+		// 兼容飞鼠API
+		for (int i = 0; i < nCount; i++)
+		{
+			CSgitSubQuotField instruments;
+			memset(&instruments, 0, sizeof(CSgitSubQuotField));
+			strcpy(instruments.ContractID, ppInstrumentID[i]);
+
+			this->mdapi->SubQuot(&instruments);
+		}
+
 		/*int ret = this->controlTimeOut(&submarket_sem);
 		if (ret == -1) {
 			USER_PRINT("MdSpi::SubMarketData TimeOut!");
@@ -287,8 +299,23 @@ void MdSpi::SubMarket(list<string> *l_instrument) {
 		instrumentID[i] = new char[strlen(charResult) + 1];
 		strcpy(instrumentID[i], charResult);
 	}
-	USER_PRINT(this->mdapi);
-	this->mdapi->SubscribeMarketData(instrumentID, size);
+	
+	//this->mdapi->SubscribeMarketData(instrumentID, size);
+
+	// 兼容飞鼠API订阅行情
+	for (int i = 0; i < size; i++)
+	{
+		CSgitSubQuotField instruments;
+		memset(&instruments, 0, sizeof(CSgitSubQuotField));
+		strcpy(instruments.ContractID, instrumentID[i]);
+
+		this->mdapi->SubQuot(&instruments);
+	}
+}
+
+///行情就绪
+void MdSpi::Ready() {
+	this->mdapi->Ready();
 }
 
 ///取消订阅行情
@@ -304,8 +331,9 @@ void MdSpi::UnSubMarket(list<string> *l_instrument) {
 		instrumentID[i] = new char[strlen(charResult) + 1];
 		strcpy(instrumentID[i], charResult);
 	}
-	USER_PRINT(this->mdapi);
-	this->mdapi->UnSubscribeMarketData(instrumentID, size);
+
+	// 兼容飞鼠API不支持退订合约
+	//this->mdapi->UnSubscribeMarketData(instrumentID, size);
 
 	// 析构字符串数组
 	for (i = 0; i < size; i++) {
@@ -321,7 +349,7 @@ void MdSpi::UnSubMarket(list<string> *l_instrument) {
 }
 
 //订阅行情应答
-void MdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+void MdSpi::OnRspSubMarketData(CSgitFtdcSpecificInstrumentField *pSpecificInstrument, CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (pSpecificInstrument) {
 			Utils::printGreenColorWithKV("MdSpi::OnRspSubMarketData() 订阅行情合约代码", pSpecificInstrument->InstrumentID);
@@ -335,7 +363,8 @@ void MdSpi::UnSubscribeMarketData(char *ppInstrumentID[], int nCount) {
 	USER_PRINT("MdSpi::UnSubscribeMarketData");
 	if (this->isLogged) {
 		
-		this->mdapi->UnSubscribeMarketData(ppInstrumentID, nCount);
+		//兼容飞鼠API(不支持退订)
+		//this->mdapi->UnSubscribeMarketData(ppInstrumentID, nCount);
 		/*int ret = this->controlTimeOut(&unsubmarket_sem);
 		if (ret == -1) {
 			USER_PRINT("MdSpi::UnSubscribeMarketData TimeOut!");
@@ -384,7 +413,7 @@ CTP_Manager * MdSpi::getCtpManager() {
 }
 
 //取消订阅行情应答
-void MdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+void MdSpi::OnRspUnSubMarketData(CSgitFtdcSpecificInstrumentField *pSpecificInstrument, CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	if (bIsLast && !(this->IsErrorRspInfo(pRspInfo))) {
 		this->ctp_m->getXtsLogger()->info("MdSpi::OnRspUnSubMarketData() 取消合约代码 = {} 取消应答信息 = {}", pSpecificInstrument->InstrumentID, pRspInfo->ErrorMsg);
 		//sem_post(&unsubmarket_sem);
@@ -395,11 +424,10 @@ void MdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificIns
 
 
 //深度行情接收
-void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {
-	USER_PRINT("MdSpi::OnRtnDepthMarketData IN");
-    //cout << "===========================================" << endl;
+void MdSpi::OnRtnDepthMarketData(CSgitFtdcDepthMarketDataField *pDepthMarketData) {
+	//cout << "===========================================" << endl;
     //cout << "深度行情" << ", ";
-	//cout << "交易日:" << pDepthMarketData->TradingDay << ", " << "合约代码:" << pDepthMarketData->InstrumentID << ", " << "最新价:" << pDepthMarketData->LastPrice << ", " << "持仓量:" << pDepthMarketData->OpenInterest << endl;
+	cout << "交易日:" << pDepthMarketData->TradingDay << ", " << "合约代码:" << pDepthMarketData->InstrumentID << ", " << "最新价:" << pDepthMarketData->LastPrice << ", " << "持仓量:" << pDepthMarketData->OpenInterest << endl;
     //<< "上次结算价:" << pDepthMarketData->presettlementprice << endl
  //   //<< "昨收盘:" << pDepthMarketData->PreClosePrice << endl
  //   //<< "数量:" << pDepthMarketData->Volume << endl
@@ -469,10 +497,9 @@ void MdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketDat
 	sem_post((this->ctp_m->getSem_strategy_handler()));
 
 	//cout << "===========================================" << endl;
-	USER_PRINT("MdSpi::OnRtnDepthMarketData OUT");
 }
 
-void MdSpi::CopyTickData(CThostFtdcDepthMarketDataField *dst, CThostFtdcDepthMarketDataField *src) {
+void MdSpi::CopyTickData(CSgitFtdcDepthMarketDataField *dst, CSgitFtdcDepthMarketDataField *src) {
 	///交易日
 	strcpy(dst->TradingDay, src->TradingDay);
 	///合约代码
@@ -560,7 +587,7 @@ void MdSpi::CopyTickData(CThostFtdcDepthMarketDataField *dst, CThostFtdcDepthMar
 	///当日均价
 	dst->AveragePrice = src->AveragePrice;
 	///业务日期
-	strcpy(dst->ActionDay, src->ActionDay);
+	//strcpy(dst->ActionDay, src->ActionDay);
 }
 
 

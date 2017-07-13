@@ -203,7 +203,7 @@ int User::getLoginRequestID() {
 	return this->loginRequestID;
 }
 
-CThostFtdcTraderApi * User::getUserTradeAPI() {
+CSgitFtdcTraderApi * User::getUserTradeAPI() {
 	return this->UserTradeAPI;
 }
 
@@ -257,7 +257,7 @@ void User::setLoginRequestID(int loginRequestID) {
 	this->loginRequestID = loginRequestID;
 }
 
-void User::setUserTradeAPI(CThostFtdcTraderApi *UserTradeAPI) {
+void User::setUserTradeAPI(CSgitFtdcTraderApi *UserTradeAPI) {
 	this->UserTradeAPI = UserTradeAPI;
 }
 
@@ -301,7 +301,7 @@ void User::addStrategyToList(Strategy *stg) {
 }
 
 /// 拷贝持仓明细数据
-void User::CopyPositionDetailData(CThostFtdcInvestorPositionDetailField *dst, CThostFtdcInvestorPositionDetailField *src) {
+void User::CopyPositionDetailData(CSgitFtdcInvestorPositionDetailField *dst, CSgitFtdcInvestorPositionDetailField *src) {
 	///合约代码
 	strcpy(dst->InstrumentID, src->InstrumentID);
 	///经纪公司代码
@@ -386,7 +386,7 @@ int User::get_instrument_id_action_counter(string instrument_id) {
 }
 
 /// 添加对应合约撤单次数计数器,例如"cu1602":1 "cu1701":1
-void User::add_instrument_id_action_counter(CThostFtdcOrderField *pOrder) {
+void User::add_instrument_id_action_counter(CSgitFtdcOrderField *pOrder) {
 	USER_PRINT("User::add_instrument_id_action_counter");
 
 	//std:cout << "User::add_instrument_id_action_counter()" << std::endl;
@@ -440,6 +440,48 @@ void User::add_instrument_id_action_counter(CThostFtdcOrderField *pOrder) {
 	}
 }
 
+/// 添加对应合约撤单次数统计(Sgit)
+void User::add_instrument_id_action_counter(CSgitFtdcInputOrderActionField *pInputOrderAction) {
+
+	if (strlen(pInputOrderAction->OrderSysID) == 0) { //只统计针对交易所编码的order
+		Utils::printRedColor("User::add_instrument_id_action_counter() pInputOrderAction->OrderSysID长度为0");
+		return;
+	}
+
+	//对某个合约进行加1操作
+	map<string, int>::iterator m_itor;
+	m_itor = this->stg_map_instrument_action_counter->find(string(pInputOrderAction->InstrumentID));
+	if (m_itor == (this->stg_map_instrument_action_counter->end())) {
+
+		/*std::cout << "\t撤单列表里不存在该合约 = " << pInputOrderAction->InstrumentID << std::endl;
+		std::cout << "\t添加 " << pInputOrderAction->InstrumentID << " 合约到列表中..." << std::endl;*/
+
+		this->getXtsLogger()->info("User::add_instrument_id_action_counter() 撤单列表里不存在该合约 = {} 添加 {} 合约到列表中", pInputOrderAction->InstrumentID, pOrder->InstrumentID);
+
+		//this->stg_map_instrument_action_counter->insert(pair<string, int>(instrument_id, 0));
+		this->init_instrument_id_action_counter(string(pInputOrderAction->InstrumentID));
+	}
+	else {
+		//cout << "撤单列表里找到该合约 = " << pInputOrderAction->InstrumentID << endl;
+		m_itor->second += 1;
+	}
+
+	// 将撤单次数赋予该账户下所有的策略
+	list<Strategy *>::iterator stg_itor;
+	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) { // 遍历Strategy
+
+		// 如果是A合约
+		if (!strcmp((*stg_itor)->getStgInstrumentIdA().c_str(), pInputOrderAction->InstrumentID)) {
+			(*stg_itor)->setStgAOrderActionCount(this->get_instrument_id_action_counter(string(pInputOrderAction->InstrumentID)));
+		}
+
+		if (!(strcmp((*stg_itor)->getStgInstrumentIdB().c_str(), pInputOrderAction->InstrumentID))) {
+			(*stg_itor)->setStgBOrderActionCount(this->get_instrument_id_action_counter(string(pInputOrderAction->InstrumentID)));
+		}
+	}
+
+}
+
 /// 设置报单引用基准
 void User::setStgOrderRefBase(long long stg_order_ref_base) {
 	this->stg_order_ref_base = stg_order_ref_base;
@@ -450,7 +492,7 @@ long long User::getStgOrderRefBase() {
 	return this->stg_order_ref_base;
 }
 
-void User::OrderInsert(CThostFtdcInputOrderField *insert_order, Strategy *stg, string strategy_id) {
+void User::OrderInsert(CSgitFtdcInputOrderField *insert_order, Strategy *stg, string strategy_id) {
 
 	// 当有其他地方调用操作报单引用,阻塞,信号量P操作
 	sem_wait(&(this->sem_get_order_ref));
@@ -480,7 +522,7 @@ void User::setStgInstrumnetPriceTick() {
 	USER_PRINT("User::setStgInstrumnetPriceTick");
 	//1:遍历strategy list
 	list<Strategy *>::iterator stg_itor;
-	list<CThostFtdcInstrumentField *>::iterator instrument_info_itor;
+	list<CSgitFtdcInstrumentField *>::iterator instrument_info_itor;
 	for (stg_itor = this->l_strategys->begin(); stg_itor != this->l_strategys->end(); stg_itor++) {
 		//2:遍历合约信息列表,找到对应合约的最小跳
 		for (instrument_info_itor = this->getUserTradeSPI()->getL_Instruments_Info()->begin();
@@ -509,7 +551,7 @@ list<USER_INSTRUMENT_POSITION *> * User::getL_Position_Detail_From_CTP() {
 }
 
 
-void User::addL_Position_Detail_From_CTP(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail) {
+void User::addL_Position_Detail_From_CTP(CSgitFtdcInvestorPositionDetailField *pInvestorPositionDetail) {
 
 	list<USER_INSTRUMENT_POSITION *>::iterator itor;
 	bool isFind = false;
@@ -587,7 +629,7 @@ list<USER_INSTRUMENT_POSITION *> * User::getL_Position_Detail_From_Local_Order()
 	return this->l_position_detail_from_local_order;
 }
 
-void User::addL_Position_Detail_From_Local_Order(USER_CThostFtdcOrderField *order) {
+void User::addL_Position_Detail_From_Local_Order(USER_CSgitFtdcOrderField *order) {
 	std::cout << "User::addL_Position_Detail_From_Local_Order" << std::endl;
 	list<USER_INSTRUMENT_POSITION *>::iterator itor;
 	bool isFind = false;
@@ -668,7 +710,7 @@ list<USER_INSTRUMENT_POSITION *> * User::getL_Position_Detail_From_Local_Trade()
 	return this->l_position_detail_from_local_trade;
 }
 
-void User::addL_Position_Detail_From_Local_Trade(USER_CThostFtdcTradeField *trade) {
+void User::addL_Position_Detail_From_Local_Trade(USER_CSgitFtdcTradeField *trade) {
 	std::cout << "User::addL_Position_Detail_From_Local_Trade()" << std::endl;
 	list<USER_INSTRUMENT_POSITION *>::iterator itor;
 	bool isFind = false;
@@ -760,7 +802,7 @@ void User::getL_Position_Detail_Data(list<USER_INSTRUMENT_POSITION *> *l_positio
 /************************************************************************/
 /* 完成Order的MongoDB操作                                                 */
 /************************************************************************/
-void User::DB_OrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderField *pInputOrder) {
+void User::DB_OrderInsert(mongo::DBClientConnection *conn, CSgitFtdcInputOrderField *pInputOrder) {
 	USER_PRINT("User::DB_OrderInsert DB Connection!");
 	USER_PRINT(conn);
 	BSONObjBuilder b;
@@ -812,22 +854,22 @@ void User::DB_OrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderF
 	b.append("RequestID", pInputOrder->RequestID);
 	///用户强评标志
 	b.append("UserForceClose", pInputOrder->UserForceClose);
-	///互换单标志
-	b.append("IsSwapOrder", pInputOrder->IsSwapOrder);
-	///交易所代码
-	b.append("ExchangeID", pInputOrder->ExchangeID);
-	///投资单元代码
-	b.append("InvestUnitID", pInputOrder->InvestUnitID);
-	///资金账号
-	b.append("AccountID", pInputOrder->AccountID);
-	///币种代码
-	b.append("CurrencyID", pInputOrder->CurrencyID);
-	///交易编码
-	b.append("ClientID", pInputOrder->ClientID);
-	///IP地址
-	b.append("IPAddress", pInputOrder->IPAddress);
-	///Mac地址
-	b.append("MacAddress", pInputOrder->MacAddress);
+	/////互换单标志
+	//b.append("IsSwapOrder", pInputOrder->IsSwapOrder);
+	/////交易所代码
+	//b.append("ExchangeID", pInputOrder->ExchangeID);
+	/////投资单元代码
+	//b.append("InvestUnitID", pInputOrder->InvestUnitID);
+	/////资金账号
+	//b.append("AccountID", pInputOrder->AccountID);
+	/////币种代码
+	//b.append("CurrencyID", pInputOrder->CurrencyID);
+	/////交易编码
+	//b.append("ClientID", pInputOrder->ClientID);
+	/////IP地址
+	//b.append("IPAddress", pInputOrder->IPAddress);
+	/////Mac地址
+	//b.append("MacAddress", pInputOrder->MacAddress);
 
 	string time_str = string(Utils::getNowTimeMs());
 	int pos1 = time_str.find_first_of('_');
@@ -874,7 +916,7 @@ void User::DB_UpdateOrderRef(string order_ref_base) {
 	this->getCTP_Manager()->getDBManager()->UpdateFutureAccountOrderRef(this, order_ref_base);
 }
 
-void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *pOrder){
+void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CSgitFtdcOrderField *pOrder){
 	USER_PRINT("User::DB_OnRtnOrder DB Connection!");
 	USER_PRINT(conn);
 	BSONObjBuilder b;
@@ -995,22 +1037,22 @@ void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *
 	b.append("BrokerOrderSeq", pOrder->BrokerOrderSeq);
 	///相关报单
 	b.append("RelativeOrderSysID", pOrder->RelativeOrderSysID);
-	///郑商所成交数量
-	b.append("ZCETotalTradedVolume", pOrder->ZCETotalTradedVolume);
-	///互换单标志
-	b.append("IsSwapOrder", pOrder->IsSwapOrder);
-	///营业部编号
-	b.append("BranchID", pOrder->BranchID);
-	///投资单元代码
-	b.append("InvestUnitID", pOrder->InvestUnitID);
-	///资金账号
-	b.append("AccountID", pOrder->AccountID);
-	///币种代码
-	b.append("CurrencyID", pOrder->CurrencyID);
-	///IP地址
-	b.append("IPAddress", pOrder->IPAddress);
-	///Mac地址
-	b.append("MacAddress", pOrder->MacAddress);
+	/////郑商所成交数量
+	//b.append("ZCETotalTradedVolume", pOrder->ZCETotalTradedVolume);
+	/////互换单标志
+	//b.append("IsSwapOrder", pOrder->IsSwapOrder);
+	/////营业部编号
+	//b.append("BranchID", pOrder->BranchID);
+	/////投资单元代码
+	//b.append("InvestUnitID", pOrder->InvestUnitID);
+	/////资金账号
+	//b.append("AccountID", pOrder->AccountID);
+	/////币种代码
+	//b.append("CurrencyID", pOrder->CurrencyID);
+	/////IP地址
+	//b.append("IPAddress", pOrder->IPAddress);
+	/////Mac地址
+	//b.append("MacAddress", pOrder->MacAddress);
 
 	string time_str = Utils::getNowTimeMs();
 	int pos1 = time_str.find_first_of('_');
@@ -1056,7 +1098,7 @@ void User::DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *
 	
 }
 
-void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *pTrade){
+void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CSgitFtdcTradeField *pTrade){
 	USER_PRINT(DB_ONRTNORDER_COLLECTION"User::DB_OnRtnTrade DB Connection!");
 	BSONObjBuilder b;
 	/// 交易员id
@@ -1166,7 +1208,7 @@ void User::DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *
 	USER_PRINT("DBManager::DB_OnRtnTrade ok");
 }
 
-void User::DB_OrderAction(mongo::DBClientConnection *conn, CThostFtdcInputOrderActionField *pOrderAction){
+void User::DB_OrderAction(mongo::DBClientConnection *conn, CSgitFtdcInputOrderActionField *pOrderAction){
 	USER_PRINT("User::DB_OrderAction DB Connection!");
 	USER_PRINT(conn);
 	BSONObjBuilder b;
@@ -1200,12 +1242,12 @@ void User::DB_OrderAction(mongo::DBClientConnection *conn, CThostFtdcInputOrderA
 	b.append("UserID", pOrderAction->UserID);
 	///合约代码
 	b.append("InstrumentID", pOrderAction->InstrumentID);
-	///投资单元代码
-	b.append("InvestUnitID", pOrderAction->InvestUnitID);
-	///IP地址
-	b.append("IPAddress", pOrderAction->IPAddress);
-	///Mac地址
-	b.append("MacAddress", pOrderAction->MacAddress);
+	/////投资单元代码
+	//b.append("InvestUnitID", pOrderAction->InvestUnitID);
+	/////IP地址
+	//b.append("IPAddress", pOrderAction->IPAddress);
+	/////Mac地址
+	//b.append("MacAddress", pOrderAction->MacAddress);
 	BSONObj p = b.obj();
 	conn->insert(DB_ORDERACTION_COLLECTION, p);
 
@@ -1214,7 +1256,7 @@ void User::DB_OrderAction(mongo::DBClientConnection *conn, CThostFtdcInputOrderA
 	USER_PRINT("DBManager::DB_OrderAction ok");
 }
 
-void User::DB_OrderCombine(mongo::DBClientConnection *conn, CThostFtdcOrderField *pOrder){
+void User::DB_OrderCombine(mongo::DBClientConnection *conn, CSgitFtdcOrderField *pOrder){
 	USER_PRINT("User::DB_OrderCombine DB Connection!");
 	USER_PRINT(conn);
 	BSONObjBuilder b;
@@ -1334,22 +1376,22 @@ void User::DB_OrderCombine(mongo::DBClientConnection *conn, CThostFtdcOrderField
 	b.append("BrokerOrderSeq", pOrder->BrokerOrderSeq);
 	///相关报单
 	b.append("RelativeOrderSysID", pOrder->RelativeOrderSysID);
-	///郑商所成交数量
-	b.append("ZCETotalTradedVolume", pOrder->ZCETotalTradedVolume);
-	///互换单标志
-	b.append("IsSwapOrder", pOrder->IsSwapOrder);
-	///营业部编号
-	b.append("BranchID", pOrder->BranchID);
-	///投资单元代码
-	b.append("InvestUnitID", pOrder->InvestUnitID);
-	///资金账号
-	b.append("AccountID", pOrder->AccountID);
-	///币种代码
-	b.append("CurrencyID", pOrder->CurrencyID);
-	///IP地址
-	b.append("IPAddress", pOrder->IPAddress);
-	///Mac地址
-	b.append("MacAddress", pOrder->MacAddress);
+	/////郑商所成交数量
+	//b.append("ZCETotalTradedVolume", pOrder->ZCETotalTradedVolume);
+	/////互换单标志
+	//b.append("IsSwapOrder", pOrder->IsSwapOrder);
+	/////营业部编号
+	//b.append("BranchID", pOrder->BranchID);
+	/////投资单元代码
+	//b.append("InvestUnitID", pOrder->InvestUnitID);
+	/////资金账号
+	//b.append("AccountID", pOrder->AccountID);
+	/////币种代码
+	//b.append("CurrencyID", pOrder->CurrencyID);
+	/////IP地址
+	//b.append("IPAddress", pOrder->IPAddress);
+	/////Mac地址
+	//b.append("MacAddress", pOrder->MacAddress);
 	BSONObj p = b.obj();
 	conn->insert(DB_ORDERCOMBINE_COLLECTION, p);
 
@@ -1358,7 +1400,7 @@ void User::DB_OrderCombine(mongo::DBClientConnection *conn, CThostFtdcOrderField
 	USER_PRINT("DBManager::DB_OrderCombine ok");
 }
 
-void User::DB_OnRspOrderAction(mongo::DBClientConnection *conn, CThostFtdcInputOrderActionField *pInputOrderAction){
+void User::DB_OnRspOrderAction(mongo::DBClientConnection *conn, CSgitFtdcInputOrderActionField *pInputOrderAction){
 	USER_PRINT("User::DB_OnRspOrderAction DB Connection!");
 	USER_PRINT(conn);
 	BSONObjBuilder b;
@@ -1392,12 +1434,12 @@ void User::DB_OnRspOrderAction(mongo::DBClientConnection *conn, CThostFtdcInputO
 	b.append("UserID", pInputOrderAction->UserID);
 	///合约代码
 	b.append("InstrumentID", pInputOrderAction->InstrumentID);
-	///投资单元代码
-	b.append("InvestUnitID", pInputOrderAction->InvestUnitID);
-	///IP地址
-	b.append("IPAddress", pInputOrderAction->IPAddress);
-	///Mac地址
-	b.append("MacAddress", pInputOrderAction->MacAddress);
+	/////投资单元代码
+	//b.append("InvestUnitID", pInputOrderAction->InvestUnitID);
+	/////IP地址
+	//b.append("IPAddress", pInputOrderAction->IPAddress);
+	/////Mac地址
+	//b.append("MacAddress", pInputOrderAction->MacAddress);
 	BSONObj p = b.obj();
 	conn->insert(DB_ONRSPORDERACTION_COLLECTION, p);
 
@@ -1406,7 +1448,7 @@ void User::DB_OnRspOrderAction(mongo::DBClientConnection *conn, CThostFtdcInputO
 	USER_PRINT("DBManager::DB_OnRspOrderAction ok");
 } // CTP认为撤单参数错误
 
-void User::DB_OnErrRtnOrderAction(mongo::DBClientConnection *conn, CThostFtdcOrderActionField *pOrderAction){
+void User::DB_OnErrRtnOrderAction(mongo::DBClientConnection *conn, CSgitFtdcOrderActionField *pOrderAction){
 	USER_PRINT("User::DB_OnErrRtnOrderAction DB Connection!");
 	USER_PRINT(conn);
 	BSONObjBuilder b;
@@ -1466,14 +1508,14 @@ void User::DB_OnErrRtnOrderAction(mongo::DBClientConnection *conn, CThostFtdcOrd
 	b.append("StatusMsg", pOrderAction->StatusMsg);*/
 	///合约代码
 	b.append("InstrumentID", pOrderAction->InstrumentID);
-	///营业部编号
-	b.append("BranchID", pOrderAction->BranchID);
-	///投资单元代码
-	b.append("InvestUnitID", pOrderAction->InvestUnitID);
-	///IP地址
-	b.append("IPAddress", pOrderAction->IPAddress);
-	///Mac地址
-	b.append("MacAddress", pOrderAction->MacAddress);
+	/////营业部编号
+	//b.append("BranchID", pOrderAction->BranchID);
+	/////投资单元代码
+	//b.append("InvestUnitID", pOrderAction->InvestUnitID);
+	/////IP地址
+	//b.append("IPAddress", pOrderAction->IPAddress);
+	/////Mac地址
+	//b.append("MacAddress", pOrderAction->MacAddress);
 	BSONObj p = b.obj();
 
 	conn->insert(DB_ONERRRTNORDERACTION_COLLECTION, p);
@@ -1483,7 +1525,7 @@ void User::DB_OnErrRtnOrderAction(mongo::DBClientConnection *conn, CThostFtdcOrd
 	USER_PRINT("DBManager::DB_OnErrRtnOrderAction ok");
 } // 交易所认为撤单错误
 
-void User::DB_OnRspOrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderField *pInputOrder){
+void User::DB_OnRspOrderInsert(mongo::DBClientConnection *conn, CSgitFtdcInputOrderField *pInputOrder){
 	USER_PRINT("User::DB_OnRspOrderInsert DB Connection!");
 	USER_PRINT(conn);
 	BSONObjBuilder b;
@@ -1533,22 +1575,22 @@ void User::DB_OnRspOrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputO
 	b.append("RequestID", pInputOrder->RequestID);
 	///用户强评标志
 	b.append("UserForceClose", pInputOrder->UserForceClose);
-	///互换单标志
-	b.append("IsSwapOrder", pInputOrder->IsSwapOrder);
-	///交易所代码
-	b.append("ExchangeID", pInputOrder->ExchangeID);
-	///投资单元代码
-	b.append("InvestUnitID", pInputOrder->InvestUnitID);
-	///资金账号
-	b.append("AccountID", pInputOrder->AccountID);
-	///币种代码
-	b.append("CurrencyID", pInputOrder->CurrencyID);
-	///交易编码
-	b.append("ClientID", pInputOrder->ClientID);
-	///IP地址
-	b.append("IPAddress", pInputOrder->IPAddress);
-	///Mac地址
-	b.append("MacAddress", pInputOrder->MacAddress);
+	/////互换单标志
+	//b.append("IsSwapOrder", pInputOrder->IsSwapOrder);
+	/////交易所代码
+	//b.append("ExchangeID", pInputOrder->ExchangeID);
+	/////投资单元代码
+	//b.append("InvestUnitID", pInputOrder->InvestUnitID);
+	/////资金账号
+	//b.append("AccountID", pInputOrder->AccountID);
+	/////币种代码
+	//b.append("CurrencyID", pInputOrder->CurrencyID);
+	/////交易编码
+	//b.append("ClientID", pInputOrder->ClientID);
+	/////IP地址
+	//b.append("IPAddress", pInputOrder->IPAddress);
+	/////Mac地址
+	//b.append("MacAddress", pInputOrder->MacAddress);
 	
 	BSONObj p = b.obj();
 	conn->insert(DB_ONRSPORDERINSERT_COLLECTION, p);
@@ -1558,7 +1600,7 @@ void User::DB_OnRspOrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputO
 } // CTP认为报单参数错误
 
 
-void User::DB_OnErrRtnOrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderField *pInputOrder){
+void User::DB_OnErrRtnOrderInsert(mongo::DBClientConnection *conn, CSgitFtdcInputOrderField *pInputOrder){
 	USER_PRINT("User::DB_OnErrRtnOrderInsert DB Connection!");
 	USER_PRINT(conn);
 	BSONObjBuilder b;
@@ -1608,22 +1650,22 @@ void User::DB_OnErrRtnOrderInsert(mongo::DBClientConnection *conn, CThostFtdcInp
 	b.append("RequestID", pInputOrder->RequestID);
 	///用户强评标志
 	b.append("UserForceClose", pInputOrder->UserForceClose);
-	///互换单标志
-	b.append("IsSwapOrder", pInputOrder->IsSwapOrder);
-	///交易所代码
-	b.append("ExchangeID", pInputOrder->ExchangeID);
-	///投资单元代码
-	b.append("InvestUnitID", pInputOrder->InvestUnitID);
-	///资金账号
-	b.append("AccountID", pInputOrder->AccountID);
-	///币种代码
-	b.append("CurrencyID", pInputOrder->CurrencyID);
-	///交易编码
-	b.append("ClientID", pInputOrder->ClientID);
-	///IP地址
-	b.append("IPAddress", pInputOrder->IPAddress);
-	///Mac地址
-	b.append("MacAddress", pInputOrder->MacAddress);
+	/////互换单标志
+	//b.append("IsSwapOrder", pInputOrder->IsSwapOrder);
+	/////交易所代码
+	//b.append("ExchangeID", pInputOrder->ExchangeID);
+	/////投资单元代码
+	//b.append("InvestUnitID", pInputOrder->InvestUnitID);
+	/////资金账号
+	//b.append("AccountID", pInputOrder->AccountID);
+	/////币种代码
+	//b.append("CurrencyID", pInputOrder->CurrencyID);
+	/////交易编码
+	//b.append("ClientID", pInputOrder->ClientID);
+	/////IP地址
+	//b.append("IPAddress", pInputOrder->IPAddress);
+	/////Mac地址
+	//b.append("MacAddress", pInputOrder->MacAddress);
 	BSONObj p = b.obj();
 	conn->insert(DB_ONERRRTNORDERINSERT_COLLECTION, p);
 	USER_PRINT("DBManager::DB_OnErrRtnOrderInsert ok");
@@ -1631,7 +1673,7 @@ void User::DB_OnErrRtnOrderInsert(mongo::DBClientConnection *conn, CThostFtdcInp
 
 } // 交易所认为报单错误
 
-void User::DB_OnRspQryInvestorPosition(mongo::DBClientConnection *conn, CThostFtdcInvestorPositionField *pInvestorPosition){
+void User::DB_OnRspQryInvestorPosition(mongo::DBClientConnection *conn, CSgitFtdcInvestorPositionField *pInvestorPosition){
 	USER_PRINT("User::DB_OnRspQryInvestorPosition DB Connection!");
 	USER_PRINT(conn);
 	BSONObjBuilder b;
@@ -1717,12 +1759,12 @@ void User::DB_OnRspQryInvestorPosition(mongo::DBClientConnection *conn, CThostFt
 	b.append("MarginRateByMoney", pInvestorPosition->MarginRateByMoney);
 	///保证金率(按手数)
 	b.append("MarginRateByVolume", pInvestorPosition->MarginRateByVolume);
-	///执行冻结
-	b.append("StrikeFrozen", pInvestorPosition->StrikeFrozen);
-	///执行冻结金额
-	b.append("StrikeFrozenAmount", pInvestorPosition->StrikeFrozenAmount);
-	///放弃执行冻结
-	b.append("AbandonFrozen", pInvestorPosition->AbandonFrozen);
+	/////执行冻结
+	//b.append("StrikeFrozen", pInvestorPosition->StrikeFrozen);
+	/////执行冻结金额
+	//b.append("StrikeFrozenAmount", pInvestorPosition->StrikeFrozenAmount);
+	/////放弃执行冻结
+	//b.append("AbandonFrozen", pInvestorPosition->AbandonFrozen);
 	BSONObj p = b.obj();
 	conn->insert(DB_ONRSPQRYINVESTORPOSITION, p);
 

@@ -13,8 +13,8 @@
 #include <time.h>
 #include <sys/time.h>
 #include <list>
-#include "ThostFtdcMdApi.h"
-#include "ThostFtdcUserApiStruct.h"
+#include "SgitFtdcMdApi.h"
+#include "SgitFtdcUserApiStruct.h"
 #include "User.h"
 #include "Strategy.h"
 #include "CTP_Manager.h"
@@ -27,10 +27,10 @@ using std::string;
 class CTP_Manager;
 class Strategy;
 
-class MdSpi :public CThostFtdcMdSpi{
+class MdSpi :public CSgitFtdcMdSpi{
 
 public:
-    MdSpi(CThostFtdcMdApi *mdapi);
+    MdSpi(CSgitFtdcMdApi *mdapi);
 	//建立连接
 	void Connect(char *frontAddress);
     //建立连接时触发
@@ -44,34 +44,37 @@ public:
 	//登录
 	void Login(char *BrokerID, char *UserID, char *Password);
     ///登录请求响应
-    void OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo,
+    void OnRspUserLogin(CSgitFtdcRspUserLoginField *pRspUserLogin, CSgitFtdcRspInfoField *pRspInfo,
                         int nRequestID, bool bIsLast);
 	//登出
 	void Logout(char *BrokerID, char *UserID);
     ///登出请求响应
-    void OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+    void OnRspUserLogout(CSgitFtdcUserLogoutField *pUserLogout, CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 	///订阅行情
 	void SubMarket(list<string> *l_instrument);
+
+	///行情就绪
+	void Ready();
 
 	///取消订阅行情
 	void UnSubMarket(list<string> *l_instrument);
 
     ///订阅行情应答
-    void OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+    void OnRspSubMarketData(CSgitFtdcSpecificInstrumentField *pSpecificInstrument, CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
     ///取消订阅行情应答
-    void OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+    void OnRspUnSubMarketData(CSgitFtdcSpecificInstrumentField *pSpecificInstrument, CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
     ///深度行情通知
-    void OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData);
-	void CopyTickData(CThostFtdcDepthMarketDataField *dst, CThostFtdcDepthMarketDataField *src);
+    void OnRtnDepthMarketData(CSgitFtdcDepthMarketDataField *pDepthMarketData);
+	void CopyTickData(CSgitFtdcDepthMarketDataField *dst, CSgitFtdcDepthMarketDataField *src);
 
 	//通信断开
 	void OnFrontDisconnected(int nReason);
 
 	//返回数据是否报错
-	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
+	bool IsErrorRspInfo(CSgitFtdcRspInfoField *pRspInfo);
 
 	//订阅行情
 	void SubMarketData(char *ppInstrumentID[], int nCount);
@@ -101,9 +104,9 @@ public:
 	CTP_Manager *getCtpManager();
 
 private:
-    CThostFtdcMdApi *mdapi;
-    CThostFtdcReqUserLoginField *loginField;
-	CThostFtdcUserLogoutField *logoutField;
+    CSgitFtdcMdApi *mdapi;
+    CSgitFtdcReqUserLoginField *loginField;
+	CSgitFtdcUserLogoutField *logoutField;
     int loginRequestID;
 	bool isLogged;
 	bool isFirstTimeLogged;
@@ -119,6 +122,6 @@ private:
 	sem_t unsubmarket_sem;*/
 	list<Strategy *> *l_strategys;
 	CTP_Manager *ctp_m;
-	CThostFtdcDepthMarketDataField *last_tick_data;
+	CSgitFtdcDepthMarketDataField *last_tick_data;
 };
 #endif //QUANT_CTP_MDSPI_H

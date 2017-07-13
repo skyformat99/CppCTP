@@ -5,7 +5,7 @@
 #include <string>
 #include <cstring>
 #include <mongo/client/dbclient.h>
-#include "ThostFtdcTraderApi.h"
+#include "SgitFtdcTraderApi.h"
 #include "TdSpi.h"
 #include "DBManager.h"
 #include "Order.h"
@@ -45,7 +45,7 @@ public:
 	bool getIsFirstTimeLogged();
 	bool getIsConfirmSettlement();
 	int getLoginRequestID();
-	CThostFtdcTraderApi *getUserTradeAPI();
+	CSgitFtdcTraderApi *getUserTradeAPI();
 	class TdSpi *getUserTradeSPI();
 	string getFrontAddress();
 
@@ -62,7 +62,7 @@ public:
 	void setIsFirstTimeLogged(bool isFirstTimeLogged);
 	void setIsConfirmSettlement(bool isConfirmSettlement);
 	void setLoginRequestID(int loginRequestID);
-	void setUserTradeAPI(CThostFtdcTraderApi *UserTradeAPI);
+	void setUserTradeAPI(CSgitFtdcTraderApi *UserTradeAPI);
 	void setUserTradeSPI(TdSpi *UserTradeSPI);
 	void setFrontAddress(string frontAddress);
 	Trader *GetTrader();
@@ -78,7 +78,7 @@ public:
 	void addStrategyToList(Strategy *stg);
 
 	/// 拷贝持仓明细数据
-	void CopyPositionDetailData(CThostFtdcInvestorPositionDetailField *dst, CThostFtdcInvestorPositionDetailField *src);
+	void CopyPositionDetailData(CSgitFtdcInvestorPositionDetailField *dst, CSgitFtdcInvestorPositionDetailField *src);
 
 	/// 初始化合约撤单次数,例如"cu1601":0 "cu1701":0
 	void init_instrument_id_action_counter(string instrument_id);
@@ -87,7 +87,10 @@ public:
 	int get_instrument_id_action_counter(string instrument_id);
 
 	/// 添加对应合约撤单次数计数器,例如"cu1602":1 "cu1701":1
-	void add_instrument_id_action_counter(CThostFtdcOrderField *pOrder);
+	void add_instrument_id_action_counter(CSgitFtdcOrderField *pOrder);
+
+	/// 添加对应合约撤单次数统计(Sgit)
+	void add_instrument_id_action_counter(CSgitFtdcInputOrderActionField *pInputOrderAction);
 
 	/// 报单引用基准
 	void setStgOrderRefBase(long long stg_order_ref_base);
@@ -96,7 +99,7 @@ public:
 	long long getStgOrderRefBase();
 
 	/// 获取报单
-	void OrderInsert(CThostFtdcInputOrderField *insert_order, Strategy *stg, string strategy_id);
+	void OrderInsert(CSgitFtdcInputOrderField *insert_order, Strategy *stg, string strategy_id);
 
 	/// 设置策略内合约最小跳价格
 	void setStgInstrumnetPriceTick();
@@ -104,15 +107,15 @@ public:
 
 	void setL_Position_Detail_From_CTP(list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_ctp);
 	list<USER_INSTRUMENT_POSITION *> *getL_Position_Detail_From_CTP();
-	void addL_Position_Detail_From_CTP(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail);
+	void addL_Position_Detail_From_CTP(CSgitFtdcInvestorPositionDetailField *pInvestorPositionDetail);
 
 	void setL_Position_Detail_From_Local_Order(list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_local_order);
 	list<USER_INSTRUMENT_POSITION *> *getL_Position_Detail_From_Local_Order();
-	void addL_Position_Detail_From_Local_Order(USER_CThostFtdcOrderField *order);
+	void addL_Position_Detail_From_Local_Order(USER_CSgitFtdcOrderField *order);
 
 	void setL_Position_Detail_From_Local_Trade(list<USER_INSTRUMENT_POSITION *> *l_position_detail_from_local_trade);
 	list<USER_INSTRUMENT_POSITION *> *getL_Position_Detail_From_Local_Trade();
-	void addL_Position_Detail_From_Local_Trade(USER_CThostFtdcTradeField *order);
+	void addL_Position_Detail_From_Local_Trade(USER_CSgitFtdcTradeField *order);
 
 	/// 获取统计持仓明细结果
 	void getL_Position_Detail_Data(list<USER_INSTRUMENT_POSITION *> *l_position_detail_cal);
@@ -125,16 +128,16 @@ public:
 	/************************************************************************/
 	/* 完成Order的MongoDB操作                                                 */
 	/************************************************************************/
-	void DB_OrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderField *pInputOrder);
-	void DB_OnRtnOrder(mongo::DBClientConnection *conn, CThostFtdcOrderField *pOrder);
-	void DB_OnRtnTrade(mongo::DBClientConnection *conn, CThostFtdcTradeField *pTrade);
-	void DB_OrderAction(mongo::DBClientConnection *conn, CThostFtdcInputOrderActionField *pOrderAction);
-	void DB_OrderCombine(mongo::DBClientConnection *conn, CThostFtdcOrderField *pOrder);
-	void DB_OnRspOrderAction(mongo::DBClientConnection *conn, CThostFtdcInputOrderActionField *pInputOrderAction); // CTP认为撤单参数错误
-	void DB_OnErrRtnOrderAction(mongo::DBClientConnection *conn, CThostFtdcOrderActionField *pOrderAction); // 交易所认为撤单错误
-	void DB_OnRspOrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderField *pInputOrder); // CTP认为报单参数错误
-	void DB_OnErrRtnOrderInsert(mongo::DBClientConnection *conn, CThostFtdcInputOrderField *pInputOrder); // 交易所认为报单错误
-	void DB_OnRspQryInvestorPosition(mongo::DBClientConnection *conn, CThostFtdcInvestorPositionField *pInvestorPosition); // 持仓信息
+	void DB_OrderInsert(mongo::DBClientConnection *conn, CSgitFtdcInputOrderField *pInputOrder);
+	void DB_OnRtnOrder(mongo::DBClientConnection *conn, CSgitFtdcOrderField *pOrder);
+	void DB_OnRtnTrade(mongo::DBClientConnection *conn, CSgitFtdcTradeField *pTrade);
+	void DB_OrderAction(mongo::DBClientConnection *conn, CSgitFtdcInputOrderActionField *pOrderAction);
+	void DB_OrderCombine(mongo::DBClientConnection *conn, CSgitFtdcOrderField *pOrder);
+	void DB_OnRspOrderAction(mongo::DBClientConnection *conn, CSgitFtdcInputOrderActionField *pInputOrderAction); // CTP认为撤单参数错误
+	void DB_OnErrRtnOrderAction(mongo::DBClientConnection *conn, CSgitFtdcOrderActionField *pOrderAction); // 交易所认为撤单错误
+	void DB_OnRspOrderInsert(mongo::DBClientConnection *conn, CSgitFtdcInputOrderField *pInputOrder); // CTP认为报单参数错误
+	void DB_OnErrRtnOrderInsert(mongo::DBClientConnection *conn, CSgitFtdcInputOrderField *pInputOrder); // 交易所认为报单错误
+	void DB_OnRspQryInvestorPosition(mongo::DBClientConnection *conn, CSgitFtdcInvestorPositionField *pInvestorPosition); // 持仓信息
 	// 更新报单引用
 	void DB_UpdateOrderRef(string order_ref_base);
 
@@ -218,7 +221,7 @@ private:
 	bool isConfirmSettlement;
 	int loginRequestID;
 	string TraderID;
-	CThostFtdcTraderApi *UserTradeAPI;
+	CSgitFtdcTraderApi *UserTradeAPI;
 	TdSpi *UserTradeSPI;
 	Trader *trader;
 	list<Strategy *> *l_strategys;
@@ -241,7 +244,7 @@ private:
 	sem_t sem_inc_last_order_ref_cal_tmp; // 信号量,用来保证同一时间只能一处累加操作
 
 	// 阻塞队列
-	moodycamel::BlockingConcurrentQueue<CThostFtdcDepthMarketDataField *> queue_OrderInsert;	// 行情队列
+	moodycamel::BlockingConcurrentQueue<CSgitFtdcDepthMarketDataField *> queue_OrderInsert;	// 行情队列
 	string last_order_ref;	// 上一次order_ref
 	string current_order_ref;	// 当前order_ref
 	int last_order_ref_cal;	// 最后一次order_ref接收次数统计

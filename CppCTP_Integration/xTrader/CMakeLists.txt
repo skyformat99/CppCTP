@@ -20,7 +20,7 @@
 	set(EXECUTABLE_OUTPUT_PATH ./bin/)
 
     #set extern libraries
-    set(LIBRARIES libthostmduserapi.so libthosttraderapi.so libmongoclient.so libboost_thread.so libboost_system.so libboost_regex.so)
+    set(LIBRARIES libsgitquotapi.so libsgittradeapi.so libmongoclient.so libboost_thread.so libboost_system.so libboost_regex.so)
 
     #add execute file
     add_executable(quant_ctp_XTrader ${SOURCE_FILES})

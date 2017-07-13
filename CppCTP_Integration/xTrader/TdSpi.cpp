@@ -57,20 +57,20 @@ TdSpi::TdSpi() {
 	if (flag != 0) {
 		USER_PRINT("Can not create folder");
 	}
-	tdapi = CThostFtdcTraderApi::CreateFtdcTraderApi(flowpath.c_str());*/
+	tdapi = CSgitFtdcTraderApi::CreateFtdcTraderApi(flowpath.c_str());*/
 	/*sem_init(&connect_sem, 0, 1);
 	sem_init(&login_sem, 0, 1);
 	sem_init(&logout_sem, 0, 1);
 	sem_init(&sem_ReqQrySettlementInfoConfirm, 0, 1);
 	sem_init(&sem_ReqQrySettlementInfo, 0, 1);
 	sem_init(&sem_ReqSettlementInfoConfirm, 0, 1);*/
-	this->l_instruments_info = new list<CThostFtdcInstrumentField *>();
+	this->l_instruments_info = new list<CSgitFtdcInstrumentField *>();
 	this->l_strategys = NULL;
 	this->isFirstQryTrade = true;
 	this->isFirstQryOrder = true;
 	this->isFirstTimeLogged = true;
-	this->l_query_trade = new list<CThostFtdcTradeField *>();
-	this->l_query_order = new list<CThostFtdcOrderField *>();
+	this->l_query_trade = new list<CSgitFtdcTradeField *>();
+	this->l_query_order = new list<CSgitFtdcOrderField *>();
 }
 
 //增加api
@@ -79,7 +79,7 @@ void TdSpi::addApi(User *user, string flowpath) {
 	if (flag != 0) {
 		USER_PRINT("Can not create folder");
 	} else {
-		this->tdapi = CThostFtdcTraderApi::CreateFtdcTraderApi(flowpath.c_str());
+		this->tdapi = CSgitFtdcTraderApi::CreateFtdcTraderApi(flowpath.c_str());
 		cout << this->tdapi << endl;
 		USER_PRINT("API ADD TO user Already!");
 		//l_api.push_back(tdapi);
@@ -94,24 +94,24 @@ void TdSpi::Connect(User *user, bool init_flag) {
 	//注册事件处理对象
 	this->tdapi->RegisterSpi(user->getUserTradeSPI());
 	//订阅共有流
-	this->tdapi->SubscribePublicTopic(THOST_TERT_QUICK);
+	this->tdapi->SubscribePublicTopic(Sgit_TERT_QUICK);
 	/************************************************************************/
 	/* 根据读取数据库数据决定订阅私有流是否需要重新传输                                                                     */
 	/************************************************************************/
 	//订阅私有流
 	if (init_flag) //系统正常初始化,从上次退出继续初始化
 	{
-		//std::cout << "\t启动模式 = THOST_TERT_RESUME" << std::endl;
-		//this->tdapi->SubscribePrivateTopic(THOST_TERT_RESUME);
-		this->tdapi->SubscribePrivateTopic(THOST_TERT_RESTART);
+		//std::cout << "\t启动模式 = Sgit_TERT_RESUME" << std::endl;
+		//this->tdapi->SubscribePrivateTopic(Sgit_TERT_RESUME);
+		this->tdapi->SubscribePrivateTopic(Sgit_TERT_RESTART);
 	} 
 	else // 系统非正常退出,重新传送所有数据
 	{
-		//std::cout << "\t启动模式 = THOST_TERT_RESTART" << std::endl;
-		this->tdapi->SubscribePrivateTopic(THOST_TERT_RESTART);
+		//std::cout << "\t启动模式 = Sgit_TERT_RESTART" << std::endl;
+		this->tdapi->SubscribePrivateTopic(Sgit_TERT_RESTART);
 	}
 
-	this->tdapi->Init();
+	this->tdapi->Init(true);
 
 	//等待回调
 	std::unique_lock<std::mutex> lck(mtx);
@@ -191,7 +191,7 @@ int TdSpi::Login(User *user) {
 	//this->l_UserID.push_back(UserID);
 	//this->l_Password.push_back(Password);
 
-	loginField = new CThostFtdcReqUserLoginField();
+	loginField = new CSgitFtdcReqUserLoginField();
 	strcpy(loginField->BrokerID, user->getBrokerID().c_str());
 	strcpy(loginField->UserID, user->getUserID().c_str());
 	strcpy(loginField->Password, user->getPassword().c_str());
@@ -222,15 +222,15 @@ int TdSpi::Login(User *user) {
 }
 
 ///登录请求响应
-void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
-                           CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+void TdSpi::OnRspUserLogin(CSgitFtdcRspUserLoginField *pRspUserLogin,
+                           CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	std::cout << "TdSpi::OnRspUserLogin()" << std::endl;
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		//sem_post(&login_sem);
 		//std::cout << "=================================================================================" << endl;
 		std::cout << "\t*TdAPI 交易日:" << this->tdapi->GetTradingDay() << ", ";
 		///交易日
-		//std::cout << "CThostFtdcRspUserLoginField 交易日:" << pRspUserLogin->TradingDay << ", ";
+		//std::cout << "CSgitFtdcRspUserLoginField 交易日:" << pRspUserLogin->TradingDay << ", ";
 		///登录成功时间
 		std::cout << "登录成功时间:" << pRspUserLogin->LoginTime << ", ";
 		///经纪公司代码
@@ -256,7 +256,7 @@ void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 		///中金所时间
 		std::cout << "中金所时间" << pRspUserLogin->FFEXTime << ", ";
 		///能源中心时间
-		std::cout << "能源中心时间" << pRspUserLogin->INETime << endl;
+		//std::cout << "能源中心时间" << pRspUserLogin->INETime << endl;
 		string s_trading_day = this->tdapi->GetTradingDay();
 		//std::cout << "=================================================================================" << endl;
 		
@@ -281,6 +281,8 @@ void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 		{
 			this->ctp_m->sendTradeOffLineMessage(this->current_user->getUserID(), 0);
 		}
+		//支持飞鼠API方法
+		this->tdapi->Ready();
 	}
 	else {
 		//std::cout << "TdSpi::OnRspUserLogin()" << std::endl;
@@ -297,13 +299,15 @@ void TdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 //查询交易结算确认
 int TdSpi::QrySettlementInfoConfirm(User *user) {
 
-	CThostFtdcQrySettlementInfoConfirmField qrySettlementField;
+	int request_error = 0;
+
+	CSgitFtdcQrySettlementInfoConfirmField qrySettlementField;
 
 	strcpy(qrySettlementField.BrokerID, user->getBrokerID().c_str());
 	strcpy(qrySettlementField.InvestorID, user->getUserID().c_str());
 
 	sleep(1);
-	int request_error = this->tdapi->ReqQrySettlementInfoConfirm(&qrySettlementField, user->getRequestID());
+	//int request_error = this->tdapi->ReqQrySettlementInfoConfirm(&qrySettlementField, user->getRequestID());
 
 	/*int ret = this->controlTimeOut(&sem_ReqQrySettlementInfoConfirm);
 	if (ret == -1) {
@@ -314,7 +318,7 @@ int TdSpi::QrySettlementInfoConfirm(User *user) {
 
 
 //请求查询结算信息确认响应
-void TdSpi::OnRspQrySettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+void TdSpi::OnRspQrySettlementInfoConfirm(CSgitFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (this->current_user->getRequestID() == nRequestID) {
@@ -350,14 +354,14 @@ void TdSpi::OnRspQrySettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *
 
 //查询结算信息
 void TdSpi::QrySettlementInfo(User *user) {
-	CThostFtdcQrySettlementInfoField pQrySettlementInfo;
+	CSgitFtdcQrySettlementInfoField pQrySettlementInfo;
 
 	strcpy(pQrySettlementInfo.BrokerID, user->getBrokerID().c_str());
 	strcpy(pQrySettlementInfo.InvestorID, user->getUserID().c_str());
 
 	strcpy(pQrySettlementInfo.TradingDay, "");
 	sleep(1);
-	this->tdapi->ReqQrySettlementInfo(&pQrySettlementInfo, user->getRequestID());
+	//this->tdapi->ReqQrySettlementInfo(&pQrySettlementInfo, user->getRequestID());
 
 	/*int ret = this->controlTimeOut(&sem_ReqQrySettlementInfo);
 	if (ret == -1) {
@@ -366,8 +370,8 @@ void TdSpi::QrySettlementInfo(User *user) {
 }
 
 //请求查询投资者结算结果响应
-void TdSpi::OnRspQrySettlementInfo(CThostFtdcSettlementInfoField *pSettlementInfo,
-                                   CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+void TdSpi::OnRspQrySettlementInfo(CSgitFtdcSettlementInfoField *pSettlementInfo,
+                                   CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspQrySettlementInfo");
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (this->current_user->getRequestID() == nRequestID) {
@@ -399,13 +403,13 @@ void TdSpi::OnRspQrySettlementInfo(CThostFtdcSettlementInfoField *pSettlementInf
 //确认结算结果
 void TdSpi::ConfirmSettlementInfo(User *user) {
 
-	CThostFtdcSettlementInfoConfirmField pSettlementInfoConfirm;
+	CSgitFtdcSettlementInfoConfirmField pSettlementInfoConfirm;
 	strcpy(pSettlementInfoConfirm.BrokerID, user->getBrokerID().c_str());
 	strcpy(pSettlementInfoConfirm.InvestorID, user->getUserID().c_str());
 	strcpy(pSettlementInfoConfirm.ConfirmDate, this->tdapi->GetTradingDay());
 
 	sleep(1);
-	this->tdapi->ReqSettlementInfoConfirm(&pSettlementInfoConfirm, user->getRequestID());
+	//this->tdapi->ReqSettlementInfoConfirm(&pSettlementInfoConfirm, user->getRequestID());
 
 	/*int ret = this->controlTimeOut(&sem_ReqSettlementInfoConfirm);
 	if (ret == -1) {
@@ -414,7 +418,7 @@ void TdSpi::ConfirmSettlementInfo(User *user) {
 }
 
 //投资者结算结果确认响应
-void TdSpi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+void TdSpi::OnRspSettlementInfoConfirm(CSgitFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspSettlementInfoConfirm");
 	USER_PRINT(bIsLast);
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
@@ -453,14 +457,14 @@ void TdSpi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSe
 //查询交易所
 void TdSpi::QryExchange() {
 	USER_PRINT("TdSpi::QryExchange");
-	CThostFtdcQryExchangeField *pQryExchange = new CThostFtdcQryExchangeField();
+	CSgitFtdcQryExchangeField *pQryExchange = new CSgitFtdcQryExchangeField();
 	strcpy(pQryExchange->ExchangeID, "");
-	this->tdapi->ReqQryExchange(pQryExchange, this->loginRequestID);
+	//this->tdapi->ReqQryExchange(pQryExchange, this->loginRequestID);
 	delete pQryExchange;
 }
 
 //响应查询交易所
-void TdSpi::OnRspQryExchange(CThostFtdcExchangeField *pExchange, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+void TdSpi::OnRspQryExchange(CSgitFtdcExchangeField *pExchange, CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspQryExchange")
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		///交易所代码
@@ -475,7 +479,7 @@ void TdSpi::OnRspQryExchange(CThostFtdcExchangeField *pExchange, CThostFtdcRspIn
 //查询合约
 void TdSpi::QryInstrument(string exchangeid, string instrumentid) {
 	USER_PRINT("TdSpi::QryInstrument Begin")
-	CThostFtdcQryInstrumentField *pQryInstrument = new CThostFtdcQryInstrumentField();
+	CSgitFtdcQryInstrumentField *pQryInstrument = new CSgitFtdcQryInstrumentField();
 	strcpy(pQryInstrument->ExchangeID, exchangeid.c_str());
 	strcpy(pQryInstrument->InstrumentID, instrumentid.c_str());
 	sleep(1);
@@ -486,16 +490,16 @@ void TdSpi::QryInstrument(string exchangeid, string instrumentid) {
 
 //查询行情
 void TdSpi::QryDepthMarketData(string instrumentid) {
-	CThostFtdcQryDepthMarketDataField *pQryDepthMarketData = new CThostFtdcQryDepthMarketDataField();
+	CSgitFtdcQryDepthMarketDataField *pQryDepthMarketData = new CSgitFtdcQryDepthMarketDataField();
 
 	strcpy(pQryDepthMarketData->InstrumentID, instrumentid.c_str());
 
-	this->tdapi->ReqQryDepthMarketData(pQryDepthMarketData, this->current_user->getRequestID());
+	//this->tdapi->ReqQryDepthMarketData(pQryDepthMarketData, this->current_user->getRequestID());
 	delete pQryDepthMarketData;
 }
 
 ///请求查询行情响应
-void TdSpi::OnRspQryDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+void TdSpi::OnRspQryDepthMarketData(CSgitFtdcDepthMarketDataField *pDepthMarketData, CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspQryDepthMarketData");
 	std::cout << "TdSpi::OnRspQryDepthMarketData()" << std::endl;
 	if (!IsErrorRspInfo(pRspInfo)) {
@@ -588,21 +592,21 @@ void TdSpi::OnRspQryDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarket
 			///当日均价
 			cout << "当日均价:" << pDepthMarketData->AveragePrice << ", ";
 			///业务日期
-			cout << "业务日期:" << pDepthMarketData->ActionDay << endl;
+			//cout << "业务日期:" << pDepthMarketData->ActionDay << endl;
 			//std::cout << "=================================================================================" << endl;
 		}
 	}
 }
 
 //响应查询合约
-void TdSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+void TdSpi::OnRspQryInstrument(CSgitFtdcInstrumentField *pInstrument, CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	//USER_PRINT("TdSpi::OnRspQryInstrument")
 	//std::cout << "isLast" << bIsLast << endl;
 	if ((!this->IsErrorRspInfo(pRspInfo))) {
 		if (pInstrument) {
 			/// 初始化的时候，必须保证l_instruments_info为空
 			/*if (this->l_instruments_info->size() > 0) {
-			list<CThostFtdcInstrumentField *>::iterator instrument_itor;
+			list<CSgitFtdcInstrumentField *>::iterator instrument_itor;
 			for (instrument_itor = l_instruments_info->begin(); instrument_itor != l_instruments_info->end();) {
 			instrument_itor = l_instruments_info->erase(instrument_itor);
 			}
@@ -671,9 +675,9 @@ void TdSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CThostFtd
 			///组合类型
 			std::cout << "组合类型" << pInstrument->CombinationType << endl;*/
 
-			CThostFtdcInstrumentField *pInstrument_tmp = new CThostFtdcInstrumentField();
+			CSgitFtdcInstrumentField *pInstrument_tmp = new CSgitFtdcInstrumentField();
 			/*memset(pInstrument_tmp, 0x00, sizeof(pInstrument_tmp));
-			memcpy(pInstrument_tmp, pInstrument, sizeof(CThostFtdcInstrumentField));*/
+			memcpy(pInstrument_tmp, pInstrument, sizeof(CSgitFtdcInstrumentField));*/
 
 			this->CopyInstrumentInfo(pInstrument_tmp, pInstrument);
 
@@ -696,7 +700,7 @@ void TdSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CThostFtd
 }
 
 //拷贝合约信息
-void TdSpi::CopyInstrumentInfo(CThostFtdcInstrumentField *dst, CThostFtdcInstrumentField *src) {
+void TdSpi::CopyInstrumentInfo(CSgitFtdcInstrumentField *dst, CSgitFtdcInstrumentField *src) {
 	///合约代码
 	strcpy(dst->InstrumentID, src->InstrumentID);
 
@@ -704,7 +708,7 @@ void TdSpi::CopyInstrumentInfo(CThostFtdcInstrumentField *dst, CThostFtdcInstrum
 	strcpy(dst->ExchangeID, src->ExchangeID);
 
 	///合约名称
-	TThostFtdcInstrumentNameType	InstrumentName;
+	TSgitFtdcInstrumentNameType	InstrumentName;
 	strcpy(dst->InstrumentName, src->InstrumentName);
 
 	///合约在交易所的代码
@@ -772,28 +776,10 @@ void TdSpi::CopyInstrumentInfo(CThostFtdcInstrumentField *dst, CThostFtdcInstrum
 
 	///空头保证金率
 	dst->ShortMarginRatio = src->ShortMarginRatio;
-
-	///是否使用大额单边保证金算法
-	dst->MaxMarginSideAlgorithm = src->MaxMarginSideAlgorithm;
-
-	///基础商品代码
-	strcpy(dst->UnderlyingInstrID, src->UnderlyingInstrID);
-
-	///执行价
-	dst->StrikePrice = src->StrikePrice;
-
-	///期权类型
-	dst->OptionsType = src->OptionsType;
-
-	///合约基础商品乘数
-	dst->UnderlyingMultiple = src->UnderlyingMultiple;
-
-	///组合类型
-	dst->CombinationType = src->CombinationType;
 }
 
 ///合约交易状态通知
- void TdSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus) {
+ void TdSpi::OnRtnInstrumentStatus(CSgitFtdcInstrumentStatusField *pInstrumentStatus) {
 	//USER_PRINT("TdSpi::OnRtnInstrumentStatus");
 	if (pInstrumentStatus) {
 		/*///交易所代码
@@ -832,7 +818,7 @@ void TdSpi::CopyInstrumentInfo(CThostFtdcInstrumentField *dst, CThostFtdcInstrum
 //查询报单
 void TdSpi::QryOrder() {
 	USER_PRINT("TdSpi::QryOrder");
-	CThostFtdcQryOrderField *pQryOrder = new CThostFtdcQryOrderField();
+	CSgitFtdcQryOrderField *pQryOrder = new CSgitFtdcQryOrderField();
 	//strcpy(pQryOrder->BrokerID, const_cast<char *>(this->getBrokerID().c_str()));
 	//strcpy(pQryOrder->InvestorID, const_cast<char *>(this->getUserID().c_str()));
 	int error_no = this->tdapi->ReqQryOrder(pQryOrder, this->getRequestID());
@@ -850,7 +836,7 @@ void TdSpi::QryOrder() {
 }
 
 //响应查询报单;
-void TdSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+void TdSpi::OnRspQryOrder(CSgitFtdcOrderField *pOrder, CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspQryOrder");
 	//list<Session *>::iterator sid_itor;
 
@@ -859,7 +845,7 @@ void TdSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *
 		if (this->isFirstQryOrder == false) //如果新一轮接收，清空list列表
 		{
 			if (this->l_query_order->size() > 0) {
-				list<CThostFtdcOrderField *>::iterator itor;
+				list<CSgitFtdcOrderField *>::iterator itor;
 				for (itor = this->l_query_order->begin(); itor != this->l_query_order->end();) {
 					delete (*itor);
 					itor = l_query_order->erase(itor);
@@ -992,7 +978,7 @@ void TdSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *
 				//std::cout << "互换单标志:" << pOrder->IsSwapOrder << endl;
 				//std::cout << "=================================================================================" << endl;
 
-				CThostFtdcOrderField *pOrder_new = new CThostFtdcOrderField();
+				CSgitFtdcOrderField *pOrder_new = new CSgitFtdcOrderField();
 				this->CopyOrderInfo(pOrder_new, pOrder);
 
 				this->l_query_order->push_back(pOrder_new);
@@ -1016,14 +1002,14 @@ void TdSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *
 
 //查询保证金率
 void TdSpi::QryInstrumentMarginRate() {
-	CThostFtdcQryInstrumentMarginRateField *pQryInstrumentMarginRate = new CThostFtdcQryInstrumentMarginRateField();
+	CSgitFtdcQryInstrumentMarginRateField *pQryInstrumentMarginRate = new CSgitFtdcQryInstrumentMarginRateField();
 
-	this->tdapi->ReqQryInstrumentMarginRate(pQryInstrumentMarginRate, this->getRequestID());
+	//this->tdapi->ReqQryInstrumentMarginRate(pQryInstrumentMarginRate, this->getRequestID());
 	delete pQryInstrumentMarginRate;
 }
 
 ///请求查询合约保证金率响应
-void TdSpi::OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateField *pInstrumentMarginRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+void TdSpi::OnRspQryInstrumentMarginRate(CSgitFtdcInstrumentMarginRateField *pInstrumentMarginRate, CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspQryInstrumentMarginRate");
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (pInstrumentMarginRate) {
@@ -1056,13 +1042,13 @@ void TdSpi::OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateField *pI
 
 //查询手续费
 void TdSpi::QryInstrumentCommissionRate() {
-	CThostFtdcQryInstrumentCommissionRateField *pQryInstrumentCommissionRate = new CThostFtdcQryInstrumentCommissionRateField();
-	this->tdapi->ReqQryInstrumentCommissionRate(pQryInstrumentCommissionRate, this->getRequestID());
+	CSgitFtdcQryInstrumentCommissionRateField *pQryInstrumentCommissionRate = new CSgitFtdcQryInstrumentCommissionRateField();
+	//this->tdapi->ReqQryInstrumentCommissionRate(pQryInstrumentCommissionRate, this->getRequestID());
 	delete pQryInstrumentCommissionRate;
 }
 
 ///请求查询合约手续费率响应
-void TdSpi::OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissionRateField *pInstrumentCommissionRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+void TdSpi::OnRspQryInstrumentCommissionRate(CSgitFtdcInstrumentCommissionRateField *pInstrumentCommissionRate, CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspQryInstrumentCommissionRate");
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (pInstrumentCommissionRate) {
@@ -1093,7 +1079,7 @@ void TdSpi::OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissionRateF
 //查询投资者
 void TdSpi::QryInvestor() {
 	USER_PRINT("TdSpi::QryInvestor");
-	CThostFtdcQryInvestorField *pQryInvestor = new CThostFtdcQryInvestorField();
+	CSgitFtdcQryInvestorField *pQryInvestor = new CSgitFtdcQryInvestorField();
 	this->tdapi->ReqQryInvestor(pQryInvestor, this->getRequestID());
 	delete pQryInvestor;
 }
@@ -1101,7 +1087,7 @@ void TdSpi::QryInvestor() {
 
 
 //查询投资者响应
-void TdSpi::OnRspQryInvestor(CThostFtdcInvestorField *pInvestor, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+void TdSpi::OnRspQryInvestor(CSgitFtdcInvestorField *pInvestor, CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspQryInvestor");
 	if (!this->IsErrorRspInfo(pRspInfo)) {
 		if (pInvestor) {
@@ -1131,14 +1117,14 @@ void TdSpi::OnRspQryInvestor(CThostFtdcInvestorField *pInvestor, CThostFtdcRspIn
 			///手续费率模板代码
 			std::cout << "手续费率模板代码:" << pInvestor->CommModelID << ", ";
 			///保证金率模板代码
-			std::cout << "保证金率模板代码:" << pInvestor->MarginModelID << endl;
+			//std::cout << "保证金率模板代码:" << pInvestor->MarginModelID << endl;
 			std::cout << "=================================================================================" << endl;
 		}
 	}
 }
 
 /// 拷贝持仓明细数据
-void TdSpi::CopyPositionDetailData(CThostFtdcInvestorPositionDetailField *dst, CThostFtdcInvestorPositionDetailField *src) {
+void TdSpi::CopyPositionDetailData(CSgitFtdcInvestorPositionDetailField *dst, CSgitFtdcInvestorPositionDetailField *src) {
 	///合约代码
 	strcpy(dst->InstrumentID, src->InstrumentID);
 	///经纪公司代码
@@ -1196,7 +1182,7 @@ void TdSpi::CopyPositionDetailData(CThostFtdcInvestorPositionDetailField *dst, C
 //查询投资者持仓
 void TdSpi::QryInvestorPosition() {
 	USER_PRINT("TdSpi::QryInvestorPosition");
-	CThostFtdcQryInvestorPositionField *pQryInvestorPosition = new CThostFtdcQryInvestorPositionField();
+	CSgitFtdcQryInvestorPositionField *pQryInvestorPosition = new CSgitFtdcQryInvestorPositionField();
 	this->tdapi->ReqQryInvestorPosition(pQryInvestorPosition, this->getRequestID());
 	delete pQryInvestorPosition;
 }
@@ -1204,7 +1190,7 @@ void TdSpi::QryInvestorPosition() {
 //查询投资者持仓明细
 void TdSpi::QryInvestorPositionDetail() {
 	USER_PRINT("TdSpi::QryInvestorPositionDetail");
-	CThostFtdcQryInvestorPositionDetailField *pQryInvestorPositionDetail = new CThostFtdcQryInvestorPositionDetailField();
+	CSgitFtdcQryInvestorPositionDetailField *pQryInvestorPositionDetail = new CSgitFtdcQryInvestorPositionDetailField();
 	this->tdapi->ReqQryInvestorPositionDetail(pQryInvestorPositionDetail, this->getRequestID());
 	delete pQryInvestorPositionDetail;
 	//等待回调
@@ -1217,8 +1203,8 @@ void TdSpi::QryInvestorPositionDetail() {
 }
 
 ///请求查询投资者持仓明细响应
-void TdSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail, 
-	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+void TdSpi::OnRspQryInvestorPositionDetail(CSgitFtdcInvestorPositionDetailField *pInvestorPositionDetail, 
+	CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	//std::cout << "TdSpi::OnRspQryInvestorPositionDetail()" << std::endl;
 	USER_PRINT("TdSpi::OnRspQryInvestorPositionDetail");
 	if (!this->IsErrorRspInfo(pRspInfo)) {
@@ -1278,7 +1264,7 @@ void TdSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField
 			cout << "平仓金额:" << pInvestorPositionDetail->CloseAmount << endl;*/
 			//cout << "=================================================================================" << endl;
 		
-			CThostFtdcInvestorPositionDetailField *tmp = new CThostFtdcInvestorPositionDetailField();
+			CSgitFtdcInvestorPositionDetailField *tmp = new CSgitFtdcInvestorPositionDetailField();
 			this->CopyPositionDetailData(tmp, pInvestorPositionDetail);
 
 			/*将持仓明细添加到对应user统计列表里*/
@@ -1293,8 +1279,8 @@ void TdSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField
 }
 
 //请求查询投资者持仓响应
-void TdSpi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition,
-	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+void TdSpi::OnRspQryInvestorPosition(CSgitFtdcInvestorPositionField *pInvestorPosition,
+	CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	//std::cout << "TdSpi::OnRspQryInvestorPosition()" << std::endl;
 	USER_PRINT("TdSpi::OnRspQryInvestorPosition");
 	if (!this->IsErrorRspInfo(pRspInfo)) {
@@ -1395,13 +1381,13 @@ void TdSpi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorP
 
 //查询账号资金
 void TdSpi::QryTradingAccount() {
-	CThostFtdcQryTradingAccountField *pQryTradingAccount = new CThostFtdcQryTradingAccountField();
+	CSgitFtdcQryTradingAccountField *pQryTradingAccount = new CSgitFtdcQryTradingAccountField();
 	this->tdapi->ReqQryTradingAccount(pQryTradingAccount, this->getRequestID());
 	delete pQryTradingAccount;
 }
 
 //查询账号资金响应
-void TdSpi::OnRspQryTradingAccount(CThostFtdcTradingAccountField *pTradingAccount, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+void TdSpi::OnRspQryTradingAccount(CSgitFtdcTradingAccountField *pTradingAccount, CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspQryTradingAccount");
 	if (!this->IsErrorRspInfo(pRspInfo)) {
 		if (pTradingAccount) {
@@ -1466,7 +1452,7 @@ void TdSpi::OnRspQryTradingAccount(CThostFtdcTradingAccountField *pTradingAccoun
 			std::cout << "投资者交割保证金:" << pTradingAccount->DeliveryMargin << ", ";
 			///交易所交割保证金
 			std::cout << "交易所交割保证金:" << pTradingAccount->ExchangeDeliveryMargin << endl;
-			///保底期货结算准备金
+			/*///保底期货结算准备金
 			std::cout << "||保底期货结算准备金:" << pTradingAccount->ReserveBalance << ", ";
 			///币种代码
 			std::cout << "币种代码:" << pTradingAccount->CurrencyID << ", ";
@@ -1497,7 +1483,7 @@ void TdSpi::OnRspQryTradingAccount(CThostFtdcTradingAccountField *pTradingAccoun
 			///根据持仓盈亏算法计算的特殊产品持仓盈亏
 			std::cout << "根据持仓盈亏算法计算的特殊产品持仓盈亏:" << pTradingAccount->SpecProductPositionProfitByAlg << endl;
 			///特殊产品交易所保证金
-			std::cout << "||特殊产品交易所保证金:" << pTradingAccount->SpecProductExchangeMargin << endl;
+			std::cout << "||特殊产品交易所保证金:" << pTradingAccount->SpecProductExchangeMargin << endl;*/
 			std::cout << "=================================================================================" << endl;
 		}
 	}
@@ -1506,13 +1492,13 @@ void TdSpi::OnRspQryTradingAccount(CThostFtdcTradingAccountField *pTradingAccoun
 //查询成交单
 void TdSpi::QryTrade() {
 	USER_PRINT("TdSpi::QryTrade");
-	CThostFtdcQryTradeField *pQryTrade = new CThostFtdcQryTradeField();
-	this->tdapi->ReqQryTrade(pQryTrade, this->getRequestID());
+	CSgitFtdcQryTradeField *pQryTrade = new CSgitFtdcQryTradeField();
+	//this->tdapi->ReqQryTrade(pQryTrade, this->getRequestID());
 	sleep(1);
 	delete pQryTrade;
 }
 
-void TdSpi::CopyTradeInfo(CThostFtdcTradeField *dst, CThostFtdcTradeField *src) {
+void TdSpi::CopyTradeInfo(CSgitFtdcTradeField *dst, CSgitFtdcTradeField *src) {
 	///经纪公司代码
 	strcpy(dst->BrokerID, src->BrokerID);
 	///投资者代码
@@ -1577,7 +1563,7 @@ void TdSpi::CopyTradeInfo(CThostFtdcTradeField *dst, CThostFtdcTradeField *src) 
 
 
 //复制订单回报
-void TdSpi::CopyOrderInfo(CThostFtdcOrderField *dst, CThostFtdcOrderField *src) {
+void TdSpi::CopyOrderInfo(CSgitFtdcOrderField *dst, CSgitFtdcOrderField *src) {
 	///经纪公司代码
 	strcpy(dst->BrokerID, src->BrokerID);
 
@@ -1743,7 +1729,7 @@ void TdSpi::CopyOrderInfo(CThostFtdcOrderField *dst, CThostFtdcOrderField *src) 
 	///相关报单
 	strcpy(dst->RelativeOrderSysID, src->RelativeOrderSysID);
 
-	///郑商所成交数量
+	/*///郑商所成交数量
 	dst->ZCETotalTradedVolume = src->ZCETotalTradedVolume;
 
 	///互换单标志
@@ -1765,17 +1751,17 @@ void TdSpi::CopyOrderInfo(CThostFtdcOrderField *dst, CThostFtdcOrderField *src) 
 	strcpy(dst->IPAddress, src->IPAddress);
 
 	///Mac地址
-	strcpy(dst->MacAddress, src->MacAddress);
+	strcpy(dst->MacAddress, src->MacAddress);*/
 }
 
 //查询成交单响应
-void TdSpi::OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+void TdSpi::OnRspQryTrade(CSgitFtdcTradeField *pTrade, CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspQryTrade");
 	if (!(this->IsErrorRspInfo(pRspInfo))) {
 		if (this->isFirstQryTrade == false) { //如果新一轮的接收,清空接收list列表
 			//清空
 			if (this->l_query_trade->size() > 0) {
-				list<CThostFtdcTradeField *>::iterator Itor;
+				list<CSgitFtdcTradeField *>::iterator Itor;
 				for (Itor = l_query_trade->begin(); Itor != l_query_trade->end();) {
 					delete (*Itor);
 					Itor = l_query_trade->erase(Itor);
@@ -1849,7 +1835,7 @@ void TdSpi::OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *
 			///成交来源
 			std::cout << "成交来源:" << pTrade->TradeSource << endl;
 
-			CThostFtdcTradeField *pTrade_new = new CThostFtdcTradeField();
+			CSgitFtdcTradeField *pTrade_new = new CSgitFtdcTradeField();
 			this->CopyTradeInfo(pTrade_new, pTrade);
 			
 
@@ -1865,7 +1851,7 @@ void TdSpi::OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *
 }
 
 //下单
-int TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder, Strategy *stg) {
+int TdSpi::OrderInsert(User *user, CSgitFtdcInputOrderField *pInputOrder, Strategy *stg) {
 
 	int request_error = 0;
 
@@ -1891,87 +1877,87 @@ int TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder, Strat
 	//strcpy(pInputOrder->UserID, this->getUserID().c_str());
 
 	///报单价格条件
-	//TThostFtdcOrderPriceTypeType	OrderPriceType; //char 任意价 '1'
-	pInputOrder->OrderPriceType = THOST_FTDC_OPT_LimitPrice;
+	//TSgitFtdcOrderPriceTypeType	OrderPriceType; //char 任意价 '1'
+	pInputOrder->OrderPriceType = Sgit_FTDC_OPT_LimitPrice;
 
 	///买卖方向
-	//TThostFtdcDirectionType	Direction; //char 0买1卖
+	//TSgitFtdcDirectionType	Direction; //char 0买1卖
 	//pInputOrder->Direction = Direction;
 
 	///组合开平标志
-	//TThostFtdcCombOffsetFlagType	CombOffsetFlag; //char s[5]
+	//TSgitFtdcCombOffsetFlagType	CombOffsetFlag; //char s[5]
 	//strcpy(pInputOrder->CombOffsetFlag, CombOffsetFlag); //组合开平标志 开0平1强平2平今3平昨4
 	//pInputOrder->CombOffsetFlag[0] = CombOffsetFlag;
 
 	///组合投机套保标志
-	//TThostFtdcCombHedgeFlagType	CombHedgeFlag; //char s[5]
+	//TSgitFtdcCombHedgeFlagType	CombHedgeFlag; //char s[5]
 	//strcpy(pInputOrder->CombHedgeFlag, "1"); //"1"投机, "2"套利, "3"套保
 	pInputOrder->CombHedgeFlag[0] = '1';
 
 	///价格
-	//TThostFtdcPriceType	LimitPrice; //double
+	//TSgitFtdcPriceType	LimitPrice; //double
 	//pInputOrder->LimitPrice = Price;
 
 	///数量
-	//TThostFtdcVolumeType	VolumeTotalOriginal; //int
+	//TSgitFtdcVolumeType	VolumeTotalOriginal; //int
 	//pInputOrder->VolumeTotalOriginal = Volume;
 
 	///有效期类型
-	//TThostFtdcTimeConditionType	TimeCondition; //char 当日有效：'3'
-	pInputOrder->TimeCondition = THOST_FTDC_TC_GFD; //当日有效
+	//TSgitFtdcTimeConditionType	TimeCondition; //char 当日有效：'3'
+	pInputOrder->TimeCondition = Sgit_FTDC_TC_GFD; //当日有效
 
 	///GTD日期
-	//TThostFtdcDateType	GTDDate; //char s[9]
+	//TSgitFtdcDateType	GTDDate; //char s[9]
 	///成交量类型
-	//TThostFtdcVolumeConditionType	VolumeCondition; //char 任何数量 '1'
-	pInputOrder->VolumeCondition = THOST_FTDC_VC_AV; //任何数量 '1'
+	//TSgitFtdcVolumeConditionType	VolumeCondition; //char 任何数量 '1'
+	pInputOrder->VolumeCondition = Sgit_FTDC_VC_AV; //任何数量 '1'
 
 	///最小成交量
-	//TThostFtdcVolumeType	MinVolume; //int
+	//TSgitFtdcVolumeType	MinVolume; //int
 	pInputOrder->MinVolume = 1;
 
 	///触发条件
-	//TThostFtdcContingentConditionType	ContingentCondition; //char 立即 '1'
-	pInputOrder->ContingentCondition = THOST_FTDC_CC_Immediately;
+	//TSgitFtdcContingentConditionType	ContingentCondition; //char 立即 '1'
+	pInputOrder->ContingentCondition = Sgit_FTDC_CC_Immediately;
 
 	///止损价
-	//TThostFtdcPriceType	StopPrice; //double 置为0
+	//TSgitFtdcPriceType	StopPrice; //double 置为0
 	//pInputOrder->StopPrice = 0;
 
 	///强平原因
-	//TThostFtdcForceCloseReasonType	ForceCloseReason; //char 非强平 '0'
-	pInputOrder->ForceCloseReason = THOST_FTDC_FCC_NotForceClose;
+	//TSgitFtdcForceCloseReasonType	ForceCloseReason; //char 非强平 '0'
+	pInputOrder->ForceCloseReason = Sgit_FTDC_FCC_NotForceClose;
 
 	///自动挂起标志
-	//TThostFtdcBoolType	IsAutoSuspend; //bool false
+	//TSgitFtdcBoolType	IsAutoSuspend; //bool false
 	pInputOrder->IsAutoSuspend = 0;
 	///业务单元
-	//TThostFtdcBusinessUnitType	BusinessUnit; // char s[21]
+	//TSgitFtdcBusinessUnitType	BusinessUnit; // char s[21]
 
 	///请求编号
-	//TThostFtdcRequestIDType	RequestID; //int
+	//TSgitFtdcRequestIDType	RequestID; //int
 	//pInputOrder->RequestID = this->getRequestID();
 
 	///用户强评标志
-	//TThostFtdcBoolType	UserForceClose; //int
+	//TSgitFtdcBoolType	UserForceClose; //int
 	pInputOrder->UserForceClose = 0;
 
 	///互换单标志
-	//TThostFtdcBoolType	IsSwapOrder; //bool false
+	//TSgitFtdcBoolType	IsSwapOrder; //bool false
 	///交易所代码
-	//TThostFtdcExchangeIDType	ExchangeID;
+	//TSgitFtdcExchangeIDType	ExchangeID;
 	///投资单元代码
-	//TThostFtdcInvestUnitIDType	InvestUnitID;
+	//TSgitFtdcInvestUnitIDType	InvestUnitID;
 	///资金账号
-	//TThostFtdcAccountIDType	AccountID;
+	//TSgitFtdcAccountIDType	AccountID;
 	///币种代码
-	//TThostFtdcCurrencyIDType	CurrencyID;
+	//TSgitFtdcCurrencyIDType	CurrencyID;
 	///交易编码
-	//TThostFtdcClientIDType	ClientID;
+	//TSgitFtdcClientIDType	ClientID;
 	///IP地址
-	//TThostFtdcIPAddressType	IPAddress;
+	//TSgitFtdcIPAddressType	IPAddress;
 	///Mac地址
-	//TThostFtdcMacAddressType	MacAddress;
+	//TSgitFtdcMacAddressType	MacAddress;
 	//sleep(1);
 
 	/*std::cout << "TdSpi::OrderInsert() 报单参数:" <<
@@ -2036,7 +2022,7 @@ int TdSpi::OrderInsert(User *user, CThostFtdcInputOrderField *pInputOrder, Strat
 }
 
 ///报单录入请求响应
-void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+void TdSpi::OnRspOrderInsert(CSgitFtdcInputOrderField *pInputOrder, CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	USER_PRINT("TdSpi::OnRspOrderInsert");
 	if ((this->IsErrorRspInfo(pRspInfo, "TdSpi::OnRspOrderInsert()"))) {
 		if (pInputOrder) {
@@ -2123,225 +2109,229 @@ void TdSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcR
 }
 
 //下单响应
-void TdSpi::OnRtnOrder(CThostFtdcOrderField *pOrder) {
+void TdSpi::OnRtnOrder(CSgitFtdcOrderField *pOrder, CSgitFtdcRspInfoField *pRspInfo) {
 	USER_PRINT("TdSpi::OnRtnOrder");
 	//list<Session *>::iterator sid_itor;
 	//std::cout << "TdSpi::OnRtnOrder()" << std::endl;
-	if (pOrder) {
-		/*std::cout << "pOrder->SessionID = " << pOrder->SessionID << endl;
-		std::cout << "this->SessionID = " << this->SessionID << endl;
-		std::cout << "pOrder->FrontID = " << pOrder->FrontID << endl;
-		std::cout << "this->FrontID = " << this->FrontID << endl;*/
+	
+	// Sgit委托成功则进入
+	if (!this->IsErrorRspInfo(pRspInfo))
+	{
+		if (pOrder) {
+			/*std::cout << "pOrder->SessionID = " << pOrder->SessionID << endl;
+			std::cout << "this->SessionID = " << this->SessionID << endl;
+			std::cout << "pOrder->FrontID = " << pOrder->FrontID << endl;
+			std::cout << "this->FrontID = " << this->FrontID << endl;*/
 
-		///// sessionid判断
-		//for (sid_itor = this->current_user->getL_Sessions()->begin(); sid_itor != this->current_user->getL_Sessions()->end(); sid_itor++) {
-		//	USER_PRINT((*sid_itor)->getSessionID());
-		//	if (pOrder->SessionID == (*sid_itor)->getSessionID()) {
-		
+			///// sessionid判断
+			//for (sid_itor = this->current_user->getL_Sessions()->begin(); sid_itor != this->current_user->getL_Sessions()->end(); sid_itor++) {
+			//	USER_PRINT((*sid_itor)->getSessionID());
+			//	if (pOrder->SessionID == (*sid_itor)->getSessionID()) {
 
-		
 
-		//std::cout << "=================================================================================" << endl;
-		//经纪公司代码
-		//std::cout << "\t*经纪公司代码:" << pOrder->BrokerID << ", ";
-		////投资者代码
-		//std::cout << "投资者代码:" << pOrder->InvestorID << ", ";
-		////合约代码
-		//std::cout << "合约代码:" << pOrder->InstrumentID << ",       ";
-		////报单引用
-		//std::cout << "报单引用:" << pOrder->OrderRef << ", ";
-		////用户代码
-		//std::cout << "用户代码:" << pOrder->UserID << ", ";
-		////报单价格条件
-		//std::cout << "报单价格条件:" << pOrder->OrderPriceType << ", ";
-		////买卖方向
-		//std::cout << "买卖方向:" << pOrder->Direction << ", ";
-		////组合开平标志
-		//std::cout << "组合开平标志:" << pOrder->CombOffsetFlag << ", ";
-		////组合投机套保标志
-		//std::cout << "组合投机套保标志:" << pOrder->CombHedgeFlag << ", ";
-		////价格
-		//std::cout << "价格:" << pOrder->LimitPrice << ", ";
-		////数量
-		//std::cout << "数量:" << pOrder->VolumeTotalOriginal << ", ";
-		////有效期类型
-		//std::cout << "有效期类型:" << pOrder->TimeCondition << ", ";
-		////GTD日期
-		//std::cout << "GTD日期:" << pOrder->GTDDate << ", ";
-		////成交量类型
-		//std::cout << "成交量类型:" << pOrder->VolumeCondition << ", ";
-		////最小成交量
-		//std::cout << "最小成交量:" << pOrder->MinVolume << ", ";
-		////触发条件
-		//std::cout << "触发条件:" << pOrder->ContingentCondition << ", ";
-		////止损价
-		//std::cout << "止损价:" << pOrder->StopPrice << ", ";
-		////强平原因
-		//std::cout << "强平原因:" << pOrder->ForceCloseReason << ", ";
-		////自动挂起标志
-		//std::cout << "自动挂起标志:" << pOrder->IsAutoSuspend << ", ";
-		////业务单元
-		//std::cout << "业务单元:" << pOrder->BusinessUnit << ", ";
-		////请求编号
-		//std::cout << "请求编号:" << pOrder->RequestID << ", ";
-		////本地报单编号
-		//std::cout << "本地报单编号:" << pOrder->OrderLocalID << ", ";
-		////交易所代码
-		//std::cout << "交易所代码:" << pOrder->ExchangeID << ", ";
-		////会员代码
-		//std::cout << "会员代码:" << pOrder->ParticipantID << ", ";
-		////客户代码
-		//std::cout << "客户代码:" << pOrder->ClientID << ", ";
-		////合约在交易所的代码
-		//std::cout << "合约在交易所的代码:" << pOrder->ExchangeInstID << ", ";
-		////交易所交易员代码
-		//std::cout << "交易所交易员代码:" << pOrder->TraderID << ", ";
-		////安装编号
-		//std::cout << "安装编号:" << pOrder->InstallID << ", ";
-		////报单提交状态
-		//std::cout << "报单提交状态:" << pOrder->OrderSubmitStatus << ", ";
-		////报单提示序号
-		//std::cout << "报单提示序号:" << pOrder->NotifySequence << ", ";
-		////交易日
-		//std::cout << "交易日:" << pOrder->TradingDay << ", ";
-		////结算编号
-		//std::cout << "结算编号:" << pOrder->SettlementID << ", ";
-		////报单编号
-		//std::cout << "报单编号:" << pOrder->OrderSysID << ", ";
-		/////报单来源
-		//std::cout << "报单来源:" << pOrder->OrderSource << ", ";
-		/////报单状态
-		//std::cout << "报单状态:" << pOrder->OrderStatus << ", ";
-		/////报单类型
-		//std::cout << "报单类型:" << pOrder->OrderType << ", ";
-		/////今成交数量
-		//std::cout << "今成交数量:" << pOrder->VolumeTraded << ", ";
-		/////剩余数量
-		//std::cout << "剩余数量:" << pOrder->VolumeTotal << ", ";
-		/////报单日期
-		//std::cout << "报单日期:" << pOrder->InsertDate << ", ";
-		/////委托时间
-		//std::cout << "委托时间:" << pOrder->InsertTime << ", ";
-		/////激活时间
-		//std::cout << "激活时间:" << pOrder->ActiveTime << ", ";
-		/////挂起时间
-		//std::cout << "挂起时间:" << pOrder->SuspendTime << ", ";
-		/////最后修改时间
-		//std::cout << "最后修改时间:" << pOrder->UpdateTime << ", ";
-		/////撤销时间
-		//std::cout << "撤销时间:" << pOrder->CancelTime << ", ";
-		/////最后修改交易所交易员代码
-		//std::cout << "最后修改交易所交易员代码:" << pOrder->ActiveTraderID << ", ";
-		/////结算会员编号
-		//std::cout << "结算会员编号:" << pOrder->ClearingPartID << ", ";
-		/////序号
-		//std::cout << "序号:" << pOrder->SequenceNo << ", ";
-		/////前置编号
-		//std::cout << "前置编号:" << pOrder->FrontID << ", ";
-		/////会话编号
-		//std::cout << "会话编号:" << pOrder->SessionID << ", ";
-		/////用户端产品信息
-		//std::cout << "用户端产品信息:" << pOrder->UserProductInfo << ", ";
-		/////状态信息
-		//codeDst[90] = { 0 };
-		//Utils::Gb2312ToUtf8(codeDst, 90, pOrder->StatusMsg, strlen(pOrder->StatusMsg)); // Gb2312ToUtf8
-		//std::cout << "状态信息:" << codeDst << ", ";
-		/////用户强评标志
-		//std::cout << "用户强评标志:" << pOrder->UserForceClose << ", ";
-		/////操作用户代码
-		//std::cout << "操作用户代码:" << pOrder->ActiveUserID << ", ";
-		/////经纪公司报单编号
-		//std::cout << "经纪公司报单编号:" << pOrder->BrokerOrderSeq << ", ";
-		/////相关报单
-		//std::cout << "相关报单:" << pOrder->RelativeOrderSysID << ", ";
-		/////郑商所成交数量
-		//std::cout << "郑商所成交数量:" << pOrder->ZCETotalTradedVolume << ", ";
-		/////互换单标志
-		//std::cout << "互换单标志:" << pOrder->IsSwapOrder << endl;
-		//std::cout << "=================================================================================" << endl;
 
-		//		this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pOrder);
-		//		//delete[] codeDst;
 
-		//		list<Strategy *>::iterator itor;
-		//		for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
-		//			(*itor)->OnRtnOrder(pOrder);
-		//		}
-		//	}
-		//}
+			//std::cout << "=================================================================================" << endl;
+			////经纪公司代码
+			//std::cout << "\t*经纪公司代码:" << pOrder->BrokerID << ", ";
+			////投资者代码
+			//std::cout << "投资者代码:" << pOrder->InvestorID << ", ";
+			////合约代码
+			//std::cout << "合约代码:" << pOrder->InstrumentID << ",       ";
+			////报单引用
+			//std::cout << "报单引用:" << pOrder->OrderRef << ", ";
+			////用户代码
+			//std::cout << "用户代码:" << pOrder->UserID << ", ";
+			////报单价格条件
+			//std::cout << "报单价格条件:" << pOrder->OrderPriceType << ", ";
+			////买卖方向
+			//std::cout << "买卖方向:" << pOrder->Direction << ", ";
+			////组合开平标志
+			//std::cout << "组合开平标志:" << pOrder->CombOffsetFlag << ", ";
+			////组合投机套保标志
+			//std::cout << "组合投机套保标志:" << pOrder->CombHedgeFlag << ", ";
+			////价格
+			//std::cout << "价格:" << pOrder->LimitPrice << ", ";
+			////数量
+			//std::cout << "数量:" << pOrder->VolumeTotalOriginal << ", ";
+			////有效期类型
+			//std::cout << "有效期类型:" << pOrder->TimeCondition << ", ";
+			////GTD日期
+			//std::cout << "GTD日期:" << pOrder->GTDDate << ", ";
+			////成交量类型
+			//std::cout << "成交量类型:" << pOrder->VolumeCondition << ", ";
+			////最小成交量
+			//std::cout << "最小成交量:" << pOrder->MinVolume << ", ";
+			////触发条件
+			//std::cout << "触发条件:" << pOrder->ContingentCondition << ", ";
+			////止损价
+			//std::cout << "止损价:" << pOrder->StopPrice << ", ";
+			////强平原因
+			//std::cout << "强平原因:" << pOrder->ForceCloseReason << ", ";
+			////自动挂起标志
+			//std::cout << "自动挂起标志:" << pOrder->IsAutoSuspend << ", ";
+			////业务单元
+			//std::cout << "业务单元:" << pOrder->BusinessUnit << ", ";
+			////请求编号
+			//std::cout << "请求编号:" << pOrder->RequestID << ", ";
+			////本地报单编号
+			//std::cout << "本地报单编号:" << pOrder->OrderLocalID << ", ";
+			////交易所代码
+			//std::cout << "交易所代码:" << pOrder->ExchangeID << ", ";
+			////会员代码
+			//std::cout << "会员代码:" << pOrder->ParticipantID << ", ";
+			////客户代码
+			//std::cout << "客户代码:" << pOrder->ClientID << ", ";
+			////合约在交易所的代码
+			//std::cout << "合约在交易所的代码:" << pOrder->ExchangeInstID << ", ";
+			////交易所交易员代码
+			//std::cout << "交易所交易员代码:" << pOrder->TraderID << ", ";
+			////安装编号
+			//std::cout << "安装编号:" << pOrder->InstallID << ", ";
+			////报单提交状态
+			//std::cout << "报单提交状态:" << pOrder->OrderSubmitStatus << ", ";
+			////报单提示序号
+			//std::cout << "报单提示序号:" << pOrder->NotifySequence << ", ";
+			////交易日
+			//std::cout << "交易日:" << pOrder->TradingDay << ", ";
+			////结算编号
+			//std::cout << "结算编号:" << pOrder->SettlementID << ", ";
+			////报单编号
+			//std::cout << "报单编号:" << pOrder->OrderSysID << ", ";
+			/////报单来源
+			//std::cout << "报单来源:" << pOrder->OrderSource << ", ";
+			/////报单状态
+			//std::cout << "报单状态:" << pOrder->OrderStatus << ", ";
+			/////报单类型
+			//std::cout << "报单类型:" << pOrder->OrderType << ", ";
+			/////今成交数量
+			//std::cout << "今成交数量:" << pOrder->VolumeTraded << ", ";
+			/////剩余数量
+			//std::cout << "剩余数量:" << pOrder->VolumeTotal << ", ";
+			/////报单日期
+			//std::cout << "报单日期:" << pOrder->InsertDate << ", ";
+			/////委托时间
+			//std::cout << "委托时间:" << pOrder->InsertTime << ", ";
+			/////激活时间
+			//std::cout << "激活时间:" << pOrder->ActiveTime << ", ";
+			/////挂起时间
+			//std::cout << "挂起时间:" << pOrder->SuspendTime << ", ";
+			/////最后修改时间
+			//std::cout << "最后修改时间:" << pOrder->UpdateTime << ", ";
+			/////撤销时间
+			//std::cout << "撤销时间:" << pOrder->CancelTime << ", ";
+			/////最后修改交易所交易员代码
+			//std::cout << "最后修改交易所交易员代码:" << pOrder->ActiveTraderID << ", ";
+			/////结算会员编号
+			//std::cout << "结算会员编号:" << pOrder->ClearingPartID << ", ";
+			/////序号
+			//std::cout << "序号:" << pOrder->SequenceNo << ", ";
+			/////前置编号
+			//std::cout << "前置编号:" << pOrder->FrontID << ", ";
+			/////会话编号
+			//std::cout << "会话编号:" << pOrder->SessionID << ", ";
+			/////用户端产品信息
+			//std::cout << "用户端产品信息:" << pOrder->UserProductInfo << ", ";
+			/////状态信息
+			//codeDst[90] = { 0 };
+			//Utils::Gb2312ToUtf8(codeDst, 90, pOrder->StatusMsg, strlen(pOrder->StatusMsg)); // Gb2312ToUtf8
+			//std::cout << "状态信息:" << codeDst << ", ";
+			/////用户强评标志
+			//std::cout << "用户强评标志:" << pOrder->UserForceClose << ", ";
+			/////操作用户代码
+			//std::cout << "操作用户代码:" << pOrder->ActiveUserID << ", ";
+			/////经纪公司报单编号
+			//std::cout << "经纪公司报单编号:" << pOrder->BrokerOrderSeq << ", ";
+			/////相关报单
+			//std::cout << "相关报单:" << pOrder->RelativeOrderSysID << ", ";
+			//std::cout << "=================================================================================" << endl;
 
-		string temp(pOrder->OrderRef);
-		//std::cout << "\t报单引用 = " << temp << std::endl;
-		int len_order_ref = temp.length();
-		string result = temp.substr(0, 1);
-		//std::cout << "\tafter substr temp = " << temp << std::endl;
-		string strategyid = "";
-		
-		if (len_order_ref == 12 && result == "1") { // 通过本交易系统发出去的order长度12,首位字符为1
+			//		this->current_user->DB_OnRtnOrder(this->current_user->GetOrderConn(), pOrder);
+			//		//delete[] codeDst;
 
-			//this->current_user->DB_OnRtnOrder(this->current_user->getCTP_Manager()->getDBManager()->getConn(), pOrder);
+			//		list<Strategy *>::iterator itor;
+			//		for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+			//			(*itor)->OnRtnOrder(pOrder);
+			//		}
+			//	}
+			//}
 
-			this->current_user->getXtsLogger()->info("TdSpi::OnRtnOrder() 合约代码 = {} 报单引用 = {} 用户代码 = {} 交易所代码 = {} 组合开平标志 = {} 报单状态 = {}",
-				pOrder->InstrumentID, pOrder->OrderRef, pOrder->UserID, pOrder->ExchangeID, pOrder->CombOffsetFlag, pOrder->OrderStatus);
+			string temp(pOrder->OrderRef);
+			//std::cout << "\t报单引用 = " << temp << std::endl;
+			int len_order_ref = temp.length();
+			string result = temp.substr(0, 1);
+			//std::cout << "\tafter substr temp = " << temp << std::endl;
+			string strategyid = "";
 
-			// 断线情况自恢复逻辑
-			if (this->current_user->getIsEverLostConnection())
-			{
-				this->current_user->getXtsLogger()->info("TdSpi::OnRtnOrder() pOrder->OrderRef = {} LastOrderRef = {}", pOrder->OrderRef, this->current_user->getLastOrderRef());
-				// 对比最后一次order_ref
-				if (!strcmp(pOrder->OrderRef, this->current_user->getLastOrderRef().c_str()))
+			if (len_order_ref == 12 && result == "1") { // 通过本交易系统发出去的order长度12,首位字符为1
+
+				//this->current_user->DB_OnRtnOrder(this->current_user->getCTP_Manager()->getDBManager()->getConn(), pOrder);
+
+				this->current_user->getXtsLogger()->info("TdSpi::OnRtnOrder() 合约代码 = {} 报单引用 = {} 用户代码 = {} 交易所代码 = {} 组合开平标志 = {} 报单状态 = {}",
+					pOrder->InstrumentID, pOrder->OrderRef, pOrder->UserID, pOrder->ExchangeID, pOrder->CombOffsetFlag, pOrder->OrderStatus);
+
+				// 断线情况自恢复逻辑
+				if (this->current_user->getIsEverLostConnection())
 				{
-					this->current_user->autoIncrementLastOrderRefCalTmp();
-					
-					this->current_user->getXtsLogger()->info("TdSpi::OnRtnOrder() getLastOrderRefCalTmp = {} getLastOrderRefCal = {}", this->current_user->getLastOrderRefCalTmp(), this->current_user->getLastOrderRefCal());
-					
-					if (this->current_user->getLastOrderRefCalTmp() == this->current_user->getLastOrderRefCal())
+					this->current_user->getXtsLogger()->info("TdSpi::OnRtnOrder() pOrder->OrderRef = {} LastOrderRef = {}", pOrder->OrderRef, this->current_user->getLastOrderRef());
+					// 对比最后一次order_ref
+					if (!strcmp(pOrder->OrderRef, this->current_user->getLastOrderRef().c_str()))
 					{
-						this->current_user->setIsEverLostConnection(false);
-						// 重新归0
-						this->current_user->resetLastOrderRefCalTmp();
+						this->current_user->autoIncrementLastOrderRefCalTmp();
+
+						this->current_user->getXtsLogger()->info("TdSpi::OnRtnOrder() getLastOrderRefCalTmp = {} getLastOrderRefCal = {}", this->current_user->getLastOrderRefCalTmp(), this->current_user->getLastOrderRefCal());
+
+						if (this->current_user->getLastOrderRefCalTmp() == this->current_user->getLastOrderRefCal())
+						{
+							this->current_user->setIsEverLostConnection(false);
+							// 重新归0
+							this->current_user->resetLastOrderRefCalTmp();
+						}
 					}
 				}
-			}
-			else {
-				// 对比最后一次order_ref，不相等归1，并且赋值相等进行计数统计
-				if (!strcmp(pOrder->OrderRef, this->current_user->getLastOrderRef().c_str()))
-				{
-					this->current_user->autoIncrementLastOrderRefCal();
-				}
 				else {
-					this->current_user->setLastOrderRef(pOrder->OrderRef);
-					this->current_user->resetLastOrderRefCal();
+					// 对比最后一次order_ref，不相等归1，并且赋值相等进行计数统计
+					if (!strcmp(pOrder->OrderRef, this->current_user->getLastOrderRef().c_str()))
+					{
+						this->current_user->autoIncrementLastOrderRefCal();
+					}
+					else {
+						this->current_user->setLastOrderRef(pOrder->OrderRef);
+						this->current_user->resetLastOrderRefCal();
+					}
 				}
+
+				//delete[] codeDst;
+				strategyid = temp.substr(len_order_ref - 2, 2);
+				//std::cout << "\t回报策略编号 = " << strategyid << std::endl;
+				list<Strategy *>::iterator itor;
+
+				// 当有其他地方调用策略列表,阻塞,信号量P操作
+				sem_wait((this->ctp_m->getSem_strategy_handler()));
+
+				for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
+					//std::cout << "\t系统策略编号 = " << (*itor)->getStgStrategyId() << std::endl;
+					if ((*itor)->getStgStrategyId() == strategyid) {
+						(*itor)->OnRtnOrder(pOrder);
+						//break;
+					}
+				}
+
+				// 当有其他地方调用策略列表,阻塞,信号量P操作
+				sem_post((this->ctp_m->getSem_strategy_handler()));
 			}
 
-			//delete[] codeDst;
-			strategyid = temp.substr(len_order_ref - 2, 2);
-			//std::cout << "\t回报策略编号 = " << strategyid << std::endl;
-			list<Strategy *>::iterator itor;
-
-			// 当有其他地方调用策略列表,阻塞,信号量P操作
-			sem_wait((this->ctp_m->getSem_strategy_handler()));
-
-			for (itor = this->l_strategys->begin(); itor != this->l_strategys->end(); itor++) {
-				//std::cout << "\t系统策略编号 = " << (*itor)->getStgStrategyId() << std::endl;
-				if ((*itor)->getStgStrategyId() == strategyid) {
-					(*itor)->OnRtnOrder(pOrder);
-					//break;
-				}
-			}
-
-			// 当有其他地方调用策略列表,阻塞,信号量P操作
-			sem_post((this->ctp_m->getSem_strategy_handler()));
 		}
-
-	} else {
-		USER_PRINT("OnRtnOrder no pOrder");
+		else {
+			USER_PRINT("OnRtnOrder no pOrder");
+		}
 	}
+
+	
 }
 
 //成交通知
-void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
+void TdSpi::OnRtnTrade(CSgitFtdcTradeField *pTrade) {
 	USER_PRINT("TdSpi::OnRtnTrade");
 	//std::cout << "TdSpi::OnRtnTrade()" << std::endl;
 	if (pTrade) {
@@ -2386,7 +2376,7 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 		/////数量(本次成交数量，特指本次交易)
 		//cout << "数量:" << pTrade->Volume << ", "; //本批成交量
 		/////成交时期
-		//cout << "成交时期:" << pTrade->TradeDate << ", ";
+		//cout << "成交日期:" << pTrade->TradeDate << ", ";
 		/////成交时间
 		//cout << "成交时间:" << pTrade->TradeTime << ", ";
 		/////成交类型
@@ -2451,7 +2441,7 @@ void TdSpi::OnRtnTrade(CThostFtdcTradeField *pTrade) {
 }
 
 //下单错误响应
-void TdSpi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo) {
+void TdSpi::OnErrRtnOrderInsert(CSgitFtdcInputOrderField *pInputOrder, CSgitFtdcRspInfoField *pRspInfo) {
 	USER_PRINT("TdSpi::OnErrRtnOrderInsert");
 	if ((this->IsErrorRspInfo(pRspInfo, "TdSpi::OnErrRtnOrderInsert()"))) {
 		if (pInputOrder) {
@@ -2489,8 +2479,8 @@ int TdSpi::OrderAction(char *ExchangeID, char *OrderRef, char *OrderSysID) {
 
 	int request_error = 0;
 
-	CThostFtdcInputOrderActionField pOrderAction;
-	memset(&pOrderAction, 0x00, sizeof(CThostFtdcInputOrderActionField));
+	CSgitFtdcInputOrderActionField pOrderAction;
+	memset(&pOrderAction, 0x00, sizeof(CSgitFtdcInputOrderActionField));
 
 	strcpy(pOrderAction.BrokerID, this->getBrokerID().c_str());
 	strcpy(pOrderAction.InvestorID, this->getUserID().c_str());
@@ -2498,7 +2488,7 @@ int TdSpi::OrderAction(char *ExchangeID, char *OrderRef, char *OrderSysID) {
 	strcpy(pOrderAction.ExchangeID, ExchangeID);
 	strcpy(pOrderAction.OrderRef, OrderRef);		//设置报单引用
 	strcpy(pOrderAction.OrderSysID, OrderSysID);
-	pOrderAction.ActionFlag = THOST_FTDC_AF_Delete; //删除
+	pOrderAction.ActionFlag = Sgit_FTDC_AF_Delete; //删除
 
 	this->current_user->getXtsLogger()->info("TdSpi::OrderAction() OrderRef = {}", pOrderAction.OrderRef);
 
@@ -2524,9 +2514,11 @@ int TdSpi::OrderAction(char *ExchangeID, char *OrderRef, char *OrderSysID) {
 }
 
 //撤单错误响应
-void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-	USER_PRINT("TdSpi::OnRspOrderAction");
-	if ((this->IsErrorRspInfo(pRspInfo, "TdSpi::OnRspOrderAction()"))) {
+void TdSpi::OnRspOrderAction(CSgitFtdcInputOrderActionField *pInputOrderAction, CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+	
+	// 撤单成功
+
+	if (!(this->IsErrorRspInfo(pRspInfo, "TdSpi::OnRspOrderAction()"))) {
 		if (pInputOrderAction) {
 
 			//this->current_user->DB_OnRspOrderAction(this->current_user->getCTP_Manager()->getDBManager()->getConn(), pInputOrderAction);
@@ -2561,7 +2553,7 @@ void TdSpi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction,
 }
 
 //撤单错误
-void TdSpi::OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction, CThostFtdcRspInfoField *pRspInfo) {
+void TdSpi::OnErrRtnOrderAction(CSgitFtdcOrderActionField *pOrderAction, CSgitFtdcRspInfoField *pRspInfo) {
 	USER_PRINT("TdSpi::OnErrRtnOrderAction");
 	if ((this->IsErrorRspInfo(pRspInfo, "TdSpi::OnErrRtnOrderAction()"))) {
 		if (pOrderAction) {
@@ -2604,7 +2596,7 @@ void TdSpi::OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction, CThost
 //登出
 void TdSpi::Logout(char *BrokerID, char *UserID) {
 	USER_PRINT("TdSpi::Logout");
-	CThostFtdcUserLogoutField *pUserLogout = new CThostFtdcUserLogoutField();
+	CSgitFtdcUserLogoutField *pUserLogout = new CSgitFtdcUserLogoutField();
 	strcpy(pUserLogout->BrokerID, BrokerID);
 	strcpy(pUserLogout->UserID, UserID);
 	this->tdapi->ReqUserLogout(pUserLogout, this->loginRequestID);
@@ -2615,8 +2607,8 @@ void TdSpi::Logout(char *BrokerID, char *UserID) {
 }
 
 ///登出请求响应
-void TdSpi::OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout,
-                            CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
+void TdSpi::OnRspUserLogout(CSgitFtdcUserLogoutField *pUserLogout,
+                            CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
 	if (bIsLast && !(this->IsErrorRspInfo(pRspInfo))) {
 		USER_PRINT("TdSpi::OnRspUserLogout")
 		sem_post(&logout_sem);
@@ -2632,8 +2624,8 @@ void TdSpi::Join() {
 
 
 ///用户口令更新请求响应
-void TdSpi::OnRspUserPasswordUpdate(CThostFtdcUserPasswordUpdateField *pUserPasswordUpdate,
-                                    CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+void TdSpi::OnRspUserPasswordUpdate(CSgitFtdcUserPasswordUpdateField *pUserPasswordUpdate,
+                                    CSgitFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
     std::cout << "回调用户口令更新请求响应OnRspUserPasswordUpdate" << endl;
     if (pRspInfo->ErrorID == 0){
         std::cout << "更改成功 " << endl
@@ -2645,7 +2637,7 @@ void TdSpi::OnRspUserPasswordUpdate(CThostFtdcUserPasswordUpdateField *pUserPass
     }
 }
 
-bool TdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo, string source) {
+bool TdSpi::IsErrorRspInfo(CSgitFtdcRspInfoField *pRspInfo, string source) {
 	// 如果ErrorID != 0, 说明收到了错误的响应
 	bool bResult = ((pRspInfo) && (pRspInfo->ErrorID != 0));
 	if (bResult) {
@@ -2741,11 +2733,11 @@ void TdSpi::setListStrategy(list<Strategy *> *l_strategys) {
 	this->l_strategys = l_strategys;
 }
 
-list<CThostFtdcInstrumentField *> * TdSpi::getL_Instruments_Info() {
+list<CSgitFtdcInstrumentField *> * TdSpi::getL_Instruments_Info() {
 	return this->l_instruments_info;
 }
 
-void TdSpi::setL_Instruments_Info(list<CThostFtdcInstrumentField *> *l_instruments_info) {
+void TdSpi::setL_Instruments_Info(list<CSgitFtdcInstrumentField *> *l_instruments_info) {
 	this->l_instruments_info = l_instruments_info;
 }
 
@@ -2762,11 +2754,11 @@ string TdSpi::getTradingDay() {
 	return str_day;
 }
 
-list<CThostFtdcTradeField *> * TdSpi::getL_query_trade() {
+list<CSgitFtdcTradeField *> * TdSpi::getL_query_trade() {
 	return this->l_query_trade;
 }
 
-list<CThostFtdcOrderField *> * TdSpi::getL_query_order() {
+list<CSgitFtdcOrderField *> * TdSpi::getL_query_order() {
 	return this->l_query_order;
 }
 

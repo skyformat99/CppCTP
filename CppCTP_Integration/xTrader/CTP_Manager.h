@@ -117,6 +117,8 @@ public:
 	/// 返回用户列表
 	list<User *> *getL_User();
 
+	list<User *> *getL_User_Bee();
+
 	/// 得到strategy_list
 	list<Strategy *> *getListStrategy();
 
@@ -251,6 +253,7 @@ private:
 	list<string > *l_unsubinstrument;
 	list<string> *l_trader;
 	list<User *> *l_user;
+	list<User *> *l_user_bee;
 	list<Trader *> *l_obj_trader;
 	list<Algorithm *> *l_alg;
 	list<MarketConfig *> *l_marketconfig;
@@ -260,6 +263,10 @@ private:
 	list<Strategy *> *l_strategys;
 	list<Strategy *> *l_strategys_yesterday;
 	MdSpi *mdspi;
+
+	//兼容飞鼠CTP
+	MarketConfig *mc_bee;
+
 	int on_off; //开关
 	bool is_market_close; //休盘开始标志
 	bool is_start_end_task; //系统收盘最后5秒内要完成的收尾工作标志位
@@ -271,11 +278,11 @@ private:
 	bool isMdLogin;
 	bool isCTPFinishedPositionInit;
 	list<Session *> *l_sessions;
-	list<USER_CThostFtdcOrderField *> *l_posdetail;
-	list<USER_CThostFtdcOrderField *> *l_posdetail_yesterday;
+	list<USER_CSgitFtdcOrderField *> *l_posdetail;
+	list<USER_CSgitFtdcOrderField *> *l_posdetail_yesterday;
 
-	list<USER_CThostFtdcTradeField *> *l_posdetail_trade;
-	list<USER_CThostFtdcTradeField *> *l_posdetail_trade_yesterday;
+	list<USER_CSgitFtdcTradeField *> *l_posdetail_trade;
+	list<USER_CSgitFtdcTradeField *> *l_posdetail_trade_yesterday;
 
 	Timer *cal_timer;
 	std::vector<std::thread> user_threads;

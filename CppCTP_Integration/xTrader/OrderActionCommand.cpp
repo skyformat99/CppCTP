@@ -1,6 +1,6 @@
 #include "OrderActionCommand.h"
 
-OrderActionCommand::OrderActionCommand(TdSpi *tdapi, CThostFtdcOrderField *action_order, int command_type) :ApiCommand(tdapi, command_type) {
+OrderActionCommand::OrderActionCommand(TdSpi *tdapi, CSgitFtdcOrderField *action_order, int command_type) :ApiCommand(tdapi, command_type) {
 	this->tdapi = tdapi;
 	this->action_order = action_order;
 	this->command_type = command_type;

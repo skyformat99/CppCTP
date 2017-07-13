@@ -82,12 +82,14 @@ public:
 	void CreateFutureAccount(Trader *op, FutureAccount *fa);
 	void DeleteFutureAccount(FutureAccount *fa);
 	void UpdateFutureAccount(User *u);
+	void UpdateFutureAccountBee(User *u);
 	void UpdateFutureAccountOrderRef(User *u, string order_ref_base);
 	void SearchFutrueByUserID(string userid);
 	void SearchFutrueByTraderID(string traderid);
 	void SearchFutrueListByTraderID(string traderid, list<FutureAccount *> *l_futureaccount);
 	void SearchFutrueListByTraderID(string traderid, list<User *> *l_user);
 	void getAllFutureAccount(list<User *> *l_user);
+	void getAllFutureAccountBee(list<User *> *l_user);
 
 	/************************************************************************/
 	/* 创建策略
@@ -129,7 +131,9 @@ public:
 	void DeleteMarketConfig(MarketConfig *mc);
 	void UpdateMarketConfig(MarketConfig *mc);
 	void getAllMarketConfig(list<MarketConfig *> *l_marketconfig);
+	void getAllMarketConfigBee(list<MarketConfig *> *l_marketconfig);
 	MarketConfig *getOneMarketConfig();
+	MarketConfig *getOneMarketConfigBee();
 
 	/************************************************************************/
 	/*  创建算法
@@ -158,29 +162,29 @@ public:
 	更新持仓明细(order)*/
 	/************************************************************************/
 	//void CreatePositionDetail(PositionDetail *posd);
-	//void CreatePositionDetail(USER_CThostFtdcOrderField *posd);
-	void DeletePositionDetail(USER_CThostFtdcOrderField *posd);
-	void UpdatePositionDetail(USER_CThostFtdcOrderField *posd);
-	void getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, string trader_id = "", string userid = "");
+	//void CreatePositionDetail(USER_CSgitFtdcOrderField *posd);
+	void DeletePositionDetail(USER_CSgitFtdcOrderField *posd);
+	void UpdatePositionDetail(USER_CSgitFtdcOrderField *posd);
+	void getAllPositionDetail(list<USER_CSgitFtdcOrderField *> *l_posd, string trader_id = "", string userid = "");
 	void DropPositionDetail();
 
 
 	/************************************************************************/
 	/* 修改过仓位的策略的持仓明细(order) CRUD                                   */
 	/************************************************************************/
-	void CreatePositionDetailChanged(USER_CThostFtdcOrderField *posd);
-	void DeletePositionDetailChanged(USER_CThostFtdcOrderField *posd);
-	void UpdatePositionDetailChanged(USER_CThostFtdcOrderField *posd);
-	void getAllPositionDetailChanged(list<USER_CThostFtdcOrderField *> *l_posd, string trader_id = "", string userid = "");
+	void CreatePositionDetailChanged(USER_CSgitFtdcOrderField *posd);
+	void DeletePositionDetailChanged(USER_CSgitFtdcOrderField *posd);
+	void UpdatePositionDetailChanged(USER_CSgitFtdcOrderField *posd);
+	void getAllPositionDetailChanged(list<USER_CSgitFtdcOrderField *> *l_posd, string trader_id = "", string userid = "");
 	void DropPositionDetailChanged();
 	//根据策略,删除策略对应的order,trade持仓明细
 	bool DeletePositionDetailChangedByStrategy(Strategy *stg);
 
 
-	void CreatePositionDetailYesterday(USER_CThostFtdcOrderField *posd);
-	void DeletePositionDetailYesterday(USER_CThostFtdcOrderField *posd);
-	void UpdatePositionDetailYesterday(USER_CThostFtdcOrderField *posd);
-	void getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> *l_posd, string trader_id = "", string userid = "");
+	void CreatePositionDetailYesterday(USER_CSgitFtdcOrderField *posd);
+	void DeletePositionDetailYesterday(USER_CSgitFtdcOrderField *posd);
+	void UpdatePositionDetailYesterday(USER_CSgitFtdcOrderField *posd);
+	void getAllPositionDetailYesterday(list<USER_CSgitFtdcOrderField *> *l_posd, string trader_id = "", string userid = "");
 	void DropPositionDetailYesterday();
 	//根据策略,删除策略对应的order,trade持仓明细
 	bool DeletePositionDetailByStrategy(Strategy *stg);
@@ -191,19 +195,19 @@ public:
 	删除持仓明细(trade)
 	更新持仓明细(trade)*/
 	/************************************************************************/
-	void DeletePositionDetailTrade(USER_CThostFtdcTradeField *posd);
-	void UpdatePositionDetailTrade(USER_CThostFtdcTradeField *posd);
-	void getAllPositionDetailTrade(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id = "", string userid = "");
+	void DeletePositionDetailTrade(USER_CSgitFtdcTradeField *posd);
+	void UpdatePositionDetailTrade(USER_CSgitFtdcTradeField *posd);
+	void getAllPositionDetailTrade(list<USER_CSgitFtdcTradeField *> *l_posd, string trader_id = "", string userid = "");
 	void DropPositionDetailTrade();
 
 
 	/************************************************************************/
 	/* 修改过仓位的策略的持仓明细(trade) CRUD                                   */
 	/************************************************************************/
-	void CreatePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd);
-	void DeletePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd);
-	void UpdatePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd);
-	void getAllPositionDetailTradeChanged(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id = "", string userid = "");
+	void CreatePositionDetailTradeChanged(USER_CSgitFtdcTradeField *posd);
+	void DeletePositionDetailTradeChanged(USER_CSgitFtdcTradeField *posd);
+	void UpdatePositionDetailTradeChanged(USER_CSgitFtdcTradeField *posd);
+	void getAllPositionDetailTradeChanged(list<USER_CSgitFtdcTradeField *> *l_posd, string trader_id = "", string userid = "");
 	void DropPositionDetailTradeChanged();
 
 	///************************************************************************/
@@ -211,17 +215,17 @@ public:
 	///************************************************************************/
 	//bool UpdatePositionModifyRecord(Strategy *stg, string recordtime);
 
-	void CreatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *posd);
-	void DeletePositionDetailTradeYesterday(USER_CThostFtdcTradeField *posd);
-	void UpdatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *posd);
-	void getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id = "", string userid = "");
+	void CreatePositionDetailTradeYesterday(USER_CSgitFtdcTradeField *posd);
+	void DeletePositionDetailTradeYesterday(USER_CSgitFtdcTradeField *posd);
+	void UpdatePositionDetailTradeYesterday(USER_CSgitFtdcTradeField *posd);
+	void getAllPositionDetailTradeYesterday(list<USER_CSgitFtdcTradeField *> *l_posd, string trader_id = "", string userid = "");
 	void DropPositionDetailTradeYesterday();
 
 	/************************************************************************/
 	/* 系统状态维护
 	系统每次启动之后，初始化系统状态running为on,当系统正常关闭,running状态更新为off
-	如果启动发现running状态为on，说明上次未正常关闭,那么今天的持仓明细维护可能出错,私有流采取THOST_TERT_RESTART模式,对今持仓明细全部重新统计
-	如果启动发现running状态为off，说明上次正常关闭，私有流采取THOST_TERT_RESUME模式，从上次断开的地方重新传送数据即可
+	如果启动发现running状态为on，说明上次未正常关闭,那么今天的持仓明细维护可能出错,私有流采取Sgit_TERT_RESTART模式,对今持仓明细全部重新统计
+	如果启动发现running状态为off，说明上次正常关闭，私有流采取Sgit_TERT_RESUME模式，从上次断开的地方重新传送数据即可
 
 	任何模式初始化完成之后,本地仓位统计结果需要和CTP接口查询持仓数据结果保持一致,一旦存在不相同情况,系统要重新初始化.
 	*/

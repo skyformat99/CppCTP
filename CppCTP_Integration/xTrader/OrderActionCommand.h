@@ -7,11 +7,11 @@
 class OrderActionCommand : public ApiCommand{
 
 public:
-	OrderActionCommand(TdSpi *tdapi, CThostFtdcOrderField *action_order, int command_type);
+	OrderActionCommand(TdSpi *tdapi, CSgitFtdcOrderField *action_order, int command_type);
 	int execute() override;
 	
 private:
-	CThostFtdcOrderField *action_order;
+	CSgitFtdcOrderField *action_order;
 };
 
 #endif

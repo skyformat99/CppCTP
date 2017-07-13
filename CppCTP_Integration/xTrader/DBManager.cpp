@@ -38,6 +38,8 @@ using std::unique_ptr;
 #define DB_RUNNING_KEY							"BEES_HOME"
 #define DB_STRATEGY_YESTERDAY_COLLECTION		"CTP.strategy_yesterday"
 #define DB_ALGORITHM_COLLECTION					"CTP.algorithm"
+#define DB_FUTURE_BEE_COLLECTION				"CTP.futureaccount_bee"
+#define DB_MARKET_BEE_COLLECTION				"CTP.marketconfig_bee"
 #define ISACTIVE "1"
 #define ISNOTACTIVE "0"
 
@@ -547,6 +549,14 @@ void DBManager::UpdateFutureAccount(User *u) {
 	this->recycleConn(client);
 }
 
+void DBManager::UpdateFutureAccountBee(User *u) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
+	client->update(DB_FUTURE_BEE_COLLECTION, BSON("userid" << (u->getUserID().c_str())), BSON("$set" << BSON("userid" << u->getUserID() << "brokerid" << u->getBrokerID() << "traderid" << u->getTraderID() << "password" << u->getPassword() << "frontaddress" << u->getFrontAddress() << "on_off" << u->getOn_Off())));
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
+}
+
 void DBManager::UpdateFutureAccountOrderRef(User *u, string order_ref_base) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
@@ -750,6 +760,47 @@ void DBManager::getAllFutureAccount(list<User *> *l_user) {
 		}
 		
 		USER_PRINT("DBManager::getAllFutureAccount ok");
+	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
+}
+
+void DBManager::getAllFutureAccountBee(list<User *> *l_user) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
+	this->getXtsDBLogger()->info("DBManager::getAllFutureAccountBee()");
+
+	/// 初始化的时候，必须保证list为空
+	if (l_user->size() > 0) {
+		list<User *>::iterator user_itor;
+		for (user_itor = l_user->begin(); user_itor != l_user->end();) {
+			user_itor = l_user->erase(user_itor);
+		}
+	}
+
+	int countnum = client->count(DB_FUTURE_BEE_COLLECTION, BSON("isactive" << ISACTIVE));
+	if (countnum == 0) {
+		//cout << "DBManager::getAllFutureAccount None!" << endl;
+		this->getXtsDBLogger()->info("DBManager::getAllFutureAccountBee() None!");
+	}
+	else {
+		unique_ptr<DBClientCursor> cursor = client->query(DB_FUTURE_BEE_COLLECTION, MONGO_QUERY("isactive" << ISACTIVE));
+		while (cursor->more()) {
+			BSONObj p = cursor->next();
+			/*cout << "\t*" << "brokerid:" << p.getStringField("brokerid") << "  "
+			<< "traderid:" << p.getStringField("traderid") << "  "
+			<< "password:" << p.getStringField("password") << "  "
+			<< "userid:" << p.getStringField("userid") << "  "
+			<< "frontAddress:" << p.getStringField("frontaddress") << "  "
+			<< "on_off:" << p.getIntField("on_off") << "  "
+			<< "sessionid:" << p.getIntField("sessionid") << "  "
+			<< "isactive:" << p.getStringField("isactive") << "*" << endl;*/
+			this->getXtsDBLogger()->info("\t*brokerid:{} traderid:{} password:{} userid:{} frontAdress:{} on_off:{}",
+				p.getStringField("brokerid"), p.getStringField("traderid"), p.getStringField("password"), p.getStringField("userid"),
+				p.getStringField("frontaddress"), p.getIntField("on_off"));
+			User *user = new User(p.getStringField("frontaddress"), p.getStringField("brokerid"), p.getStringField("userid"), p.getStringField("password"), p.getStringField("userid"), p.getIntField("on_off"), p.getStringField("traderid"), p.getStringField("order_ref_base"));
+			l_user->push_back(user);
+		}
 	}
 	// 重新加到数据连接池队列
 	this->recycleConn(client);
@@ -2245,6 +2296,46 @@ void DBManager::getAllMarketConfig(list<MarketConfig *> *l_marketconfig) {
 	this->recycleConn(client);
 }
 
+void DBManager::getAllMarketConfigBee(list<MarketConfig *> *l_marketconfig) {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
+	this->getXtsDBLogger()->info("DBManager::getAllMarketConfigBee()");
+	/// 初始化的时候，必须保证list为空
+	if (l_marketconfig->size() > 0) {
+		list<MarketConfig *>::iterator market_itor;
+		for (market_itor = l_marketconfig->begin(); market_itor != l_marketconfig->end();) {
+			delete *market_itor;
+			market_itor = l_marketconfig->erase(market_itor);
+		}
+	}
+
+	int countnum = client->count(DB_MARKET_BEE_COLLECTION);
+	if (countnum == 0) {
+		this->getXtsDBLogger()->info("\tDBManager::getAllMarketConfigBee None!");
+	}
+	else {
+		unique_ptr<DBClientCursor> cursor =
+			client->query(DB_MARKET_BEE_COLLECTION, MONGO_QUERY("isactive" << ISACTIVE));
+		while (cursor->more()) {
+			BSONObj p = cursor->next();
+			this->getXtsDBLogger()->info("\t*market_id:{} market_frontAddr:{} broker_id:{} password:{}",
+				p.getStringField("market_id"), p.getStringField("market_frontAddr"), p.getStringField("broker_id"), p.getStringField("password"));
+			MarketConfig *mc = new MarketConfig();
+			mc->setMarketID(p.getStringField("market_id"));
+			mc->setMarketFrontAddr(p.getStringField("market_frontAddr"));
+			mc->setBrokerID(p.getStringField("broker_id"));
+			mc->setUserID(p.getStringField("user_id"));
+			mc->setPassword(p.getStringField("password"));
+			mc->setIsActive(p.getStringField("isactive"));
+
+			l_marketconfig->push_back(mc);
+		}
+		USER_PRINT("DBManager::getAllMarketConfig ok");
+	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
+}
+
 MarketConfig * DBManager::getOneMarketConfig() {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
@@ -2270,6 +2361,35 @@ MarketConfig * DBManager::getOneMarketConfig() {
 				p.getStringField("market_id"), p.getStringField("market_frontAddr"), p.getStringField("broker_id"), 
 				p.getStringField("password"));
 			
+			return new MarketConfig(p.getStringField("market_id"), p.getStringField("market_frontAddr"), p.getStringField("broker_id"),
+				p.getStringField("user_id"), p.getStringField("password"), p.getStringField("isactive"));
+		}
+		else {
+			USER_PRINT("DBManager::getOneMarketConfig None");
+		}
+	}
+	// 重新加到数据连接池队列
+	this->recycleConn(client);
+	return NULL;
+}
+
+MarketConfig * DBManager::getOneMarketConfigBee() {
+	// 从数据连接池队列中获取连接
+	mongo::DBClientConnection *client = this->getConn();
+	this->getXtsDBLogger()->info("DBManager::getOneMarketConfigBee()");
+	
+	int countnum = client->count(DB_MARKET_BEE_COLLECTION);
+	if (countnum == 0) {
+		cout << "\tDBManager::getOneMarketConfig None!" << endl;
+	}
+	else {
+		BSONObj p = client->findOne(DB_MARKET_BEE_COLLECTION, BSON("isactive" << ISACTIVE));
+		if ((strcmp(p.getStringField("market_id"), ""))) {
+
+			this->getXtsDBLogger()->debug("\t*market_id:{} market_frontAddr:{} broker_id:{} userid:{} password:{}",
+				p.getStringField("market_id"), p.getStringField("market_frontAddr"), p.getStringField("broker_id"),
+				p.getStringField("password"));
+
 			return new MarketConfig(p.getStringField("market_id"), p.getStringField("market_frontAddr"), p.getStringField("broker_id"),
 				p.getStringField("user_id"), p.getStringField("password"), p.getStringField("isactive"));
 		}
@@ -2505,7 +2625,7 @@ void DBManager::CreatePositionDetail(PositionDetail *posd) {
 	USER_PRINT("DBManager::CreatePositionDetail OK");
 }
 
-void DBManager::CreatePositionDetail(USER_CThostFtdcOrderField *posd) {
+void DBManager::CreatePositionDetail(USER_CSgitFtdcOrderField *posd) {
 	USER_PRINT("DBManager::CreatePositionDetail");
 
 	int posd_count_num = 0;
@@ -2546,7 +2666,7 @@ void DBManager::CreatePositionDetail(USER_CThostFtdcOrderField *posd) {
 }
 #endif
 
-void DBManager::DeletePositionDetail(USER_CThostFtdcOrderField *posd) {
+void DBManager::DeletePositionDetail(USER_CSgitFtdcOrderField *posd) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::DeletePositionDetail");
@@ -2572,7 +2692,7 @@ void DBManager::DeletePositionDetail(USER_CThostFtdcOrderField *posd) {
 }
 
 
-void DBManager::UpdatePositionDetail(USER_CThostFtdcOrderField *posd) {
+void DBManager::UpdatePositionDetail(USER_CSgitFtdcOrderField *posd) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::UpdatePositionDetail");
@@ -2617,14 +2737,14 @@ void DBManager::UpdatePositionDetail(USER_CThostFtdcOrderField *posd) {
 
 
 
-void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, string traderid, string userid) {
+void DBManager::getAllPositionDetail(list<USER_CSgitFtdcOrderField *> *l_posd, string traderid, string userid) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::getAllPositionDetail");
 	this->getXtsDBLogger()->info("DBManager::getAllPositionDetail()");
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
-		list<USER_CThostFtdcOrderField *>::iterator itor;
+		list<USER_CSgitFtdcOrderField *>::iterator itor;
 		for (itor = l_posd->begin(); itor != l_posd->end();) {
 			delete (*itor);
 			itor = l_posd->erase(itor);
@@ -2650,7 +2770,7 @@ void DBManager::getAllPositionDetail(list<USER_CThostFtdcOrderField *> *l_posd, 
 		
 		BSONObj p = cursor->next();
 
-		USER_CThostFtdcOrderField *new_pos = new USER_CThostFtdcOrderField();
+		USER_CSgitFtdcOrderField *new_pos = new USER_CSgitFtdcOrderField();
 
 		strcpy(new_pos->InstrumentID, p.getStringField("instrumentid"));
 		strcpy(new_pos->OrderRef, p.getStringField("orderref"));
@@ -2711,7 +2831,7 @@ void DBManager::DropPositionDetail() {
 /************************************************************************/
 /* 修改过仓位的策略的持仓明细(order) CRUD                                   */
 /************************************************************************/
-void DBManager::CreatePositionDetailChanged(USER_CThostFtdcOrderField *posd) {
+void DBManager::CreatePositionDetailChanged(USER_CSgitFtdcOrderField *posd) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::CreatePositionDetailChanged");
@@ -2756,7 +2876,7 @@ void DBManager::CreatePositionDetailChanged(USER_CThostFtdcOrderField *posd) {
 	this->recycleConn(client);
 	USER_PRINT("DBManager::CreatePositionDetailYesterday OK");
 }
-void DBManager::DeletePositionDetailChanged(USER_CThostFtdcOrderField *posd) {
+void DBManager::DeletePositionDetailChanged(USER_CSgitFtdcOrderField *posd) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::DeletePositionDetailChanged()");
@@ -2782,7 +2902,7 @@ void DBManager::DeletePositionDetailChanged(USER_CThostFtdcOrderField *posd) {
 	USER_PRINT("DBManager::DeletePositionDetailChanged OK");
 }
 
-void DBManager::UpdatePositionDetailChanged(USER_CThostFtdcOrderField *posd) {
+void DBManager::UpdatePositionDetailChanged(USER_CSgitFtdcOrderField *posd) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::UpdatePositionDetailChanged");
@@ -2820,7 +2940,7 @@ void DBManager::UpdatePositionDetailChanged(USER_CThostFtdcOrderField *posd) {
 	USER_PRINT("DBManager::UpdatePositionDetailChanged OK");
 }
 
-void DBManager::getAllPositionDetailChanged(list<USER_CThostFtdcOrderField *> *l_posd,
+void DBManager::getAllPositionDetailChanged(list<USER_CSgitFtdcOrderField *> *l_posd,
 	string traderid, string userid) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
@@ -2828,7 +2948,7 @@ void DBManager::getAllPositionDetailChanged(list<USER_CThostFtdcOrderField *> *l
 	this->getXtsDBLogger()->info("DBManager::getAllPositionDetailChanged()");
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
-		list<USER_CThostFtdcOrderField *>::iterator itor;
+		list<USER_CSgitFtdcOrderField *>::iterator itor;
 		for (itor = l_posd->begin(); itor != l_posd->end();) {
 			delete (*itor);
 			itor = l_posd->erase(itor);
@@ -2858,7 +2978,7 @@ void DBManager::getAllPositionDetailChanged(list<USER_CThostFtdcOrderField *> *l
 	while (cursor->more()) {
 		BSONObj p = cursor->next();
 
-		USER_CThostFtdcOrderField *new_pos = new USER_CThostFtdcOrderField();
+		USER_CSgitFtdcOrderField *new_pos = new USER_CSgitFtdcOrderField();
 
 		strcpy(new_pos->InstrumentID, p.getStringField("instrumentid"));
 		strcpy(new_pos->OrderRef, p.getStringField("orderref"));
@@ -2947,7 +3067,7 @@ bool DBManager::DeletePositionDetailChangedByStrategy(Strategy *stg) {
 }
 
 
-void DBManager::CreatePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
+void DBManager::CreatePositionDetailYesterday(USER_CSgitFtdcOrderField *posd) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::CreatePositionDetailYesterday");
@@ -2992,7 +3112,7 @@ void DBManager::CreatePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
 	this->recycleConn(client);
 	USER_PRINT("DBManager::CreatePositionDetailYesterday OK");
 }
-void DBManager::DeletePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
+void DBManager::DeletePositionDetailYesterday(USER_CSgitFtdcOrderField *posd) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::DeletePositionDetailYesterday()");
@@ -3016,7 +3136,7 @@ void DBManager::DeletePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
 	USER_PRINT("DBManager::DeletePositionDetailYesterday OK");
 }
 
-void DBManager::UpdatePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
+void DBManager::UpdatePositionDetailYesterday(USER_CSgitFtdcOrderField *posd) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::UpdatePositionDetailYesterday");
@@ -3054,14 +3174,14 @@ void DBManager::UpdatePositionDetailYesterday(USER_CThostFtdcOrderField *posd) {
 	USER_PRINT("DBManager::UpdatePositionDetailYesterday OK");
 }
 
-void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> *l_posd,
+void DBManager::getAllPositionDetailYesterday(list<USER_CSgitFtdcOrderField *> *l_posd,
 	string traderid, string userid) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::getAllPositionDetailYesterday()");
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
-		list<USER_CThostFtdcOrderField *>::iterator itor;
+		list<USER_CSgitFtdcOrderField *>::iterator itor;
 		for (itor = l_posd->begin(); itor != l_posd->end();) {
 			delete (*itor);
 			itor = l_posd->erase(itor);
@@ -3091,7 +3211,7 @@ void DBManager::getAllPositionDetailYesterday(list<USER_CThostFtdcOrderField *> 
 	while (cursor->more()) {
 		BSONObj p = cursor->next();
 
-		USER_CThostFtdcOrderField *new_pos = new USER_CThostFtdcOrderField();
+		USER_CSgitFtdcOrderField *new_pos = new USER_CSgitFtdcOrderField();
 
 		strcpy(new_pos->InstrumentID, p.getStringField("instrumentid"));
 		strcpy(new_pos->OrderRef, p.getStringField("orderref"));
@@ -3176,7 +3296,7 @@ bool DBManager::DeletePositionDetailByStrategy(Strategy *stg) {
 	return flag;
 }
 
-void DBManager::DeletePositionDetailTrade(USER_CThostFtdcTradeField *posd) {
+void DBManager::DeletePositionDetailTrade(USER_CSgitFtdcTradeField *posd) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::DeletePositionDetailTrade");
@@ -3201,7 +3321,7 @@ void DBManager::DeletePositionDetailTrade(USER_CThostFtdcTradeField *posd) {
 	USER_PRINT("DBManager::DeletePositionDetailTrade OK");
 }
 
-void DBManager::UpdatePositionDetailTrade(USER_CThostFtdcTradeField *posd) {
+void DBManager::UpdatePositionDetailTrade(USER_CSgitFtdcTradeField *posd) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::UpdatePositionDetailTrade");
@@ -3236,13 +3356,13 @@ void DBManager::UpdatePositionDetailTrade(USER_CThostFtdcTradeField *posd) {
 	USER_PRINT("DBManager::UpdatePositionDetailTrade OK");
 }
 
-void DBManager::getAllPositionDetailTrade(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id, string userid) {
+void DBManager::getAllPositionDetailTrade(list<USER_CSgitFtdcTradeField *> *l_posd, string trader_id, string userid) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::getAllPositionDetailTrade()");
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
-		list<USER_CThostFtdcTradeField *>::iterator itor;
+		list<USER_CSgitFtdcTradeField *>::iterator itor;
 		for (itor = l_posd->begin(); itor != l_posd->end();) {
 			delete (*itor);
 			itor = l_posd->erase(itor);
@@ -3268,7 +3388,7 @@ void DBManager::getAllPositionDetailTrade(list<USER_CThostFtdcTradeField *> *l_p
 
 		BSONObj p = cursor->next();
 
-		USER_CThostFtdcTradeField *new_pos = new USER_CThostFtdcTradeField();
+		USER_CSgitFtdcTradeField *new_pos = new USER_CSgitFtdcTradeField();
 
 		strcpy(new_pos->InstrumentID, p.getStringField("instrumentid"));
 		strcpy(new_pos->OrderRef, p.getStringField("orderref"));
@@ -3317,7 +3437,7 @@ void DBManager::DropPositionDetailTrade() {
 	this->recycleConn(client);
 }
 
-void DBManager::CreatePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd) {
+void DBManager::CreatePositionDetailTradeChanged(USER_CSgitFtdcTradeField *posd) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::CreatePositionDetailTradeChanged");
@@ -3360,7 +3480,7 @@ void DBManager::CreatePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd
 	USER_PRINT("DBManager::CreatePositionDetailTradeChanged OK");
 }
 
-void DBManager::DeletePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd) {
+void DBManager::DeletePositionDetailTradeChanged(USER_CSgitFtdcTradeField *posd) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::DeletePositionDetailTradeChanged");
@@ -3384,7 +3504,7 @@ void DBManager::DeletePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd
 	USER_PRINT("DBManager::DeletePositionDetailTradeChanged OK");
 }
 
-void DBManager::UpdatePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd) {
+void DBManager::UpdatePositionDetailTradeChanged(USER_CSgitFtdcTradeField *posd) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::UpdatePositionDetailTradeChanged");
@@ -3417,14 +3537,14 @@ void DBManager::UpdatePositionDetailTradeChanged(USER_CThostFtdcTradeField *posd
 	USER_PRINT("DBManager::UpdatePositionDetailTradeChanged OK");
 }
 
-void DBManager::getAllPositionDetailTradeChanged(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id, string userid) {
+void DBManager::getAllPositionDetailTradeChanged(list<USER_CSgitFtdcTradeField *> *l_posd, string trader_id, string userid) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::getAllPositionDetailTradeChanged");
 	this->getXtsDBLogger()->info("DBManager::getAllPositionDetailTradeChanged()");
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
-		list<USER_CThostFtdcTradeField *>::iterator itor;
+		list<USER_CSgitFtdcTradeField *>::iterator itor;
 		for (itor = l_posd->begin(); itor != l_posd->end();) {
 			delete (*itor);
 			itor = l_posd->erase(itor);
@@ -3454,7 +3574,7 @@ void DBManager::getAllPositionDetailTradeChanged(list<USER_CThostFtdcTradeField 
 	while (cursor->more()) {
 		BSONObj p = cursor->next();
 
-		USER_CThostFtdcTradeField *new_pos = new USER_CThostFtdcTradeField();
+		USER_CSgitFtdcTradeField *new_pos = new USER_CSgitFtdcTradeField();
 
 		strcpy(new_pos->InstrumentID, p.getStringField("instrumentid"));
 		strcpy(new_pos->OrderRef, p.getStringField("orderref"));
@@ -3522,7 +3642,7 @@ void DBManager::DropPositionDetailTradeChanged() {
 //	return flag;
 //}
 
-void DBManager::CreatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *posd) {
+void DBManager::CreatePositionDetailTradeYesterday(USER_CSgitFtdcTradeField *posd) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::CreatePositionDetailTradeYesterday");
@@ -3565,7 +3685,7 @@ void DBManager::CreatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *po
 	USER_PRINT("DBManager::CreatePositionDetailYesterday OK");
 }
 
-void DBManager::DeletePositionDetailTradeYesterday(USER_CThostFtdcTradeField *posd) {
+void DBManager::DeletePositionDetailTradeYesterday(USER_CSgitFtdcTradeField *posd) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::DeletePositionDetailTradeYesterday()");
@@ -3589,7 +3709,7 @@ void DBManager::DeletePositionDetailTradeYesterday(USER_CThostFtdcTradeField *po
 	USER_PRINT("DBManager::DeletePositionDetailTradeYesterday OK");
 }
 
-void DBManager::UpdatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *posd) {
+void DBManager::UpdatePositionDetailTradeYesterday(USER_CSgitFtdcTradeField *posd) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	USER_PRINT("DBManager::UpdatePositionDetailTradeYesterday");
@@ -3622,13 +3742,13 @@ void DBManager::UpdatePositionDetailTradeYesterday(USER_CThostFtdcTradeField *po
 	USER_PRINT("DBManager::UpdatePositionDetailTradeYesterday OK");
 }
 
-void DBManager::getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeField *> *l_posd, string trader_id, string userid) {
+void DBManager::getAllPositionDetailTradeYesterday(list<USER_CSgitFtdcTradeField *> *l_posd, string trader_id, string userid) {
 	// 从数据连接池队列中获取连接
 	mongo::DBClientConnection *client = this->getConn();
 	this->getXtsDBLogger()->info("DBManager::getAllPositionDetailTradeYesterday()");
 	/// 初始化的时候，必须保证list为空
 	if (l_posd->size() > 0) {
-		list<USER_CThostFtdcTradeField *>::iterator itor;
+		list<USER_CSgitFtdcTradeField *>::iterator itor;
 		for (itor = l_posd->begin(); itor != l_posd->end();) {
 			delete (*itor);
 			itor = l_posd->erase(itor);
@@ -3658,7 +3778,7 @@ void DBManager::getAllPositionDetailTradeYesterday(list<USER_CThostFtdcTradeFiel
 	while (cursor->more()) {
 		BSONObj p = cursor->next();
 
-		USER_CThostFtdcTradeField *new_pos = new USER_CThostFtdcTradeField();
+		USER_CSgitFtdcTradeField *new_pos = new USER_CSgitFtdcTradeField();
 
 		strcpy(new_pos->InstrumentID, p.getStringField("instrumentid"));
 		strcpy(new_pos->OrderRef, p.getStringField("orderref"));

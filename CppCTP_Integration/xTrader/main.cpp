@@ -16,7 +16,7 @@
 #include <errno.h>
 #include <arpa/inet.h>
 #include <spdlog/spdlog.h>
-#include "ThostFtdcTraderApi.h"
+#include "SgitFtdcTraderApi.h"
 #include "TdSpi.h"
 #include "CTP_Manager.h"
 #include "Utils.h"

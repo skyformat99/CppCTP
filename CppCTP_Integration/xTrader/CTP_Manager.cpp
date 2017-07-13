@@ -18,13 +18,18 @@ using namespace rapidjson;
 static Trader *op = new Trader();
 static const int MAX_THREAD_COUNT = 100;
 
+class CSgitFtdcTraderApi;
+class CSgitFtdcMdApi;
+
 int server_msg_ref = 0;
 
 CTP_Manager::CTP_Manager() {
 	this->on_off = 0;
 	//this->dbm = new DBManager();
 	this->dbm = new DBManager();
+	this->mc_bee = NULL;
 	this->l_user = new list<User *>();
+	this->l_user_bee = new list<User *>();
 	this->l_trader = new list<string>();
 	this->l_obj_trader = new list<Trader *>();
 	this->l_strategys = new list<Strategy *>();
@@ -32,11 +37,11 @@ CTP_Manager::CTP_Manager() {
 	this->l_marketconfig = new list<MarketConfig *>();
 	this->l_alg = new list<Algorithm *>();
 
-	this->l_posdetail_trade = new list<USER_CThostFtdcTradeField *>();
-	this->l_posdetail_trade_yesterday = new list<USER_CThostFtdcTradeField *>();
+	this->l_posdetail_trade = new list<USER_CSgitFtdcTradeField *>();
+	this->l_posdetail_trade_yesterday = new list<USER_CSgitFtdcTradeField *>();
 
-	this->l_posdetail = new list<USER_CThostFtdcOrderField *>();
-	this->l_posdetail_yesterday = new list<USER_CThostFtdcOrderField *>();
+	this->l_posdetail = new list<USER_CSgitFtdcOrderField *>();
+	this->l_posdetail_yesterday = new list<USER_CSgitFtdcOrderField *>();
 
 	this->l_instrument = new list<string>();
 	this->l_unsubinstrument = new list<string>();
@@ -119,9 +124,7 @@ User * CTP_Manager::CreateAccount(User *user, list<Strategy *> *l_strategys) {
 			return NULL;
 		}
 		else {
-			CThostFtdcTraderApi *tdapi = CThostFtdcTraderApi::CreateFtdcTraderApi(flowpath.c_str());
-			USER_PRINT("TdApi初始化完成...");
-			USER_PRINT(tdapi);
+			CSgitFtdcTraderApi *tdapi = CSgitFtdcTraderApi::CreateFtdcTraderApi(flowpath.c_str());
 			if (!tdapi) {
 				return NULL;
 			}
@@ -171,7 +174,7 @@ User * CTP_Manager::CreateAccount(User *user, list<Strategy *> *l_strategys) {
 
 MdSpi * CTP_Manager::CreateMd(string md_frontAddress, string md_broker, string md_user, string md_pass, list<Strategy *> *l_strategys) {
 	MdSpi *mdspi = NULL;
-	CThostFtdcMdApi *mdapi = NULL;
+	CSgitFtdcMdApi *mdapi = NULL;
 	string conn_md_frontAddress = md_frontAddress;
 	md_frontAddress = md_frontAddress.substr(6, md_frontAddress.length() - 1);
 	int pos = md_frontAddress.find_first_of(':', 0);
@@ -184,7 +187,7 @@ MdSpi * CTP_Manager::CreateMd(string md_frontAddress, string md_broker, string m
 		Utils::printRedColor("无法创建行情流文件!");
 		return NULL;
 	} else {
-		mdapi = CThostFtdcMdApi::CreateFtdcMdApi(flowpath.c_str());
+		mdapi = CSgitFtdcMdApi::CreateFtdcMdApi(flowpath.c_str());
 		mdspi = new MdSpi(mdapi);
 		mdspi->setListStrategy(l_strategys); // 初始化策略给到位
 		mdspi->setCtpManager(this);
@@ -411,6 +414,10 @@ list<User *> *CTP_Manager::getL_User() {
 	return this->l_user;
 }
 
+list<User *> *CTP_Manager::getL_User_Bee() {
+	return this->l_user_bee;
+}
+
 /// 得到strategy_list
 list<Strategy *> * CTP_Manager::getListStrategy() {
 	return this->l_strategys;
@@ -461,8 +468,8 @@ void CTP_Manager::saveStrategy() {
 		this->dbm->DropPositionDetail();
 
 		list<Strategy *>::iterator stg_itor;
-		list<USER_CThostFtdcOrderField *>::iterator posd_itor;
-		list<USER_CThostFtdcTradeField *>::iterator posd_itor_trade;
+		list<USER_CSgitFtdcOrderField *>::iterator posd_itor;
+		list<USER_CSgitFtdcTradeField *>::iterator posd_itor_trade;
 		USER_PRINT("CTP_Manager::saveStrategy");
 		std::cout << "CTP_Manager::saveStrategy()" << std::endl;
 		for (stg_itor = this->l_strategys->begin(); 
@@ -536,8 +543,8 @@ void CTP_Manager::saveStrategy() {
 void CTP_Manager::saveAllStrategyPositionDetail() {
 
 	list<Strategy *>::iterator stg_itor;
-	list<USER_CThostFtdcOrderField *>::iterator posd_itor;
-	list<USER_CThostFtdcTradeField *>::iterator posd_itor_trade;
+	list<USER_CSgitFtdcOrderField *>::iterator posd_itor;
+	list<USER_CSgitFtdcTradeField *>::iterator posd_itor_trade;
 	this->getXtsLogger()->info("CTP_Manager::saveAllStrategyPositionDetail()");
 
 	sem_wait((this->getSem_strategy_handler()));
@@ -620,8 +627,8 @@ void CTP_Manager::saveAllStrategyPositionDetail() {
 
 /// 保存一个策略持仓明细
 void CTP_Manager::saveStrategyPositionDetail(Strategy *stg) {
-	list<USER_CThostFtdcOrderField *>::iterator posd_itor;
-	list<USER_CThostFtdcTradeField *>::iterator posd_itor_trade;
+	list<USER_CSgitFtdcOrderField *>::iterator posd_itor;
+	list<USER_CSgitFtdcTradeField *>::iterator posd_itor_trade;
 	USER_PRINT("CTP_Manager::saveStrategyPositionDetail()");
 	//std::cout << "CTP_Manager::saveStrategyPositionDetail()" << std::endl;
 	this->getXtsLogger()->info("CTP_Manager::saveStrategyPositionDetail()");
@@ -699,8 +706,8 @@ void CTP_Manager::saveStrategyPositionDetail(Strategy *stg) {
 
 /// 保存一个策略持仓明细修改过的
 void CTP_Manager::saveStrategyChangedPositionDetail(Strategy *stg) {
-	list<USER_CThostFtdcOrderField *>::iterator posd_itor;
-	list<USER_CThostFtdcTradeField *>::iterator posd_itor_trade;
+	list<USER_CSgitFtdcOrderField *>::iterator posd_itor;
+	list<USER_CSgitFtdcTradeField *>::iterator posd_itor_trade;
 	this->getXtsLogger()->info("CTP_Manager::saveStrategyChangedPositionDetail()");
 	//this->dbm->UpdateStrategy((*stg_itor));
 	stg->setStgUpdatePositionDetailRecordTime(Utils::getDate());
@@ -1354,12 +1361,12 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 
 	bool bFind = false;
 
-	list<USER_CThostFtdcOrderField *> l_posd;
+	list<USER_CSgitFtdcOrderField *> l_posd;
 	ctp_m->getDBManager()->getAllPositionDetailYesterday(&l_posd, s_TraderID, s_UserID);
 
 	if (l_posd.size() > 0)
 	{
-		list<USER_CThostFtdcOrderField *>::iterator pod_itor;
+		list<USER_CSgitFtdcOrderField *>::iterator pod_itor;
 		for (pod_itor = l_posd.begin(); pod_itor != l_posd.end(); pod_itor++) {
 
 			rapidjson::Document build_doc15;
@@ -1500,7 +1507,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 
 	/// 清空 new position detail
 	if (l_posd.size() > 0) {
-		list<USER_CThostFtdcOrderField *>::iterator itor;
+		list<USER_CSgitFtdcOrderField *>::iterator itor;
 		for (itor = l_posd.begin(); itor != l_posd.end();) {
 			delete (*itor);
 			itor = l_posd.erase(itor);
@@ -1518,13 +1525,13 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 
 	
 
-	list<USER_CThostFtdcTradeField *> l_posd_trade;
+	list<USER_CSgitFtdcTradeField *> l_posd_trade;
 	ctp_m->getDBManager()->getAllPositionDetailTradeYesterday(&l_posd_trade, s_TraderID, s_UserID);
 
 	
 	if (l_posd_trade.size() > 0)
 	{
-		list<USER_CThostFtdcTradeField *>::iterator pod_itor_trade;
+		list<USER_CSgitFtdcTradeField *>::iterator pod_itor_trade;
 		for (pod_itor_trade = l_posd_trade.begin(); pod_itor_trade != l_posd_trade.end(); pod_itor_trade++) {
 
 			rapidjson::Document build_doc17;
@@ -1647,7 +1654,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 
 	/// 析构
 	if (l_posd_trade.size() > 0) {
-		list<USER_CThostFtdcTradeField *>::iterator itor;
+		list<USER_CSgitFtdcTradeField *>::iterator itor;
 		for (itor = l_posd_trade.begin(); itor != l_posd_trade.end();) {
 			delete (*itor);
 			itor = l_posd_trade.erase(itor);
@@ -1670,7 +1677,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 
 	if (l_posd.size() > 0)
 	{
-		list<USER_CThostFtdcOrderField *>::iterator pod_itor;
+		list<USER_CSgitFtdcOrderField *>::iterator pod_itor;
 		for (pod_itor = l_posd.begin(); pod_itor != l_posd.end(); pod_itor++) {
 
 			rapidjson::Document build_doc20;
@@ -1809,7 +1816,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 
 	/// 析构
 	if (l_posd.size() > 0) {
-		list<USER_CThostFtdcOrderField *>::iterator itor;
+		list<USER_CSgitFtdcOrderField *>::iterator itor;
 		for (itor = l_posd.begin(); itor != l_posd.end();) {
 			delete (*itor);
 			itor = l_posd.erase(itor);
@@ -1829,7 +1836,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 
 	if (l_posd_trade.size() > 0)
 	{
-		list<USER_CThostFtdcTradeField *>::iterator pod_itor_trade;
+		list<USER_CSgitFtdcTradeField *>::iterator pod_itor_trade;
 		for (pod_itor_trade = l_posd_trade.begin(); pod_itor_trade != l_posd_trade.end(); pod_itor_trade++) {
 
 			rapidjson::Document build_doc21;
@@ -1944,7 +1951,7 @@ void CTP_Manager::InitClientData(int fd, CTP_Manager *ctp_m, string s_TraderID, 
 
 	/// 析构
 	if (l_posd_trade.size() > 0) {
-		list<USER_CThostFtdcTradeField *>::iterator itor;
+		list<USER_CSgitFtdcTradeField *>::iterator itor;
 		for (itor = l_posd_trade.begin(); itor != l_posd_trade.end();) {
 			delete (*itor);
 			itor = l_posd_trade.erase(itor);
@@ -3096,7 +3103,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						ctp_m->UnSubmarketData(ctp_m->getMdSpi(), (*stg_itor)->getStgInstrumentIdB(), ctp_m->getL_UnsubInstrument());
 
 						//从数据库删除策略持仓明细(order)
-						list<USER_CThostFtdcOrderField *>::iterator order_itor;
+						list<USER_CSgitFtdcOrderField *>::iterator order_itor;
 						for (order_itor = (*stg_itor)->getStg_List_Position_Detail_From_Order()->begin();
 							order_itor != (*stg_itor)->getStg_List_Position_Detail_From_Order()->end();
 							order_itor++)
@@ -3106,7 +3113,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 						}
 
 						//从数据库删除策略持仓明细(trade)
-						list<USER_CThostFtdcTradeField *>::iterator trade_itor;
+						list<USER_CSgitFtdcTradeField *>::iterator trade_itor;
 						for (trade_itor = (*stg_itor)->getStg_List_Position_Detail_From_Trade()->begin(); 
 							trade_itor != (*stg_itor)->getStg_List_Position_Detail_From_Trade()->end();
 							trade_itor++) {
@@ -3267,6 +3274,16 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				for (user_itor = ctp_m->getL_User()->begin(); user_itor != ctp_m->getL_User()->end(); user_itor++) {
 					if ((*user_itor)->getUserID() == s_UserID) {
 						ctp_m->getXtsLogger()->info("\t找到需要开关的期货账户ID");
+						(*user_itor)->setOn_Off(i_OnOff);
+						bFind = true;
+						//更新数据库
+						ctp_m->getDBManager()->UpdateFutureAccount((*user_itor));
+					}
+				}
+
+				for (user_itor = ctp_m->getL_User_Bee()->begin(); user_itor != ctp_m->getL_User_Bee()->end(); user_itor++) {
+					if ((*user_itor)->getUserID() == s_UserID) {
+						ctp_m->getXtsLogger()->info("\t找到需要开关的期货账户ID(推送给小蜜蜂的)");
 						(*user_itor)->setOn_Off(i_OnOff);
 						bFind = true;
 						//更新数据库
@@ -3711,8 +3728,8 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 										break;
 									}
 
-									list<USER_CThostFtdcOrderField *>::iterator position_itor;			//order持仓明细
-									list<USER_CThostFtdcTradeField *>::iterator position_trade_itor;	//trade持仓明细
+									list<USER_CSgitFtdcOrderField *>::iterator position_itor;			//order持仓明细
+									list<USER_CSgitFtdcTradeField *>::iterator position_trade_itor;	//trade持仓明细
 									
 									/*std::cout << "\t修改之前的仓位:" << std::endl;
 									std::cout << "\tA卖(" << (*stg_itor)->getStgPositionASell() << ", " << (*stg_itor)->getStgPositionASellYesterday() << ")" << std::endl;
@@ -3729,13 +3746,13 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									//A昨卖
 									//Utils::printGreenColor("A昨卖");
 									// Order
-									USER_CThostFtdcOrderField *order_ASellYesterdayClose = new USER_CThostFtdcOrderField();
+									USER_CSgitFtdcOrderField *order_ASellYesterdayClose = new USER_CSgitFtdcOrderField();
 									(*stg_itor)->createFakeOrderPositionDetail(order_ASellYesterdayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdA(), '1', '0', '4',
 										(*stg_itor)->getStgPositionASellYesterday() - object["position_a_sell_yesterday"].GetInt());
 
 									// Trade
-									USER_CThostFtdcTradeField *trade_ASellYesterdayClose = new USER_CThostFtdcTradeField();
+									USER_CSgitFtdcTradeField *trade_ASellYesterdayClose = new USER_CSgitFtdcTradeField();
 									(*stg_itor)->createFakeTradePositionDetail(trade_ASellYesterdayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdA(), '1', '0', '4',
 										(*stg_itor)->getStgPositionASellYesterday() - object["position_a_sell_yesterday"].GetInt());
@@ -3746,13 +3763,13 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									//A昨买
 									//Utils::printGreenColor("A昨买");
 									// Order
-									USER_CThostFtdcOrderField *order_ABuyYesterdayClose = new USER_CThostFtdcOrderField();
+									USER_CSgitFtdcOrderField *order_ABuyYesterdayClose = new USER_CSgitFtdcOrderField();
 									(*stg_itor)->createFakeOrderPositionDetail(order_ABuyYesterdayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdA(), '1', '1', '4',
 										(*stg_itor)->getStgPositionABuyYesterday() - object["position_a_buy_yesterday"].GetInt());
 
 									// Trade
-									USER_CThostFtdcTradeField *trade_ABuyYesterdayClose = new USER_CThostFtdcTradeField();
+									USER_CSgitFtdcTradeField *trade_ABuyYesterdayClose = new USER_CSgitFtdcTradeField();
 									(*stg_itor)->createFakeTradePositionDetail(trade_ABuyYesterdayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdA(), '1', '1', '4',
 										(*stg_itor)->getStgPositionABuyYesterday() - object["position_a_buy_yesterday"].GetInt());
@@ -3763,13 +3780,13 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									//B昨卖
 									//Utils::printGreenColor("B昨卖");
 									// Order
-									USER_CThostFtdcOrderField *order_BSellYesterdayClose = new USER_CThostFtdcOrderField();
+									USER_CSgitFtdcOrderField *order_BSellYesterdayClose = new USER_CSgitFtdcOrderField();
 									(*stg_itor)->createFakeOrderPositionDetail(order_BSellYesterdayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '0', '4',
 										(*stg_itor)->getStgPositionBSellYesterday() - object["position_b_sell_yesterday"].GetInt());
 
 									// Trade
-									USER_CThostFtdcTradeField *trade_BSellYesterdayClose = new USER_CThostFtdcTradeField();
+									USER_CSgitFtdcTradeField *trade_BSellYesterdayClose = new USER_CSgitFtdcTradeField();
 									(*stg_itor)->createFakeTradePositionDetail(trade_BSellYesterdayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '0', '4',
 										(*stg_itor)->getStgPositionBSellYesterday() - object["position_b_sell_yesterday"].GetInt());
@@ -3780,13 +3797,13 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 									//B昨买
 									//Utils::printGreenColor("B昨买");
-									USER_CThostFtdcOrderField *order_BBuyYesterdayClose = new USER_CThostFtdcOrderField();
+									USER_CSgitFtdcOrderField *order_BBuyYesterdayClose = new USER_CSgitFtdcOrderField();
 									(*stg_itor)->createFakeOrderPositionDetail(order_BBuyYesterdayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '1', '4',
 										(*stg_itor)->getStgPositionBBuyYesterday() - object["position_b_buy_yesterday"].GetInt());
 
 									// Trade
-									USER_CThostFtdcTradeField *trade_BBuyYesterdayClose = new USER_CThostFtdcTradeField();
+									USER_CSgitFtdcTradeField *trade_BBuyYesterdayClose = new USER_CSgitFtdcTradeField();
 									(*stg_itor)->createFakeTradePositionDetail(trade_BBuyYesterdayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '1', '4',
 										(*stg_itor)->getStgPositionBBuyYesterday() - object["position_b_buy_yesterday"].GetInt());
@@ -3798,13 +3815,13 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									//A今卖
 									//Utils::printGreenColor("A今卖");
 									// Order
-									USER_CThostFtdcOrderField *order_ASellTodayClose = new USER_CThostFtdcOrderField();
+									USER_CSgitFtdcOrderField *order_ASellTodayClose = new USER_CSgitFtdcOrderField();
 									(*stg_itor)->createFakeOrderPositionDetail(order_ASellTodayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdA(), '1', '0', '3',
 										(*stg_itor)->getStgPositionASellToday() - object["position_a_sell_today"].GetInt());
 
 									// Trade
-									USER_CThostFtdcTradeField *trade_ASellTodayClose = new USER_CThostFtdcTradeField();
+									USER_CSgitFtdcTradeField *trade_ASellTodayClose = new USER_CSgitFtdcTradeField();
 									(*stg_itor)->createFakeTradePositionDetail(trade_ASellTodayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdA(), '1', '0', '3',
 										(*stg_itor)->getStgPositionASellToday() - object["position_a_sell_today"].GetInt());
@@ -3815,13 +3832,13 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									//A今买
 									//Utils::printGreenColor("A今买");
 									// Order
-									USER_CThostFtdcOrderField *order_ABuyTodayClose = new USER_CThostFtdcOrderField();
+									USER_CSgitFtdcOrderField *order_ABuyTodayClose = new USER_CSgitFtdcOrderField();
 									(*stg_itor)->createFakeOrderPositionDetail(order_ABuyTodayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdA(), '1', '1', '3',
 										(*stg_itor)->getStgPositionABuyToday() - object["position_a_buy_today"].GetInt());
 
 									// Trade
-									USER_CThostFtdcTradeField *trade_ABuyTodayClose = new USER_CThostFtdcTradeField();
+									USER_CSgitFtdcTradeField *trade_ABuyTodayClose = new USER_CSgitFtdcTradeField();
 									(*stg_itor)->createFakeTradePositionDetail(trade_ABuyTodayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdA(), '1', '1', '3',
 										(*stg_itor)->getStgPositionABuyToday() - object["position_a_buy_today"].GetInt());
@@ -3832,13 +3849,13 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									//B今卖
 									//Utils::printGreenColor("B今卖");
 									// Order
-									USER_CThostFtdcOrderField *order_BSellTodayClose = new USER_CThostFtdcOrderField();
+									USER_CSgitFtdcOrderField *order_BSellTodayClose = new USER_CSgitFtdcOrderField();
 									(*stg_itor)->createFakeOrderPositionDetail(order_BSellTodayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '0', '3',
 										(*stg_itor)->getStgPositionBSellToday() - object["position_b_sell_today"].GetInt());
 
 									// Trade
-									USER_CThostFtdcTradeField *trade_BSellTodayClose = new USER_CThostFtdcTradeField();
+									USER_CSgitFtdcTradeField *trade_BSellTodayClose = new USER_CSgitFtdcTradeField();
 									(*stg_itor)->createFakeTradePositionDetail(trade_BSellTodayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '0', '3',
 										(*stg_itor)->getStgPositionBSellToday() - object["position_b_sell_today"].GetInt());
@@ -3849,13 +3866,13 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 									//B今买
 									//Utils::printGreenColor("B今买");
 									// Order
-									USER_CThostFtdcOrderField *order_BBuyTodayClose = new USER_CThostFtdcOrderField();
+									USER_CSgitFtdcOrderField *order_BBuyTodayClose = new USER_CSgitFtdcOrderField();
 									(*stg_itor)->createFakeOrderPositionDetail(order_BBuyTodayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '1', '3',
 										(*stg_itor)->getStgPositionBBuyToday() - object["position_b_buy_today"].GetInt());
 
 									// Trade
-									USER_CThostFtdcTradeField *trade_BBuyTodayClose = new USER_CThostFtdcTradeField();
+									USER_CSgitFtdcTradeField *trade_BBuyTodayClose = new USER_CSgitFtdcTradeField();
 									(*stg_itor)->createFakeTradePositionDetail(trade_BBuyTodayClose, ctp_m->getTradingDay(),
 										(*stg_itor)->getStgInstrumentIdB(), '1', '1', '3',
 										(*stg_itor)->getStgPositionBBuyToday() - object["position_b_buy_today"].GetInt());
@@ -4278,12 +4295,12 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
 				ctp_m->getXtsLogger()->info("\t收到期货账户ID = {}", s_UserID);
 
-				list<USER_CThostFtdcOrderField *> l_posd;
+				list<USER_CSgitFtdcOrderField *> l_posd;
 				ctp_m->getDBManager()->getAllPositionDetailYesterday(&l_posd, s_TraderID, s_UserID);
 
 				if (l_posd.size() > 0)
 				{
-					list<USER_CThostFtdcOrderField *>::iterator pod_itor;
+					list<USER_CSgitFtdcOrderField *>::iterator pod_itor;
 					for (pod_itor = l_posd.begin(); pod_itor != l_posd.end(); pod_itor++) {
 
 						rapidjson::Document doc;
@@ -4425,7 +4442,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 				/// 清空 new position detail
 				if (l_posd.size() > 0) {
-					list<USER_CThostFtdcOrderField *>::iterator itor;
+					list<USER_CSgitFtdcOrderField *>::iterator itor;
 					for (itor = l_posd.begin(); itor != l_posd.end();) {
 						delete (*itor);
 						itor = l_posd.erase(itor);
@@ -4524,13 +4541,13 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
 				ctp_m->getXtsLogger()->info("\t收到期货账户ID = {}", s_UserID);
 
-				list<USER_CThostFtdcTradeField *> l_posd;
+				list<USER_CSgitFtdcTradeField *> l_posd;
 				ctp_m->getDBManager()->getAllPositionDetailTradeYesterday(&l_posd, s_TraderID, s_UserID);
 
 
 				if (l_posd.size() > 0)
 				{
-					list<USER_CThostFtdcTradeField *>::iterator pod_itor;
+					list<USER_CSgitFtdcTradeField *>::iterator pod_itor;
 					for (pod_itor = l_posd.begin(); pod_itor != l_posd.end(); pod_itor++) {
 
 						rapidjson::Document doc;
@@ -4655,7 +4672,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 				/// 析构
 				if (l_posd.size() > 0) {
-					list<USER_CThostFtdcTradeField *>::iterator itor;
+					list<USER_CSgitFtdcTradeField *>::iterator itor;
 					for (itor = l_posd.begin(); itor != l_posd.end();) {
 						delete (*itor);
 						itor = l_posd.erase(itor);
@@ -4682,12 +4699,12 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
 				ctp_m->getXtsLogger()->info("\t收到期货账户ID = {}", s_UserID);
 
-				list<USER_CThostFtdcOrderField *> l_posd;
+				list<USER_CSgitFtdcOrderField *> l_posd;
 				ctp_m->getDBManager()->getAllPositionDetailChanged(&l_posd, s_TraderID, s_UserID);
 
 				if (l_posd.size() > 0)
 				{
-					list<USER_CThostFtdcOrderField *>::iterator pod_itor;
+					list<USER_CSgitFtdcOrderField *>::iterator pod_itor;
 					for (pod_itor = l_posd.begin(); pod_itor != l_posd.end(); pod_itor++) {
 
 						rapidjson::Document doc;
@@ -4827,7 +4844,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 				/// 析构
 				if (l_posd.size() > 0) {
-					list<USER_CThostFtdcOrderField *>::iterator itor;
+					list<USER_CSgitFtdcOrderField *>::iterator itor;
 					for (itor = l_posd.begin(); itor != l_posd.end();) {
 						delete (*itor);
 						itor = l_posd.erase(itor);
@@ -4854,12 +4871,12 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 				ctp_m->getXtsLogger()->info("\t收到交易员ID = {}", s_TraderID);
 				ctp_m->getXtsLogger()->info("\t收到期货账户ID = {}", s_UserID);
 
-				list<USER_CThostFtdcTradeField *> l_posd;
+				list<USER_CSgitFtdcTradeField *> l_posd;
 				ctp_m->getDBManager()->getAllPositionDetailTradeChanged(&l_posd, s_TraderID, s_UserID);
 
 				if (l_posd.size() > 0)
 				{
-					list<USER_CThostFtdcTradeField *>::iterator pod_itor;
+					list<USER_CSgitFtdcTradeField *>::iterator pod_itor;
 					for (pod_itor = l_posd.begin(); pod_itor != l_posd.end(); pod_itor++) {
 
 						rapidjson::Document doc;
@@ -4985,7 +5002,7 @@ void CTP_Manager::HandleMessage(int fd, char *msg_tmp, CTP_Manager *ctp_m) {
 
 				/// 析构
 				if (l_posd.size() > 0) {
-					list<USER_CThostFtdcTradeField *>::iterator itor;
+					list<USER_CSgitFtdcTradeField *>::iterator itor;
 					for (itor = l_posd.begin(); itor != l_posd.end();) {
 						delete (*itor);
 						itor = l_posd.erase(itor);
@@ -5407,8 +5424,8 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 
 	list<Strategy *>::iterator stg_itor;
 	list<Strategy *>::iterator stg_itor_yesterday;
-	list<USER_CThostFtdcOrderField *>::iterator position_itor;
-	list<USER_CThostFtdcTradeField *>::iterator position_trade_itor;
+	list<USER_CSgitFtdcOrderField *>::iterator position_itor;
+	list<USER_CSgitFtdcTradeField *>::iterator position_trade_itor;
 
 	this->getXtsLogger()->info("\tCTP_Manager 系统交易日 = {}", this->getTradingDay());
 	// 判断策略
@@ -5626,8 +5643,8 @@ bool CTP_Manager::initStrategyAndFutureAccount() {
 
 /// 统计本地order,trade持仓明细
 void CTP_Manager::initPositionDetailDataFromLocalOrderAndTrade() {
-	list<USER_CThostFtdcOrderField *>::iterator position_itor;
-	list<USER_CThostFtdcTradeField *>::iterator position_trade_itor;
+	list<USER_CSgitFtdcOrderField *>::iterator position_itor;
+	list<USER_CSgitFtdcTradeField *>::iterator position_trade_itor;
 	list<User *>::iterator user_itor;
 
 	/// 遍历User,绑定对应持仓明细(Order)
@@ -5953,7 +5970,7 @@ bool CTP_Manager::getIsMarketCloseDone() {
 //获取属于某交易员所属期货账户
 void CTP_Manager::getUserListByTraderID(string traderid, CTP_Manager *ctp_m, list<User *> *l_user_trader) {
 	list<User *>::iterator future_itor;
-	for (future_itor = ctp_m->getL_User()->begin(); future_itor != ctp_m->getL_User()->end(); future_itor++) {
+	for (future_itor = ctp_m->getL_User_Bee()->begin(); future_itor != ctp_m->getL_User_Bee()->end(); future_itor++) {
 		if ((*future_itor)->getTraderID() == traderid)
 		{
 			l_user_trader->push_back((*future_itor));
@@ -6066,7 +6083,7 @@ void CTP_Manager::addCommand(ApiCommand *command) {
 ///// 初始化昨仓明细
 //bool CTP_Manager::initYesterdayPositionDetail() {
 //	bool flag = false;
-//	list<USER_CThostFtdcOrderField *>::iterator posd_itor;
+//	list<USER_CSgitFtdcOrderField *>::iterator posd_itor;
 //	list<Strategy *>::iterator stg_itor;
 //	
 //	std::cout << "CTP_Manager::initYesterdayPositionDetail()" << std::endl;
@@ -6115,7 +6132,7 @@ void CTP_Manager::addCommand(ApiCommand *command) {
 ///// 初始化昨仓明细
 //bool CTP_Manager::initYesterdayPositionDetail() {
 //	bool flag = false;
-//	list<USER_CThostFtdcOrderField *>::iterator posd_itor;
+//	list<USER_CSgitFtdcOrderField *>::iterator posd_itor;
 //	list<Strategy *>::iterator stg_itor;
 //
 //	std::cout << "CTP_Manager::initYesterdayPositionDetail()" << std::endl;
@@ -6197,7 +6214,9 @@ bool CTP_Manager::init(bool is_online) {
 	this->getXtsLogger()->info("\t初始化交易员完成...");
 
 	/// 查询所有行情信息
-	this->dbm->getAllMarketConfig(this->l_marketconfig);
+	//this->dbm->getAllMarketConfig(this->l_marketconfig);
+	/// 给小蜜蜂发送标准CTP柜台信息
+	this->dbm->getAllMarketConfigBee(this->l_marketconfig);
 
 	if ((this->l_marketconfig->size() <= 0))
 	{
@@ -6216,13 +6235,29 @@ bool CTP_Manager::init(bool is_online) {
 		return init_flag;
 	}
 
+	/// 查询标准CTP行情(提供给小蜜蜂客户端)
+	mc_bee = this->dbm->getOneMarketConfigBee();
+	if (mc_bee == NULL)
+	{
+		Utils::printRedColor("\t查询标准CTP行情(提供给小蜜蜂客户端)配置为空,未能初始化!请检查数据库!");
+		init_flag = false;
+		return init_flag;
+	}
+
 	/// 查询所有的期货账户
 	this->dbm->getAllFutureAccount(this->l_user);
 
 	if ((this->l_user->size() <= 0) || (this->l_obj_trader->size() <= 0)) {
-		USER_PRINT("期货账户或者交易员账户为空,未能初始化!");
-		//std::cout << "\t期货账户或者交易员账户为空，未能初始化!请检查数据库!" << std::endl;
 		Utils::printRedColor("\t期货账户或者交易员账户为空,未能初始化!请检查数据库!");
+		init_flag = false;
+		return init_flag;
+	}
+
+	/// (发送给小蜜蜂)查询所有的期货账户
+	this->dbm->getAllFutureAccount(this->l_user_bee);
+
+	if ((this->l_user_bee->size() <= 0) || (this->l_obj_trader->size() <= 0)) {
+		Utils::printRedColor("\t小蜜蜂期货账户或者交易员账户为空,未能初始化!请检查数据库!");
 		init_flag = false;
 		return init_flag;
 	}
@@ -6510,7 +6545,7 @@ bool CTP_Manager::init(bool is_online) {
 	this->l_user->front()->getUserTradeSPI()->QryInstrument();
 	sleep(3);
 
-	list<CThostFtdcInstrumentField *> *l_instruments_info = this->l_user->front()->getUserTradeSPI()->getL_Instruments_Info();
+	list<CSgitFtdcInstrumentField *> *l_instruments_info = this->l_user->front()->getUserTradeSPI()->getL_Instruments_Info();
 
 	if (l_instruments_info != NULL) {
 		for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
@@ -6561,7 +6596,7 @@ bool CTP_Manager::init(bool is_online) {
 		USER_PRINT("初始化昨仓明细成功...");
 	}*/
 
-	list<CThostFtdcTradeField *> *l_query_trade;
+	list<CSgitFtdcTradeField *> *l_query_trade;
 	/// 初始化今仓(trade)
 	//for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
 	//	(*user_itor)->getUserTradeSPI()->QryTrade();
@@ -6578,8 +6613,8 @@ bool CTP_Manager::init(bool is_online) {
 	/************************************************************************/
 #if 0
 	USER_PRINT("初始化持仓明细");
-	list<CThostFtdcOrderField *> *l_query_order;
-	list<CThostFtdcOrderField *>::iterator order_itor;
+	list<CSgitFtdcOrderField *> *l_query_order;
+	list<CSgitFtdcOrderField *>::iterator order_itor;
 	/// 初始化今仓(order)
 	for (user_itor = this->l_user->begin(); user_itor != this->l_user->end(); user_itor++) { // 遍历User
 		(*user_itor)->getUserTradeSPI()->QryOrder();
@@ -6616,6 +6651,8 @@ bool CTP_Manager::init(bool is_online) {
 		this->SubmarketData(this->mdspi, this->l_instrument);
 		//std::cout << "\t行情订阅已初始化!" << std::endl;
 		this->getXtsLogger()->info("\t行情订阅已初始化!");
+		this->mdspi->Ready();
+		
 	}
 
 	/*std::cout << "\033[32m===========恭喜============\033[0m" << std::endl;

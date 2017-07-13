@@ -1,0 +1,6 @@
+飞鼠仿真环境fake date
+MdSpi.cpp OnRspUserLogin()
+	...
+	//this->ctp_m->setTradingDay(s_trading_day);
+	this->ctp_m->setTradingDay("20170711");
+	...

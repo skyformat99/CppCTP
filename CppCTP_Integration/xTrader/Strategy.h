@@ -30,9 +30,9 @@ public:
 
 	Strategy(bool fake = true, User *stg_user=NULL);
 
-	void OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData);
+	void OnRtnDepthMarketData(CSgitFtdcDepthMarketDataField *pDepthMarketData);
 
-	bool CompareTickData(CThostFtdcDepthMarketDataField *last_tick_data, CThostFtdcDepthMarketDataField *pDepthMarketData);
+	bool CompareTickData(CSgitFtdcDepthMarketDataField *last_tick_data, CSgitFtdcDepthMarketDataField *pDepthMarketData);
 
 	void setTrader(Trader *trader);
 	Trader *getTrader();
@@ -55,9 +55,9 @@ public:
 	void setUserID(string userid);
 	string getUserID();
 
-	CThostFtdcInputOrderField* getStgAOrderInsertArgs();
+	CSgitFtdcInputOrderField* getStgAOrderInsertArgs();
 	void setStgAOrderInsertArgs(
-		CThostFtdcInputOrderField* stgAOrderInsertArgs);
+		CSgitFtdcInputOrderField* stgAOrderInsertArgs);
 
 	double getStgAPriceTick();
 	void setStgAPriceTick(double stgAPriceTick);
@@ -65,9 +65,9 @@ public:
 	double getStgAWaitPriceTick();
 	void setStgAWaitPriceTick(double stgAWaitPriceTick);
 
-	CThostFtdcInputOrderField* getStgBOrderInsertArgs();
+	CSgitFtdcInputOrderField* getStgBOrderInsertArgs();
 	void setStgBOrderInsertArgs(
-		CThostFtdcInputOrderField* stgBOrderInsertArgs);
+		CSgitFtdcInputOrderField* stgBOrderInsertArgs);
 
 	double getStgBPriceTick();
 	void setStgBPriceTick(double stgBPriceTick);
@@ -84,21 +84,21 @@ public:
 	DBManager* getStgDbm();
 	void setStgDbm(DBManager* stgDbm);
 
-	CThostFtdcDepthMarketDataField* getStgInstrumentATick();
+	CSgitFtdcDepthMarketDataField* getStgInstrumentATick();
 	void setStgInstrumentATick(
-		CThostFtdcDepthMarketDataField* stgInstrumentATick);
+		CSgitFtdcDepthMarketDataField* stgInstrumentATick);
 
-	CThostFtdcDepthMarketDataField* getStgInstrumentBTick();
+	CSgitFtdcDepthMarketDataField* getStgInstrumentBTick();
 	void setStgInstrumentBTick(
-		CThostFtdcDepthMarketDataField* stgInstrumentBTick);
+		CSgitFtdcDepthMarketDataField* stgInstrumentBTick);
 
-	CThostFtdcDepthMarketDataField* getStgInstrumentATickLast();
+	CSgitFtdcDepthMarketDataField* getStgInstrumentATickLast();
 	void setStgInstrumentATickLast(
-		CThostFtdcDepthMarketDataField* stgInstrumentATick);
+		CSgitFtdcDepthMarketDataField* stgInstrumentATick);
 
-	CThostFtdcDepthMarketDataField* getStgInstrumentBTickLast();
+	CSgitFtdcDepthMarketDataField* getStgInstrumentBTickLast();
 	void setStgInstrumentBTickLast(
-		CThostFtdcDepthMarketDataField* stgInstrumentBTick);
+		CSgitFtdcDepthMarketDataField* stgInstrumentBTick);
 
 	string getStgInstrumentIdA();
 	void setStgInstrumentIdA(string stgInstrumentIdA);
@@ -109,8 +109,8 @@ public:
 	bool isStgIsActive();
 	void setStgIsActive(bool stgIsActive);
 
-	list<CThostFtdcOrderField *> *getStgListOrderPending();
-	void setStgListOrderPending(list<CThostFtdcOrderField *> *stgListOrderPending);
+	list<CSgitFtdcOrderField *> *getStgListOrderPending();
+	void setStgListOrderPending(list<CSgitFtdcOrderField *> *stgListOrderPending);
 
 	int getStgLots();
 	void setStgLots(int stgLots);
@@ -258,25 +258,25 @@ public:
 	void OrderInsert(User *user, char *InstrumentID, char CombOffsetFlag, char Direction, int Volume, double Price, string OrderRef);
 
 	//下单响应
-	void OnRtnOrder(CThostFtdcOrderField *pOrder);
+	void OnRtnOrder(CSgitFtdcOrderField *pOrder);
 
 	//成交通知
-	void OnRtnTrade(CThostFtdcTradeField *pTrade);
+	void OnRtnTrade(CSgitFtdcTradeField *pTrade);
 
 	//下单错误响应
-	void OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder);
+	void OnErrRtnOrderInsert(CSgitFtdcInputOrderField *pInputOrder);
 
 	///报单录入请求响应
-	void OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder);
+	void OnRspOrderInsert(CSgitFtdcInputOrderField *pInputOrder);
 
 	//撤单
 	void OrderAction(string ExchangeID, string OrderRef, string OrderSysID);
 
 	//撤单错误响应
-	void OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction);
+	void OnRspOrderAction(CSgitFtdcInputOrderActionField *pInputOrderAction);
 
 	//撤单错误
-	void OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction);
+	void OnErrRtnOrderAction(CSgitFtdcOrderActionField *pOrderAction);
 
 	//选择下单算法
 	void Select_Order_Algorithm(string stg_order_algorithm);
@@ -290,63 +290,72 @@ public:
 	void Order_Algorithm_Three();
 
 	/// 生成报单引用
-	void Generate_Order_Ref(CThostFtdcInputOrderField *insert_order);
+	void Generate_Order_Ref(CSgitFtdcInputOrderField *insert_order);
 
 	/// 执行任务函数
-	void Exec_OrderCloseConvert(CThostFtdcInputOrderField *insert_order);   // 报单平仓自动调整
-	void Exec_OrderInsert(CThostFtdcInputOrderField *insert_order);			// 报单
-	void Exec_OrderAction(CThostFtdcOrderField *action_order);				// 撤单
+	void Exec_OrderCloseConvert(CSgitFtdcInputOrderField *insert_order);   // 报单平仓自动调整
+	void Exec_OrderInsert(CSgitFtdcInputOrderField *insert_order);			// 报单
+	void Exec_OrderAction(CSgitFtdcOrderField *action_order);				// 撤单
 	void Exec_OnRspOrderInsert();											// 报单录入请求
-	void Exec_OnRspOrderAction();											// 报单操作请求响应
-	void Exec_OnRtnOrder(CThostFtdcOrderField *pOrder);						// 报单回报
-	void ExEc_OnRtnTrade(CThostFtdcTradeField *pTrade);						// 成交回报
+	void Exec_OnRspOrderAction(CSgitFtdcInputOrderActionField *pInputOrderAction);											// 报单操作请求响应
+	void Exec_OnRtnOrder(CSgitFtdcOrderField *pOrder);						// 报单回报
+	void ExEc_OnRtnTrade(CSgitFtdcTradeField *pTrade);						// 成交回报
 	void Exec_OnErrRtnOrderInsert();										// 报单录入错误回报
 	void Exec_OnErrRtnOrderAction();										// 报单操作错误回报
-	void Exec_OnTickComing(THREAD_CThostFtdcDepthMarketDataField *pDepthMarketData);			// 行情回调,执行交易任务
+	void Exec_OnTickComing(THREAD_CSgitFtdcDepthMarketDataField *pDepthMarketData);			// 行情回调,执行交易任务
 
-	/// 更新挂单list
-	void update_pending_order_list(CThostFtdcOrderField *pOrder);
+	/// 更新挂单list(Order)
+	void update_pending_order_list(CSgitFtdcOrderField *pOrder);
+
+	/// 更新挂单list(Trade)
+	void update_pending_order_list(USER_CSgitFtdcTradeField *pTrade);
+
+	/// 更新挂单列表list(Action)
+	void update_pending_order_list(CSgitFtdcInputOrderActionField *pInputOrderAction);
 
 	/// 向pending_order_list中增加元素
-	void add_update_pending_order_list(CThostFtdcOrderField *pOrder);
+	void add_update_pending_order_list(CSgitFtdcOrderField *pOrder);
 
 	/// 报单错误回报删除pending_order_list中的元素
-	void remove_pending_order_list(CThostFtdcOrderField *pOrder); 
+	void remove_pending_order_list(CSgitFtdcOrderField *pOrder); 
 	
 	/// 撤单错误回报删除pending_order_list中的元素
-	void remove_pending_order_list(CThostFtdcOrderActionField *pOrderAction);
+	void remove_pending_order_list(CSgitFtdcOrderActionField *pOrderAction);
 
-	void remove_pending_order_list(CThostFtdcInputOrderActionField *pOrderAction);
+	void remove_pending_order_list(CSgitFtdcInputOrderActionField *pOrderAction);
 	
 	/// 错误回报返回的元素要从挂单列表里移除
-	void remove_pending_order_list(CThostFtdcInputOrderField *pOrder);
+	void remove_pending_order_list(CSgitFtdcInputOrderField *pOrder);
 
 	/// 更新持仓量(Order)
-	//void update_position(CThostFtdcOrderField *pOrder);
+	//void update_position(CSgitFtdcOrderField *pOrder);
 
 	/// 更新持仓量(UserOrder)
-	void update_position(USER_CThostFtdcOrderField *pOrder);
+	void update_position(USER_CSgitFtdcOrderField *pOrder);
 	
 	/// 更新持仓量(Trade)
-	//void update_position(CThostFtdcTradeField *pTrade);
+	void update_position(USER_CSgitFtdcTradeField *pTrade);
 
 	/// 更新持仓明细(Trade)
-	//void update_position_detail(CThostFtdcTradeField *pTrade);
+	//void update_position_detail(CSgitFtdcTradeField *pTrade);
 
 	/// 更新自定义持仓明细结构(Order)
-	void update_position_detail(USER_CThostFtdcOrderField *pOrder);
+	void update_position_detail(USER_CSgitFtdcOrderField *pOrder);
 
 	/// 更新自定义持仓明细结构(Trade)
-	void update_position_detail(USER_CThostFtdcTradeField *pTrade);
+	void update_position_detail(USER_CSgitFtdcTradeField *pTrade);
+
+	/// 更新自定义持仓明细结构(Action)
+	void update_position_detail(CSgitFtdcInputOrderActionField *pInputOrderAction);
 
 	/// 更新交易状态
 	void update_task_status();
 
 	/// 更新tick锁
-	void update_tick_lock_status(USER_CThostFtdcOrderField *order);
+	void update_tick_lock_status(USER_CSgitFtdcOrderField *order);
 
 	/// 添加字段本次成交量至order构体中
-	void add_VolumeTradedBatch(THREAD_CThostFtdcOrderField *pOrder, USER_CThostFtdcOrderField *new_Order);
+	void add_VolumeTradedBatch(THREAD_CSgitFtdcOrderField *pOrder, USER_CSgitFtdcOrderField *new_Order);
 
 	/// 得到三个数最小值
 	int getMinNum(int num1, int num2, int num3);
@@ -354,46 +363,46 @@ public:
 	/// 初始化
 	void InitStrategy();
 
-	/// 拷贝结构体CThostFtdcDepthMarketDataField
-	void CopyTickData(CThostFtdcDepthMarketDataField *dst, CThostFtdcDepthMarketDataField *src);
+	/// 拷贝结构体CSgitFtdcDepthMarketDataField
+	void CopyTickData(CSgitFtdcDepthMarketDataField *dst, CSgitFtdcDepthMarketDataField *src);
 
 	
 
-	/// 拷贝结构体THREAD_CThostFtdcDepthMarketDataField
-	void CopyThreadTickData(THREAD_CThostFtdcDepthMarketDataField *dst, CThostFtdcDepthMarketDataField *src, bool isLastElement = false);
+	/// 拷贝结构体THREAD_CSgitFtdcDepthMarketDataField
+	void CopyThreadTickData(THREAD_CSgitFtdcDepthMarketDataField *dst, CSgitFtdcDepthMarketDataField *src, bool isLastElement = false);
 
 
-	/// 拷贝结构体CThostFtdcDepthMarketDataField
-	void CopyTickData(CThostFtdcDepthMarketDataField *dst, THREAD_CThostFtdcDepthMarketDataField *src);
+	/// 拷贝结构体CSgitFtdcDepthMarketDataField
+	void CopyTickData(CSgitFtdcDepthMarketDataField *dst, THREAD_CSgitFtdcDepthMarketDataField *src);
 
-	/// 拷贝结构体CThostFtdcOrderField
-	void CopyOrderData(CThostFtdcOrderField *dst, CThostFtdcOrderField *src);
+	/// 拷贝结构体CSgitFtdcOrderField
+	void CopyOrderData(CSgitFtdcOrderField *dst, CSgitFtdcOrderField *src);
 
-	void CopyThreadOrderData(THREAD_CThostFtdcOrderField *dst, CThostFtdcOrderField *src, bool isLastElement = false);
+	void CopyThreadOrderData(THREAD_CSgitFtdcOrderField *dst, CSgitFtdcOrderField *src, bool isLastElement = false);
 
-	void CopyOrderData(CThostFtdcOrderField *dst, THREAD_CThostFtdcOrderField *src);
+	void CopyOrderData(CSgitFtdcOrderField *dst, THREAD_CSgitFtdcOrderField *src);
 
-	void CopyOrderDataToNew(USER_CThostFtdcOrderField *dst, CThostFtdcOrderField *src);
+	void CopyOrderDataToNew(USER_CSgitFtdcOrderField *dst, CSgitFtdcOrderField *src);
 
-	void CopyThreadOrderDataToNew(USER_CThostFtdcOrderField *dst, THREAD_CThostFtdcOrderField *src);
+	void CopyThreadOrderDataToNew(USER_CSgitFtdcOrderField *dst, THREAD_CSgitFtdcOrderField *src);
 
-	/// 拷贝结构体USER_CThostFtdcOrderField
-	void CopyNewOrderData(USER_CThostFtdcOrderField *dst, USER_CThostFtdcOrderField *src);
+	/// 拷贝结构体USER_CSgitFtdcOrderField
+	void CopyNewOrderData(USER_CSgitFtdcOrderField *dst, USER_CSgitFtdcOrderField *src);
 
 
-	/// 拷贝结构体CThostFtdcTradeField
-	void CopyTradeData(CThostFtdcTradeField *dst, CThostFtdcTradeField *src);
+	/// 拷贝结构体CSgitFtdcTradeField
+	void CopyTradeData(CSgitFtdcTradeField *dst, CSgitFtdcTradeField *src);
 
-	void CopyThreadTradeData(THREAD_CThostFtdcTradeField *dst, CThostFtdcTradeField *src, bool isLastElement = false);
+	void CopyThreadTradeData(THREAD_CSgitFtdcTradeField *dst, CSgitFtdcTradeField *src, bool isLastElement = false);
 
-	void CopyTradeData(CThostFtdcTradeField *dst, THREAD_CThostFtdcTradeField *src);
+	void CopyTradeData(CSgitFtdcTradeField *dst, THREAD_CSgitFtdcTradeField *src);
 
-	/// 拷贝结构体CThostFtdcTradeField
-	void CopyTradeDataToNew(USER_CThostFtdcTradeField *dst, CThostFtdcTradeField *src);
+	/// 拷贝结构体CSgitFtdcTradeField
+	void CopyTradeDataToNew(USER_CSgitFtdcTradeField *dst, CSgitFtdcTradeField *src);
 
-	void CopyThreadTradeDataToNew(USER_CThostFtdcTradeField *dst, THREAD_CThostFtdcTradeField *src);
+	void CopyThreadTradeDataToNew(USER_CSgitFtdcTradeField *dst, THREAD_CSgitFtdcTradeField *src);
 
-	void CopyNewTradeData(USER_CThostFtdcTradeField *dst, USER_CThostFtdcTradeField *src);
+	void CopyNewTradeData(USER_CSgitFtdcTradeField *dst, USER_CSgitFtdcTradeField *src);
 
 	/// 收盘保存数据
 	void DropPositionDetail();
@@ -405,22 +414,22 @@ public:
 	void UpdateStrategy(Strategy *stg);
 
 	/// 创建持仓明细
-	void CreatePositionDetail(USER_CThostFtdcOrderField *posd);
+	void CreatePositionDetail(USER_CSgitFtdcOrderField *posd);
 	
 	/// 数据库更新策略持仓明细
-	void Update_Position_Detail_To_DB(USER_CThostFtdcOrderField *posd);
+	void Update_Position_Detail_To_DB(USER_CSgitFtdcOrderField *posd);
 
 	/// 数据库更新策略持仓明细(order changed)
-	void Update_Position_Changed_Detail_To_DB(USER_CThostFtdcOrderField *posd);
+	void Update_Position_Changed_Detail_To_DB(USER_CSgitFtdcOrderField *posd);
 
 	/// 创建持仓明细
-	void CreatePositionTradeDetail(USER_CThostFtdcTradeField *posd);
+	void CreatePositionTradeDetail(USER_CSgitFtdcTradeField *posd);
 
 	/// 数据库更新策略持仓明细
-	void Update_Position_Trade_Detail_To_DB(USER_CThostFtdcTradeField *posd);
+	void Update_Position_Trade_Detail_To_DB(USER_CSgitFtdcTradeField *posd);
 
 	/// 数据库更新策略持仓明细(trade changed)
-	void Update_Position_Trade_Changed_Detail_To_DB(USER_CThostFtdcTradeField *posd);
+	void Update_Position_Trade_Changed_Detail_To_DB(USER_CSgitFtdcTradeField *posd);
 
 	/// 设置开关
 	int getOn_Off();
@@ -489,16 +498,16 @@ public:
 
 	void init_today_position();
 
-	void setL_query_trade(list<CThostFtdcTradeField *> *l_query_trade);
-	void addOrderToListQueryOrder(CThostFtdcOrderField *order);
-	void setL_query_order(list<CThostFtdcOrderField *> *l_query_order);
-	void add_position_detail(USER_CThostFtdcOrderField *posd);
+	void setL_query_trade(list<CSgitFtdcTradeField *> *l_query_trade);
+	void addOrderToListQueryOrder(CSgitFtdcOrderField *order);
+	void setL_query_order(list<CSgitFtdcOrderField *> *l_query_order);
+	void add_position_detail(USER_CSgitFtdcOrderField *posd);
 
 
-	//void CopyPositionData(PositionDetail *posd, USER_CThostFtdcOrderField *order);
+	//void CopyPositionData(PositionDetail *posd, USER_CSgitFtdcOrderField *order);
 
-	list<USER_CThostFtdcOrderField *> * getStg_List_Position_Detail_From_Order(); // 持仓明细(order)
-	list<USER_CThostFtdcTradeField *> * getStg_List_Position_Detail_From_Trade(); // 持仓明细(trade)
+	list<USER_CSgitFtdcOrderField *> * getStg_List_Position_Detail_From_Order(); // 持仓明细(order)
+	list<USER_CSgitFtdcTradeField *> * getStg_List_Position_Detail_From_Trade(); // 持仓明细(trade)
 
 	void printStrategyInfo(string message); //调试输出
 	void printStrategyInfoPosition(); //输出当前持仓明细
@@ -514,10 +523,10 @@ public:
 	void clearStgPositionDetail();
 
 	//构造模拟平仓order
-	void createFakeOrderPositionDetail(USER_CThostFtdcOrderField *order, string date, string instrumentID, char CombHedgeFlag, char Direction, char CombOffsetFlag, int VolumeTradedBatch);
+	void createFakeOrderPositionDetail(USER_CSgitFtdcOrderField *order, string date, string instrumentID, char CombHedgeFlag, char Direction, char CombOffsetFlag, int VolumeTradedBatch);
 
 	//构造模拟平仓trade
-	void createFakeTradePositionDetail(USER_CThostFtdcTradeField *trade, string date, string instrumentID, char HedgeFlag, char Direction, char OffsetFlag, int Volume);
+	void createFakeTradePositionDetail(USER_CSgitFtdcTradeField *trade, string date, string instrumentID, char HedgeFlag, char Direction, char OffsetFlag, int Volume);
 
 	//收盘前5秒处理挂单列表
 	void finish_pending_order_list();
@@ -837,11 +846,11 @@ private:
 	//string stg_lock_order_ref;			// 选择下单算法过程中产生的order_ref
 	string stg_tick_systime_record;		// 收到tick的系统时间
 
-	CThostFtdcDepthMarketDataField *stg_instrument_Last_tick;	// A合约tick（第一腿）
-	CThostFtdcDepthMarketDataField *stg_instrument_A_tick;	// A合约tick（第一腿）
-	CThostFtdcDepthMarketDataField *stg_instrument_B_tick;	// B合约tick（第二腿）
-	CThostFtdcDepthMarketDataField *stg_instrument_A_tick_last;	// A合约tick（第一腿）交易前最后一次
-	CThostFtdcDepthMarketDataField *stg_instrument_B_tick_last;	// B合约tick（第二腿）交易前最后一次
+	CSgitFtdcDepthMarketDataField *stg_instrument_Last_tick;	// A合约tick（第一腿）
+	CSgitFtdcDepthMarketDataField *stg_instrument_A_tick;	// A合约tick（第一腿）
+	CSgitFtdcDepthMarketDataField *stg_instrument_B_tick;	// B合约tick（第二腿）
+	CSgitFtdcDepthMarketDataField *stg_instrument_A_tick_last;	// A合约tick（第一腿）交易前最后一次
+	CSgitFtdcDepthMarketDataField *stg_instrument_B_tick_last;	// B合约tick（第二腿）交易前最后一次
 	double stg_spread_long;									// 市场多头价差：A合约买一价 - B合约买一价
 	int stg_spread_long_volume;								// 市场多头价差盘口挂单量min(A合约买一量 - B合约买一量)
 	double stg_spread_short;								// 市场空头价差：A合约卖一价 - B合约卖一价
@@ -919,15 +928,15 @@ private:
 	bool has_morning_break_time;	// 是否有10:15分休息时间
 	bool has_midnight_market;		// 是否有过00:00:00的交易
 
-	CThostFtdcInputOrderField *stg_a_order_insert_args;		// a合约报单参数
-	CThostFtdcInputOrderField *stg_b_order_insert_args;		// b合约报单参数
-	list<CThostFtdcOrderField *> *stg_list_order_pending;	// 挂单列表，报单、成交、撤单回报
-	list<CThostFtdcTradeField *> *stg_list_position_detail; // 持仓明细
-	list<USER_CThostFtdcOrderField *> *stg_list_position_detail_from_order; // 持仓明细
-	list<USER_CThostFtdcTradeField *> *stg_list_position_detail_from_trade; // 持仓明细
-	list<CThostFtdcTradeField *> *l_query_trade;
-	list<USER_CThostFtdcOrderField *> *l_query_order;
-	list<CThostFtdcInvestorPositionDetailField *> *l_position_detail_from_ctp;
+	CSgitFtdcInputOrderField *stg_a_order_insert_args;		// a合约报单参数
+	CSgitFtdcInputOrderField *stg_b_order_insert_args;		// b合约报单参数
+	list<CSgitFtdcOrderField *> *stg_list_order_pending;	// 挂单列表，报单、成交、撤单回报
+	list<CSgitFtdcTradeField *> *stg_list_position_detail; // 持仓明细
+	list<USER_CSgitFtdcOrderField *> *stg_list_position_detail_from_order; // 持仓明细
+	list<USER_CSgitFtdcTradeField *> *stg_list_position_detail_from_trade; // 持仓明细
+	list<CSgitFtdcTradeField *> *l_query_trade;
+	list<USER_CSgitFtdcOrderField *> *l_query_order;
+	list<CSgitFtdcInvestorPositionDetailField *> *l_position_detail_from_ctp;
 
 	long long stg_order_ref_base; // 报单引用计数
 
@@ -943,9 +952,9 @@ private:
 	std::shared_ptr<spdlog::logger> xts_logger;
 
 	// 阻塞队列
-	SafeQueue<THREAD_CThostFtdcDepthMarketDataField *> queue_OnRtnDepthMarketData;	// 行情队列
-	SafeQueue<THREAD_CThostFtdcOrderField *> queue_OnRtnOrder;						// order回调队列
-	SafeQueue<THREAD_CThostFtdcTradeField *> queue_OnRtnTrade;						// trade回调队列
+	SafeQueue<THREAD_CSgitFtdcDepthMarketDataField *> queue_OnRtnDepthMarketData;	// 行情队列
+	SafeQueue<THREAD_CSgitFtdcOrderField *> queue_OnRtnOrder;						// order回调队列
+	SafeQueue<THREAD_CSgitFtdcTradeField *> queue_OnRtnTrade;						// trade回调队列
 
 	bool queue_OnRtnDepthMarketData_on_off; // 行情队列开关
 	bool queue_OnRtnOrder_on_off;			// order回调队列开关
