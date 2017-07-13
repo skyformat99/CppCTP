@@ -5294,8 +5294,6 @@ void Strategy::thread_queue_OnRtnOrder() {
 			pOrder = NULL;
 			sem_post(&(this->sem_thread_queue_OnRtnOrder));
 		}
-
-		
 	}
 	this->queue_OnRtnOrder_on_off = false;
 }
