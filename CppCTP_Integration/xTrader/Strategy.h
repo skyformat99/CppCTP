@@ -311,7 +311,7 @@ public:
 	void update_pending_order_list(USER_CSgitFtdcTradeField *pTrade);
 
 	/// 更新挂单列表list(Action)
-	void update_pending_order_list(CSgitFtdcInputOrderActionField *pInputOrderAction);
+	void update_pending_order_list(THREAD_CSgitFtdcInputOrderActionField *pInputOrderAction);
 
 	/// 向pending_order_list中增加元素
 	void add_update_pending_order_list(CSgitFtdcOrderField *pOrder);
@@ -403,6 +403,9 @@ public:
 	void CopyThreadTradeDataToNew(USER_CSgitFtdcTradeField *dst, THREAD_CSgitFtdcTradeField *src);
 
 	void CopyNewTradeData(USER_CSgitFtdcTradeField *dst, USER_CSgitFtdcTradeField *src);
+
+	/// 拷贝action结构体
+	void CopyThreadOrderActionData(THREAD_CSgitFtdcInputOrderActionField *dst, CSgitFtdcInputOrderActionField *src, bool isLastElement = false);
 
 	/// 收盘保存数据
 	void DropPositionDetail();
@@ -549,6 +552,8 @@ public:
 	void thread_queue_OnRtnOrder();
 	// trade回调队列
 	void thread_queue_OnRtnTrade();
+	// action回调队列
+	void thread_queue_OnRspOrderAction();
 	// 停止线程
 	void end_thread();
 	// 获取停止线程状态
@@ -563,6 +568,11 @@ public:
 	// trade回调队列开关
 	void setQueue_OnRtnTrade_on_off(bool queue_OnRtnTrade_on_off);
 	bool getQueue_OnRtnTrade_on_off();
+
+	// action回调队列开关
+	void setQueue_OnRspOrderAction_on_off(bool queue_OnRspOrderAction_on_off);
+	bool getQueue_OnRspOrderAction_on_off();
+	
 
 	string getMorning_opentime();
 
@@ -955,10 +965,12 @@ private:
 	SafeQueue<THREAD_CSgitFtdcDepthMarketDataField *> queue_OnRtnDepthMarketData;	// 行情队列
 	SafeQueue<THREAD_CSgitFtdcOrderField *> queue_OnRtnOrder;						// order回调队列
 	SafeQueue<THREAD_CSgitFtdcTradeField *> queue_OnRtnTrade;						// trade回调队列
+	SafeQueue<THREAD_CSgitFtdcInputOrderActionField *> queue_OnRspOrderAction;				// action回调队列
 
 	bool queue_OnRtnDepthMarketData_on_off; // 行情队列开关
 	bool queue_OnRtnOrder_on_off;			// order回调队列开关
 	bool queue_OnRtnTrade_on_off;			// trade回调队列开关
+	bool queue_OnRspOrderAction_on_off;		// action回调开关
 
 	sem_t sem_list_order_pending;			// 信号量,用来保证同一时间只能一处地方调用挂单列表
 	sem_t sem_generate_order_ref;			// 信号量,用来保证同一时间只能一处地方调用生成报单引用
@@ -969,6 +981,7 @@ private:
 	sem_t sem_thread_queue_OnRtnDepthMarketData;
 	sem_t sem_thread_queue_OnRtnOrder;	
 	sem_t sem_thread_queue_OnRtnTrade;
+	sem_t sem_thread_queue_OnRspOrderAction;
 	
 };
 

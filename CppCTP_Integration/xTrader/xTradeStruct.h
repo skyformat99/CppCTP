@@ -453,6 +453,41 @@ struct THREAD_CSgitFtdcTradeField
 	int IsLastElement;
 };
 
+///输入报单操作
+struct THREAD_CSgitFtdcInputOrderActionField
+{
+	///经纪公司代码
+	TSgitFtdcBrokerIDType	BrokerID;
+	///投资者代码
+	TSgitFtdcInvestorIDType	InvestorID;
+	///报单操作引用
+	TSgitFtdcOrderActionRefType	OrderActionRef;
+	///报单引用
+	TSgitFtdcOrderRefType	OrderRef;
+	///请求编号
+	TSgitFtdcRequestIDType	RequestID;
+	///前置编号
+	TSgitFtdcFrontIDType	FrontID;
+	///会话编号
+	TSgitFtdcSessionIDType	SessionID;
+	///交易所代码
+	TSgitFtdcExchangeIDType	ExchangeID;
+	///报单编号
+	TSgitFtdcOrderSysIDType	OrderSysID;
+	///操作标志
+	TSgitFtdcActionFlagType	ActionFlag;
+	///价格
+	TSgitFtdcPriceType	LimitPrice;
+	///数量变化
+	TSgitFtdcVolumeType	VolumeChange;
+	///用户代码
+	TSgitFtdcUserIDType	UserID;
+	///合约代码
+	TSgitFtdcInstrumentIDType	InstrumentID;
+	///是否是最后一个元素
+	int IsLastElement;
+};
+
 ///成交
 struct USER_CSgitFtdcTradeField
 {
